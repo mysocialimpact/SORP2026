@@ -1,0 +1,49 @@
+.sorp-meetings{--meeting-green:#28633f;min-width:0}
+.sorp-meetings .sorp-meetings-limited{margin:30px 0 14px;color:var(--meeting-green);font-size:11px;font-weight:750;letter-spacing:.08em}
+.sorp-meetings-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.sorp-meeting-option{min-width:0;padding:20px 16px;border:1px solid var(--line,#d8d5cd);background:#fff}
+.sorp-meeting-option.is-preferred{border-color:var(--orange,#fb3d0b);border-top-width:3px;background:#fff8f3}
+.sorp-meeting-badge{min-height:15px;margin-bottom:16px;font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--orange,#fb3d0b)}
+.sorp-meetings .sorp-meeting-price{font-size:13px;font-weight:800;line-height:1.4;color:var(--meeting-green)}
+.sorp-meetings .sorp-meeting-option h2{margin:16px 0;font-size:clamp(22px,2vw,29px);line-height:1.12;letter-spacing:-.025em}
+.sorp-meetings .sorp-meeting-option p,.sorp-meetings .sorp-meeting-option li{font-size:14px;line-height:1.55}
+.sorp-meeting-option details{margin:22px 0;border-block:1px solid var(--line,#d8d5cd)}
+.sorp-meeting-option summary{display:flex;justify-content:space-between;gap:8px;padding:14px 0;cursor:pointer;font-size:11px;font-weight:750;list-style:none}
+.sorp-meeting-option summary::-webkit-details-marker{display:none}
+.sorp-meeting-option details[open] summary span{transform:rotate(45deg)}
+.sorp-meeting-option ul{padding-left:18px;margin:0 0 16px}.sorp-meeting-option li+li{margin-top:8px}
+.sorp-meetings .sorp-meeting-fee{font-size:12px;color:var(--muted,#6c6964);margin:22px 0}
+.sorp-meetings button{cursor:pointer;font-family:inherit}
+.sorp-meetings .sorp-meeting-book{width:100%;padding:15px 10px;border:1px solid var(--ink,#111);background:transparent;color:var(--ink,#111);font-size:11px;font-weight:750;line-height:1.4;text-align:left}
+.sorp-meetings .is-preferred .sorp-meeting-book{background:var(--ink,#111);color:white}
+.sorp-meetings button:focus-visible,.sorp-meetings summary:focus-visible{outline:2px solid var(--orange,#fb3d0b);outline-offset:4px}
+.sorp-meetings .sorp-meeting-credit{font-size:12px;color:var(--muted,#6c6964);margin:18px 0 34px}
+.sorp-meeting-calendar{scroll-margin-top:150px;margin:36px 0;padding:24px 0;border-block:1px solid var(--ink,#111)}
+.sorp-meeting-calendar-heading{display:flex;justify-content:space-between;gap:20px;align-items:start}
+.sorp-meetings .sorp-meeting-calendar-heading h2{font-size:30px;margin:10px 0}
+.sorp-meetings .sorp-meeting-close{border:0;background:transparent;color:var(--muted,#6c6964);padding:10px 0;font-size:11px;font-weight:700}
+.sorp-slot-days{display:grid;gap:12px;margin:24px 0}.sorp-slot-day{display:grid;grid-template-columns:minmax(190px,.8fr) 2fr;gap:20px;align-items:center;padding:15px 0;border-top:1px solid var(--line,#d8d5cd)}
+.sorp-slot-day h3{margin:0;font:700 12px/1.4 var(--font-sans,Arial,sans-serif);letter-spacing:.04em}.sorp-slot-day>div{display:flex;flex-wrap:wrap;gap:9px}.sorp-slot-day button{min-width:82px;padding:11px 14px;border:1px solid var(--ink,#111);background:#fff;font-weight:700}.sorp-slot-day button[aria-pressed=true]{background:var(--ink,#111);color:#fff}
+.sorp-booking-details{margin-top:28px;padding:26px;border:1px solid var(--ink,#111);background:#fff}.sorp-booking-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}.sorp-booking-fields label,.sorp-meeting-evidence label{display:grid;gap:7px;font-size:10px;font-weight:750;letter-spacing:.04em}.sorp-booking-fields input,.sorp-meeting-evidence input{min-width:0;padding:12px;border:1px solid var(--line,#d8d5cd);font:inherit}.sorp-meeting-confirm{width:100%;margin-top:18px;padding:16px;border:1px solid var(--ink,#111);background:var(--ink,#111);color:#fff;font-size:11px;font-weight:800;text-align:left}.sorp-meeting-confirm:disabled{opacity:.45;cursor:not-allowed}
+.sorp-booking-details{scroll-margin-top:52px;outline:none}
+.sorp-booking-selection{display:grid;gap:4px;margin-top:12px}
+.sorp-booking-selection strong{font-size:17px;line-height:1.35}
+.sorp-booking-selection span{font-size:13px;font-weight:750}
+.sorp-booking-selection small{color:var(--muted,#6c6964);font-size:10px;font-weight:750;letter-spacing:.06em}
+.sorp-meeting-evidence{border-left:2px solid var(--meeting-green);background:#f0f5ec;padding:16px 20px;margin:20px 0}
+.sorp-meeting-evidence h3{font-size:12px;margin:0}.sorp-meetings .sorp-meeting-evidence p{font-size:14px;margin:9px 0}.sorp-meeting-evidence>span{display:block;margin:12px 0;font-size:10px;font-weight:800}.sorp-evidence-upload input{padding:10px;background:white}
+.sorp-meeting-evidence small,.sorp-meeting-share small{display:block;font-size:12px;line-height:1.5;color:var(--muted,#6c6964)}
+.sorp-meetings .sorp-meeting-calendar-note p,.sorp-meetings .sorp-meeting-loading,.sorp-meetings .sorp-meeting-handoff{font-size:13px;color:var(--muted,#6c6964)}
+.sorp-booking-payment{margin-top:22px;padding-top:20px;border-top:1px solid var(--line,#d8d5cd)}.sorp-booking-payment>h3{font:800 12px/1.4 var(--font-sans,Arial,sans-serif);letter-spacing:.05em}.sorp-booking-confirmed{margin:26px 0;padding:28px;border-left:3px solid var(--meeting-green);background:#f0f5ec}.sorp-booking-confirmed dl{display:grid;grid-template-columns:repeat(3,1fr);margin:22px 0;border-block:1px solid #bbcbbb}.sorp-booking-confirmed dl>div{padding:14px}.sorp-booking-confirmed dl>div+div{border-left:1px solid #bbcbbb}.sorp-booking-confirmed dt{font-size:10px;font-weight:800}.sorp-booking-confirmed dd{margin:7px 0 0;font-size:15px}.sorp-meeting-calendar .sp-error{padding:14px;border-left:2px solid var(--orange,#fb3d0b);background:#fff1eb}
+.sorp-meeting-share,.sorp-meeting-advisers,.sorp-meeting-positioning{padding:26px 0;border-top:1px solid var(--line,#d8d5cd)}
+.sorp-meetings .sorp-meeting-share h2,.sorp-meetings .sorp-meeting-advisers h2{font-family:var(--font-sans,Arial,sans-serif);font-size:13px;letter-spacing:.03em;margin:0 0 14px;font-weight:750}
+.sorp-meeting-share>div{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line,#d8d5cd)}
+.sorp-meeting-share strong{font-size:11px}.sorp-meetings .sorp-meeting-share button{border:0;border-bottom:1px solid currentColor;background:transparent;color:var(--meeting-green);font-size:11px;font-weight:750;padding:7px 0}
+.sorp-meeting-share a{overflow-wrap:anywhere}.sorp-meeting-advisers a{font-size:12px;font-weight:750}
+.sorp-meetings .sorp-meeting-positioning h2{font-size:clamp(25px,3vw,36px)}.sorp-meeting-positioning em{font-style:normal;color:var(--orange,#fb3d0b)}
+.sorp-booking-share-page{max-width:1100px;margin:auto;padding:110px 24px 60px}.sorp-booking-share-page h1,.sorp-booking-share-page h2{font-family:var(--font-serif,Georgia,serif);font-weight:500}.sorp-booking-share-page h1{font-size:clamp(38px,5vw,60px);line-height:1.05;letter-spacing:-.04em}.sorp-booking-share-page p{line-height:1.6}.sorp-booking-share-page>a{display:inline-block;margin-bottom:24px;color:var(--meeting-green);font-size:12px}.sorp-booking-share-page .sorp-meetings-options:has(> :only-child){grid-template-columns:minmax(0,640px)}
+@media(max-width:1000px){.sorp-meetings-options,.sorp-booking-share-page .sorp-meetings-options:has(> :only-child){grid-template-columns:minmax(0,1fr)}.sorp-meeting-badge:empty{display:none}.sorp-meeting-option{padding:22px}.sorp-meeting-option h2{font-size:28px}.sorp-meeting-option .sorp-meeting-book{max-width:400px}}
+@media(max-width:600px){.sorp-meeting-calendar{scroll-margin-top:140px}.sorp-meeting-calendar-heading{display:block}.sorp-meetings .sorp-meeting-calendar-heading h2{font-size:26px}.sorp-slot-day{grid-template-columns:1fr;gap:10px}.sorp-booking-details{padding:18px}.sorp-booking-fields{grid-template-columns:1fr}.sorp-booking-confirmed dl{grid-template-columns:1fr}.sorp-booking-confirmed dl>div+div{border-left:0;border-top:1px solid #bbcbbb}}
+@media(max-width:600px){.sorp-booking-details{scroll-margin-top:40px}}
+
+.sorp-booking-prefilled{display:grid;gap:7px;min-width:0;font-size:10px;font-weight:750;letter-spacing:.04em}.sorp-booking-prefilled span{min-height:42px;padding:12px;border:1px solid var(--line,#d8d5cd);background:#f7f5f0;overflow-wrap:anywhere;font-size:13px;font-weight:500;letter-spacing:0}.sorp-meetings .sorp-booking-prefilled button{justify-self:start;border:0;border-bottom:1px solid currentColor;background:transparent;padding:3px 0;color:var(--ink,#111);font-size:10px;font-weight:750}

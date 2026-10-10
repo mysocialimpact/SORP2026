@@ -9,6 +9,16 @@
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "DM Sans", Arial, sans-serif;
 }
+
+/* Product workspaces own their full-screen navigation and completion flow. */
+body:has(.scr-page) > .header,
+body:has(.scr-page) > .footer,
+body:has(.sorp-conversation-page) > .header,
+body:has(.sorp-conversation-page) > .footer,
+body:has(.sorp-workspace) > .header,
+body:has(.sorp-workspace) > .footer {
+  display: none;
+}
 * {
   box-sizing: border-box;
 }

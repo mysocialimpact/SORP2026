@@ -10,10 +10,10 @@ export const site = {
   origin: "https://sorp2026.org",
   msi: "https://mysocialimpact.org",
   official: "https://charitysorp.org",
-  readiness: externalUrl(
-    process.env.READINESS_ASSESSMENT_URL ||
-      "https://mysocialimpact.org/are-you-sorp-ready/review?entry=intro",
-  ),
+  readiness:
+    process.env.READINESS_ASSESSMENT_URL
+      ? externalUrl(process.env.READINESS_ASSESSMENT_URL)
+      : "/are-you-sorp-ready/review/?entry=intro",
   platform: externalUrl(
     process.env.MSI_PLATFORM_URL ||
       "https://platform.mysocialimpact.org/snapshot",

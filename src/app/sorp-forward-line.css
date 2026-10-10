@@ -1,0 +1,49 @@
+/* One route composed with the screen's real ideas; the orange traveller is never task progress. */
+.scr-forward-line{margin:-18px 0 30px;pointer-events:none}
+.scr-forward-line-inner{width:100%;height:142px;position:relative}
+.scr-forward-line svg{display:block;width:100%;height:142px;overflow:hidden}
+.scr-forward-track,.scr-forward-trace{fill:none;stroke-width:1;vector-effect:non-scaling-stroke}
+.scr-forward-track{stroke:var(--line)}
+.scr-forward-trace{stroke:var(--orange);stroke-width:1.8;stroke-linecap:round;vector-effect:none;stroke-dasharray:var(--forward-trail,5) 100;stroke-dashoffset:0}
+.scr-forward-trace[data-measured]{animation:scr-forward-travel var(--forward-duration,22s) linear infinite}
+@keyframes scr-forward-travel{from{stroke-dashoffset:0}to{stroke-dashoffset:var(--forward-end,-105)}}
+.scr-forward-stations{position:absolute;inset:0;list-style:none;margin:0!important;padding:0!important}
+.scr-forward-stations li{position:absolute;left:var(--station-x);top:var(--station-y);width:min(190px,22vw);transform:translate(-50%,-50%);margin:0!important;padding:0!important;color:var(--ink)}
+.scr-forward-stations li::before,.scr-forward-stations li::after{content:none!important}
+.scr-forward-stations span{display:block;width:max-content;padding:0 8px 1px 0;background:var(--paper);font-family:var(--font-serif);font-size:44px;font-weight:400;letter-spacing:-.055em;line-height:.95;color:var(--orange)}
+.scr-forward-stations strong{position:absolute;left:0;display:block;width:100%;font-size:9px;line-height:1.35;letter-spacing:.075em;font-weight:800;text-transform:uppercase}
+.scr-forward-stations .is-high strong{top:52px}.scr-forward-stations .is-low strong{bottom:50px}
+.scr-forward-line--benefits{position:absolute;inset:0 0 auto;margin:0;height:220px}
+.scr-forward-line--benefits .scr-forward-line-inner,.scr-forward-line--benefits svg{height:220px}
+/* Keep actual progress; remove competing decorative connectors. */
+.scr-page :is(.scr-current-flow li,.sh-station){border:0}
+.scr-page :is(.scr-current-flow li,.scr-method-flow>div,.scr-rail-flow li,.sh-station,.scr-benefits li)::after,
+.scr-page .scr-current-flow li::before,.scr-page .scr-agenda-cycle li::before{content:none!important}
+.scr-page .scr-agenda-guide .scr-agenda-cycle{border-left:0}
+.scr-page .scr-agenda-cycle span,.scr-page .scr-rail-meter{display:none}
+.scr-page :is(.sh-state,.sd-found-mark,.hs-ready,.scr-ready-tick,.scr-opening-enter,.scr-progress-sequence li.is-active span,.scr-evidence-checklist .is-active>span){animation:none!important}
+.scr-screen--homework .sh-process .sh-station,.scr-screen--homework .sh-process>li>h2{display:none}
+.scr-screen--homework .sh-process{margin-top:-8px!important}
+.scr-screen--homework .sh-process>li{padding-top:16px;border-top:1px solid var(--line)}
+.scr-screen--method .scr-current-flow ol{display:none}
+.scr-screen--criterion .scr-area-progress{grid-template-columns:repeat(19,minmax(0,1fr));gap:7px;max-width:none;margin-bottom:28px}
+.scr-screen--criterion .scr-area-progress span{height:2px;background:var(--line)}
+.scr-screen--criterion .scr-area-progress span.is-reviewed{background:color-mix(in srgb,var(--scr-green) 54%,var(--line))}
+.scr-screen--criterion .scr-area-progress span.is-current{height:3px;background:var(--orange);transform:translateY(-.5px)}
+.scr-page .sh-station{height:58px;place-items:start}
+.scr-page .sh-number{font-family:var(--font-serif);font-size:36px;font-weight:400;line-height:1;top:0;color:var(--orange)}
+.scr-page .sh-state{top:10px}
+.scr-beyond-words{display:flex;flex-wrap:wrap;gap:32px;margin:32px 0;font-family:var(--font-serif);font-size:clamp(27px,3vw,40px);line-height:1.1}
+.scr-beyond-words span:first-child{font-family:var(--font-sans);font-size:12px;font-weight:700;letter-spacing:.08em}
+@media(max-width:760px){
+.scr-forward-line{margin:-8px 0 24px}
+.scr-forward-line-inner,.scr-forward-line svg{height:128px}
+.scr-forward-stations span{font-size:34px;padding-right:5px}
+.scr-forward-stations strong{font-size:7px;letter-spacing:.045em;overflow-wrap:anywhere}
+.scr-forward-stations li{width:28vw}
+.scr-forward-stations .is-high strong{top:42px}.scr-forward-stations .is-low strong{bottom:40px}
+.scr-forward-line--benefits,.scr-forward-line--benefits .scr-forward-line-inner,.scr-forward-line--benefits svg{height:100px}
+.scr-screen--homework .sh-process{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px}
+.scr-screen--homework .sh-process>li{display:block;padding:15px 0}
+}
+@media(prefers-reduced-motion:reduce){.scr-page .scr-forward-trace{animation:none!important;stroke-dashoffset:0}}

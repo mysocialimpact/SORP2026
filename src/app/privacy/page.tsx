@@ -7,27 +7,36 @@ export default function Privacy() {
     <Article
       title="A thoughtful, accessible experience."
       eyebrow="PRIVACY & ACCESSIBILITY"
-      lead="This first version is a public information website. It does not require an account or collect assessment answers."
+      lead="The public information pages need no account. Are You SORP Ready stores your work in your browser and uses the details you choose to provide to deliver its assessment and report."
     >
       <section>
         <h2>Privacy on this website</h2>
         <p>
-          The website code does not set advertising cookies, use analytics
-          trackers, or include a contact form or database. Fonts are served with
-          the website, so your browser does not need to request them from an
-          external font service.
+          The website does not set advertising cookies or include advertising
+          trackers. Fonts are served with the website, so your browser does not
+          need to request them from an external font service.
         </p>
         <p>
-          Your hosting provider may process ordinary connection data, such as IP
-          addresses, request times and browser information, to deliver and
-          secure the website. The published privacy notice must be reviewed
-          against the final hosting configuration and organisation details
-          before launch.
+          Are You SORP Ready saves assessment progress and results in your
+          browser so you can continue your work. If you create an account or
+          sign in, the service sends the account details and saved progress you
+          provide to its secure account service. If you request an emailed
+          report, it sends the email address, organisation details and report
+          content needed to create and deliver that report.
         </p>
         <p>
-          Links to My Social Impact and other websites take you to separate
-          services with their own privacy policies. Any assessment data is
-          handled by the assessment provider, not this information website.
+          Optional booking and payment actions use Google Calendar and Stripe.
+          Those providers process the information needed to complete the action
+          under their own privacy terms. Links to other websites also take you
+          to services with their own privacy policies.
+        </p>
+        <p>
+          The hosting provider and connected services may process ordinary
+          connection data, such as IP addresses, request times and browser
+          information, to deliver and secure the service. My Social Impact uses
+          assessment and contact information only to provide the requested
+          product, save progress, deliver reports, respond to support requests
+          and provide optional services you select.
         </p>
       </section>
       <section>

@@ -1,0 +1,43 @@
+/* Introduction 1 of 4 only. No shared introduction or journey overrides. */
+.scr-page--scope .scr-opening-enter{animation:none}
+.si-welcome{padding-top:10px}
+.si-welcome-title{min-width:0}
+.scr-main .si-welcome-heading h1{max-width:none;font-size:clamp(48px,7.15vw,100px);line-height:1;letter-spacing:-.055em;margin:0 0 17px;text-wrap:balance}
+.scr-main .si-welcome .si-eyebrow{font-size:11px;margin-bottom:19px}
+.scr-main .si-welcome-subtitle{font-size:clamp(16px,1.55vw,21px);font-weight:500;letter-spacing:.015em;margin:0;max-width:none}
+.si-welcome-rule{width:100%;height:20px;margin:24px 0 20px;overflow:hidden}
+.si-welcome-rule svg{display:block;width:100%;height:100%;stroke:var(--line);stroke-width:1}
+.si-welcome-rule .si-welcome-signal{stroke:var(--orange);stroke-width:2;stroke-dasharray:9 91;animation:si-welcome-trace 9s linear infinite}
+@keyframes si-welcome-trace{from{stroke-dashoffset:8}to{stroke-dashoffset:-92}}
+.si-welcome-promise{display:grid;grid-template-columns:minmax(220px,.34fr) minmax(0,.66fr);align-items:start;gap:clamp(28px,5vw,70px);margin-top:2px}
+.scr-main .si-welcome-free{display:flex;flex-wrap:wrap;gap:0 14px;margin:0;max-width:none;font-size:20px;line-height:1.35;letter-spacing:.015em}
+.si-welcome-free strong{font-weight:700}
+.scr-main .si-welcome-lead{font-size:clamp(19px,1.8vw,24px);line-height:1.5;max-width:920px;margin:0 0 15px;letter-spacing:-.012em}
+.scr-main .si-welcome-optional{max-width:790px;font-size:15px;line-height:1.6;color:var(--muted);margin:0}
+.scr-main .si-welcome-boundary{font-size:11px;font-weight:750;letter-spacing:.055em;line-height:1.55;max-width:none;margin:27px 0 16px}
+.si-welcome .si-expander>summary{min-height:52px}
+.si-welcome-signature{display:flex;gap:17px;align-items:center;margin:0}
+.si-welcome-signature img{width:56px;height:70px;object-fit:cover;object-position:center 30%;flex-shrink:0}
+.si-welcome-signature>div{display:grid;gap:3px}
+.si-welcome-signature small{font-size:9px;letter-spacing:.12em;color:var(--muted);margin-bottom:3px}
+.si-welcome-signature strong{font-size:14px;font-weight:700;line-height:1.4}
+.si-welcome-signature span{font-size:12px;color:var(--muted);line-height:1.4}
+@media(max-width:760px){
+  .si-welcome{padding-top:0}
+  .si-welcome-promise{grid-template-columns:1fr;gap:15px;margin-top:0}
+  .scr-main .si-welcome-heading h1{font-size:clamp(43px,12.2vw,72px);max-width:600px;line-height:1.02;letter-spacing:-.05em;margin-bottom:13px;text-wrap:balance}
+  .scr-main .si-welcome .si-eyebrow{font-size:10px;margin-bottom:15px}
+  .scr-main .si-welcome-subtitle{max-width:310px;font-size:15px;line-height:1.5}
+  .si-welcome-rule{margin:15px 0 13px;height:15px}
+  .scr-main .si-welcome-free{font-size:18px;gap:2px 10px;margin-bottom:15px}
+  .scr-main .si-welcome-lead{font-size:18px;line-height:1.5;margin-bottom:14px}
+  .scr-main .si-welcome-optional{font-size:13px;line-height:1.6}
+  .scr-main .si-welcome-boundary{font-size:10px;letter-spacing:.025em;margin:22px 0 14px}
+  .si-welcome .si-expander>summary{font-size:10px;min-height:49px}
+  .si-welcome-signature{gap:13px;margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line);align-items:center}
+  .si-welcome-signature img{width:46px;height:58px}
+  .si-welcome-signature strong{font-size:13px}
+  .si-welcome-signature span{font-size:11px}
+  .si-welcome-signature small{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){.si-welcome-rule .si-welcome-signal{animation:none;stroke-dasharray:9 91;stroke-dashoffset:0}}

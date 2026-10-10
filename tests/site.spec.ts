@@ -14,7 +14,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     .all()) {
     await expect(link).toHaveAttribute(
       "href",
-      "https://mysocialimpact.org/are-you-sorp-ready/review?entry=intro",
+      "/are-you-sorp-ready/review/?entry=intro",
     );
   }
   await expect(
@@ -71,6 +71,8 @@ test("all supporting pages render accessibly, without overflow or broken interna
     "/ask-sorp/",
     "/privacy/",
     "/readiness/",
+    "/are-you-sorp-ready/",
+    "/are-you-sorp-ready/review/?entry=intro",
   ]) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);

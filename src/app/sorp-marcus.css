@@ -1,0 +1,128 @@
+.scr-marcus {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  margin: 38px 0 8px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.scr-marcus-portrait {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #f0ede7;
+}
+
+.scr-marcus-portrait::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 34px;
+  height: 3px;
+  background: var(--orange);
+}
+
+.scr-marcus-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.scr-page .scr-marcus .scr-marcus-eyebrow {
+  margin: 0 0 13px;
+  color: var(--orange);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .09em;
+  line-height: 1.5;
+}
+
+.scr-page .scr-marcus .scr-marcus-name {
+  margin: 0 0 3px;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 27px;
+  line-height: 1.15;
+  letter-spacing: -.025em;
+}
+
+.scr-marcus-name span {
+  font-family: var(--font-sans);
+  font-size: .43em;
+  font-weight: 650;
+  letter-spacing: .045em;
+  white-space: nowrap;
+}
+
+.scr-page .scr-marcus .scr-marcus-role {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.scr-page .scr-marcus .scr-marcus-message {
+  margin: 14px 0 0;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-style: normal;
+  line-height: 1.65;
+}
+
+.scr-marcus--methodology {
+  grid-template-columns: 66px minmax(0, 1fr);
+  gap: 15px;
+  margin-top: 32px;
+  padding-top: 22px;
+}
+
+.scr-page .scr-marcus--methodology .scr-marcus-eyebrow {
+  margin-bottom: 8px;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.scr-page .scr-marcus--methodology .scr-marcus-name { font-size: 21px; }
+.scr-page .scr-marcus--methodology .scr-marcus-role { font-size: 11px; }
+.scr-page .scr-marcus--methodology .scr-marcus-message { font-size: 13px; line-height: 1.6; }
+
+.scr-marcus--booking {
+  grid-template-columns: clamp(150px, 16vw, 210px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 3vw, 40px);
+  margin: 30px 0 36px;
+  padding-block: 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+.scr-page .scr-marcus--booking .scr-marcus-name { font-size: clamp(30px, 3vw, 40px); }
+.scr-page .scr-marcus--booking .scr-marcus-eyebrow { font-size: 11px; }
+.scr-page .scr-marcus--booking .scr-marcus-role { font-size: 13px; }
+.scr-page .scr-marcus--booking .scr-marcus-message { max-width: 480px; font-size: 17px; }
+
+@media (max-width: 760px) {
+  .scr-marcus { grid-template-columns: 88px minmax(0, 1fr); gap: 18px; }
+  .scr-page .scr-marcus p { display: block; }
+  .scr-marcus--methodology { max-width: 480px; grid-template-columns: 62px minmax(0, 1fr); margin-top: 22px; }
+  .scr-marcus--booking { grid-template-columns: 125px minmax(0, 1fr); gap: 22px; }
+  .scr-page .scr-marcus--booking .scr-marcus-message { font-size: 15px; }
+}
+
+@media (max-width: 480px) {
+  .scr-marcus--intro { grid-template-columns: 78px minmax(0, 1fr); gap: 16px; }
+  .scr-page .scr-marcus--intro .scr-marcus-name { font-size: 24px; }
+  .scr-marcus--booking { grid-template-columns: 102px minmax(0, 1fr); align-items: start; gap: 18px; }
+  .scr-page .scr-marcus--booking .scr-marcus-name { font-size: 27px; }
+  .scr-page .scr-marcus--booking .scr-marcus-eyebrow { font-size: 10px; margin-bottom: 10px; }
+  .scr-page .scr-marcus--booking .scr-marcus-message { font-size: 14px; }
+}
