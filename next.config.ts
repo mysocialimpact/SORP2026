@@ -15,6 +15,12 @@ const config: NextConfig = {
             destination: "https://sorp2026.org/:path*",
             permanent: true,
           },
+          {
+            source: "/:path*",
+            has: [{ type: "host", value: "www\\.sorp2026\\.org" }],
+            destination: "https://sorp2026.org/:path*",
+            permanent: true,
+          },
         ]
       : [];
   },
