@@ -17,9 +17,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
       "/are-you-sorp-ready/review/?entry=intro",
     );
   }
-  await expect(
-    page.getByText("Coming soon", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("Coming soon", { exact: true })).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -54,7 +52,9 @@ test("homepage, product destinations and accessible mobile navigation", async ({
       .click();
   }
   await expect(page).toHaveURL(/contact/);
-  await expect(page.getByRole("link", { name: /marcus@mysocialimpact.org/ })).toHaveAttribute("href", "mailto:marcus@mysocialimpact.org");
+  await expect(
+    page.getByRole("link", { name: /marcus@mysocialimpact.org/ }),
+  ).toHaveAttribute("href", "mailto:marcus@mysocialimpact.org");
   expect(errors).toEqual([]);
 });
 test("all supporting pages render accessibly, without overflow or broken internal links", async ({
@@ -95,4 +95,31 @@ test("preview stays out of search engines and unknown routes return 404", async 
     "Disallow: /",
   );
   expect((await request.get("/does-not-exist/")).status()).toBe(404);
+});
+
+test("footer identifies the exact build and The Ideas Shed company", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const footer = page.getByRole("contentinfo");
+  const build = footer.getByLabel("Website build information");
+  await build.scrollIntoViewIfNeeded();
+  await expect(build).toBeVisible();
+  await expect(build).toContainText(/Preview · Build \d{8}\.\d{6}/);
+  await expect(build.locator("time")).toContainText(
+    /\d{2}:\d{2}:\d{2} (BST|GMT)/,
+  );
+  const timestamp = await build.locator("time").getAttribute("datetime");
+  expect(Number.isNaN(Date.parse(timestamp!))).toBe(false);
+  const initialText = await build.innerText();
+  await expect(
+    footer.getByRole("link", { name: "The Ideas Shed Limited", exact: true }),
+  ).toHaveAttribute("href", "https://www.theideasshed.com/");
+  await expect(footer).toContainText(
+    "Registered in England and Wales · Company number 17380053",
+  );
+  await page.reload();
+  expect(await build.innerText()).toBe(initialText);
+  await page.goto("/contact/");
+  expect(await build.innerText()).toBe(initialText);
 });

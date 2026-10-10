@@ -6,6 +6,8 @@ Review preview: https://sorp2026-qbshbvbcu-marcuswarry.vercel.app (`dpl_2rY4mLAR
 
 ## Design and preservation
 
+Footer update: every website build now includes a timestamp-derived build number, its build date/time in Europe/London (explicit BST/GMT), and Preview/Production status. Next.js embeds these at compile time; reloading the page does not advance the timestamp. The Ideas Shed Limited's registered details (England and Wales, company number 17380053) were verified against the footer of `https://www.theideasshed.com/` on 10 October 2026 and added beneath the official logo attribution.
+
 Four main navigation destinations: Home, Are You SORP Ready?, Ask SORP, Contact. The gateway uses ink, orange and soft violet, a short typographic opening and two product panels. It retains the existing deeper/supporting URLs without putting them in the main navigation.
 
 The readiness presentation still uses the existing `SorpFilm`, all nine scenes, artwork, chapter controls, transitions and assessment URLs. The film component and its CSS are unchanged from the production baseline. Experimental swipe, sticky-bar and slide-height changes were removed following the user's preservation instruction. Only the missing original Lora font and skip-link targets are restored. The 19-question methodology, assessment engine, data and backend services were not replaced.

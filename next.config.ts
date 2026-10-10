@@ -1,6 +1,22 @@
 import type { NextConfig } from "next";
 const live = process.env.SITE_LIVE === "true";
+// Next inlines these values into the compiled application. They identify the
+// build, not the visitor's clock or the time a server renders the footer.
+const builtAt = new Date(
+  process.env.SORP_BUILD_TIMESTAMP || Date.now(),
+).toISOString();
+const buildDigits = builtAt.replace(/\D/g, "").slice(0, 14);
 const config: NextConfig = {
+  env: {
+    NEXT_PUBLIC_SITE_BUILD_NUMBER: `${buildDigits.slice(0, 8)}.${buildDigits.slice(8)}`,
+    NEXT_PUBLIC_SITE_BUILT_AT: builtAt,
+    NEXT_PUBLIC_SITE_BUILD_ENVIRONMENT:
+      process.env.VERCEL_ENV === "production" && live
+        ? "Production"
+        : live
+          ? "Live build"
+          : "Preview",
+  },
   poweredByHeader: false,
   trailingSlash: true,
   ...(process.env.STATIC_EXPORT === "true"
