@@ -11,11 +11,8 @@ const reviewStyles = readFileSync(new URL("../../src/app/sorp-candidate-review.c
 test("the saved account gate sits before public report retrieval and captures the required profile", () => {
   assert.match(review, /\["find", "confirmation", "account"\]/);
   assert.match(review, /go\("account"\); event\("account_step_viewed"\)/);
-  assert.match(review, /SIGN IN WITH GOOGLE/);
   assert.match(review, /ALREADY HAVE AN ACCOUNT\?/);
-  assert.match(review, /ALREADY HAVE AN ACCOUNT\?[\s\S]*SIGN IN →[\s\S]*scr-google-signin/);
-  assert.match(review, /function GoogleMark/);
-  assert.match(review, /aria-busy=\{googleSignInStarting\}/);
+  assert.match(review, /ALREADY HAVE AN ACCOUNT\?[\s\S]*SIGN IN →[\s\S]*Email address/);
   assert.match(review, /Confirm email address/);
   assert.match(review, /Confirm password/);
   assert.match(review, /Your role/);
@@ -23,10 +20,13 @@ test("the saved account gate sits before public report retrieval and captures th
   assert.match(review, /await startHomework\(\)/);
 });
 
-test("account access remains clearly visible in the sticky top-right header", () => {
+test("email account access remains available while Google account controls are disabled", () => {
+  assert.match(review, /const GOOGLE_ACCOUNT_SIGN_IN_ENABLED = false/);
   assert.match(review, /className="scr-header-actions"/);
-  assert.match(review, /className="scr-header-login"/);
-  assert.match(review, /LOG IN <b>WITH GOOGLE<\/b>/);
+  assert.match(review, /GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <a className="scr-header-login"/);
+  assert.match(review, /!account && GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <>/);
+  assert.match(review, /CREATE MY FREE ACCOUNT →/);
+  assert.match(review, /SIGN IN AND CONTINUE →/);
   assert.match(review, /<b>SIGNED IN<\/b>/);
   assert.match(review, /action: "logout"/);
   assert.match(review, /BUILD 120 · 10 OCTOBER 2026 · 13:38 BST/);
