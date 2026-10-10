@@ -11,7 +11,7 @@ function StartReview() {
 
 export function SorpReadyPage() {
   return <>
-    <main className="sr-story">
+    <main id="main" className="sr-story">
       <header className="sr-hero" id="top">
         <div><p className="sr-eyebrow">Impact &amp; Sustainability Reporting Readiness for SORP 2026</p>
           <h1>Are you <em>SORP ready?</em></h1>

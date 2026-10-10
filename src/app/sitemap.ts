@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         "/for-advisers/",
         "/about/",
         "/ask-sorp/",
+        "/contact/",
         "/are-you-sorp-ready/",
         "/privacy/",
       ].map((path) => ({
