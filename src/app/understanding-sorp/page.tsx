@@ -146,7 +146,7 @@ export default function Understanding() {
         </p>
         <p>
           This independent introduction draws on{" "}
-          <a href="https://mysocialimpact.org/are-you-sorp-ready">
+          <a href="/are-you-sorp-ready/">
             My Social Impact’s published scope and methodology
           </a>
           , checked on 10 October 2026. The official site was returning an error

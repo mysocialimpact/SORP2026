@@ -1,0 +1,61 @@
+/* Review only: shared title band and route anchor, then full-width content. */
+.scr-page.scr-page .scr-workspace{display:block;width:100%;max-width:1440px;margin:0 auto;padding:calc(30px - var(--scr-nav-extra,0px)) clamp(22px,5vw,76px) 125px}
+.scr-page.scr-page .scr-main{position:relative;width:100%;max-width:1160px;margin:0 auto;padding:44px 0 0;min-width:0;--scr-title-height:clamp(142px,12.6vw,182px)}
+.scr-page .scr-main .si-progress{position:absolute;inset:0 auto auto 0;margin:0}
+.scr-page .scr-main .scr-screen-eyebrow{position:absolute;top:0;left:0;margin:0;color:var(--orange);font-size:11px;font-weight:700;letter-spacing:.06em;line-height:1.5}
+.scr-page .scr-main .scr-screen-hero{min-height:var(--scr-title-height);height:auto;margin:0;padding:0 0 24px;display:flex;flex-direction:column;justify-content:flex-start;gap:10px;border:0;text-align:left}
+.scr-page .scr-main .scr-screen-hero h1{font-size:clamp(38px,4.6vw,62px);line-height:1.04;letter-spacing:-.045em;font-weight:400;max-width:1100px;margin:0;text-wrap:balance}
+.scr-page .scr-main .scr-screen-hero :is(.scr-kicker,.si-eyebrow,.hs-done){margin:0;font-size:11px;line-height:1.4;letter-spacing:.07em}
+.scr-page .scr-main .scr-screen-hero p{margin:0}
+.scr-page .scr-main .scr-screen-hero .hs-done span{font-size:inherit;width:20px;height:20px}
+.scr-screen--criterion .scr-main .scr-area-progress{margin-top:-8px}
+.scr-page .scr-main .scr-milestone{position:absolute;top:0;right:0;max-width:100%;margin:0;padding:7px 12px;font-size:10px;animation:none}
+.scr-page .scr-main .scr-screen-hero h1 br{display:none}
+.scr-page--scope .scr-main .scr-screen-hero h1{font-size:clamp(43px,5.7vw,80px)}
+.scr-page--method .scr-main .scr-screen-hero h1,
+.scr-page .scr-main:has(.scr-area-progress) .scr-screen-hero h1,
+.scr-page .scr-homework-failure .scr-screen-hero h1{font-size:clamp(32px,3.5vw,44px);max-width:1100px}
+.scr-page .scr-main :is(.si-welcome,.sd-find-hero,.sd-found,.hs-building,.hs-ready,.scr-quick-ready,.scr-ending-intro,.scr-ending-finish,.scr-homework-delay){padding-top:0;margin-top:0;border-top:0}
+.scr-page .scr-main .sd-found{display:block}
+.scr-page .scr-main :is(.sd-find-hero,.scr-homework-failure,.scr-quick-ready){max-width:none}
+.scr-page .scr-main .scr-quick-ready{animation:none}
+.scr-page .scr-main :is(.hs-building,.hs-ready){max-width:none;text-align:left}
+.scr-page .scr-main .hs-build-description{min-height:64px}
+.scr-page .scr-main .sh-heading{margin:0;max-width:none}
+.scr-page .scr-main .sh-heading>p{margin-bottom:26px}
+.scr-page .scr-main .scr-benefits-journey{margin-top:-58px}
+.scr-page .scr-main .scr-benefits h1{font-size:clamp(36px,4.6vw,62px);margin:0}
+.scr-page .scr-main .si-vision-spread{display:block}
+.scr-page .scr-main .si-vision{border:0;padding:0;margin:0 0 28px}
+.scr-page .scr-main .si-vision h2{max-width:850px}
+.scr-page .scr-main .si-brand-story>p{max-width:850px}
+.scr-page.scr-page .scr-supporting-guide{position:static;width:100%;max-width:1160px;margin:48px auto 0;padding:28px 0 0;border:0;border-top:1px solid var(--line)}
+.scr-page .scr-supporting-guide :is(p,a,.scr-guide-note){display:block}
+.scr-page .scr-supporting-guide :is(h2,p,.scr-beyond-caption,.scr-current-flow-note){max-width:850px}
+.scr-page .scr-supporting-guide .scr-current-flow ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px}
+.scr-page .scr-supporting-guide .scr-rail-areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 24px}
+.scr-page .scr-supporting-guide .scr-agenda-cycle{display:flex;gap:32px}
+@media(max-width:760px){
+.scr-page.scr-page .scr-workspace{padding:24px 22px 135px}
+.scr-page.scr-page .scr-main{--scr-title-height:260px;padding-top:44px}
+.scr-page .scr-main .scr-screen-hero{gap:14px}
+.scr-page .scr-main .scr-screen-hero h1,
+.scr-page--method .scr-main .scr-screen-hero h1,
+.scr-page .scr-main:has(.scr-area-progress) .scr-screen-hero h1,
+.scr-page .scr-homework-failure .scr-screen-hero h1{font-size:clamp(30px,8.8vw,44px)}
+.scr-screen--criterion .scr-main .scr-area-progress{margin-top:-4px}
+.scr-page--scope .scr-main .scr-screen-hero h1{font-size:clamp(43px,11vw,64px)}
+  .scr-page.scr-page--benefits .scr-main .scr-screen-hero{overflow:visible;padding-bottom:18px}
+  .scr-page.scr-page--benefits .scr-main .scr-screen-hero h1{line-height:1.08;text-wrap:wrap}
+  .scr-page .scr-main .scr-benefits-journey{margin-top:0}
+.scr-page .scr-main .scr-benefits ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 14px}
+.scr-page .scr-main .scr-benefits li{display:contents}
+.scr-page .scr-main .scr-benefit-number{grid-row:1;width:fit-content;padding:0 7px 0 0;font-size:44px;margin:0 0 16px}
+.scr-page .scr-main .scr-benefits li:nth-child(2) .scr-benefit-number{grid-column:2;margin-top:25px}
+.scr-page .scr-main .scr-benefits li:nth-child(3) .scr-benefit-number{grid-column:3;margin-top:50px}
+.scr-page .scr-main .scr-benefits li>div{grid-column:1/-1}
+.scr-page .scr-main .scr-benefits li:nth-child(1)>div{grid-row:2}
+.scr-page .scr-main .scr-benefits li:nth-child(2)>div{grid-row:3}
+.scr-page .scr-main .scr-benefits li:nth-child(3)>div{grid-row:4}
+.scr-page .scr-supporting-guide .scr-current-flow ol,.scr-page .scr-supporting-guide .scr-rail-areas{grid-template-columns:1fr}
+}

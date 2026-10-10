@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         "/for-advisers/",
         "/about/",
         "/ask-sorp/",
+        "/are-you-sorp-ready/",
         "/privacy/",
       ].map((path) => ({
         url: `${site.origin}${path}`,

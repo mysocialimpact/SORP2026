@@ -2,7 +2,9 @@ import { defineConfig, devices } from "@playwright/test";
 import { existsSync } from "node:fs";
 export default defineConfig({
   testDir: "./tests",
-  testIgnore: process.env.TEST_STATIC === 'true' ? '**/site.spec.ts' : '**/static.spec.ts',
+  testIgnore: process.env.TEST_STATIC === 'true'
+    ? ['**/site.spec.ts', '**/product-unit/**']
+    : ['**/static.spec.ts', '**/product-unit/**'],
   fullyParallel: true,
   workers: 2,
   reporter: [["list"], ["html", { open: "never" }]],

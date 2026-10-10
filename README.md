@@ -1,6 +1,6 @@
 # SORP 2026
 
-An independent, editorial website from My Social Impact, built by The Ideas Shed. Next.js App Router, TypeScript and responsive CSS. No accounts, database, tracking or backend service is required. Fonts and approved team photos are hosted locally.
+The SORP 2026 marketing website and Are You SORP Ready product from My Social Impact, built by The Ideas Shed. It uses Next.js App Router, TypeScript and responsive CSS. Fonts and approved team photos are hosted locally.
 
 ## Develop
 
@@ -18,15 +18,22 @@ npm run build
 npm run typecheck
 npm run lint
 npm run test:e2e
+node tests/sorp-journey.browser.mjs
 ```
 
 The browser suite uses `/usr/bin/chromium` by default. Set `CHROMIUM_PATH` to your local Chromium executable. It tests desktop and mobile navigation, product destinations, every supporting page, overflow, WCAG axe checks, preview indexing restrictions and 404 handling. Build before testing.
 
-`npm run start` starts the production server. Optional environment overrides are documented in `.env.example`. `SITE_LIVE` defaults to false: preview builds include noindex directives and no canonical tags or sitemap URLs. Verified outbound product URLs live in `src/lib/site.ts`; they are server-only configuration and do not require credentials.
+`npm run start` starts the production server. Environment settings are documented in `.env.example`. `SITE_LIVE` defaults to false: preview builds include noindex directives and no canonical tags or sitemap URLs. The public assessment and report depend on the readiness APIs. Accounts, payments and calendar booking remain unavailable until their destination-specific credentials are configured.
 
-## IONOS shared hosting
+## Deployment
 
-Version one is fully exportable; a Node server is optional. Confirm the existing hosting product, assigned directory, HTTPS certificate and any existing content before uploading. No DNS changes are included in this project.
+The complete product requires a Next.js server deployment because its account,
+assessment, report, payment and booking endpoints run as server routes. Deploy it
+to the existing `sorp2026` Vercel project with the environment settings listed
+in `.env.example`.
+
+The marketing-only pages can still be exported for archival or preview use, but
+the static export does not include a working assessment product.
 
 Preview export:
 
@@ -37,16 +44,9 @@ cp deploy/ionos-preview.htaccess out/.htaccess
 
 Upload the **contents** of `out/`, including `.htaccess`, through the authorised IONOS deployment route to an unused, assigned preview document root. Do not overwrite an existing website without confirming its exact directory and backup. Absolute asset URLs require serving at the domain root, not a nested path. The export requires no database, PHP or Node runtime.
 
-Approved production export, only after `.org` hosting/TLS and content are verified:
+The production template permanently redirects `.com` (and `www` variants) to `https://sorp2026.org`, preserving paths and query strings. Next.js servers use the host-based permanent redirect in `next.config.ts`.
 
-```sh
-STATIC_EXPORT=true SITE_LIVE=true npm run build
-cp deploy/ionos-live.htaccess out/.htaccess
-```
-
-The production template permanently redirects `.com` (and `www` variants) to `https://sorp2026.org`, preserving paths and query strings. Next.js servers use the host-based permanent redirect in `next.config.ts`. The Apache templates require the hosting service to support `.htaccess`, `mod_rewrite` and `mod_headers`; verify on the actual IONOS product. Next.js response headers/redirects are not applied by static hosting automatically.
-
-Before announcing launch, verify homepage and every route on the real host, TLS, images/fonts, the external readiness CTA, privacy notice, canonical tags, sitemap, robots, and a `.com/path?query=value` redirect. Keep the previous deployed files for rollback. A successful local build is not proof of publication or live domain readiness.
+Before announcing launch, verify homepage and every route on the real host, TLS, images/fonts, the local readiness CTA, privacy notice, canonical tags, sitemap, robots, account sign-in, a representative assessment and report, and the optional payment and booking flows. Keep the previous deployment available for rollback. A successful local build is not proof of publication or live domain readiness.
 
 ## Content and product architecture
 
@@ -55,7 +55,8 @@ Before announcing launch, verify homepage and every route on the real host, TLS,
 - `/for-charities/`, `/for-advisers/`: practical audience guidance.
 - `/ask-sorp/`: explicitly unavailable, coming-soon product route, ready for a future application.
 - `/about/`: verified founders, portraits and attribution.
-- `/readiness/`: information and onward navigation to the existing service; no replacement assessment.
-- `/privacy/`: current website behaviour and accessibility approach; confirm with final hosting configuration.
+- `/are-you-sorp-ready/`: the product presentation and route into the local assessment.
+- `/are-you-sorp-ready/review/`: the assessment, saved account journey and report.
+- `/privacy/`: current website, assessment and connected-service behaviour.
 
 See `docs/sources.md` for verification evidence and limitations. The official standard's availability and the live hosting destination remain external prerequisites, not application code defects.

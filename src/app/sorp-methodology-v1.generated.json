@@ -1,0 +1,819 @@
+{
+  "methodologyId": "ARE_YOU_SORP_READY",
+  "methodologyVersion": "1.0",
+  "tests": [
+    {
+      "id": "OA1",
+      "title": "PURPOSE AND MAIN ACTIVITIES",
+      "sorp": "1.19",
+      "question": "Can you clearly explain why your charity exists and the main activities it carries out to achieve its purposes?",
+      "why": "Impact starts with purpose. A charity cannot credibly explain the difference it makes without explaining what it exists to achieve and what it actually does.",
+      "tiers": [
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Governing purposes and main activities are both clear, substantive and meaningfully connected.",
+        "Both are identifiable and substantially explained, but an important activity/purpose link or detail is thin.",
+        "Purposes or activities are reasonably clear, but the other element is generic, incomplete or weakly connected.",
+        "Only broad mission language or a superficial activity description is available.",
+        "No meaningful explanation of both purpose and main activities."
+      ],
+      "notSure": "Available evidence does not allow a reliable judgement."
+    },
+    {
+      "id": "OA2",
+      "title": "PUBLIC BENEFIT",
+      "sorp": "1.20",
+      "question": "Can you explain how your main activities further your charitable purposes for public benefit?",
+      "why": "Public benefit connects activities with beneficiaries and wider society and is closely related to the impact story.",
+      "tiers": [
+        {
+          "status": "MUST WHERE APPLICABLE",
+          "weight": 4
+        },
+        {
+          "status": "MUST WHERE APPLICABLE",
+          "weight": 4
+        },
+        {
+          "status": "MUST WHERE APPLICABLE",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Clear explanation of how the main activities further the charity’s purposes for public benefit.",
+        "The link is substantially explained but one important element is thin.",
+        "Public benefit is asserted and some link to activities exists, but the explanation is incomplete.",
+        "Only a generic statement that the charity provides public benefit.",
+        "No meaningful public-benefit explanation."
+      ],
+      "notSure": "Jurisdiction or available evidence prevents reliable assessment.",
+      "note": "The MUST applies in England, Wales and Northern Ireland where applicable. Where this jurisdictional requirement does not apply, the status is NOT SPECIFICALLY REQUIRED and the strength weight is 1. The separate formal statement about having regard to Charity Commission public-benefit guidance is outside this review.",
+      "jurisdictionOverrides": {
+        "scotland": {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        "roi": {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        "elsewhere": {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        }
+      }
+    },
+    {
+      "id": "OA3",
+      "title": "SHORT- AND LONGER-TERM AIMS",
+      "sorp": "1.23–1.24",
+      "question": "Are your aims and objectives for this reporting period clear — and can you explain how they relate to your longer-term aims?",
+      "why": "Impact develops over time. SORP specifically requires larger charities to explain the relationship between immediate and longer-term aims.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Reporting-period aims and longer-term aims are both clear, with an explicit relationship between them.",
+        "Both are clear but their relationship is only partly explained.",
+        "Both are mentioned but one is vague, or the relationship is largely implicit.",
+        "Only broad/timeless aspirations or one timeframe is meaningfully present.",
+        "No usable aims/objectives."
+      ],
+      "notSure": "Insufficient evidence to distinguish the relevant aims.",
+      "note": "Do not impose an MSI universal definition of short or long term."
+    },
+    {
+      "id": "OA4",
+      "title": "ACTIVITIES → AIMS",
+      "sorp": "1.24",
+      "question": "Can you explain how your significant programmes, projects or services contribute to your stated aims and objectives?",
+      "why": "This connects what the charity does to what it intends to achieve.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Significant activities are identified and explicitly connected to the aims/objectives they support.",
+        "Most significant activities are well connected, with one meaningful gap.",
+        "Activities are described and some contribution is explained, but links are patchy or weak.",
+        "Mainly an activity list with little explanation of contribution.",
+        "No meaningful activity-to-aim relationship."
+      ],
+      "notSure": "Cannot reliably connect available activity and aim information."
+    },
+    {
+      "id": "OA5",
+      "title": "CHANGE SOUGHT",
+      "sorp": "1.24",
+      "question": "Can you clearly explain the change or difference your charity is trying to make through its activities?",
+      "why": "This identifies the intended change before examining what actually happened.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Intended change/difference is explicit, specific and clearly related to activities/beneficiaries.",
+        "Intended change is clear but one important aspect or connection is thin.",
+        "A change can be identified but is broad, incomplete or inconsistently articulated.",
+        "Only a very general aspiration is present.",
+        "No meaningful intended change."
+      ],
+      "notSure": "Evidence does not allow the intended change to be reliably identified."
+    },
+    {
+      "id": "OA6",
+      "title": "STRATEGY",
+      "sorp": "1.24",
+      "question": "Can you explain your strategy for achieving your stated aims and objectives?",
+      "why": "The charity should explain how its approach is intended to lead towards its aims.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "A coherent strategy explains how the charity intends to achieve its stated aims.",
+        "Strategy is substantially clear but an important route, assumption or connection is thin.",
+        "Elements of an approach are present, but strategy is incomplete or weakly connected to aims.",
+        "Activities or broad intentions are presented as though they were a strategy.",
+        "No meaningful strategy."
+      ],
+      "notSure": "Available material cannot support a reliable judgement."
+    },
+    {
+      "id": "OA7",
+      "title": "MEASURES OF SUCCESS",
+      "sorp": "1.24",
+      "question": "Have you defined the criteria or measures you use to judge whether you have been successful during the reporting period?",
+      "why": "Measures give readers a basis for judging whether intended change was achieved.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Relevant criteria/measures are clearly defined and provide an understandable basis for assessing success.",
+        "A useful set of measures exists but one material area or definition is weak.",
+        "Some relevant measures exist, but they are incomplete, inconsistent or only partly connected to success.",
+        "Isolated statistics/metrics exist without a clear framework for judging success.",
+        "No meaningful criteria or measures."
+      ],
+      "notSure": "Cannot determine what measures are actually used."
+    },
+    {
+      "id": "AP1",
+      "title": "MAIN ACHIEVEMENTS",
+      "sorp": "1.27",
+      "question": "Can you clearly summarise your charity’s main achievements during the reporting period?",
+      "why": "Impact reporting needs to explain what was achieved, not merely which activities took place.",
+      "tiers": [
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Main achievements are clearly identified and described as achievements, not merely activities.",
+        "Main achievements are substantially clear but one material area is thin.",
+        "Some genuine achievements are present but reporting is heavily output/activity focused.",
+        "Predominantly activity description with little explanation of achievement.",
+        "No substantive achievements."
+      ],
+      "notSure": "Achievement narrative cannot be assessed reliably."
+    },
+    {
+      "id": "AP2",
+      "title": "DIFFERENCE TO BENEFICIARIES AND WIDER SOCIETY",
+      "sorp": "1.27",
+      "question": "Can you explain how your work made a difference to your beneficiaries — and whether it created wider benefits for society?",
+      "why": "SORP says trustees SHOULD CONSIDER the difference their work makes to beneficiaries and wider society.",
+      "tiers": [
+        {
+          "status": "SHOULD",
+          "weight": 2
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        }
+      ],
+      "rubric": [
+        "Clear explanation of difference to beneficiaries and explicit consideration of wider societal benefit where relevant.",
+        "Beneficiary difference is clear but wider effects or one important dimension is thin.",
+        "Some difference is described, but beneficiary meaning is incomplete or substantially inferred.",
+        "Mostly outputs/testimonials/general claims with little explanation of changed circumstances.",
+        "No meaningful explanation of difference."
+      ],
+      "notSure": "Relationship between the work and claimed difference cannot be reliably assessed.",
+      "note": "An explicit conclusion that wider societal benefits were not material can still satisfy the consideration element."
+    },
+    {
+      "id": "AP3",
+      "title": "PERFORMANCE AGAINST AIMS",
+      "sorp": "1.28",
+      "question": "Can you explain how well you carried out your activities and how far your achievements met the aims and objectives you set for the period?",
+      "why": "This compares intended aims with actual performance and achievements.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Clear direct comparison between actual performance/achievements and stated period aims.",
+        "Most material aims are compared with performance but one meaningful gap remains.",
+        "Some comparison exists, but much is implicit or incomplete.",
+        "Aims and results are both present but there is little meaningful comparison.",
+        "No usable comparison."
+      ],
+      "notSure": "Relevant aims/results cannot be reconciled sufficiently."
+    },
+    {
+      "id": "AP4",
+      "title": "IMPACT MADE",
+      "sorp": "1.30",
+      "question": "Can you explain the impact your charity is making?",
+      "why": "The report should explain the effect or influence the charity has on beneficiaries and wider society.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "The report clearly explains the difference/effect the charity is making on beneficiaries and/or wider society — recognisably impact rather than merely activity/output.",
+        "Impact is substantially explained but one important dimension is thin or partly conflated with outcomes/outputs.",
+        "Some genuine impact/effect is present, but the explanation is weak, incomplete or heavily reliant on outputs.",
+        "Broad impact claims are made with little explanation of the actual difference.",
+        "No meaningful impact explanation."
+      ],
+      "notSure": "Available wording/evidence does not permit reliable classification.",
+      "note": "MSI evidence judgement must not secretly create extra SORP requirements here."
+    },
+    {
+      "id": "AP5",
+      "title": "LONGER-TERM EFFECTS",
+      "sorp": "1.30",
+      "question": "Have you considered the longer-term effects of your activities on individual beneficiaries and on society as a whole?",
+      "why": "SORP says the charity MUST CONSIDER the long-term effect of its activities; this is not a requirement for a separate long-term impact report.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Longer-term effects are substantively considered for beneficiaries and wider society where relevant, including appropriate uncertainty/limitations.",
+        "Clear longer-term consideration exists but one dimension is thin.",
+        "Longer-term effects are mentioned but consideration is incomplete or generic.",
+        "Only superficial reference to future/long-term impact.",
+        "No meaningful consideration."
+      ],
+      "notSure": "Cannot determine whether genuine longer-term consideration occurred."
+    },
+    {
+      "id": "AP6",
+      "title": "OUTPUTS ACHIEVED",
+      "sorp": "1.31",
+      "question": "Can you explain the outputs your activities actually achieved — particularly where you had numerical targets?",
+      "why": "Output reporting shows what was delivered and how that compares with targets where they existed.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        }
+      ],
+      "rubric": [
+        "Material outputs are clearly reported, with actual performance against numerical targets where targets existed.",
+        "Outputs are substantially clear but one material activity/target is missing or thin.",
+        "Some outputs are reported but coverage or target comparison is incomplete.",
+        "Scattered output numbers with little organised explanation.",
+        "No meaningful output reporting."
+      ],
+      "notSure": "Available information does not permit reliable assessment."
+    },
+    {
+      "id": "AP7",
+      "title": "FACTORS AFFECTING RESULTS",
+      "sorp": "1.32",
+      "question": "Can you explain the significant positive and negative factors that affected your results — including things outside your control — and, where relevant, how they influenced future plans?",
+      "why": "Credible reporting explains what helped or hindered results and how that informed plans.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        }
+      ],
+      "rubric": [
+        "Significant positive and negative factors are explained, including relevant external factors, their effects, and implications for future plans where relevant.",
+        "Material factors/effects are substantially covered with one meaningful gap.",
+        "Factors are identified but their effects or future implications are weak.",
+        "Generic challenges/success factors with little connection to actual results.",
+        "No meaningful discussion."
+      ],
+      "notSure": "Available narrative is insufficient to determine material factors."
+    },
+    {
+      "id": "LF1",
+      "title": "FUTURE PLANS",
+      "sorp": "1.47",
+      "question": "Can you clearly explain what your charity plans to do next?",
+      "why": "Impact reporting should connect what happened with what the charity intends to do next.",
+      "tiers": [
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Concrete, meaningful future plans are clearly explained.",
+        "Plans are substantially clear but an important element is thin.",
+        "Some future plans exist but remain generic or incomplete.",
+        "Broad intentions only.",
+        "No substantive future plans."
+      ],
+      "notSure": "Future plans cannot be reliably identified."
+    },
+    {
+      "id": "LF2",
+      "title": "FUTURE AIMS AND ACTIVITIES",
+      "sorp": "1.48",
+      "question": "Can you explain your future aims and objectives and the activities you plan to undertake to achieve them?",
+      "why": "This creates continuity between intended change, past learning and future activity.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Future aims/objectives and planned activities are both clear and meaningfully linked.",
+        "Both are substantially explained but the connection or one material element is thin.",
+        "Both appear but are generic/incomplete, or only one is well developed.",
+        "Broad future aspiration or activity list with little connection.",
+        "Neither substantive future aims nor activities are explained."
+      ],
+      "notSure": "Insufficient evidence to assess."
+    },
+    {
+      "id": "LF3",
+      "title": "LEARNING → FUTURE DIRECTION",
+      "sorp": "1.49",
+      "question": "Can you explain how experience and lessons learned have influenced your future plans, decisions and use of resources?",
+      "why": "This links learning from experience to future decisions and resource use.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        }
+      ],
+      "rubric": [
+        "Specific learning/experience is explicitly connected to future plans, decisions and/or resource allocation.",
+        "Clear learning-to-future connection exists but one meaningful dimension is thin.",
+        "Learning is described and some future implication is visible, but links are incomplete.",
+        "Generic lessons-learned statements without meaningful influence on future action.",
+        "No meaningful learning-to-future connection."
+      ],
+      "notSure": "Cannot determine whether learning influenced future decisions."
+    },
+    {
+      "id": "S1",
+      "title": "SUSTAINABILITY RESPONSE",
+      "sorp": "1.60–1.61",
+      "question": "Can you explain how your charity is responding to and managing environmental, governance and social matters?",
+      "why": "SORP includes sustainability reporting in Module 1, with tier-dependent requirements.",
+      "tiers": [
+        {
+          "status": "MAY",
+          "weight": 1
+        },
+        {
+          "status": "MAY",
+          "weight": 1
+        },
+        {
+          "status": "MUST",
+          "weight": 4
+        }
+      ],
+      "rubric": [
+        "Clear, coherent explanation of how the charity responds to and manages its material environmental, governance and social matters.",
+        "Substantial explanation across relevant ESG matters with one meaningful gap.",
+        "Some relevant ESG areas are covered but reporting is incomplete or uneven.",
+        "Isolated initiatives or generic ESG statements with little management explanation.",
+        "No meaningful sustainability response."
+      ],
+      "notSure": "Cannot reliably determine the charity’s position.",
+      "note": "For Tier 1 and Tier 2, a zero may affect broader Reporting Strength but must not imply SORP non-compliance. SORP examples such as climate KPIs, privacy, cyber/data security, ethics, employee wellbeing, diversity/inclusion and community support are examples, not mandatory subtests. Paragraph 1.65 raises a separate conditional legal flag, not another atomic question."
+    },
+    {
+      "id": "S2",
+      "title": "SIGNPOSTING TO OTHER SUSTAINABILITY REPORTING",
+      "sorp": "1.64",
+      "question": "If you report on these matters somewhere else, does your Trustees’ Annual Report tell readers where they can find that information?",
+      "why": "When detailed sustainability information exists elsewhere, readers should be able to find it from the TAR.",
+      "tiers": [
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "NOT SPECIFICALLY REQUIRED",
+          "weight": 1
+        },
+        {
+          "status": "SHOULD",
+          "weight": 2
+        }
+      ],
+      "rubric": [
+        "TAR clearly identifies where the external sustainability information can be found, with a clear and usable signpost or reference.",
+        "The external source is clearly identifiable, but the signposting could be more precise.",
+        "External reporting is mentioned, but the route to it is incomplete or unclear.",
+        "There is only a vague reference to other reporting, with no practical way for the reader to locate it.",
+        "Separate sustainability reporting exists, but the TAR provides no meaningful signpost."
+      ],
+      "notSure": "Cannot establish whether or how signposting is provided. Needs confirmation.",
+      "na": "No separate sustainability reporting exists to signpost to. Exclude this question from the denominator."
+    }
+  ],
+  "groups": [
+    {
+      "title": "OBJECTIVES AND ACTIVITIES",
+      "subtitle": "Official SORP heading",
+      "prefix": "OA"
+    },
+    {
+      "title": "ACHIEVEMENTS AND PERFORMANCE",
+      "subtitle": "Official SORP heading",
+      "prefix": "AP"
+    },
+    {
+      "title": "LEARNING AND FUTURE DIRECTION",
+      "subtitle": "MSI grouping — not an official SORP heading",
+      "prefix": "LF"
+    },
+    {
+      "title": "SUSTAINABILITY",
+      "subtitle": "Official SORP heading",
+      "prefix": "S"
+    }
+  ],
+  "answers": [
+    "YES, CLEARLY",
+    "MOSTLY",
+    "PARTLY",
+    "LIMITED",
+    "NOT YET"
+  ],
+  "answerScores": {
+    "yes": 4,
+    "mostly": 3,
+    "partly": 2,
+    "limited": 1,
+    "not_yet": 0,
+    "not_sure": 0
+  },
+  "reportingStrengthBands": [
+    {
+      "min": 0,
+      "max": 9,
+      "label": "VERY LIMITED"
+    },
+    {
+      "min": 10,
+      "max": 19,
+      "label": "EARLY STAGE"
+    },
+    {
+      "min": 20,
+      "max": 29,
+      "label": "EMERGING"
+    },
+    {
+      "min": 30,
+      "max": 39,
+      "label": "DEVELOPING"
+    },
+    {
+      "min": 40,
+      "max": 49,
+      "label": "BUILDING"
+    },
+    {
+      "min": 50,
+      "max": 59,
+      "label": "ESTABLISHED FOUNDATIONS"
+    },
+    {
+      "min": 60,
+      "max": 69,
+      "label": "GOOD PROGRESS"
+    },
+    {
+      "min": 70,
+      "max": 79,
+      "label": "STRONG"
+    },
+    {
+      "min": 80,
+      "max": 89,
+      "label": "VERY STRONG"
+    },
+    {
+      "min": 90,
+      "max": 100,
+      "label": "LEADING PRACTICE"
+    }
+  ],
+  "crossCuttingPrinciples": [
+    {
+      "title": "FAIR, BALANCED AND UNDERSTANDABLE",
+      "sorp": "1.5, 1.9",
+      "description": "Credible reporting acknowledges material limitations, challenges and things that did not go as planned."
+    },
+    {
+      "title": "OUTPUTS → OUTCOMES → IMPACT",
+      "sorp": "1.8",
+      "description": "One does not automatically prove the next."
+    },
+    {
+      "title": "LEARNING AND REFLECTION",
+      "sorp": "1.9",
+      "description": "Reporting shows what the charity learns from experience, not only evidence of success."
+    },
+    {
+      "title": "NARRATIVE–RESOURCE COHERENCE",
+      "sorp": "1.8, 1.22",
+      "description": "The account of activities and achievements should make sense alongside resources used; this is not an audit."
+    }
+  ],
+  "confidenceDefinitions": {
+    "HIGH": "Clear, directly relevant evidence in a fully validated source.",
+    "MEDIUM": "Relevant evidence exists but interpretation or completeness is less certain.",
+    "LOW": "Evidence is ambiguous, incomplete or weak.",
+    "NOT ASSESSABLE": "The source itself does not permit a reliable judgement."
+  },
+  "requirementSemantics": {
+    "MUST": "An applicable SORP requirement; mandatory status is reported separately from Reporting Strength.",
+    "SHOULD": "A SORP good-practice recommendation, not a mandatory requirement.",
+    "MAY": "An optional SORP approach where appropriate.",
+    "NOT SPECIFICALLY REQUIRED": "Higher-tier practice can inform Reporting Strength but does not become a MUST at this tier."
+  },
+  "scoringRules": {
+    "formula": "Sum of answer score multiplied by the applicable tier weight, divided by the sum of four multiplied by each applicable tier weight, then multiplied by 100.",
+    "notSure": "NOT SURE earns zero and remains in the denominator; it is uncertainty, not non-compliance.",
+    "notApplicable": "Only a genuinely permitted N/A is excluded from the denominator; V1.0 permits this for S2 when no separate sustainability reporting exists.",
+    "mandatory": "Applicable MUST requirements are reported separately: YES, CLEARLY demonstrated; MOSTLY attention; PARTLY, LIMITED or NOT YET gap; NOT SURE unconfirmed."
+  },
+  "evidenceRules": {
+    "historical": "Historical TAR reporting strength and mandatory status use only validated published TAR/accounts evidence and remain frozen when current answers change.",
+    "current": "Current SORP readiness uses answers explicitly confirmed or supplied by the charity; these are self-reported, not independently verified.",
+    "wider": "Evidence outside the historical TAR is recorded separately and has no third percentage; it does not retrospectively raise the historical score or automatically satisfy a SORP requirement.",
+    "antiDoubleCounting": "The four cross-cutting principles inform reasoning and recommendations but never add questions, scores or hidden penalties."
+  },
+  "sorpSource": "https://www.charitysorp.org/documents/d/guest/charities-sorp-2026-1",
+  "protocol": {
+    "methodologyId": "ARE_YOU_SORP_READY",
+    "methodologyVersion": "1.0",
+    "status": "APPROVED_ACTIVE",
+    "title": "HOW THE HISTORICAL TAR IS ASSESSED",
+    "historicalAssessment": {
+      "pipeline": [
+        "CANONICAL QUESTION",
+        "RETRIEVE EVIDENCE",
+        "COMPARE WITH CANONICAL RUBRIC",
+        "ASSIGN ANSWER",
+        "RECORD EVIDENCE + REASONING + CONFIDENCE",
+        "DETERMINISTIC SCORING"
+      ],
+      "steps": [
+        {
+          "title": "IDENTIFY THE APPLICABLE CANONICAL QUESTION",
+          "rule": "Supply the exact question, rubric, SORP paragraph, charity tier and applicability/status. The AI does not decide the standard."
+        },
+        {
+          "title": "SEARCH THE RELEVANT SOURCE",
+          "rule": "Search the complete validated TAR/accounts for evidence relevant to each question, including supporting, materially contradictory and qualifying evidence. Do not select only the most favourable passage."
+        },
+        {
+          "title": "EXTRACT EVIDENCE",
+          "rule": "Retain exact excerpts, pages or sections, source and question ID, including multiple passages where needed to explain the judgement."
+        },
+        {
+          "title": "CHECK SOURCE SUFFICIENCY",
+          "rule": "Substantive absence in a complete, reliably searched source may support NOT YET. Missing pages, unreliable parsing or an incomplete or unsearchable source require NOT SURE / NOT ASSESSABLE. Never manufacture failure from source uncertainty."
+        },
+        {
+          "title": "COMPARE WITH THE EXACT CANONICAL RUBRIC",
+          "rule": "Assign exactly one canonical answer: YES, CLEARLY; MOSTLY; PARTLY; LIMITED; NOT YET; NOT SURE; or N/A only where explicitly permitted. The canonical rubric defines what good looks like; AI judges the evidence against it and cannot introduce hidden criteria."
+        },
+        {
+          "title": "RETURN STRUCTURED REASONING",
+          "rule": "Return methodologyVersion, questionId, answer, exact evidence excerpts and pages/sections, concise rubric-based reasoning, confidence, applicability/status, source sufficiency and optional separately labelled MSI insight."
+        },
+        {
+          "title": "DETERMINISTIC CODE CALCULATES THE RESULT",
+          "rule": "Product code alone applies canonical weights, denominator, Reporting Strength percentage, score band and mandatory requirement status. AI returns no numeric result."
+        }
+      ]
+    },
+    "applicability": {
+      "requiredFacts": [
+        "reporting period",
+        "charity tier",
+        "jurisdiction",
+        "applicable SORP status",
+        "conditional requirements",
+        "genuine N/A conditions"
+      ],
+      "unknownFact": "Flag for confirmation; do not silently assume.",
+      "oa2": "Apply the canonical jurisdictional override. Do not treat an unknown jurisdiction as a confirmed MUST or confirmed exception.",
+      "s2": "N/A is permitted only when it is established that no separate sustainability reporting exists to signpost to. Otherwise keep the question in the denominator or flag the applicability fact for confirmation.",
+      "decisionOwner": "Deterministic product rules and known charity facts; AI must not invent applicability."
+    },
+    "historicalCorrection": {
+      "distinction": "A corrected interpretation of evidence in the historical TAR is not a change in the charity's current position since that TAR.",
+      "auditFields": [
+        "original automated finding",
+        "original evidence/reasoning",
+        "corrected finding",
+        "corrected evidence",
+        "reason for correction",
+        "reviewer or human confirmation",
+        "timestamp where supported"
+      ],
+      "rule": "Retain the original finding and a human-confirmed correction as separate audit records. Do not silently overwrite the historical result or treat the correction as a current-position improvement."
+    },
+    "confidenceEscalation": {
+      "scoreEffect": "Confidence never changes numerical points.",
+      "mustRule": "LOW-confidence or NOT ASSESSABLE applicable MUST findings are visibly flagged for human review.",
+      "presentation": "LOW confidence is not independently assured fact. Source incompleteness must not become confident NOT YET. Answer and confidence remain separate fields."
+    },
+    "evidenceConflict": "Consider all materially conflicting or qualifying TAR evidence. Do not score from the strongest isolated passage; record contradictions that affect the rubric judgement.",
+    "calculation": {
+      "formula": "Raw earned weighted points divided by maximum applicable weighted points, multiplied by 100.",
+      "precision": "Retain raw weighted points and maximum internally; round only the displayed headline percentage to the nearest whole point. Determine the MSI band from the same calculated percentage in web and PDF/report.",
+      "resultRecord": "Store methodologyVersion 1.0 and enough structured answers, applicability and evidence to reproduce the result."
+    },
+    "reproducibility": "The same source under the same methodology version follows fixed questions, applicability, rubrics, answer vocabulary, scoring, weights and bands. AI semantic judgement may vary at borderline cases and may require human review; reproducibility means fixed methodology, transparent evidence, explicit rubric reasoning, confidence and a human-review path, not an unsupported claim that AI can never vary.",
+    "aiBoundary": {
+      "may": [
+        "retrieve evidence",
+        "judge evidence against the supplied rubric",
+        "explain reasoning",
+        "assign confidence",
+        "surface contradictory evidence",
+        "produce separately labelled MSI insight"
+      ],
+      "mayNot": [
+        "change question wording",
+        "alter rubrics or tier status",
+        "alter weights or score bands",
+        "invent N/A or hidden criteria",
+        "exclude a question without a canonical rule",
+        "turn SHOULD into MUST",
+        "mutate approved V1.0 during assessment"
+      ]
+    },
+    "legacy": "Pre-V1.0 and 15-question assessments retain their original methodology identity and are never reinterpreted as Canonical V1.0."
+  },
+  "generatedFrom": "GENERATED FROM COW CONSOLE CANONICAL METHODOLOGY V1.0 — DO NOT EDIT DIRECTLY"
+}
