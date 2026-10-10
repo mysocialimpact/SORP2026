@@ -1,4 +1,4 @@
-.scr-page{--scr-green:#276b43;min-height:100svh;background:var(--paper);color:var(--ink)}
+.scr-page{--ink:#11100f;--paper:#fbfaf7;--white:#fff;--orange:#c93600;--line:rgba(17,16,15,.18);--muted:#6c6964;--scr-green:#276b43;min-height:100svh;background:var(--paper);color:var(--ink)}
 .scr-page .sorp-workspace-brand{position:sticky;top:0;z-index:60;padding-inline:clamp(20px,3vw,44px);border-bottom:0}
 .scr-page .sorp-workspace-brand a{align-items:center}
 .scr-page .sorp-workspace-brand a>span{font-size:.94rem;line-height:1.1}

@@ -1,5 +1,8 @@
 :root {
   --ivory: #f7f7ef;
+  --white: #ffffff;
+  --paper: #fbfaf7;
+  --orange: #fb3d0b;
   --green: #123e32;
   --green-deep: #10382d;
   --mint: #d6edb6;
@@ -8,6 +11,10 @@
   --line: #d9dfd1;
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "DM Sans", Arial, sans-serif;
+  --font-serif: var(--serif);
+  --font-sans: var(--sans);
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --site-header-height: 88px;
 }
 
 /* Product workspaces own their full-screen navigation and completion flow. */
