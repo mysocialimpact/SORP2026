@@ -455,6 +455,10 @@
 .gateway-build {
   font-variant-numeric: tabular-nums;
 }
+.gateway-build strong,
+.gateway-build time {
+  display: inline;
+}
 .gateway-contact-hero {
   display: grid;
   grid-template-columns: 1.3fr 1fr;

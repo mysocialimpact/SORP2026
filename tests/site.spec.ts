@@ -105,9 +105,8 @@ test("footer identifies the exact build and The Ideas Shed company", async ({
   const build = footer.getByLabel("Website build information");
   await build.scrollIntoViewIfNeeded();
   await expect(build).toBeVisible();
-  await expect(build).toContainText(/Preview · Build \d{8}\.\d{6}/);
-  await expect(build.locator("time")).toContainText(
-    /\d{2}:\d{2}:\d{2} (BST|GMT)/,
+  await expect(build).toHaveText(
+    /^Build \d{8}\.\d{4} · \d{2} [A-Z][a-z]{2} \d{4} · \d{2}:\d{2}$/,
   );
   const timestamp = await build.locator("time").getAttribute("datetime");
   expect(Number.isNaN(Date.parse(timestamp!))).toBe(false);

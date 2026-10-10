@@ -6,7 +6,7 @@ Review preview: https://sorp2026-qbshbvbcu-marcuswarry.vercel.app (`dpl_2rY4mLAR
 
 ## Design and preservation
 
-Footer update: every website build now includes a timestamp-derived build number, its build date/time in Europe/London (explicit BST/GMT), and Preview/Production status. Next.js embeds these at compile time; reloading the page does not advance the timestamp. The Ideas Shed Limited's registered details (England and Wales, company number 17380053) were verified against the footer of `https://www.theideasshed.com/` on 10 October 2026 and added beneath the official logo attribution.
+Footer update: a compact build number and date/time, e.g. `Build 20261010.2135 · 10 Oct 2026 · 22:35`. No seconds or environment labels. Times use Europe/London. Next.js embeds these at compile time; reloading the page does not advance the timestamp. The Ideas Shed Limited's registered details (England and Wales, company number 17380053) were verified against the footer of `https://www.theideasshed.com/` on 10 October 2026 and added beneath the official logo attribution.
 
 Four main navigation destinations: Home, Are You SORP Ready?, Ask SORP, Contact. The gateway uses ink, orange and soft violet, a short typographic opening and two product panels. It retains the existing deeper/supporting URLs without putting them in the main navigation.
 

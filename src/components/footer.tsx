@@ -12,10 +12,8 @@ export function Footer() {
   const buildTime = new Intl.DateTimeFormat("en-GB", {
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
     hour12: false,
     timeZone: "Europe/London",
-    timeZoneName: "short",
   }).format(new Date(builtAt));
   return (
     <footer className="footer gateway-footer">
@@ -46,10 +44,8 @@ export function Footer() {
             </span>
           </p>
           <p className="gateway-build" aria-label="Website build information">
-            <strong>
-              {process.env.NEXT_PUBLIC_SITE_BUILD_ENVIRONMENT} · Build{" "}
-              {process.env.NEXT_PUBLIC_SITE_BUILD_NUMBER}
-            </strong>
+            <strong>Build {process.env.NEXT_PUBLIC_SITE_BUILD_NUMBER}</strong>
+            {" · "}
             <time dateTime={builtAt}>
               {buildDate} · {buildTime}
             </time>

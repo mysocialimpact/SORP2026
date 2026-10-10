@@ -5,17 +5,11 @@ const live = process.env.SITE_LIVE === "true";
 const builtAt = new Date(
   process.env.SORP_BUILD_TIMESTAMP || Date.now(),
 ).toISOString();
-const buildDigits = builtAt.replace(/\D/g, "").slice(0, 14);
+const buildDigits = builtAt.replace(/\D/g, "").slice(0, 12);
 const config: NextConfig = {
   env: {
     NEXT_PUBLIC_SITE_BUILD_NUMBER: `${buildDigits.slice(0, 8)}.${buildDigits.slice(8)}`,
     NEXT_PUBLIC_SITE_BUILT_AT: builtAt,
-    NEXT_PUBLIC_SITE_BUILD_ENVIRONMENT:
-      process.env.VERCEL_ENV === "production" && live
-        ? "Production"
-        : live
-          ? "Live build"
-          : "Preview",
   },
   poweredByHeader: false,
   trailingSlash: true,
