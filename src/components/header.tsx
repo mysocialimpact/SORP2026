@@ -1,28 +1,42 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
-import { Arrow } from "./ui";
-export function Header({ readinessHref }: { readinessHref: string }) {
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+const links = [
+  ["/", "Home"],
+  ["/are-you-sorp-ready/", "Are You SORP Ready?"],
+  ["/ask-sorp/", "Ask SORP"],
+  ["/contact/", "Contact"],
+];
+export function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const toggle = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && open) {
+        setOpen(false);
+        toggle.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [open]);
   return (
-    <header className="header">
-      <div className="shell header-inner">
+    <header className="header gateway-header">
+      <div className="gateway-width gateway-header-inner">
         <Link
-          className="wordmark"
+          className="gateway-wordmark"
           href="/"
           aria-label="SORP 2026 home"
           onClick={() => setOpen(false)}
         >
-          SORP
-          <span className="wordmark-year">
-            2026
-            <span className="brand-star" aria-hidden="true">
-              ✳
-            </span>
-          </span>
+          SORP<span>2026</span>
+          <i aria-hidden="true" />
         </Link>
         <button
-          className="menu-toggle"
+          ref={toggle}
+          className="gateway-menu"
           aria-expanded={open}
           aria-controls="main-nav"
           aria-label={open ? "Close navigation" : "Open navigation"}
@@ -33,27 +47,23 @@ export function Header({ readinessHref }: { readinessHref: string }) {
         <nav
           id="main-nav"
           aria-label="Main navigation"
-          className={open ? "nav nav-open" : "nav"}
+          className={`gateway-nav${open ? " is-open" : ""}`}
         >
-          <Link href="/understanding-sorp" onClick={() => setOpen(false)}>
-            Understanding SORP
-          </Link>
-          <Link href="/#tools" onClick={() => setOpen(false)}>
-            Our tools
-          </Link>
-          <Link href="/#beyond-compliance" onClick={() => setOpen(false)}>
-            Beyond compliance
-          </Link>
-          <Link href="/about" onClick={() => setOpen(false)}>
-            About us
-          </Link>
-          <Link
-            className="nav-cta"
-            href={readinessHref}
-            onClick={() => setOpen(false)}
-          >
-            Check your readiness <Arrow />
-          </Link>
+          {links.map(([href, label]) => (
+            <Link
+              key={href}
+              href={href}
+              aria-current={
+                pathname === href ||
+                (href !== "/" && pathname.startsWith(href.replace(/\/$/, "")))
+                  ? "page"
+                  : undefined
+              }
+              onClick={() => setOpen(false)}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
       </div>
     </header>

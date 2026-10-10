@@ -7,10 +7,10 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Better reporting.Greater impact.",
+    "SORP 2026.Made simpler.",
   );
   for (const link of await page
-    .getByRole("link", { name: "Check your readiness — free" })
+    .getByRole("link", { name: "Start your free review" })
     .all()) {
     await expect(link).toHaveAttribute(
       "href",
@@ -18,7 +18,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     );
   }
   await expect(
-    page.getByText("COMING SOON — BETA", { exact: true }),
+    page.getByText("Coming soon", { exact: true }),
   ).toBeVisible();
   expect(
     await page.evaluate(
@@ -44,20 +44,17 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   if (testInfo.project.name === "mobile") {
     await page.getByRole("button", { name: "Open navigation" }).click();
     await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "Understanding SORP" })
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "Contact", exact: true })
       .click();
   } else {
     await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "Understanding SORP" })
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "Contact", exact: true })
       .click();
   }
-  await expect(page).toHaveURL(/understanding-sorp/);
-  await page
-    .getByText("Is the readiness tool a full SORP compliance check?")
-    .click();
-  await expect(page.getByText("No. Are You SORP Ready? focuses")).toBeVisible();
+  await expect(page).toHaveURL(/contact/);
+  await expect(page.getByRole("link", { name: /marcus@mysocialimpact.org/ })).toHaveAttribute("href", "mailto:marcus@mysocialimpact.org");
   expect(errors).toEqual([]);
 });
 test("all supporting pages render accessibly, without overflow or broken internal links", async ({
@@ -69,6 +66,7 @@ test("all supporting pages render accessibly, without overflow or broken interna
     "/for-advisers/",
     "/about/",
     "/ask-sorp/",
+    "/contact/",
     "/privacy/",
     "/readiness/",
     "/are-you-sorp-ready/",

@@ -5,38 +5,40 @@ import "@fontsource/dm-sans/600.css";
 import "@fontsource/dm-sans/700.css";
 import "@fontsource/instrument-serif/400.css";
 import "@fontsource/instrument-serif/400-italic.css";
+import "@fontsource/lora/400.css";
 import "./globals.css";
+import "./gateway.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
   title: {
-    default: "SORP 2026 — Better reporting. Greater impact.",
+    default: "SORP 2026. Made simpler.",
     template: "%s | SORP 2026",
   },
   description:
-    "Independent SORP 2026 guidance, practical tools and expert insight for charities and the professionals who support them. Brought to you by My Social Impact.",
+    "Practical tools for charities, accountants and advisers navigating SORP 2026. Independent tools developed by My Social Impact.",
   robots: { index: site.live, follow: site.live },
   openGraph: {
     type: "website",
     locale: "en_GB",
     siteName: "SORP 2026",
-    title: "Better reporting. Greater impact.",
+    title: "SORP 2026. Made simpler.",
     description:
       "A clearer path through SORP 2026. Independent guidance and practical tools from My Social Impact.",
     images: [
       {
-        url: "/social-card.png",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "SORP 2026 — Better reporting. Greater impact. Brought to you by My Social Impact.",
+        alt: "SORP 2026. Made simpler. Tools by My Social Impact.",
       },
     ],
   },
   twitter: { card: "summary_large_image" },
 };
-export const viewport: Viewport = { themeColor: "#123e32" };
+export const viewport: Viewport = { themeColor: "#faf9f6" };
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -46,7 +48,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <Header readinessHref={site.readiness ?? "/readiness"} />
+        <Header />
         {children}
         <Footer />
       </body>

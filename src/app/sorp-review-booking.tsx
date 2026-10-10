@@ -10,7 +10,11 @@ type Slot = { start: string; end: string };
 type Details = { name: string; email: string; organisation: string };
 type Checkout = { clientSecret: string; sessionId: string };
 type Confirmation = { session: string; start: string; priceMinor: number; paid?: boolean; invitationSent: boolean };
-const REVIEW_KEY = "msi-sorp-final-candidate-v1";
+const REVIEW_KEY = "msi-sorp-canonical-methodology-v1";
+const LEGACY_REVIEW_KEY = "msi-sorp-final-candidate-v1";
+function storedReview() {
+  return JSON.parse(localStorage.getItem(REVIEW_KEY) || localStorage.getItem(LEGACY_REVIEW_KEY) || "null");
+}
 const formatDate = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: BOOKING_TIME_ZONE, weekday: "long", day: "numeric", month: "long" }).format(new Date(iso)).toUpperCase();
 const formatTime = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: BOOKING_TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
 
@@ -44,7 +48,7 @@ export function SorpReviewBooking({ shared = false, onSelect, humanIntroduction,
   useEffect(() => {
     queueMicrotask(() => {
       try {
-        const stored = JSON.parse(localStorage.getItem(REVIEW_KEY) || "null");
+        const stored = storedReview();
         if (stored) {
           setDetails({ name: stored.name || "", email: stored.email || "", organisation: stored.candidate?.name || "" });
           setReviewSessionId(stored.sessionId || "");
@@ -118,7 +122,7 @@ export function SorpReviewBooking({ shared = false, onSelect, humanIntroduction,
     if (file.size > 4_000_000 || !(/\.(pdf|doc|docx)$/i.test(file.name))) { setError("Choose one PDF or Word document up to 4 MB."); return; }
     setEvidenceBusy(true); setError("");
     try {
-      const stored = JSON.parse(localStorage.getItem(REVIEW_KEY) || "null");
+      const stored = storedReview();
       const form = new FormData();
       form.set("file", file, file.name); form.set("state", JSON.stringify(stored?.state || {})); form.set("sessionId", reviewSessionId || crypto.randomUUID());
       if (stored?.intelligence?.effectiveVersion) form.set("intelligenceVersion", stored.intelligence.effectiveVersion);
@@ -172,7 +176,7 @@ export function SorpReviewBooking({ shared = false, onSelect, humanIntroduction,
         {!checkout && <button className="sorp-meeting-confirm" type="button" disabled={!!busy || !validDetails()} onClick={() => void beginBooking()}>{busy === "booking" ? "CHECKING YOUR TIME…" : offer.priceMinor ? `CONTINUE TO SECURE £${offer.priceMinor / 100} PAYMENT →` : "CONFIRM MY FREE CALL →"}</button>}
         {checkout && <div className="sorp-booking-payment"><h3>SECURE INLINE PAYMENT</h3><p>Your selected time is re-checked before any authorised payment is captured.</p><InlineStripeCheckout clientSecret={checkout.clientSecret} onComplete={finalisePaid}/>{busy === "finalising" && <p role="status">Confirming payment and creating your Calendar invitation…</p>}<button type="button" className="sorp-meeting-close" onClick={() => setCheckout(null)}>CLOSE PAYMENT</button></div>}
       </div>}
-      {confirmation && <div className="sorp-booking-confirmed" role="status"><p className="scr-kicker">YOU’RE BOOKED ✓</p><h2>{confirmation.session}</h2><dl><div><dt>DATE</dt><dd>{formatDate(confirmation.start)}</dd></div><div><dt>TIME</dt><dd>{formatTime(confirmation.start)} · Europe/London</dd></div><div><dt>PRICE</dt><dd>{confirmation.priceMinor ? `£${confirmation.priceMinor / 100} · PAID` : "FREE"}</dd></div></dl>{!askSorp && <p>We already have your SORP review and the comments you added, so you won’t need to start from scratch.</p>}{!askSorp && offer.supportingEvidence && !evidence && <p>Remember to send your Impact Report / wider evidence before the session.</p>}<p>✓ A Google Calendar invitation has been sent.</p></div>}{error && <p className="sp-error" role="alert">{error}</p>}
+      {confirmation && <div className="sorp-booking-confirmed" role="status"><p className="scr-kicker">YOU’RE BOOKED ✓</p><h2>{confirmation.session}</h2><dl><div><dt>DATE</dt><dd>{formatDate(confirmation.start)}</dd></div><div><dt>TIME</dt><dd>{formatTime(confirmation.start)} · Europe/London</dd></div><div><dt>PRICE</dt><dd>{confirmation.priceMinor ? `£${confirmation.priceMinor / 100} · PAID` : "FREE"}</dd></div></dl>{!askSorp && <p>We already have your SORP review and the comments you added, so you won’t need to start from scratch.</p>}{!askSorp && offer.supportingEvidence && !evidence && <p>Remember to send your Impact Report / wider evidence before the session.</p>}<p>{confirmation.invitationSent ? "✓ A Google Calendar invitation has been sent." : "Your booking is confirmed, but the calendar invitation was not confirmed as sent. Please contact marcus@mysocialimpact.org if it does not arrive."}</p></div>}{error && <p className="sp-error" role="alert">{error}</p>}
     </section>}
 
     {!shared && !askSorp && <section className="sorp-meeting-share"><h2>NEED SOMEONE ELSE TO APPROVE THIS?</h2><p>If someone else at your organisation handles payments, send them this booking option.</p>{bookingServices.filter((item) => item.priceMinor > 0 && (!sharedOffer || item.id === sharedOffer)).map((item) => <div key={item.id}><strong>{item.name} · £{item.priceMinor / 100}</strong><button type="button" onClick={() => void share(item.id)}>{copied === item.id ? "LINK COPIED ✓" : "SHARE THIS BOOKING OPTION →"}</button>{copied === `manual-${item.id}` && <p role="status">Copy this link: <a href={sharePath(item.id)}>{`${typeof window === "undefined" ? "https://sorp2026.org" : window.location.origin}${sharePath(item.id)}`}</a></p>}</div>)}<small>The shared page contains only the service, duration, price and what’s included—not your assessment or personal information.</small></section>}

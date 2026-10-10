@@ -1,5 +1,7 @@
 # Editorial sources — checked 10 October 2026
 
+This file records the initial website build. For current production observations, the simplified redesign, official brand assets and integration results, see [redesign-verification.md](redesign-verification.md). The historical hosting observations below are not the current deployment status.
+
 ## Verified live sources
 
 - https://mysocialimpact.org — HTTP 200, published organisation, team biographies, images, platform and studio links.
