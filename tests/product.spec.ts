@@ -28,17 +28,22 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
 
 test("destination APIs fail safely without production credentials", async ({ request }) => {
   const account = await request.get("/api/readiness-account");
-  expect(account.status()).toBe(200);
-  expect(await account.json()).toEqual({ signedIn: false });
+  expect(account.status()).toBe(503);
+  await expect(account.json()).resolves.toEqual({
+    error: "The existing SORP service connection is temporarily unavailable.",
+  });
 
   const payment = await request.post("/api/sorp-payments/checkout", {
     data: { paymentType: "voluntary_support", amountMinor: 500 },
   });
   expect(payment.status()).toBe(503);
-  await expect(payment.json()).resolves.toMatchObject({
-    error: "Secure checkout is temporarily unavailable.",
+  await expect(payment.json()).resolves.toEqual({
+    error: "The existing SORP service connection is temporarily unavailable.",
   });
 
   const booking = await request.get("/api/booking/availability?service=initial");
-  expect([400, 503]).toContain(booking.status());
+  expect(booking.status()).toBe(503);
+  await expect(booking.json()).resolves.toEqual({
+    error: "The existing SORP service connection is temporarily unavailable.",
+  });
 });

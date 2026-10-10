@@ -28,11 +28,3 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 14
-      - run: STATIC_EXPORT=true SITE_LIVE=false npm run build
-      - run: cp deploy/ionos-preview.htaccess out/.htaccess
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ionos-preview-site
-          path: out/
-          include-hidden-files: true
-          retention-days: 14
