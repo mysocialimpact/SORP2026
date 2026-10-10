@@ -112,7 +112,7 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
     try {
       const response = await fetch("/api/sorp-payments/checkout", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ paymentType, band: paymentType === "human_review" ? band : null, amountMinor, sessionId, organisation, idempotencyKey: key }),
+        body: JSON.stringify({ paymentType, band: paymentType === "human_review" ? band : null, amountMinor, sessionId, organisation, idempotencyKey: key, returnOrigin: window.location.origin }),
       });
       const data = await response.json() as { url?: string; error?: string };
       if (!response.ok || !data.url) throw new Error(data.error || "We could not open secure checkout just now.");

@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 const review = readFileSync(new URL("../../src/app/sorp-candidate-review.tsx", import.meta.url), "utf8");
 const google = readFileSync(new URL("../../src/app/booking-google.ts", import.meta.url), "utf8");
 const googleCallback = readFileSync(new URL("../../src/app/api/booking/google/callback/route.ts", import.meta.url), "utf8");
+const backendProxy = readFileSync(new URL("../../src/app/backend-proxy.ts", import.meta.url), "utf8");
 const reviewStyles = readFileSync(new URL("../../src/app/sorp-candidate-review.css", import.meta.url), "utf8");
 
 test("the saved account gate sits before public report retrieval and captures the required profile", () => {
@@ -36,13 +37,11 @@ test("account access remains clearly visible in the sticky top-right header", ()
   assert.match(reviewStyles, /@media\(max-width:900px\)[\s\S]*grid-template-columns:minmax\(0,1fr\) auto/);
 });
 
-test("Google account sign-in retries temporary failures and recovers an interrupted first callback", () => {
-  assert.match(googleCallback, /attempt <= 3/);
-  assert.match(googleCallback, /response\.status === 429 \|\| response\.status >= 500/);
-  assert.match(googleCallback, /account\.response\?\.status === 401/);
-  assert.match(googleCallback, /account\.response\?\.status === 409/);
-  assert.match(googleCallback, /action: "login"/);
-  assert.match(googleCallback, /action: "signup"/);
+test("Google account callback stays on the destination while the existing backend handles the account", () => {
+  assert.match(googleCallback, /proxyExistingSorpBackend\(request, "\/api\/booking\/google\/callback"\)/);
+  assert.match(backendProxy, /redirect: "manual"/);
+  assert.match(backendProxy, /"location"/);
+  assert.match(backendProxy, /getSetCookie/);
 });
 
 test("Google account sign-in requests identity only and uses a short-lived signed state", () => {
