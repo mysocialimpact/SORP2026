@@ -166,7 +166,8 @@ export default function Home() {
             <h2 id="people-title">The people behind the tools.</h2>
             <p>
               Developed by My Social Impact—combining financial rigour,
-              practical charity experience and creative thinking.
+              monitoring and evaluation, technology, practical charity
+              experience and creative thinking.
             </p>
             <Link className="gateway-quiet-link" href="/contact/">
               Say hello <Arrow diagonal />
@@ -204,6 +205,38 @@ export default function Home() {
                 <p>
                   Social impact strategist
                   <br />& creative campaign specialist
+                </p>
+              </figcaption>
+            </figure>
+            <figure>
+              <Image
+                src="/images/gareth-murphy.webp"
+                alt="Gareth Murphy"
+                width={1123}
+                height={1401}
+                sizes="(max-width: 700px) 44vw, 240px"
+              />
+              <figcaption>
+                <h3>Gareth Murphy</h3>
+                <p>
+                  Data, systems
+                  <br />& technology
+                </p>
+              </figcaption>
+            </figure>
+            <figure>
+              <Image
+                src="/images/nicholas-demeter.webp"
+                alt="Nicholas Demeter"
+                width={1023}
+                height={1537}
+                sizes="(max-width: 700px) 44vw, 240px"
+              />
+              <figcaption>
+                <h3>Nicholas Demeter</h3>
+                <p>
+                  Monitoring &amp; evaluation
+                  <br />USAID &amp; international development
                 </p>
               </figcaption>
             </figure>

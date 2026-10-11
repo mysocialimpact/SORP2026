@@ -440,7 +440,8 @@
 .gateway-portraits {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  column-gap: 24px;
+  row-gap: 34px;
 }
 .gateway-portraits figure {
   margin: 0;
@@ -457,7 +458,7 @@
   font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.035em;
-  margin: 16px 0 8px;
+  margin: 13px 0 6px;
 }
 .gateway-portraits h3 span {
   font-size: 11px;
@@ -1266,7 +1267,8 @@
     gap: 40px;
   }
   .gateway-portraits {
-    gap: 16px;
+    column-gap: 16px;
+    row-gap: 28px;
   }
   .gateway-portraits img {
     height: 200px;
@@ -1475,7 +1477,8 @@
     margin-top: 10px;
   }
   .gateway-portraits {
-    gap: 16px;
+    column-gap: 16px;
+    row-gap: 28px;
   }
   .gateway-portraits img {
     height: 210px;

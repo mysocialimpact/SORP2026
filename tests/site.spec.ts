@@ -29,6 +29,13 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   await expect(
     page.getByRole("heading", { name: "The people behind the tools." }),
   ).toBeVisible();
+  await expect(page.getByRole("img", { name: "Gareth Murphy" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Nicholas Demeter" })).toBeVisible();
+  const nicholasProfile = page.getByRole("figure").filter({
+    has: page.getByRole("heading", { name: "Nicholas Demeter" }),
+  });
+  await expect(nicholasProfile).toContainText("Monitoring & evaluation");
+  await expect(nicholasProfile).toContainText("USAID & international development");
   const sectionHierarchy = await page.locator(".platform-family-head").evaluate((header) => {
     const heading = header.querySelector("h2");
     const introduction = header.querySelector("p:last-child");
