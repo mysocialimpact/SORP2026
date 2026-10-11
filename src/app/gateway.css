@@ -669,11 +669,9 @@
 @keyframes ask-arrive {
   from {
     transform: translateX(25px);
-    opacity: 0;
   }
   to {
     transform: translateX(0);
-    opacity: 1;
   }
 }
 @media (min-width: 1600px) {
