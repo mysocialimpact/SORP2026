@@ -17,10 +17,15 @@ test("homepage presents the social enterprise mission and agreed vision", async 
 test("mission page is concise, partner-friendly and accessible", async ({ page }) => {
   await page.goto("/our-mission/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Technology should make doing good easier");
-  await expect(page.getByText("Free wherever possible. Affordable where we need to charge.", { exact: false })).toBeVisible();
+  await expect(page.getByText("solving social and environmental problems", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Use technology wherever it helps. Bring in people wherever they matter." })).toBeVisible();
+  await expect(page.getByText("judgement, perspective or care", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Free wherever possible" })).toBeVisible();
   await expect(page.getByText("Our tools are designed to work alongside your existing advisers, not replace them.", { exact: false })).toBeVisible();
-  await expect(page.getByAltText("My Social Impact").first()).toBeVisible();
-  await expect(page.getByAltText("The Ideas Shed").first()).toBeVisible();
+  await expect(page.getByRole("main").getByAltText("My Social Impact")).toHaveCount(0);
+  await expect(page.getByRole("main").getByAltText("The Ideas Shed")).toHaveCount(0);
+  await expect(page.getByRole("contentinfo").getByAltText("My Social Impact")).toBeVisible();
+  await expect(page.getByRole("contentinfo").getByAltText("The Ideas Shed")).toBeVisible();
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
 });
