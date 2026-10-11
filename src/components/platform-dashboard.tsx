@@ -9,7 +9,7 @@ import { Arrow } from "@/components/ui";
 type Account = { name: string; email: string; position: string; organisation?: string; lastSavedAt?: string };
 type Progress = { step?: string; candidate?: { name?: string }; report?: unknown; sessionId?: string; criterion?: number; corrections?: Record<string, { reviewed?: boolean }> };
 type AccountResponse = { signedIn?: boolean; account?: Account; progress?: Progress; error?: string };
-type ExcellenceProgress = { status?: string; data?: { answers?: Array<number | null>; result?: unknown; purpose?: { status?: string; progress?: number } } };
+type ExcellenceProgress = { status?: string; data?: { answers?: Array<number | null>; result?: unknown; purpose?: { status?: string; progress?: number }; migration?: { source?: string } } };
 type ReportReview = { id: string; filename: string; status: string; feedbackReady?: boolean };
 
 const completeSteps = new Set(["report-ready", "report", "email-ready", "final-feedback", "support", "before-go", "next", "help", "done"]);
@@ -113,10 +113,16 @@ export function PlatformDashboard() {
   const excellenceAnswered = excellence?.data?.answers?.filter(answer => answer !== null).length || 0;
   const excellenceComplete = excellence?.status === "complete" && Boolean(excellence.data?.result);
   const purposeStatus = excellence?.data?.purpose?.status;
-  const excellenceLabel = purposeStatus === "complete" ? "Purpose pathway complete" : purposeStatus && purposeStatus !== "not_started" ? `Purpose · ${excellence.data?.purpose?.progress || 0}%` : excellenceComplete ? "Baseline complete" : excellenceAnswered ? `${excellenceAnswered} of 25 answered` : "Ready to start";
+  const purposeStarted = Boolean(purposeStatus && purposeStatus !== "not_started");
+  const purposeProgress = Math.max(0, Math.min(100, excellence?.data?.purpose?.progress || 0));
+  const excellenceLabel = purposeStatus === "complete" ? "Purpose pathway complete" : purposeStarted ? `Baseline complete · Purpose started` : excellenceComplete ? "Baseline complete" : excellenceAnswered ? `${excellenceAnswered} of 25 answered` : "Ready to start";
   const latestReportReview = reportReviews[0];
   const readinessPercent = readinessPercentage(progress, readinessStarted, readinessComplete);
-  const excellencePercent = purposeStatus && purposeStatus !== "not_started" ? Math.max(0, Math.min(100, excellence?.data?.purpose?.progress || 0)) : excellenceComplete ? 100 : Math.round(excellenceAnswered / 25 * 100);
+  // The baseline is a completed first stage, so opening Purpose must never make
+  // the product appear to fall backwards from complete to zero progress.
+  const excellencePercent = excellenceComplete
+    ? purposeStatus === "complete" ? 100 : purposeStarted ? Math.round(20 + purposeProgress * 0.8) : 20
+    : Math.round(excellenceAnswered / 25 * 20);
   const reportPercent = reportReviewPercentage(latestReportReview);
   const productProgress: ProductProgress[] = [
     { number: "01", name: "Are You SORP Ready?", status: readinessComplete ? "Complete" : readinessStarted ? "In progress" : "Not started", percentage: readinessPercent },
@@ -148,7 +154,7 @@ export function PlatformDashboard() {
       <header><p className="gateway-kicker">Beyond reporting</p><h2 id="dashboard-impact-title">Strengthen your impact.</h2><p>Practical tools and human expertise for understanding, improving and communicating the difference you make.</p></header>
       <div className="dashboard-products">
         <article className="dashboard-card is-director"><div className="dashboard-card-top"><span>03</span><b>Explore</b></div><h2>My <em>Impact</em><br/>Director</h2><p>Ongoing senior impact expertise for charities.</p><Link href="/my-impact-director/">Explore support <Arrow /></Link></article>
-        <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{excellenceLabel}</b></div><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200}/><p>{excellenceComplete ? "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
+        <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{excellenceLabel}</b></div><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200}/>{excellence?.data?.migration?.source === "legacy-social-impact-excellence" ? <p className="dashboard-context">Your previous assessment has been brought into this account.</p> : null}<p>{excellenceComplete ? purposeStarted ? "Your completed baseline is safe here. Continue with the Purpose pathway when you are ready." : "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
         <article className="dashboard-card is-reports"><div className="dashboard-card-top"><span>05</span><b>{latestReportReview ? latestReportReview.feedbackReady ? "Feedback ready" : latestReportReview.status === "awaiting_payment" ? "Report uploaded" : latestReportReview.status.replaceAll("_", " ") : "Available"}</b></div><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887}/><p>{latestReportReview ? latestReportReview.filename : "£100 written review and a 60-minute expert discussion."}</p><Link href="/charity-impact-reports/review/">{latestReportReview ? "View review status" : "Start report review"} <Arrow /></Link></article>
         <article className="dashboard-card is-purpose"><div className="dashboard-card-top"><span>06</span><b>Explore</b></div><Image src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809}/><p>Turn purpose into meaningful action and credible communication.</p><Link href="/purpose-works/">Explore Purpose Works <Arrow /></Link></article>
       </div>

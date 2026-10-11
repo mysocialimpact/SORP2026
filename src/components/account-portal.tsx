@@ -89,6 +89,6 @@ export function AccountPortal() {
       {mode === "login" && <Link className="account-forgot" href="/forgot-password/">Forgotten your password?</Link>}
       <button className="gateway-action account-submit" disabled={busy} type="submit">{busy ? "Please wait…" : mode === "login" ? "Log in to SORP2026 →" : "Create my SORP2026 account →"}</button>
     </form>}
-    <p className="account-note">One account for the SORP readiness review and your SORP2026 dashboard. Google sign-in remains unavailable until its existing configuration is fully verified.</p>
+    <p className="account-note">One account for every SORP2026 product. If you previously used Social Impact Excellence, sign up with the same email address and eligible saved work will reconnect automatically. Google sign-in remains unavailable until its existing configuration is fully verified.</p>
   </div>;
 }
