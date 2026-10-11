@@ -2,15 +2,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { AccountControl } from "./account-control";
 const links = [
   ["/", "Home"],
-  ["/are-you-sorp-ready/", "Are You SORP Ready?"],
-  ["/ask-sorp/", "Ask SORP"],
+  ["/#products", "Products"],
   ["/contact/", "Contact"],
 ];
 export function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const productWorkspace = pathname.startsWith("/are-you-sorp-ready/review");
   const toggle = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
@@ -55,7 +56,7 @@ export function Header() {
               href={href}
               aria-current={
                 pathname === href ||
-                (href !== "/" && pathname.startsWith(href.replace(/\/$/, "")))
+                (href !== "/" && !href.includes("#") && pathname.startsWith(href.replace(/\/$/, "")))
                   ? "page"
                   : undefined
               }
@@ -64,6 +65,7 @@ export function Header() {
               {label}
             </Link>
           ))}
+          {!productWorkspace && <AccountControl onNavigate={() => setOpen(false)} />}
         </nav>
       </div>
     </header>

@@ -3,7 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { MsiBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
+import { ExperienceCloud } from "@/components/experience-cloud";
 import { site } from "@/lib/site";
+import { excellenceProducts } from "@/lib/products";
 export const metadata: Metadata = {
   title: "SORP 2026. Made simpler.",
   ...(site.live ? { alternates: { canonical: "/" } } : {}),
@@ -24,12 +26,12 @@ export default function Home() {
           <div className="gateway-intro-aside">
             <p>
               Practical tools for charities, accountants and advisers navigating
-              the new charity reporting requirements.
+              reporting requirements and creating greater impact.
             </p>
             <MsiBrand />
           </div>
         </section>
-        <section className="gateway-products" aria-label="Our tools" id="tools">
+        <section className="gateway-products" aria-label="SORP 2026 tools" id="products">
           <article className="gateway-ready">
             <div className="gateway-product-top">
               <span className="gateway-status">
@@ -96,6 +98,31 @@ export default function Home() {
             </span>
           </article>
         </section>
+        <section className="platform-family" aria-labelledby="platform-family-title">
+          <header className="platform-family-head">
+            <p className="gateway-kicker">From compliance to excellence</p>
+            <h2 id="platform-family-title">Reporting is the beginning.</h2>
+            <p>Four ways to make impact clearer, stronger and part of everyday practice.</p>
+          </header>
+          <div className="platform-family-grid">
+            {excellenceProducts.map(product => (
+              <Link href={product.href} className={`platform-family-card ${product.className}`} key={product.slug}>
+                <span className="platform-family-meta"><b>{product.number}</b>{product.status}</span>
+                {product.slug === "social-impact-excellence" && <Image className="platform-family-logo is-excellence" src="/product/social-impact-excellence.svg" alt="Social Impact Excellence" width={1600} height={500} />}
+                {product.slug === "charity-impact-reports" && <Image className="platform-family-logo is-reports" src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887} />}
+                {product.slug === "purpose-works" && <Image className="platform-family-logo is-purpose" src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809} />}
+                {product.slug === "my-impact-director" && <h3 className="platform-family-director">My <em>Impact</em><br/>Director</h3>}
+                <div className="platform-family-card-copy">
+                  <p>{product.short}</p>
+                  <span>Explore <Arrow /></span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
+      <ExperienceCloud />
+      <div className="gateway-width">
         <section className="gateway-people" aria-labelledby="people-title">
           <div className="gateway-people-intro">
             <p className="gateway-kicker">People behind the tools</p>
@@ -142,8 +169,8 @@ export default function Home() {
               <figcaption>
                 <h3>Dr Chris Arnold</h3>
                 <p>
-                  Co-founder · Brand, Purpose
-                  <br />& Ethical Marketing
+                  Social impact strategist
+                  <br />& creative campaign specialist
                 </p>
               </figcaption>
             </figure>

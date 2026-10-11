@@ -8,6 +8,7 @@ import "@fontsource/instrument-serif/400-italic.css";
 import "@fontsource/lora/400.css";
 import "./globals.css";
 import "./gateway.css";
+import "./platform.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { site } from "@/lib/site";
