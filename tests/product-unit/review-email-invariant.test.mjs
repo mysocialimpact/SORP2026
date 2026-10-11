@@ -35,7 +35,7 @@ test("report email waits for the completed report, then sends once before option
   assert.match(finalEffect, /if \(!reportComplete\)/);
   assert.match(finalEffect, /saved\.emailSent/);
   assert.match(finalEffect, /emailAttempt\.current === receiptKey/);
-  const finalSend = source.slice(source.indexOf("async function sendFinalReport("), source.indexOf("async function contribute("));
+  const finalSend = source.slice(source.indexOf("async function sendFinalReport("), source.indexOf("function back("));
   assert.match(finalSend, /"final-feedback"/);
   assert.match(finalSend, /"done"/);
   assert.match(finalSend, /deliveryStage: "report-complete"/);

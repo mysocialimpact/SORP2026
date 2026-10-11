@@ -5,7 +5,13 @@ import { loadStripe, type StripeEmbeddedCheckout } from "@stripe/stripe-js";
 
 // Stripe publishable keys identify the account in browser code; the secret key
 // stays only in the existing payment service. This is the account's live key.
-const stripePromise = loadStripe("pk_live_51TmpEHFnN1aHQF6IYpnh7DW0aYI7LTsdKZRpIGG6zJnSPyNPYiUzgfx1CuLM4hLtXHUMhjMlCXLhTUcl8nyIpOtF00BLC5lNlM");
+let stripePromise: ReturnType<typeof loadStripe> | null = null;
+function stripeClient() {
+  // Loading Stripe only after a visitor chooses to contribute keeps the public
+  // homepage fast and avoids contacting a payment provider unnecessarily.
+  stripePromise ??= loadStripe("pk_live_51TmpEHFnN1aHQF6IYpnh7DW0aYI7LTsdKZRpIGG6zJnSPyNPYiUzgfx1CuLM4hLtXHUMhjMlCXLhTUcl8nyIpOtF00BLC5lNlM");
+  return stripePromise;
+}
 
 export function SorpPublicSupportCheckout({ clientSecret, sessionId, onPaid }: { clientSecret: string; sessionId: string; onPaid: () => void }) {
   const mount = useRef<HTMLDivElement>(null);
@@ -39,7 +45,7 @@ export function SorpPublicSupportCheckout({ clientSecret, sessionId, onPaid }: {
     }
     async function attach() {
       try {
-        const stripe = await stripePromise;
+        const stripe = await stripeClient();
         if (!stripe || !mount.current || cancelled) throw new Error("Secure payment could not be opened.");
         checkout = await stripe.initEmbeddedCheckout({ clientSecret, onComplete: () => { void verify(); } });
         if (cancelled || !mount.current) { checkout.destroy(); return; }

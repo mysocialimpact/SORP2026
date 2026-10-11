@@ -7,8 +7,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { tierFromSetup, tierLabel, type AssessmentSetup } from "./sorp-questionnaire";
 import { answers, answerScores, groups, methodologyVersion, reportingStrengthBands, requirementFor, scoreCanonical, tests, type CanonicalAnswer, type MethodologyTier } from "./sorp-methodology-v1";
 import { trackSorpEvent } from "./sorp-growth";
-import { supportPence, type SupportChoice } from "./sorp-payment-amounts";
-import { SorpPublicSupportCheckout } from "./sorp-public-support-checkout";
+import { useVoluntaryContribution, VoluntaryContributionControls } from "@/components/voluntary-contribution";
 import { SorpReviewBooking } from "./sorp-review-booking";
 import { SorpMarcus } from "./sorp-marcus";
 import { SorpIdentityPreview } from "./sorp-identity-preview";
@@ -268,9 +267,6 @@ export function SorpCandidateReview() {
   const [reportSlide, setReportSlide] = useState(0);
   const [generationReady, setGenerationReady] = useState(false);
   const [milestone, setMilestone] = useState("");
-  const [support, setSupport] = useState<SupportChoice>(5);
-  const [custom, setCustom] = useState("");
-  const [checkout, setCheckout] = useState<{ clientSecret: string; sessionId: string } | null>(null);
   const [emailSending, setEmailSending] = useState(false);
   const [feedbackStatus, setFeedbackStatus] = useState<{ quick: string; final: string }>({ quick: "", final: "" });
   const [problemEmail, setProblemEmail] = useState("");
@@ -286,6 +282,13 @@ export function SorpCandidateReview() {
   const [accountError, setAccountError] = useState("");
   const [googleSignInStarting, setGoogleSignInStarting] = useState(false);
   const [reportDragActive, setReportDragActive] = useState(false);
+  const contribution = useVoluntaryContribution({
+    sessionId: saved.sessionId,
+    organisation: saved.candidate?.name,
+    email: saved.email,
+    onStarted: amountMinor => event("support_payment_started", { amountMinor, currency: "GBP", paymentType: "voluntary_support" }),
+    onPaid: () => setSaved(state => ({ ...state, supportPaid: true })),
+  });
 
   useEffect(() => {
     if (hydrated.current) return;
@@ -689,25 +692,17 @@ export function SorpCandidateReview() {
     if (navigator.locks) await navigator.locks.request(receiptKey, send);
     else await send();
   }
-  async function contribute() {
-    const amountMinor = supportPence(support, custom);
-    if (!amountMinor || busy) return; setBusy("support"); setError(""); event("support_payment_started", { amountMinor, currency: "GBP", paymentType: "voluntary_support" });
-    try { const data = await post("/api/sorp-payments/checkout", { paymentType: "voluntary_support", presentation: "embedded", band: null, amountMinor, sessionId: saved.sessionId, organisation: saved.candidate?.name, email: saved.email, idempotencyKey: `${saved.sessionId}:support:${amountMinor}:${crypto.randomUUID()}` }); if (data.presentation !== "embedded" || !data.clientSecret || !data.id) throw new Error("Inline payment could not be opened. No payment was taken."); setCheckout({ clientSecret: data.clientSecret, sessionId: data.id }); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : "Inline payment could not open. No payment was taken."); }
-    finally { setBusy(""); }
-  }
-
   function back() {
     const previous = navigation.past.at(-1);
     if (!previous || busy) return;
-    setCheckout(null); setError("");
+    contribution.close(); setError("");
     setNavigation(history => ({ past: history.past.slice(0, -1), current: previous, future: [history.current, ...history.future] }));
     setSaved(state => ({ ...state, ...previous }));
   }
   function forward() {
     const next = navigation.future[0];
     if (!next || busy) return;
-    setCheckout(null); setError("");
+    contribution.close(); setError("");
     setNavigation(history => ({ past: [...history.past, history.current], current: next, future: history.future.slice(1) }));
     setSaved(state => ({ ...state, ...next }));
   }
@@ -816,7 +811,7 @@ export function SorpCandidateReview() {
         </>}
         {saved.step === "email-ready" && <><SorpScreenHero><p className="scr-kicker">YOUR PERSONALISED REPORT IS READY ✓</p><h1>Your report is yours.</h1></SorpScreenHero><div className="scr-email-celebration"><small>YOUR REPORT IS READY</small><span aria-hidden="true">✓</span></div><p>It includes your Historical Snapshot, current self-reported readiness, the {tests.length} canonical questions, your comments, SORP sources and your priorities.</p><p>Share it with colleagues or trustees, use it as an internal action plan, or bring it to a conversation with My Social Impact.</p></>}
         {saved.step === "final-feedback" && <><SorpScreenHero><p className="scr-kicker">OPTIONAL · A FEW SECONDS</p><h1>HELP THE NEXT CHARITY</h1></SorpScreenHero><p>One quick piece of feedback helps us improve the tool. Skip it if now is not a good moment.</p><FeedbackPanel overall rating={saved.finalRating} comment={saved.finalComment} status={feedbackStatus.final} onRating={value => { setSaved(state => ({ ...state, finalRating: value })); void saveFeedback("final", value, saved.finalComment); }} onComment={value => { setFeedbackStatus(current => ({ ...current, final: "" })); setSaved(state => ({ ...state, finalComment: value })); }} onCommentBlur={() => void saveFeedback("final", saved.finalRating, saved.finalComment)}/></>}
-        {saved.step === "support" && <><SorpScreenHero><p className="scr-kicker">WHAT NEXT · OPTIONAL CONTRIBUTION</p><h1>ENJOYED THIS?{" "}PLEASE HELP US KEEP IT FREE.</h1></SorpScreenHero><p className="scr-lead">If this has been useful, a small contribution helps us keep building and running free tools like this, particularly for smaller charities.</p><p>Your report is already yours. This is completely optional.</p>{saved.supportPaid ? <p className="scr-mail">THANK YOU. THAT GENUINELY HELPS ✓</p> : checkout ? <><SorpPublicSupportCheckout clientSecret={checkout.clientSecret} sessionId={checkout.sessionId} onPaid={() => { setSaved(state => ({ ...state, supportPaid: true })); setCheckout(null); }}/><button type="button" className="scr-clear" onClick={() => setCheckout(null)}>CLOSE PAYMENT AND STAY HERE</button></> : <><div className="scr-amounts">{([5, 10, 20, "other"] as const).map(amount => <button key={amount} type="button" aria-pressed={support === amount} onClick={() => setSupport(amount)}>{amount === "other" ? "OTHER" : `£${amount}`}</button>)}</div>{support === "other" && <label className="scr-context">Amount in pounds<input inputMode="decimal" value={custom} onChange={e => setCustom(e.target.value)} /></label>}</>}</>}
+        {saved.step === "support" && <><SorpScreenHero><p className="scr-kicker">WHAT NEXT · OPTIONAL CONTRIBUTION</p><h1>ENJOYED THIS?{" "}PLEASE HELP US KEEP IT FREE.</h1></SorpScreenHero><p className="scr-lead">If this has been useful, a small contribution helps us keep building and running free tools like this, particularly for smaller charities.</p><p>Your report is already yours. This is completely optional.</p><VoluntaryContributionControls contribution={contribution} paid={saved.supportPaid} variant="assessment" /></>}
         {saved.step === "before-go" && <div className="scr-ending-intro"><SorpScreenHero><p className="scr-kicker">YOUR REPORT IS COMPLETE ✓</p><h1>ONE USEFUL IDEA BEFORE YOU GO.</h1></SorpScreenHero><p className="scr-lead">Your personalised report is already yours. Nothing that follows changes that.</p><p>There are two short, optional screens about using impact information throughout the year and the human help available if you want it.</p><p className="scr-ending-promise">{saved.emailSent ? `We’ve also emailed the PDF to ${saved.email}.` : emailSending ? `We’re emailing the PDF to ${saved.email} now.` : `The PDF will be sent to ${saved.email}; your report remains available here.`}</p></div>}
         {saved.step === "next" && <><SorpScreenHero><p className="scr-kicker">BEYOND THE ANNUAL REPORT</p><h1>Better impact is the opportunity.</h1></SorpScreenHero><p className="scr-lead">SORP readiness matters. But useful impact information should also help your organisation make better decisions every month, not be reconstructed at year-end.</p><div className="scr-next-list">{[{title:"PURPOSE",text:"Be clear about the change you exist to create."},{title:"LEADERSHIP",text:"Put impact into governance, accountability and everyday decisions."},{title:"DATA",text:"Gather useful evidence and measure what matters."},{title:"DELIVERY",text:"Use evidence to improve programmes, services and results."},{title:"COMMUNICATION",text:"Explain the difference clearly, credibly and transparently."}].map((item,index)=><article key={item.title}><small>{String(index+1).padStart(2,"0")}</small><div><h2>{item.title}</h2><p>{item.text}</p></div></article>)}</div><div className="scr-next-value"><h2>WHY THIS MATTERS</h2><p>It gives trustees better oversight, helps managers learn and prioritise, and gives funders and donors clearer evidence of the value their support creates.</p><p>We call this <strong>Social Impact Excellence</strong>: treating impact as a practical management discipline throughout the year.</p></div></>}
         {saved.step === "help" && <><SorpReviewBooking reviewHeading={<SorpScreenHero><h1>WANT TO TALK THROUGH YOUR RESULTS?</h1></SorpScreenHero>} humanIntroduction={<SorpMarcus variant="booking" />} onSelect={() => event("book_conversation_clicked")} /><section className="scr-implementation-support"><p className="scr-kicker">AFTER THE HUMAN REVIEW · OPTIONAL</p><h2>NEED HELP MAKING THE CHANGES?</h2><p>After your review, we can help you implement what is needed. Practical SORP-readiness and Social Impact Excellence support starts from £250, depending on the work required.</p><p>This can include addressing reporting priorities and starting a practical year-round approach to defining, measuring, managing and communicating impact.</p><p>The assessment identifies areas worth discussing. The human review is where MSI agrees what work, if any, your charity actually needs. The AI does not prescribe a service.</p><div className="scr-implementation-links"><a href="mailto:marcus@mysocialimpact.org?subject=Social%20Impact%20Report%20review" onClick={() => event("social_impact_report_review_clicked")}>ASK US TO REVIEW YOUR SOCIAL IMPACT REPORT →</a><a href="mailto:marcus@mysocialimpact.org?subject=Implementation%20support%20from%20%C2%A3250" onClick={() => event("implementation_support_clicked")}>ASK ABOUT SUPPORT FROM £250 →</a></div></section></>}
@@ -880,7 +875,7 @@ export function SorpCandidateReview() {
         {saved.step === "report" && <button onClick={() => { if (saved.reportView === 0) setSaved(state => ({ ...state, reportView: 1 })); else go("final-feedback"); }}>{saved.reportView === 0 ? "SEE MY PRIORITIES" : "FINISH MY REVIEW"}<span>→</span></button>}
         {saved.step === "email-ready" && <button onClick={() => go("final-feedback")}>CONTINUE <span>→</span></button>}
         {saved.step === "final-feedback" && <><button className="is-secondary" onClick={() => { go("support"); event("support_ask_viewed"); }}>SKIP FOR NOW</button><button onClick={() => { go("support"); event("support_ask_viewed"); }}>CONTINUE <span>→</span></button></>}
-        {saved.step === "support" && (saved.supportPaid ? <button onClick={() => go("before-go")}>SEE WHAT COMES NEXT <span>→</span></button> : <><button className="is-secondary" onClick={() => { setCheckout(null); go("before-go"); }}>NOT NOW <span>→</span></button>{!checkout && <button disabled={!!busy || !supportPence(support, custom)} onClick={() => void contribute()}>{busy === "support" ? "OPENING PAYMENT…" : "CONTRIBUTE"}<span>→</span></button>}</>)}
+        {saved.step === "support" && (saved.supportPaid ? <button onClick={() => go("before-go")}>SEE WHAT COMES NEXT <span>→</span></button> : <><button className="is-secondary" onClick={() => { contribution.close(); go("before-go"); }}>NOT NOW <span>→</span></button>{!contribution.checkout && <button disabled={!!busy || contribution.busy || !contribution.amountMinor} onClick={() => void contribution.contribute()}>{contribution.busy ? "OPENING PAYMENT…" : "CONTRIBUTE"}<span>→</span></button>}</>)}
         {saved.step === "next" && <button className="is-secondary" onClick={() => go("done")}>SKIP TO FINISH <span>→</span></button>}
         {saved.step === "help" && <div className="scr-booking-actions">
           {[["10 MIN — FREE", "BOOK FREE CALL", "ten_minute_call_clicked"], ["30 MIN — £50", "BOOK £50 REVIEW", "review_cta_clicked"], ["60 MIN — £100", "BOOK £100 REVIEW", "social_impact_report_review_clicked"]].map(([label, action, eventType], index) => <button type="button" className="scr-booking-choice" key={label} onClick={() => { event(eventType); document.querySelectorAll<HTMLButtonElement>(".sorp-meetings-options .sorp-meeting-book")[index]?.click(); }}><small>{label}</small><strong>{action} →</strong></button>)}

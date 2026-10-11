@@ -31,6 +31,7 @@ export function Footer() {
             <a href={site.official}>official SORP</a> or professional judgement.
           </p>
           <div>
+            <Link href="/our-mission/">Our mission</Link>
             <Link href="/privacy/">Privacy & accessibility</Link>
             <Link href="/contact/">Contact</Link>
             <span>© {new Date().getFullYear()} My Social Impact</span>
