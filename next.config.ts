@@ -5,10 +5,12 @@ const live = process.env.SITE_LIVE === "true";
 const builtAt = new Date(
   process.env.SORP_BUILD_TIMESTAMP || Date.now(),
 ).toISOString();
-const buildDigits = builtAt.replace(/\D/g, "").slice(0, 12);
+// Keep this as a simple release counter. Increment it for each approved
+// website release; SORP_BUILD_NUMBER can override it in a release pipeline.
+const buildNumber = process.env.SORP_BUILD_NUMBER || "1";
 const config: NextConfig = {
   env: {
-    NEXT_PUBLIC_SITE_BUILD_NUMBER: `${buildDigits.slice(0, 8)}.${buildDigits.slice(8)}`,
+    NEXT_PUBLIC_SITE_BUILD_NUMBER: buildNumber,
     NEXT_PUBLIC_SITE_BUILT_AT: builtAt,
   },
   poweredByHeader: false,
