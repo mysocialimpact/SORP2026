@@ -81,6 +81,7 @@
   0%, 88%, 100% { color: #d5d0d8; background: transparent; border-color: #ffffff18; }
   92%, 96% { color: #242329; background: #d8ff52; border-color: #d8ff52; }
 }
+.ask-scene { animation: none; }
 .ask-scene .gateway-kicker, .ask-scene-copy, .ask-scene-detail { color: #4f4659; }
 .ask-scene h2 em { color: #583875; }
 
