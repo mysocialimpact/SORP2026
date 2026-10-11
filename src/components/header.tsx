@@ -6,6 +6,7 @@ import { AccountControl } from "./account-control";
 const links = [
   ["/", "Home"],
   ["/#products", "Products"],
+  ["/our-mission/", "Our mission"],
   ["/contact/", "Contact"],
 ];
 export function Header() {

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { MsiBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
 import { ExperienceCloud } from "@/components/experience-cloud";
+import { HomepageContribution } from "@/components/voluntary-contribution";
 import { site } from "@/lib/site";
 import { excellenceProducts } from "@/lib/products";
 export const metadata: Metadata = {
@@ -29,6 +30,11 @@ export default function Home() {
               reporting requirements and creating greater impact.
             </p>
             <MsiBrand />
+            <p className="gateway-enterprise-note">
+              A social enterprise initiative using technology to make
+              professional-quality tools accessible—especially to smaller
+              charities. <Link href="/our-mission/">Our mission →</Link>
+            </p>
           </div>
         </section>
         <section className="gateway-products" aria-label="SORP 2026 tools" id="products">
@@ -98,6 +104,10 @@ export default function Home() {
             </span>
           </article>
         </section>
+        <aside className="gateway-adviser-note" aria-label="Working with accountants and advisers">
+          <strong>Already working with an accountant or adviser? Brilliant.</strong>
+          <p>Our tools work alongside your existing advisers, not instead of them. We’re here when specialist impact and sustainability reporting support is useful.</p>
+        </aside>
         <section className="platform-family" aria-labelledby="platform-family-title">
           <header className="platform-family-head">
             <p className="gateway-kicker">From compliance to excellence</p>
@@ -122,6 +132,22 @@ export default function Home() {
         </section>
       </div>
       <ExperienceCloud />
+      <section
+        className="gateway-vision"
+        id="our-vision"
+        aria-labelledby="vision-title"
+      >
+        <div className="gateway-width gateway-vision-statement">
+          <p className="gateway-kicker">Our vision</p>
+          <h2 id="vision-title">
+            Imagine a world where nothing stood in the way of our potential to
+            make a difference.
+          </h2>
+          <Link className="gateway-quiet-link" href="/our-mission/">
+            Read our mission <Arrow diagonal />
+          </Link>
+        </div>
+      </section>
       <div className="gateway-width">
         <section className="gateway-people" aria-labelledby="people-title">
           <div className="gateway-people-intro">
@@ -132,7 +158,7 @@ export default function Home() {
               With a human face.
             </h2>
             <p>
-              Built by My Social Impact. Bringing charity reporting and
+              Developed by My Social Impact. Bringing charity reporting and
               real-world impact together.
             </p>
             <Link className="gateway-quiet-link" href="/contact/">
@@ -177,35 +203,7 @@ export default function Home() {
           </div>
         </section>
       </div>
-      <section
-        className="gateway-vision"
-        id="beyond-compliance"
-        aria-labelledby="vision-title"
-      >
-        <div className="gateway-width gateway-vision-inner">
-          <div>
-            <p className="gateway-kicker">Our ambition goes further</p>
-            <h2 id="vision-title">
-              Better reporting.
-              <br />
-              <span>Greater impact.</span>
-            </h2>
-          </div>
-          <div>
-            <p className="gateway-vision-lead">
-              Imagine a world where every charity had the tools to understand,
-              demonstrate and improve the difference it makes.
-            </p>
-            <p>
-              That’s why we build practical tools. SORP readiness is a starting
-              point. Greater social impact is the ambition.
-            </p>
-            <a className="gateway-quiet-link" href={site.platform!}>
-              Explore Social Impact Excellence <Arrow diagonal />
-            </a>
-          </div>
-        </div>
-      </section>
+      <HomepageContribution />
     </main>
   );
 }
