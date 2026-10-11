@@ -218,6 +218,14 @@
 .review-order li { border-top: 1px solid #24232942; padding: 12px 0; font-size: 13px; }
 .review-connection-note { background: #fff5d9; border-left: 3px solid #bd3b21; padding: 14px; margin-bottom: 18px; }
 .review-connection-note p { font-size: 12px; margin-top: 5px; }
+.review-upload-success { margin: 0; padding: 14px 16px; border-left: 3px solid #668900; background: #f3fadf; font-size: 13px; line-height: 1.5; }
+.review-history { display: grid; gap: 0; margin-top: 8px; border-top: 1px solid var(--g-line); }
+.review-history > .gateway-kicker { margin: 20px 0 8px; }
+.review-history article { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--g-line); }
+.review-history article > div { display: grid; gap: 3px; min-width: 0; }
+.review-history article strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.review-history article small { color: var(--g-muted); font-size: 10px; }
+.review-history article > b { max-width: 180px; font-size: 10px; line-height: 1.35; text-align: right; text-transform: uppercase; }
 .review-order .gateway-action { width: 100%; border: 0; }
 .review-order .gateway-action:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 .review-order .gateway-quiet-link { margin-top: 17px; }
