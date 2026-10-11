@@ -53,11 +53,23 @@ test("dashboard shows genuine readiness and native Social Impact Excellence stat
   } }));
   await page.goto("/dashboard/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("QA");
-  await expect(page.getByText("In progress", { exact: true })).toBeVisible();
+  const progressOverview = page.getByRole("region", { name: "Where you are." });
+  await expect(progressOverview).toBeVisible();
+  await expect(progressOverview.getByText("Are You SORP Ready?", { exact: true })).toBeVisible();
+  const readinessProgress = progressOverview.getByRole("progressbar", { name: "Are You SORP Ready?: In progress" });
+  await expect(readinessProgress).toHaveAttribute("aria-valuenow", "63");
+  await expect(readinessProgress.locator("xpath=..")).toContainText("In progress63%");
+  await expect(progressOverview.locator("li").filter({ hasText: "Coming soon" })).toHaveCount(1);
+  await expect(progressOverview.locator("li").filter({ hasText: "Not started" })).toHaveCount(4);
+  await expect(page.getByRole("heading", { name: "Your SORP tools." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Strengthen your impact." })).toBeVisible();
   await expect(page.getByRole("link", { name: /Continue assessment/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/");
   await expect(page.getByText("Ready to start", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Start assessment" })).toHaveAttribute("href", "/social-impact-excellence/assessment/");
-  await expect(page.getByText("Coming soon", { exact: true })).toBeVisible();
+  const impactColumns = await page.locator(".dashboard-product-group--impact .dashboard-products").evaluate(
+    grid => getComputedStyle(grid).gridTemplateColumns.split(" ").length,
+  );
+  expect(impactColumns).toBe(page.viewportSize()!.width > 700 ? 2 : 1);
 });
 
 test("Social Impact Excellence uses the SORP account and saves real assessment progress", async ({ page }) => {
