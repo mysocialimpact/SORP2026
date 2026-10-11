@@ -44,8 +44,17 @@ export default function Home() {
             </h2>
           </div>
         </section>
-        <section className="gateway-products" aria-label="SORP 2026 tools" id="products">
-          <article className="gateway-ready">
+        <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
+          <header className="gateway-section-head gateway-sorp-head">
+            <p className="gateway-kicker">Your SORP 2026 toolkit</p>
+            <h2 id="sorp-tools-title">Start here. Get SORP ready.</h2>
+            <p>
+              Two practical products to help you understand what matters, see
+              where you stand and move forward with confidence.
+            </p>
+          </header>
+          <div className="gateway-products">
+            <article className="gateway-ready">
             <div className="gateway-product-top">
               <span className="gateway-status">
                 <i />
@@ -78,8 +87,8 @@ export default function Home() {
               <br />
               Not a full financial accounting compliance assessment.
             </span>
-          </article>
-          <article className="gateway-ask">
+            </article>
+            <article className="gateway-ask">
             <div className="gateway-product-top">
               <span className="gateway-status">Coming soon</span>
               <span className="gateway-product-number" aria-hidden="true">
@@ -109,17 +118,28 @@ export default function Home() {
               <br />
               Accounting, reporting, disclosures and impact.
             </span>
-          </article>
+            </article>
+          </div>
+          <aside className="gateway-adviser-note" aria-labelledby="adviser-note-title">
+            <p className="gateway-kicker">For accountants and advisers</p>
+            <div>
+              <strong id="adviser-note-title">Already working with an accountant or adviser? Brilliant.</strong>
+              <p>
+                These SORP tools give charities and their advisers a clearer
+                shared starting point. They support the relationship—they do
+                not replace professional judgement.
+              </p>
+            </div>
+            <Link className="gateway-quiet-link" href="/for-advisers/">
+              See how we work together <Arrow diagonal />
+            </Link>
+          </aside>
         </section>
-        <aside className="gateway-adviser-note" aria-label="Working with accountants and advisers">
-          <strong>Already working with an accountant or adviser? Brilliant.</strong>
-          <p>Our tools work alongside your existing advisers, not instead of them. We’re here when specialist impact and sustainability reporting support is useful.</p>
-        </aside>
         <section className="platform-family" aria-labelledby="platform-family-title">
           <header className="platform-family-head">
-            <p className="gateway-kicker">From compliance to excellence</p>
-            <h2 id="platform-family-title">Reporting is the beginning.</h2>
-            <p>Four ways to make impact clearer, stronger and part of everyday practice.</p>
+            <p className="gateway-kicker">Beyond SORP</p>
+            <h2 id="platform-family-title">Four more ways to strengthen your impact.</h2>
+            <p>Smaller, focused tools for the work that comes after compliance.</p>
           </header>
           <div className="platform-family-grid">
             {excellenceProducts.map(product => (
@@ -142,15 +162,11 @@ export default function Home() {
       <div className="gateway-width">
         <section className="gateway-people" aria-labelledby="people-title">
           <div className="gateway-people-intro">
-            <p className="gateway-kicker">People behind the tools</p>
-            <h2 id="people-title">
-              Expertise.
-              <br />
-              With a human face.
-            </h2>
+            <p className="gateway-kicker">Charity reporting meets social impact</p>
+            <h2 id="people-title">The people behind the tools.</h2>
             <p>
-              Developed by My Social Impact. Bringing charity reporting and
-              real-world impact together.
+              Developed by My Social Impact—combining financial rigour,
+              practical charity experience and creative thinking.
             </p>
             <Link className="gateway-quiet-link" href="/contact/">
               Say hello <Arrow diagonal />

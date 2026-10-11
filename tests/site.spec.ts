@@ -18,6 +18,31 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     );
   }
   await expect(page.getByText("Coming soon", { exact: true })).toBeVisible();
+  const sorpSection = page.locator("section.gateway-sorp-section");
+  await expect(
+    sorpSection.getByRole("heading", { name: "Start here. Get SORP ready." }),
+  ).toBeVisible();
+  await expect(
+    sorpSection.getByText("Already working with an accountant or adviser? Brilliant."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "The people behind the tools." }),
+  ).toBeVisible();
+  const sectionHierarchy = await page.locator(".platform-family-head").evaluate((header) => {
+    const heading = header.querySelector("h2");
+    const introduction = header.querySelector("p:last-child");
+    return {
+      heading: heading ? Number.parseFloat(getComputedStyle(heading).fontSize) : 0,
+      introduction: introduction ? Number.parseFloat(getComputedStyle(introduction).fontSize) : 0,
+    };
+  });
+  expect(sectionHierarchy.heading).toBeGreaterThan(sectionHierarchy.introduction * 2.5);
+  if (testInfo.project.name === "mobile") {
+    const productColumns = await page.locator(".platform-family-grid").evaluate(
+      (grid) => getComputedStyle(grid).gridTemplateColumns.split(" ").length,
+    );
+    expect(productColumns).toBe(2);
+  }
   await expect(
     page.getByRole("img", { name: "Social Impact Excellence" }).first(),
   ).toHaveAttribute("src", /social-impact-excellence-transparent\.png/);
