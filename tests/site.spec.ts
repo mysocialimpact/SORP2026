@@ -18,6 +18,9 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     );
   }
   await expect(page.getByText("Coming soon", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: "Social Impact Excellence" }).first(),
+  ).toHaveAttribute("src", /social-impact-excellence-transparent\.png/);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,

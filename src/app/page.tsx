@@ -118,7 +118,7 @@ export default function Home() {
             {excellenceProducts.map(product => (
               <Link href={product.href} className={`platform-family-card ${product.className}`} key={product.slug}>
                 <span className="platform-family-meta"><b>{product.number}</b>{product.status}</span>
-                {product.slug === "social-impact-excellence" && <Image className="platform-family-logo is-excellence" src="/product/social-impact-excellence.svg" alt="Social Impact Excellence" width={1600} height={500} />}
+                {product.slug === "social-impact-excellence" && <Image className="platform-family-logo is-excellence" src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} />}
                 {product.slug === "charity-impact-reports" && <Image className="platform-family-logo is-reports" src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887} />}
                 {product.slug === "purpose-works" && <Image className="platform-family-logo is-purpose" src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809} />}
                 {product.slug === "my-impact-director" && <h3 className="platform-family-director">My <em>Impact</em><br/>Director</h3>}

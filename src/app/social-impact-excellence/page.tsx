@@ -19,7 +19,7 @@ export default function ExcellencePage() {
         <p className="product-lead">Assess where you are. Understand what needs attention. Build a stronger, more systematic approach to impact.</p>
         <Link className="gateway-action" href="/social-impact-excellence/assessment/">Start the 10–15 minute assessment <Arrow /></Link>
       </div>
-      <div className="product-brand-panel is-excellence"><Image src="/product/social-impact-excellence.svg" alt="Social Impact Excellence" width={1600} height={500} priority /></div>
+      <div className="product-brand-panel is-excellence"><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority /></div>
     </section>
     <section className="product-statement gateway-width"><p className="gateway-kicker">Five connected pillars</p><h2>One honest baseline.<br/>A better way forward.</h2><p>The established Social Impact Maturity Assessment, private results and the complete existing Purpose pathway now sit inside SORP2026. Other deeper pillar pathways remain clearly marked until the original product releases them.</p></section>
     <section className="excellence-pillars gateway-width" aria-label="The five pillars of Social Impact Excellence">
