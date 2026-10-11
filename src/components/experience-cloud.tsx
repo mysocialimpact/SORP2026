@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 
 const organisations = [
   "ActionAid", "STOP THE TRAFFIK", "Great Ormond Street Hospital", "Blue Cross", "Farm Africa",
-  "CARE International", "Friends of the Earth", "Greenpeace", "Interim Spaces", "Brainstrust",
+  "CARE International", "Friends of the Earth", "Greenpeace", "Interim Spaces",
   "Traidcraft", "Forum for the Future", "RSPB", "RSPCA", "National Asthma Campaign",
   "St John Ambulance", "Family Planning Association", "International Planned Parenthood Federation",
   "Médecins Sans Frontières", "Brook", "National AIDS Trust", "Stroke Association",
