@@ -6,6 +6,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
+  await expect(page.getByText("Brainstrust", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "SORP 2026.Made simpler.",
   );
