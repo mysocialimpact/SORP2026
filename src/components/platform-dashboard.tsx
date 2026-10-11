@@ -7,13 +7,61 @@ import { useEffect, useState } from "react";
 import { Arrow } from "@/components/ui";
 
 type Account = { name: string; email: string; position: string; organisation?: string; lastSavedAt?: string };
-type Progress = { step?: string; candidate?: { name?: string }; report?: unknown; sessionId?: string };
+type Progress = { step?: string; candidate?: { name?: string }; report?: unknown; sessionId?: string; criterion?: number; corrections?: Record<string, { reviewed?: boolean }> };
 type AccountResponse = { signedIn?: boolean; account?: Account; progress?: Progress; error?: string };
 type ExcellenceProgress = { status?: string; data?: { answers?: Array<number | null>; result?: unknown; purpose?: { status?: string; progress?: number } } };
 type ReportReview = { id: string; filename: string; status: string; feedbackReady?: boolean };
 
 const completeSteps = new Set(["report-ready", "report", "email-ready", "final-feedback", "support", "before-go", "next", "help", "done"]);
 const untouchedSteps = new Set([undefined, "scope", "public-methodology", "intro", "benefits", "find"]);
+const readinessPhases = [
+  ["scope", "public-methodology", "intro", "benefits"],
+  ["find", "confirmation", "account"],
+  ["homework", "tar-recovery"],
+  ["assessment", "quick-generating"],
+  ["quick-ready", "quick", "quick-feedback"],
+  ["method", "criterion", "complete"],
+  ["generating", "report-ready", "report", "email-ready"],
+  ["final-feedback", "support", "before-go", "next", "help", "done"],
+];
+
+function readinessPercentage(progress: Progress, started: boolean, complete: boolean) {
+  if (complete) return 100;
+  if (!started || !progress.step) return 0;
+  const phase = Math.max(0, readinessPhases.findIndex(steps => steps.includes(progress.step || "")));
+  const reviewed = Object.values(progress.corrections || {}).filter(item => item.reviewed).length;
+  const withinPhase = progress.step === "criterion" ? Math.min(reviewed / 21, 1) : 0.35;
+  return Math.min(99, Math.max(1, Math.round(((phase + withinPhase) / readinessPhases.length) * 100)));
+}
+
+function reportReviewPercentage(review?: ReportReview) {
+  if (!review) return 0;
+  if (review.feedbackReady) return 100;
+  if (review.status === "awaiting_payment") return 25;
+  if (review.status.includes("paid")) return 55;
+  if (review.status.includes("review")) return 80;
+  return 40;
+}
+
+type ProductProgress = { number: string; name: string; status: string; percentage: number; unavailable?: boolean };
+
+function ProductProgressBar({ products }: { products: ProductProgress[] }) {
+  return <section className="dashboard-progress" aria-labelledby="dashboard-progress-title">
+    <header>
+      <p className="gateway-kicker">Your progress across all six products</p>
+      <h2 id="dashboard-progress-title">Where you are.</h2>
+    </header>
+    <ol>
+      {products.map(product => <li key={product.number} className={product.unavailable ? "is-unavailable" : product.percentage > 0 ? "is-started" : ""}>
+        <div><span>{product.number}</span><strong>{product.name}</strong></div>
+        <div className="dashboard-progress-track" role="progressbar" aria-label={`${product.name}: ${product.status}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={product.percentage}>
+          <span style={{ width: `${product.percentage}%` }} />
+        </div>
+        <p>{product.status}<b>{product.unavailable ? "—" : `${product.percentage}%`}</b></p>
+      </li>)}
+    </ol>
+  </section>;
+}
 
 export function PlatformDashboard() {
   const router = useRouter();
@@ -67,23 +115,43 @@ export function PlatformDashboard() {
   const purposeStatus = excellence?.data?.purpose?.status;
   const excellenceLabel = purposeStatus === "complete" ? "Purpose pathway complete" : purposeStatus && purposeStatus !== "not_started" ? `Purpose · ${excellence.data?.purpose?.progress || 0}%` : excellenceComplete ? "Baseline complete" : excellenceAnswered ? `${excellenceAnswered} of 25 answered` : "Ready to start";
   const latestReportReview = reportReviews[0];
+  const readinessPercent = readinessPercentage(progress, readinessStarted, readinessComplete);
+  const excellencePercent = purposeStatus && purposeStatus !== "not_started" ? Math.max(0, Math.min(100, excellence?.data?.purpose?.progress || 0)) : excellenceComplete ? 100 : Math.round(excellenceAnswered / 25 * 100);
+  const reportPercent = reportReviewPercentage(latestReportReview);
+  const productProgress: ProductProgress[] = [
+    { number: "01", name: "Are You SORP Ready?", status: readinessComplete ? "Complete" : readinessStarted ? "In progress" : "Not started", percentage: readinessPercent },
+    { number: "02", name: "Ask SORP", status: "Coming soon", percentage: 0, unavailable: true },
+    { number: "03", name: "My Impact Director", status: "Not started", percentage: 0 },
+    { number: "04", name: "Social Impact Excellence", status: excellencePercent === 100 ? "Complete" : excellencePercent > 0 ? "In progress" : "Not started", percentage: excellencePercent },
+    { number: "05", name: "Charity Impact Reports", status: reportPercent === 100 ? "Complete" : reportPercent > 0 ? "In progress" : "Not started", percentage: reportPercent },
+    { number: "06", name: "Purpose Works", status: "Not started", percentage: 0 },
+  ];
   return <>
     <header className="dashboard-welcome">
       <div><p className="gateway-kicker">My SORP2026</p><h1>Welcome back, <span>{firstName}.</span></h1><p>{data.account.organisation || data.account.email}</p></div>
       <button type="button" onClick={signOut} disabled={busy}>{busy ? "Signing out…" : "Sign out"}</button>
     </header>
-    <section className="dashboard-products" aria-label="Your products">
-      <article className="dashboard-card is-ready">
-        <div className="dashboard-card-top"><span>01 · Live beta</span><b>{readinessComplete ? "Review complete" : readinessStarted ? "In progress" : "Ready to start"}</b></div>
-        <h2>Are You<br/>SORP Ready?</h2>
-        {progress.candidate?.name && <p className="dashboard-context">{progress.candidate.name}</p>}
-        <Link href={readinessHref}>{readinessLabel} <Arrow /></Link>
-      </article>
-      <article className="dashboard-card is-ask"><div className="dashboard-card-top"><span>02</span><b>Coming soon</b></div><h2>Ask SORP.</h2><p>Whole-SORP guidance is in development. No inactive chatbot, no fictional history.</p><Link href="/ask-sorp/">See what’s coming <Arrow /></Link></article>
-      <article className="dashboard-card is-director"><div className="dashboard-card-top"><span>03</span><b>Explore</b></div><h2>My <em>Impact</em><br/>Director</h2><p>Ongoing senior impact expertise for charities.</p><Link href="/my-impact-director/">Explore support <Arrow /></Link></article>
-      <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{excellenceLabel}</b></div><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200}/><p>{excellenceComplete ? "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
-      <article className="dashboard-card is-reports"><div className="dashboard-card-top"><span>05</span><b>{latestReportReview ? latestReportReview.feedbackReady ? "Feedback ready" : latestReportReview.status === "awaiting_payment" ? "Report uploaded" : latestReportReview.status.replaceAll("_", " ") : "Available"}</b></div><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887}/><p>{latestReportReview ? latestReportReview.filename : "£100 written review and a 60-minute expert discussion."}</p><Link href="/charity-impact-reports/review/">{latestReportReview ? "View review status" : "Start report review"} <Arrow /></Link></article>
-      <article className="dashboard-card is-purpose"><div className="dashboard-card-top"><span>06</span><b>Explore</b></div><Image src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809}/><p>Turn purpose into meaningful action and credible communication.</p><Link href="/purpose-works/">Explore Purpose Works <Arrow /></Link></article>
+    <ProductProgressBar products={productProgress} />
+    <section className="dashboard-product-group dashboard-product-group--sorp" aria-labelledby="dashboard-sorp-title">
+      <header><p className="gateway-kicker">SORP 2026</p><h2 id="dashboard-sorp-title">Your SORP tools.</h2><p>Understand the new reporting requirements and see how ready your charity is.</p></header>
+      <div className="dashboard-products">
+        <article className="dashboard-card is-ready">
+          <div className="dashboard-card-top"><span>01 · Live beta</span><b>{readinessComplete ? "Review complete" : readinessStarted ? "In progress" : "Ready to start"}</b></div>
+          <h2>Are You<br/>SORP Ready?</h2>
+          {progress.candidate?.name && <p className="dashboard-context">{progress.candidate.name}</p>}
+          <Link href={readinessHref}>{readinessLabel} <Arrow /></Link>
+        </article>
+        <article className="dashboard-card is-ask"><div className="dashboard-card-top"><span>02</span><b>Coming soon</b></div><h2>Ask SORP.</h2><p>Whole-SORP guidance is in development. No inactive chatbot, no fictional history.</p><Link href="/ask-sorp/">See what’s coming <Arrow /></Link></article>
+      </div>
+    </section>
+    <section className="dashboard-product-group dashboard-product-group--impact" aria-labelledby="dashboard-impact-title">
+      <header><p className="gateway-kicker">Beyond reporting</p><h2 id="dashboard-impact-title">Strengthen your impact.</h2><p>Practical tools and human expertise for understanding, improving and communicating the difference you make.</p></header>
+      <div className="dashboard-products">
+        <article className="dashboard-card is-director"><div className="dashboard-card-top"><span>03</span><b>Explore</b></div><h2>My <em>Impact</em><br/>Director</h2><p>Ongoing senior impact expertise for charities.</p><Link href="/my-impact-director/">Explore support <Arrow /></Link></article>
+        <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{excellenceLabel}</b></div><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200}/><p>{excellenceComplete ? "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
+        <article className="dashboard-card is-reports"><div className="dashboard-card-top"><span>05</span><b>{latestReportReview ? latestReportReview.feedbackReady ? "Feedback ready" : latestReportReview.status === "awaiting_payment" ? "Report uploaded" : latestReportReview.status.replaceAll("_", " ") : "Available"}</b></div><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887}/><p>{latestReportReview ? latestReportReview.filename : "£100 written review and a 60-minute expert discussion."}</p><Link href="/charity-impact-reports/review/">{latestReportReview ? "View review status" : "Start report review"} <Arrow /></Link></article>
+        <article className="dashboard-card is-purpose"><div className="dashboard-card-top"><span>06</span><b>Explore</b></div><Image src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809}/><p>Turn purpose into meaningful action and credible communication.</p><Link href="/purpose-works/">Explore Purpose Works <Arrow /></Link></article>
+      </div>
     </section>
   </>;
 }
