@@ -25,16 +25,23 @@ export default function Home() {
             </h1>
           </div>
           <div className="gateway-intro-aside">
+            <span className="gateway-enterprise-label">A social enterprise initiative</span>
             <p>
               Practical tools for charities, accountants and advisers navigating
               reporting requirements and creating greater impact.
             </p>
-            <MsiBrand />
+            <MsiBrand attribution="Developed by" />
             <p className="gateway-enterprise-note">
-              A social enterprise initiative using technology to make
-              professional-quality tools accessible—especially to smaller
-              charities. <Link href="/our-mission/">Our mission →</Link>
+              Using technology to make professional-quality tools accessible—
+              especially to smaller charities.
             </p>
+          </div>
+          <div className="gateway-opening-vision">
+            <p className="gateway-kicker">Our social enterprise vision</p>
+            <h2>
+              Imagine a world where nothing stood in the way of our potential
+              to make a difference.
+            </h2>
           </div>
         </section>
         <section className="gateway-products" aria-label="SORP 2026 tools" id="products">
@@ -132,22 +139,6 @@ export default function Home() {
         </section>
       </div>
       <ExperienceCloud />
-      <section
-        className="gateway-vision"
-        id="our-vision"
-        aria-labelledby="vision-title"
-      >
-        <div className="gateway-width gateway-vision-statement">
-          <p className="gateway-kicker">Our vision</p>
-          <h2 id="vision-title">
-            Imagine a world where nothing stood in the way of our potential to
-            make a difference.
-          </h2>
-          <Link className="gateway-quiet-link" href="/our-mission/">
-            Read our mission <Arrow diagonal />
-          </Link>
-        </div>
-      </section>
       <div className="gateway-width">
         <section className="gateway-people" aria-labelledby="people-title">
           <div className="gateway-people-intro">
