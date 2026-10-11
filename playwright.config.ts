@@ -7,7 +7,9 @@ export default defineConfig({
     : ['**/static.spec.ts', '**/product-unit/**'],
   fullyParallel: true,
   workers: 2,
-  reporter: [["list"], ["html", { open: "never" }]],
+  reporter: process.env.CI
+    ? [["list"], ["html", { open: "never" }], ["github"]]
+    : [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: "http://127.0.0.1:3000",
     launchOptions: {
