@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
+import { HomepageContribution } from "@/components/voluntary-contribution";
 
 export const metadata: Metadata = {
   title: "Our Mission",
@@ -38,15 +39,16 @@ export default function OurMissionPage() {
       >
         <div className="mission-hero-copy">
           <p className="gateway-kicker">
-            Our mission · A social enterprise initiative
+            We’re a social enterprise. We’re on a mission.
           </p>
           <h1 id="mission-title">
-            Technology should make doing good easier. <em>Not more expensive.</em>
+            We’re on a mission to help solve more <em>social and environmental problems.</em>
           </h1>
           <p>
-            We built SORP2026 to put professional-quality tools within reach of
-            charities—especially smaller organisations—so more energy can go
-            into solving social and environmental problems.
+            Technology and AI are opening up exciting possibilities for doing
+            good. We’re building practical tools to put those possibilities into
+            the hands of charities and small organisations—helping them get the
+            support they need and create greater impact.
           </p>
         </div>
         <div
@@ -71,8 +73,9 @@ export default function OurMissionPage() {
             make a difference.
           </h2>
           <p>
-            Better tools cannot solve every problem. But they can give more
-            organisations the time, confidence and capability to act.
+            Every charity has the potential to make a difference. We want more
+            organisations to have the tools, confidence and support to turn
+            that potential into action.
           </p>
         </div>
       </section>
@@ -173,6 +176,7 @@ export default function OurMissionPage() {
           </Link>
         </div>
       </section>
+      <HomepageContribution mission />
     </main>
   );
 }
