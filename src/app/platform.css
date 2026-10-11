@@ -41,7 +41,7 @@
 .platform-family-meta { display: flex; justify-content: space-between; gap: 20px; text-transform: uppercase; font-size: 11px; letter-spacing: .08em; }
 .platform-family-meta b { font-weight: 500; }
 .platform-family-logo { width: min(76%, 430px); height: auto; object-fit: contain; margin: auto; }
-.platform-family-logo.is-excellence { width: min(87%, 520px); }
+.platform-family-logo.is-excellence { width: min(66%, 340px); max-height: 225px; }
 .platform-family-logo.is-reports { width: min(65%, 350px); max-height: 185px; }
 .platform-family-logo.is-purpose { width: min(68%, 370px); filter: brightness(0) invert(1); }
 .platform-family-card-copy { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-top: auto; }
@@ -93,6 +93,7 @@
 .product-brand-panel, .director-lockup { aspect-ratio: 1 / 1; border-radius: 5px; display: flex; align-items: center; justify-content: center; padding: 42px; }
 .product-brand-panel img { width: 88%; height: auto; object-fit: contain; }
 .product-brand-panel.is-excellence { background: #f0a7c1; }
+.product-brand-panel.is-excellence img { width: 78%; }
 .product-brand-panel.is-reports { background: #ffd567; }
 .product-brand-panel.is-reports img { width: 70%; }
 .product-brand-panel.is-purpose { background: #493b72; }
