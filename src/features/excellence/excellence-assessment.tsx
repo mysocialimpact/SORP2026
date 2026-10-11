@@ -21,7 +21,7 @@ const reassurance = [
 type ProductPayload = {
   signedIn?: boolean;
   account?: { id: string; name: string; organisation?: string };
-  productProgress?: { status: string; data?: Partial<SnapshotDraft> } | null;
+  productProgress?: { status: string; data?: (Partial<SnapshotDraft> & Record<string, unknown>) } | null;
   error?: string;
 };
 
@@ -50,6 +50,7 @@ export function ExcellenceAssessment() {
   const contentRef = useRef<HTMLElement>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [account, setAccount] = useState<ProductPayload["account"]>();
+  const [productData, setProductData] = useState<Record<string, unknown>>({});
   const [draft, setDraft] = useState<SnapshotDraft | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
@@ -77,6 +78,7 @@ export function ExcellenceAssessment() {
       const remote = safeDraft(payload.productProgress?.data);
       const chosen = mergeSnapshotDrafts([remote, local].filter((value): value is SnapshotDraft => Boolean(value))) || newDraft();
       setAccount(payload.account);
+      setProductData(payload.productProgress?.data || {});
       setDraft(chosen);
       try { localStorage.setItem(LOCAL_KEY, JSON.stringify(chosen)); } catch { /* server saving remains available */ }
       setSaveState(remote ? "Saved to your SORP2026 account" : "Ready to save to your account");
@@ -97,10 +99,11 @@ export function ExcellenceAssessment() {
     const response = await fetch("/api/readiness-account/", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ action: "save-product", productId: PRODUCT_ID, status, data: next }),
+      body: JSON.stringify({ action: "save-product", productId: PRODUCT_ID, status, data: { ...productData, ...next } }),
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.error || "Your account copy could not be saved.");
+    setProductData(current => ({ ...current, ...next }));
     setSaveState("Saved to your SORP2026 account");
   }
 

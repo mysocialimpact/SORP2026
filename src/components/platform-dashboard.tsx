@@ -9,7 +9,7 @@ import { Arrow } from "@/components/ui";
 type Account = { name: string; email: string; position: string; organisation?: string; lastSavedAt?: string };
 type Progress = { step?: string; candidate?: { name?: string }; report?: unknown; sessionId?: string };
 type AccountResponse = { signedIn?: boolean; account?: Account; progress?: Progress; error?: string };
-type ExcellenceProgress = { status?: string; data?: { answers?: Array<number | null>; result?: unknown } };
+type ExcellenceProgress = { status?: string; data?: { answers?: Array<number | null>; result?: unknown; purpose?: { status?: string; progress?: number } } };
 type ReportReview = { id: string; filename: string; status: string; feedbackReady?: boolean };
 
 const completeSteps = new Set(["report-ready", "report", "email-ready", "final-feedback", "support", "before-go", "next", "help", "done"]);
@@ -64,6 +64,8 @@ export function PlatformDashboard() {
   const firstName = data.account.name.split(/\s+/)[0];
   const excellenceAnswered = excellence?.data?.answers?.filter(answer => answer !== null).length || 0;
   const excellenceComplete = excellence?.status === "complete" && Boolean(excellence.data?.result);
+  const purposeStatus = excellence?.data?.purpose?.status;
+  const excellenceLabel = purposeStatus === "complete" ? "Purpose pathway complete" : purposeStatus && purposeStatus !== "not_started" ? `Purpose · ${excellence.data?.purpose?.progress || 0}%` : excellenceComplete ? "Baseline complete" : excellenceAnswered ? `${excellenceAnswered} of 25 answered` : "Ready to start";
   const latestReportReview = reportReviews[0];
   return <>
     <header className="dashboard-welcome">
@@ -79,7 +81,7 @@ export function PlatformDashboard() {
       </article>
       <article className="dashboard-card is-ask"><div className="dashboard-card-top"><span>02</span><b>Coming soon</b></div><h2>Ask SORP.</h2><p>Whole-SORP guidance is in development. No inactive chatbot, no fictional history.</p><Link href="/ask-sorp/">See what’s coming <Arrow /></Link></article>
       <article className="dashboard-card is-director"><div className="dashboard-card-top"><span>03</span><b>Explore</b></div><h2>My <em>Impact</em><br/>Director</h2><p>Ongoing senior impact expertise for charities.</p><Link href="/my-impact-director/">Explore support <Arrow /></Link></article>
-      <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{excellenceComplete ? "Assessment complete" : excellenceAnswered ? `${excellenceAnswered} of 25 answered` : "Ready to start"}</b></div><Image src="/product/social-impact-excellence.svg" alt="Social Impact Excellence" width={1600} height={500}/><p>{excellenceComplete ? "Your five-pillar baseline and results are saved to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={excellenceComplete ? "/social-impact-excellence/results/" : "/social-impact-excellence/assessment/"}>{excellenceComplete ? "View results" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
+      <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{excellenceLabel}</b></div><Image src="/product/social-impact-excellence.svg" alt="Social Impact Excellence" width={1600} height={500}/><p>{excellenceComplete ? "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
       <article className="dashboard-card is-reports"><div className="dashboard-card-top"><span>05</span><b>{latestReportReview ? latestReportReview.feedbackReady ? "Feedback ready" : latestReportReview.status === "awaiting_payment" ? "Report uploaded" : latestReportReview.status.replaceAll("_", " ") : "Available"}</b></div><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887}/><p>{latestReportReview ? latestReportReview.filename : "£100 written review and a 60-minute expert discussion."}</p><Link href="/charity-impact-reports/review/">{latestReportReview ? "View review status" : "Start report review"} <Arrow /></Link></article>
       <article className="dashboard-card is-purpose"><div className="dashboard-card-top"><span>06</span><b>Explore</b></div><Image src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809}/><p>Turn purpose into meaningful action and credible communication.</p><Link href="/purpose-works/">Explore Purpose Works <Arrow /></Link></article>
     </section>
