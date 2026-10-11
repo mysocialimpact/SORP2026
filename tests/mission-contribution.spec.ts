@@ -7,7 +7,11 @@ test("homepage presents the social enterprise mission and agreed vision", async 
   await expect(page.getByRole("heading", { name: "Imagine a world where nothing stood in the way of our potential to make a difference." })).toBeVisible();
   await expect(page.getByText("Already working with an accountant or adviser? Brilliant.")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Help us keep these tools free." })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Our mission" }).first()).toHaveAttribute("href", "/our-mission/");
+  const footer = page.getByRole("contentinfo");
+  await expect(footer.getByText("Imagine a world where curiosity and creativity were valued as highly as certainty.")).toBeVisible();
+  await expect(footer.getByRole("link", { name: "See what else is in the Shed!" })).toHaveAttribute("href", "https://www.theideasshed.com/");
+  await expect(footer).not.toContainText("Independent tools");
+  await expect(footer.getByRole("link", { name: /Our mission|Privacy|Contact/ })).toHaveCount(0);
 });
 
 test("mission page is concise, partner-friendly and accessible", async ({ page }) => {
