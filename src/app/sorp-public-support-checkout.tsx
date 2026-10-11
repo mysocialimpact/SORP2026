@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { loadStripe, type StripeEmbeddedCheckout } from "@stripe/stripe-js";
+// The pure entry point does not contact Stripe when the public page loads.
+// Stripe.js is requested only after a visitor chooses to contribute.
+import { loadStripe } from "@stripe/stripe-js/pure";
+import type { StripeEmbeddedCheckout } from "@stripe/stripe-js";
 
 // Stripe publishable keys identify the account in browser code; the secret key
 // stays only in the existing payment service. This is the account's live key.

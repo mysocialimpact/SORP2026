@@ -7,7 +7,7 @@ const builtAt = new Date(
 ).toISOString();
 // Keep this as a simple release counter. Increment it for each approved
 // website release; SORP_BUILD_NUMBER can override it in a release pipeline.
-const buildNumber = process.env.SORP_BUILD_NUMBER || "1";
+const buildNumber = process.env.SORP_BUILD_NUMBER || "2";
 const config: NextConfig = {
   env: {
     NEXT_PUBLIC_SITE_BUILD_NUMBER: buildNumber,
