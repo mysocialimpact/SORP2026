@@ -23,7 +23,11 @@ body:has(.scr-page) > .footer,
 body:has(.sorp-conversation-page) > .header,
 body:has(.sorp-conversation-page) > .footer,
 body:has(.sorp-workspace) > .header,
-body:has(.sorp-workspace) > .footer {
+body:has(.sorp-workspace) > .footer,
+body:has(.sie-assessment) > .header,
+body:has(.sie-assessment) > .footer,
+body:has(.sie-team-response) > .header,
+body:has(.sie-team-response) > .footer {
   display: none;
 }
 * {

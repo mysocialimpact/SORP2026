@@ -11,6 +11,7 @@ type Progress = { step?: string; candidate?: { name?: string }; report?: unknown
 type AccountResponse = { signedIn?: boolean; account?: Account; progress?: Progress; error?: string };
 type ExcellenceProgress = { status?: string; data?: { answers?: Array<number | null>; result?: unknown; purpose?: { status?: string; progress?: number }; migration?: { source?: string } } };
 type ReportReview = { id: string; filename: string; status: string; feedbackReady?: boolean };
+type TeamWorkspaceSummary = { organisation?: { programme?: string; name?: string }; invitations?: Array<{ status?: string }> };
 
 const completeSteps = new Set(["report-ready", "report", "email-ready", "final-feedback", "support", "before-go", "next", "help", "done"]);
 const untouchedSteps = new Set([undefined, "scope", "public-methodology", "intro", "benefits", "find"]);
@@ -70,6 +71,7 @@ export function PlatformDashboard() {
   const [busy, setBusy] = useState(false);
   const [excellence, setExcellence] = useState<ExcellenceProgress | null>(null);
   const [reportReviews, setReportReviews] = useState<ReportReview[]>([]);
+  const [teamWorkspace, setTeamWorkspace] = useState<TeamWorkspaceSummary | null>(null);
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
@@ -88,9 +90,11 @@ export function PlatformDashboard() {
     void Promise.all([
       fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "load-product", productId: "social-impact-excellence" }), signal: controller.signal, cache: "no-store" }).then(async response => ({ response, payload: await response.json() })),
       fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "list-report-reviews" }), signal: controller.signal, cache: "no-store" }).then(async response => ({ response, payload: await response.json() })),
-    ]).then(([excellenceResult, reviewResult]) => {
+      fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "team-workspace" }), signal: controller.signal, cache: "no-store" }).then(async response => ({ response, payload: await response.json() })),
+    ]).then(([excellenceResult, reviewResult, teamResult]) => {
       if (excellenceResult.response.ok) setExcellence(excellenceResult.payload.productProgress || null);
       if (reviewResult.response.ok) setReportReviews(reviewResult.payload.reviews || []);
+      if (teamResult.response.ok) setTeamWorkspace(teamResult.payload);
     }).catch(() => undefined);
     return () => controller.abort();
   }, [data?.signedIn]);
@@ -116,6 +120,8 @@ export function PlatformDashboard() {
   const purposeStarted = Boolean(purposeStatus && purposeStatus !== "not_started");
   const purposeProgress = Math.max(0, Math.min(100, excellence?.data?.purpose?.progress || 0));
   const excellenceLabel = purposeStatus === "complete" ? "Purpose pathway complete" : purposeStarted ? `Baseline complete · Purpose started` : excellenceComplete ? "Baseline complete" : excellenceAnswered ? `${excellenceAnswered} of 25 answered` : "Ready to start";
+  const teamActive = ["team", "excellence"].includes(teamWorkspace?.organisation?.programme || "");
+  const teamCompleted = teamWorkspace?.invitations?.filter(item => item.status === "completed").length || 0;
   const latestReportReview = reportReviews[0];
   const readinessPercent = readinessPercentage(progress, readinessStarted, readinessComplete);
   // The baseline is a completed first stage, so opening Purpose must never make
@@ -154,7 +160,7 @@ export function PlatformDashboard() {
       <header><p className="gateway-kicker">Beyond reporting</p><h2 id="dashboard-impact-title">Strengthen your impact.</h2><p>Practical tools and human expertise for understanding, improving and communicating the difference you make.</p></header>
       <div className="dashboard-products">
         <article className="dashboard-card is-director"><div className="dashboard-card-top"><span>03</span><b>Explore</b></div><h2>My <em>Impact</em><br/>Director</h2><p>Ongoing senior impact expertise for charities.</p><Link href="/my-impact-director/">Explore support <Arrow /></Link></article>
-        <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{excellenceLabel}</b></div><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200}/>{excellence?.data?.migration?.source === "legacy-social-impact-excellence" ? <p className="dashboard-context">Your previous assessment has been brought into this account.</p> : null}<p>{excellenceComplete ? purposeStarted ? "Your completed baseline is safe here. Continue with the Purpose pathway when you are ready." : "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
+        <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{teamActive ? `Team · ${teamCompleted} complete` : excellenceLabel}</b></div><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200}/>{excellence?.data?.migration?.source === "legacy-social-impact-excellence" ? <p className="dashboard-context">Your previous assessment has been brought into this account.</p> : null}<p>{teamActive ? `${teamWorkspace?.organisation?.name || "Your organisation"} has a shared Team Perspective. Invite colleagues and see the protected combined result here.` : excellenceComplete ? purposeStarted ? "Your completed baseline is safe here. Continue with the Purpose pathway when you are ready." : "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={teamActive ? "/social-impact-excellence/team/" : excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{teamActive ? "Open Team Perspective" : excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
         <article className="dashboard-card is-reports"><div className="dashboard-card-top"><span>05</span><b>{latestReportReview ? latestReportReview.feedbackReady ? "Feedback ready" : latestReportReview.status === "awaiting_payment" ? "Report uploaded" : latestReportReview.status.replaceAll("_", " ") : "Available"}</b></div><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887}/><p>{latestReportReview ? latestReportReview.filename : "£100 written review and a 60-minute expert discussion."}</p><Link href="/charity-impact-reports/review/">{latestReportReview ? "View review status" : "Start report review"} <Arrow /></Link></article>
         <article className="dashboard-card is-purpose"><div className="dashboard-card-top"><span>06</span><b>Explore</b></div><Image src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809}/><p>Turn purpose into meaningful action and credible communication.</p><Link href="/purpose-works/">Explore Purpose Works <Arrow /></Link></article>
       </div>
