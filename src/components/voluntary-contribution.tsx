@@ -111,7 +111,7 @@ export function VoluntaryContributionControls({
   </div>;
 }
 
-export function HomepageContribution() {
+export function HomepageContribution({ mission = false }: { mission?: boolean }) {
   const [sessionId] = useState(() => {
     if (typeof window === "undefined") return "";
     const key = "sorp2026-home-contribution-session";
@@ -129,9 +129,15 @@ export function HomepageContribution() {
     <div className="gateway-width gateway-contribution-inner">
       <div className="gateway-contribution-copy">
         <p className="gateway-kicker">Support our social enterprise</p>
-        <h2 id="contribution-title">Help us keep these tools free.</h2>
-        <p>We’re building practical tools to help charities create greater impact, and we’re determined to make them free wherever possible.</p>
-        <p>If you’ve found them useful, your contribution helps us improve them, maintain them and make more tools available to everyone.</p>
+        <h2 id="contribution-title">{mission ? "Found the tools useful? Help us make more." : "Help us keep these tools free."}</h2>
+        {mission ? <>
+          <p>You don’t need to use our consultancy services to be part of this. If our free tools give you what you need, that’s a result we’re proud of.</p>
+          <p>If you’d like to support our mission, a few pounds helps us keep these tools free, improve them and build more for smaller charities and organisations.</p>
+          <p>Use what helps. Give if you can. Every contribution is entirely voluntary.</p>
+        </> : <>
+          <p>We’re building practical tools to help charities create greater impact, and we’re determined to make them free wherever possible.</p>
+          <p>If you’ve found them useful, your contribution helps us improve them, maintain them and make more tools available to everyone.</p>
+        </>}
       </div>
       <div className="gateway-contribution-panel">
         <span>Entirely voluntary</span>

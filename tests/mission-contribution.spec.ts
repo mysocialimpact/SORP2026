@@ -16,8 +16,7 @@ test("homepage presents the social enterprise mission and agreed vision", async 
 
 test("mission page is concise, partner-friendly and accessible", async ({ page }) => {
   await page.goto("/our-mission/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Technology should make doing good easier");
-  await expect(page.getByText("solving social and environmental problems", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("We’re on a mission to help solve more social and environmental problems.");
   await expect(page.getByRole("heading", { name: "Use technology wherever it helps. Bring in people wherever they matter." })).toBeVisible();
   await expect(page.getByText("judgement, perspective or care", { exact: false })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Free wherever possible" })).toBeVisible();
@@ -30,7 +29,8 @@ test("mission page is concise, partner-friendly and accessible", async ({ page }
   expect(accessibility.violations).toEqual([]);
 });
 
-test("guest homepage contribution reuses inline checkout and verifies payment before thanking", async ({ page }) => {
+for (const path of ["/", "/our-mission/"]) {
+test(`guest contribution at ${path} reuses inline checkout and verifies payment before thanking`, async ({ page }) => {
   const writes: Record<string, unknown>[] = [];
   await page.route("https://js.stripe.com/**", route => route.fulfill({
     contentType: "application/javascript",
@@ -41,8 +41,8 @@ test("guest homepage contribution reuses inline checkout and verifies payment be
     return route.fulfill({ json: { presentation: "embedded", id: "cs_test_homepage", clientSecret: "test_fixture_secret" } });
   });
   await page.route("**/api/sorp-payments/status", route => route.fulfill({ json: { status: "paid", paymentType: "voluntary_support", amountMinor: 1000 } }));
-  await page.goto("/");
-  const section = page.getByRole("region", { name: "Help us keep these tools free." });
+  await page.goto(path);
+  const section = page.getByRole("region", { name: path === "/" ? "Help us keep these tools free." : "Found the tools useful? Help us make more." });
   await section.getByRole("button", { name: "£10" }).click();
   await section.getByRole("button", { name: "Make a voluntary contribution →" }).click();
   await section.getByRole("button", { name: "Simulate safe contribution" }).click();
@@ -52,3 +52,4 @@ test("guest homepage contribution reuses inline checkout and verifies payment be
   expect(typeof writes[0].sessionId).toBe("string");
   expect(String(writes[0].sessionId).length).toBeGreaterThan(20);
 });
+}
