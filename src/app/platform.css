@@ -132,6 +132,19 @@
 .product-next a { display: inline-flex; align-items: center; gap: 14px; font-size: 18px; font-weight: 600; }
 
 .excellence-pillars { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--g-line); border-bottom: 1px solid var(--g-line); margin-bottom: 100px; }
+.excellence-programmes { margin-bottom: 100px; display: grid; grid-template-columns: 1.12fr repeat(3, 1fr); border: 1px solid var(--g-line); background: #fff; }
+.excellence-programmes > div, .excellence-programmes > article { min-height: 420px; padding: 34px 28px; border-right: 1px solid var(--g-line); }
+.excellence-programmes > article:last-child { border-right: 0; }
+.excellence-programmes > div { background: #222126; color: #fff; }
+.excellence-programmes > div h2 { margin: 0 0 24px; font-size: clamp(38px, 4vw, 56px); line-height: .94; letter-spacing: -.055em; }
+.excellence-programmes > div > p:last-child { max-width: 310px; color: #c7c4cb; font-size: 14px; line-height: 1.55; }
+.excellence-programmes article { display: flex; flex-direction: column; }
+.excellence-programmes article.is-team { background: #f0a7c1; }
+.excellence-programmes article > span { color: #a42960; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.excellence-programmes article h3 { margin: 65px 0 16px; font-size: 34px; line-height: .95; letter-spacing: -.045em; }
+.excellence-programmes article p { margin: 0; color: var(--g-muted); font-size: 14px; line-height: 1.55; }
+.excellence-programmes article strong { margin-top: 22px; font-size: 11px; }
+.excellence-programmes article a { margin-top: auto; padding-top: 20px; border-top: 1px solid currentColor; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 700; }
 .excellence-pillars article { padding: 32px 20px 36px; border-right: 1px solid var(--g-line); }
 .excellence-pillars article:last-child { border: 0; }
 .excellence-pillars span { font-size: 11px; color: #a42960; }
@@ -267,6 +280,9 @@
   .product-hero { gap: 38px; min-height: 570px; }
   .product-three h3 { margin-top: 45px; }
   .excellence-pillars { grid-template-columns: repeat(3, 1fr); }
+  .excellence-programmes { grid-template-columns: 1fr 1fr; }
+  .excellence-programmes > div, .excellence-programmes > article { min-height: 360px; border-bottom: 1px solid var(--g-line); }
+  .excellence-programmes > article:nth-child(2) { border-right: 0; }
   .excellence-pillars article:nth-child(3) { border-right: 0; }
   .excellence-pillars article:nth-child(-n+3) { border-bottom: 1px solid var(--g-line); }
   .dashboard-progress ol { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 28px; }
@@ -314,6 +330,9 @@
   .product-split h2 { font-size: 45px; }
   .product-next { align-items: flex-start; flex-direction: column; }
   .excellence-pillars { grid-template-columns: 1fr; margin-bottom: 64px; }
+  .excellence-programmes { grid-template-columns: 1fr; margin-bottom: 64px; }
+  .excellence-programmes > div, .excellence-programmes > article { min-height: 330px; border-right: 0; }
+  .excellence-programmes > article:last-child { border-bottom: 0; }
   .excellence-pillars article { border-right: 0; border-bottom: 1px solid var(--g-line); min-height: 180px; }
   .excellence-pillars article:nth-child(-n+3) { border-bottom: 1px solid var(--g-line); }
   .excellence-pillars h3 { margin-top: 30px; }
