@@ -4,8 +4,8 @@ test("audience choice is optional, reversible and retained without tracking", as
   const writes: string[] = [];
   page.on("request", request => { if (request.method() === "POST") writes.push(request.url()); });
   await page.goto("/");
-  const charity = page.getByRole("button", { name: /I work in a charity/ });
-  const adviser = page.getByRole("button", { name: /I advise charities/ });
+  const charity = page.getByRole("button", { name: /CHARITIES/ });
+  const adviser = page.getByRole("button", { name: /ACCOUNTANTS & ADVISERS/ });
   await expect(charity).toHaveAttribute("aria-pressed", "false");
   await expect(adviser).toHaveAttribute("aria-pressed", "false");
   await charity.focus();

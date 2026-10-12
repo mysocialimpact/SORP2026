@@ -40,26 +40,17 @@ export function HomepageAudience() {
   }
 
   return (
-    <section className="homepage-audience" aria-labelledby="audience-title">
-      <div className="homepage-audience-heading">
-        <p className="gateway-kicker">Your work. Your starting point.</p>
-        <h2 id="audience-title">Who are you here as?</h2>
-        <p>Helping charities make a difference? You’re in the right place.</p>
-      </div>
+    <section className="homepage-audience" aria-label="Choose your audience">
       <div className="homepage-audience-options">
         {([
-          ["charity", "I work in a charity", "For charity employees, leadership teams, trustees, finance teams and volunteers."],
-          ["adviser", "I advise charities", "For accountants, auditors, consultants, lawyers and other professional advisers supporting charities."],
+          ["charity", "CHARITIES", "Staff · Leaders · Trustees · Volunteers"],
+          ["adviser", "ACCOUNTANTS & ADVISERS", "Accountants · Auditors · Consultants · Lawyers"],
         ] as const).map(([value, title, description]) => (
           <button key={value} type="button" aria-pressed={audience === value} onClick={() => select(value)}>
-            <span className="homepage-audience-marker" aria-hidden="true">{audience === value ? "✓" : "+"}</span>
             <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>
           </button>
         ))}
       </div>
-      <p className="homepage-audience-note" aria-live="polite">
-        {audience ? "Noted for this visit. Select again to clear — all six products are still yours to explore." : "No sign-up needed. Explore the tools below at your own pace."}
-      </p>
     </section>
   );
 }

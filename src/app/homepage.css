@@ -24,32 +24,29 @@
 .gateway-home-cover .gateway-enterprise-label { color: #78301c; }
 .gateway-home-cover .gateway-opening { padding-bottom: 80px; }
 .homepage-audience {
-  margin-top: 54px;
-  padding: clamp(26px, 4vw, 54px);
+  margin-top: 42px;
+  padding: 16px;
   background: #242329;
-  color: #faf9f6;
   border-radius: 8px;
 }
-.homepage-audience-heading { margin-bottom: 30px; }
-.homepage-audience-heading .gateway-kicker { color: #d8ff52; margin-bottom: 16px; }
-.homepage-audience-heading h2 { font-size: clamp(40px, 4.6vw, 66px); letter-spacing: -.05em; }
-.homepage-audience-heading > p:last-child { margin-top: 14px; font-size: 17px; color: #dedbe1; }
-.homepage-audience-options { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.homepage-audience-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .homepage-audience-options button {
-  display: flex; gap: 16px; align-items: flex-start; text-align: left;
-  padding: 30px 26px; color: #242329; background: #ffad8e;
+  position: relative; display: block; min-width: 0; text-align: left;
+  padding: 30px 28px 28px; color: #242329; background: #ffad8e;
   border: 2px solid transparent; border-radius: 4px; font: inherit; cursor: pointer;
   transition: transform .16s ease, box-shadow .16s ease;
 }
 .homepage-audience-options button:nth-child(2) { background: #ded7f1; }
 .homepage-audience-options button:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #ffffff20; }
-.homepage-audience-options button[aria-pressed="true"] { border-color: #d8ff52; box-shadow: 0 0 0 3px #d8ff52; }
+.homepage-audience-options button[aria-pressed="true"] { border-color: #242329; box-shadow: inset 0 0 0 3px #ffffffb8, 0 0 0 3px #d8ff52; }
+.homepage-audience-options button[aria-pressed="true"]::after {
+  content: "Selected"; position: absolute; top: 12px; right: 14px;
+  padding: 5px 8px; border-radius: 999px; background: #242329; color: #fff;
+  font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
 .gateway .homepage-audience-options button:focus-visible { outline-color: #d8ff52; }
-.homepage-audience-options strong { display: block; font-size: clamp(30px, 3vw, 42px); line-height: 1.08; font-weight: 500; letter-spacing: -.045em; }
-.homepage-audience-description { display: block; margin-top: 16px; font-size: 15px; line-height: 1.5; }
-.homepage-audience-marker { flex: 0 0 30px; height: 30px; margin-top: 3px; border: 1px solid #24232980; border-radius: 50%; display: grid; place-items: center; font-size: 20px; }
-[aria-pressed="true"] .homepage-audience-marker { background: #242329; color: #fff; }
-.homepage-audience-note { font-size: 13px; color: #dedbe1; margin-top: 22px; min-height: 21px; }
+.homepage-audience-options strong { display: block; padding-right: 54px; font-size: clamp(36px, 4.25vw, 62px); line-height: .94; font-weight: 600; letter-spacing: -.06em; }
+.homepage-audience-description { display: block; margin-top: 22px; font-size: clamp(14px, 1.25vw, 17px); line-height: 1.35; font-weight: 500; }
 .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 58px; }
 .gateway-signature {
   margin: 76px 0 0;
@@ -93,13 +90,11 @@
 }
 @media (max-width: 700px) {
   .gateway-home-cover .gateway-opening { padding-bottom: 64px; }
-  .homepage-audience { margin-top: 36px; padding: 28px 20px; }
-  .homepage-audience-heading { margin-bottom: 24px; }
-  .homepage-audience-heading > p:last-child { font-size: 15px; }
-  .homepage-audience-options { grid-template-columns: 1fr; gap: 16px; }
-  .homepage-audience-options button { padding: 24px 18px; gap: 12px; }
-  .homepage-audience-description { font-size: 14px; }
-  .homepage-audience-note { min-height: 38px; }
+  .homepage-audience { margin-top: 30px; padding: 10px; }
+  .homepage-audience-options { grid-template-columns: 1fr; gap: 10px; }
+  .homepage-audience-options button { padding: 24px 20px 22px; }
+  .homepage-audience-options strong { font-size: clamp(34px, 11vw, 48px); }
+  .homepage-audience-description { margin-top: 14px; font-size: 14px; }
   .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 42px; }
   .gateway-signature { margin-top: 54px; padding: 35px 10px 37px; }
   .gateway-signature + .platform-family { padding-top: 56px; }
