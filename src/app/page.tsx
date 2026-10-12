@@ -40,10 +40,10 @@ export default function Home() {
             </p>
           </div>
         </section>
-        <HomepageAudience />
       </div>
       </div>
       <div className="gateway-width">
+        <HomepageAudience />
         <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
           <header className="gateway-section-head gateway-sorp-head">
             <p className="gateway-kicker">Your SORP 2026 toolkit</p>

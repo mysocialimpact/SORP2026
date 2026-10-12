@@ -42,8 +42,9 @@ export function HomepageAudience() {
   return (
     <section className="homepage-audience" aria-labelledby="audience-title">
       <div className="homepage-audience-heading">
+        <p className="gateway-kicker">Your work. Your starting point.</p>
         <h2 id="audience-title">Who are you here as?</h2>
-        <p>Entirely optional. Everyone is welcome.</p>
+        <p>Helping charities make a difference? You’re in the right place.</p>
       </div>
       <div className="homepage-audience-options">
         {([
