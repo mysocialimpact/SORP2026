@@ -35,7 +35,7 @@ export default function ExcellencePage() {
       <div><p className="gateway-kicker">One platform account</p><h2>Start here.<br/>Continue the full journey.</h2></div>
       <div><p>Your SORP2026 account saves the maturity assessment, Purpose diagnostic and supporting evidence independently from your readiness review. The original Social Impact Excellence platform remains unchanged.</p><Link href="/social-impact-excellence/assessment/">Start or continue the assessment <Arrow /></Link><Link href="/social-impact-excellence/journey/">Open your Excellence journey <Arrow /></Link><a href={site.platform!}>Visit the original platform <Arrow diagonal /></a></div>
     </section>
-    <nav className="product-next gateway-width" aria-label="Next product"><span>Also explore</span><Link href="/charity-impact-reports/">Charity Impact Reports <Arrow /></Link></nav>
+    <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/purpose-works/">Purpose Works <Arrow /></Link></nav>
   </main>;
 }
 

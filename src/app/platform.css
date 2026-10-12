@@ -12,6 +12,125 @@
 .gateway-account-control span { font-size: 12px; transition: transform .2s ease; }
 .gateway-account-control:hover span { transform: translate(2px, -2px); }
 
+/* The shared product shell: six stationery dividers, one SORP2026 folder. */
+.product-folder {
+  --folder-paper: #faf9f6;
+  --folder-edge: #d7d2c9;
+  position: relative;
+  z-index: 20;
+  background:
+    linear-gradient(90deg, #ebe7de 0 1px, transparent 1px calc(100% - 1px), #d8d3ca calc(100% - 1px)),
+    linear-gradient(#f1eee7, #e7e2d9);
+  box-shadow: inset 0 -1px 0 #c9c3b8;
+  font-family: var(--sans);
+}
+.product-folder-tabs {
+  width: min(1280px, calc(100% - 112px));
+  margin-inline: auto;
+  padding-top: 16px;
+  overflow: visible;
+}
+.product-folder-tabs-track {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
+  gap: 5px;
+  min-height: 76px;
+}
+.product-folder-tab {
+  --tab-colour: #ece8df;
+  --tab-ink: #242329;
+  position: relative;
+  min-width: 0;
+  min-height: 66px;
+  padding: 11px 14px 10px;
+  border: 1px solid color-mix(in srgb, var(--tab-ink) 22%, transparent);
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  color: var(--tab-ink);
+  background:
+    repeating-linear-gradient(103deg, transparent 0 7px, #fff1 7px 8px, transparent 8px 17px),
+    linear-gradient(165deg, #ffffff20, transparent 38%),
+    var(--tab-colour);
+  box-shadow: 0 -2px 5px #2423290a, inset 0 1px 0 #ffffff47;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 8px;
+  align-items: start;
+  text-decoration: none;
+  transform: translateY(var(--tab-step));
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), filter .2s ease;
+}
+.product-folder-tab::after {
+  content: "";
+  position: absolute;
+  inset: auto -1px -11px;
+  height: 12px;
+  background: inherit;
+  border-inline: inherit;
+  opacity: 0;
+}
+.product-folder-tab > span {
+  grid-row: 1 / 3;
+  padding-top: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  opacity: .68;
+}
+.product-folder-tab strong {
+  min-width: 0;
+  font-size: clamp(11px, .95vw, 14px);
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+.product-folder-tab small {
+  align-self: end;
+  margin-top: 7px;
+  font-size: 8px;
+  line-height: 1;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  opacity: .66;
+}
+.product-folder-tab:hover {
+  filter: saturate(1.04) brightness(1.015);
+  transform: translateY(calc(var(--tab-step) - 4px));
+  box-shadow: 0 -7px 14px #24232916, inset 0 1px 0 #ffffff61;
+}
+.product-folder-tab.is-active {
+  z-index: 2;
+  min-height: 74px;
+  transform: translateY(-4px);
+  box-shadow: 0 -9px 18px #24232920, inset 0 1px 0 #ffffff75;
+}
+.product-folder-tab.is-active::after { opacity: 1; }
+.product-folder-tab:focus-visible {
+  z-index: 3;
+  outline: 3px solid #6148bc;
+  outline-offset: 3px;
+}
+.product-folder-sheet-edge {
+  position: relative;
+  z-index: 1;
+  height: 10px;
+  border-top: 1px solid #24232920;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 12px, #4f443608 12px 13px),
+    var(--folder-paper);
+  box-shadow: 0 7px 13px #24232912;
+}
+.product-folder + .product-page,
+.product-folder + .gateway-ask-page,
+.product-folder + .sr-story {
+  animation: folder-section-arrive .28s var(--ease) both;
+}
+@keyframes folder-section-arrive {
+  from { opacity: .75; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+
 .platform-family { padding: 110px 0 100px; }
 .platform-family-head {
   display: grid;
@@ -202,10 +321,10 @@
 .dashboard-progress li > div:first-child strong { display: block; max-width: 130px; font-size: 12px; line-height: 1.25; }
 .dashboard-progress-track { height: 7px; margin: 14px 0 10px; overflow: hidden; background: #514e56; }
 .dashboard-progress-track > span { display: block; height: 100%; min-width: 0; background: #ff6240; }
-.dashboard-progress li:nth-child(3) .dashboard-progress-track > span { background: #d8ff52; }
+.dashboard-progress li:nth-child(3) .dashboard-progress-track > span { background: #ffd567; }
 .dashboard-progress li:nth-child(4) .dashboard-progress-track > span { background: #f0a7c1; }
-.dashboard-progress li:nth-child(5) .dashboard-progress-track > span { background: #ffd567; }
-.dashboard-progress li:nth-child(6) .dashboard-progress-track > span { background: #a58edb; }
+.dashboard-progress li:nth-child(5) .dashboard-progress-track > span { background: #a58edb; }
+.dashboard-progress li:nth-child(6) .dashboard-progress-track > span { background: #d8ff52; }
 .dashboard-progress li.is-unavailable { opacity: .58; }
 .dashboard-progress li > p { display: flex; justify-content: space-between; gap: 8px; color: #c9c5cc; font-size: 9px; text-transform: uppercase; letter-spacing: .04em; }
 .dashboard-progress li > p b { color: #faf9f6; font-weight: 600; }
@@ -289,6 +408,32 @@
   .dashboard-progress li:nth-child(4) { border-left: 0; }
 }
 @media (max-width: 700px) {
+  .product-folder { overflow: hidden; }
+  .product-folder-tabs {
+    width: 100%;
+    padding: 13px 0 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .product-folder-tabs::-webkit-scrollbar { display: none; }
+  .product-folder-tabs-track {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+    min-height: 72px;
+    gap: 5px;
+    padding-inline: 20px;
+  }
+  .product-folder-tab {
+    flex: 0 0 168px;
+    min-height: 62px;
+    padding-inline: 13px;
+    scroll-snap-align: center;
+  }
+  .product-folder-tab.is-active { min-height: 70px; }
+  .product-folder-tab strong { font-size: 13px; }
   .gateway-account-control { border: 0; border-radius: 0; padding: 14px 0 !important; justify-content: space-between; }
   .platform-family { padding: 70px 0 62px; }
   .platform-family-head, .experience-cloud-head { grid-template-columns: 1fr; gap: 18px; }
@@ -379,4 +524,8 @@
 @media (prefers-reduced-motion: reduce) {
   .experience-name { animation: none; }
   .platform-family-card { transition: none; }
+  .product-folder-tab { transition: none; }
+  .product-folder + .product-page,
+  .product-folder + .gateway-ask-page,
+  .product-folder + .sr-story { animation: none; }
 }
