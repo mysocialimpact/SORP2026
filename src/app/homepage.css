@@ -28,6 +28,17 @@
 [aria-pressed="true"] .homepage-audience-marker { background: #1b3931; color: #fff; }
 .homepage-audience-note { font-size: 12px; color: #43554a; margin-top: 12px; min-height: 19px; }
 .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 58px; }
+.gateway-signature {
+  margin: 76px 0 0;
+  padding: 46px 0 48px;
+  border-top: 1px solid #bcb8b1;
+  border-bottom: 1px solid #bcb8b1;
+  text-align: center;
+}
+.gateway-signature p { margin: 0 0 5px; font-size: clamp(24px, 3vw, 38px); letter-spacing: -.045em; line-height: 1.1; }
+.gateway-signature h2 { font-family: "Instrument Serif", Georgia, serif; font-size: clamp(42px, 5.4vw, 74px); font-style: italic; font-weight: 400; color: #355747; letter-spacing: -.045em; line-height: 1; }
+.gateway-signature + .platform-family { padding-top: 76px; }
+.gateway-vision-link { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 12px; margin-top: 30px; color: #d8ff52; font-size: 15px; font-weight: 600; }
 .gateway .gateway-home-vision { margin: 0 0 90px; }
 .homepage-hello { padding: 84px 0 96px; border-top: 1px solid #ddd9d0; background: #f0eee7; scroll-margin-top: 24px; }
 .homepage-hello-layout { display: grid; grid-template-columns: 1.05fr 1fr; gap: 90px; align-items: start; }
@@ -65,6 +76,8 @@
   .homepage-audience-description { font-size: 13px; }
   .homepage-audience-note { min-height: 38px; }
   .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 42px; }
+  .gateway-signature { margin-top: 54px; padding: 35px 10px 37px; }
+  .gateway-signature + .platform-family { padding-top: 56px; }
   .gateway .gateway-home-vision { margin-bottom: 58px; }
   .homepage-hello { padding: 54px 0 64px; }
   .homepage-hello-layout { grid-template-columns: 1fr; gap: 32px; }

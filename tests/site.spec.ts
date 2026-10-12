@@ -75,18 +75,10 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(axe.violations).toEqual([]);
-  if (testInfo.project.name === "mobile") {
-    await page.getByRole("button", { name: "Open navigation" }).click();
-    await page
-      .getByRole("navigation", { name: "Main navigation" })
-      .getByRole("link", { name: "Contact", exact: true })
-      .click();
-  } else {
-    await page
-      .getByRole("navigation", { name: "Main navigation" })
-      .getByRole("link", { name: "Contact", exact: true })
-      .click();
-  }
+  await page
+    .getByRole("navigation", { name: "Information" })
+    .getByRole("link", { name: "Contact", exact: true })
+    .click();
   await expect(page).toHaveURL(/contact/);
   await expect(
     page.getByRole("link", { name: /marcus@mysocialimpact.org/ }),
@@ -175,6 +167,29 @@ test("the digital filing folder keeps all six products in one accessible sequenc
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(axe.violations).toEqual([]);
+});
+
+test("supporting pages remain inside the Home folder section", async ({ page }) => {
+  for (const [path, title] of [["/our-mission/", "Our Mission"], ["/contact/", "Contact"]] as const) {
+    await page.goto(path);
+    const folder = page.getByRole("navigation", { name: "SORP2026 products" });
+    await expect(folder.getByRole("link")).toHaveCount(7);
+    await expect(folder.getByRole("link", { name: /Home/ })).toHaveAttribute("aria-current", "location");
+    await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toContainText(`Home/${title}`);
+  }
+
+  await page.goto("/are-you-sorp-ready/review/?entry=intro");
+  await expect(page.getByRole("navigation", { name: "SORP2026 products" }).getByRole("link", { name: /Are You SORP Ready/ })).toHaveAttribute("aria-current", "location");
+  await expect(page.locator(".gateway-header .gateway-account-control")).toHaveCount(1);
+});
+
+test("the compact header uses the folder as primary navigation", async ({ page }) => {
+  await page.goto("/");
+  const header = page.getByRole("banner");
+  await expect(header.getByRole("link", { name: /SORP 2026 home/ })).toContainText("Reporting for greater impact.");
+  await expect(header.getByRole("link", { name: /SORP 2026 home/ })).toHaveAttribute("href", "/");
+  await expect(header.getByRole("navigation")).toHaveCount(0);
+  await expect(header.getByRole("link", { name: /Log in|My Dashboard|Account/ })).toHaveCount(1);
 });
 test("preview stays out of search engines and unknown routes return 404", async ({
   request,

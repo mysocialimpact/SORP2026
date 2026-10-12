@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
 import { HomepageContribution } from "@/components/voluntary-contribution";
+import { SupportingBreadcrumb } from "@/components/supporting-breadcrumb";
 
 export const metadata: Metadata = {
   title: "Our Mission",
@@ -33,6 +34,7 @@ const promises = [
 export default function OurMissionPage() {
   return (
     <main id="main" className="gateway gateway-mission">
+      <div className="gateway-width"><SupportingBreadcrumb current="Our Mission" /></div>
       <section
         className="gateway-width mission-hero"
         aria-labelledby="mission-title"

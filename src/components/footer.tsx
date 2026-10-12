@@ -1,6 +1,7 @@
 import { site } from "@/lib/site";
 import { IdeasBrand, MsiBrand } from "./brand";
 import { Arrow } from "./ui";
+import Link from "next/link";
 export function Footer() {
   const builtAt = process.env.NEXT_PUBLIC_SITE_BUILT_AT!;
   const buildDate = new Intl.DateTimeFormat("en-GB", {
@@ -18,6 +19,12 @@ export function Footer() {
   return (
     <footer className="footer gateway-footer">
       <div className="gateway-width">
+        <nav className="gateway-footer-nav" aria-label="Information">
+          <Link href="/our-mission/">Our Mission</Link>
+          <Link href="/contact/">Contact</Link>
+          <Link href="/privacy/">Privacy &amp; accessibility</Link>
+          <Link href="/">Folder index</Link>
+        </nav>
         <div className="gateway-footer-intro">
           <p className="gateway-kicker">Ideas made useful</p>
           <h2>Greater impact takes expertise, curiosity and creativity.</h2>

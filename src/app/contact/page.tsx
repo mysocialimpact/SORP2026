@@ -3,6 +3,7 @@ import Image from "next/image";
 import { MsiBrand, IdeasBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
+import { SupportingBreadcrumb } from "@/components/supporting-breadcrumb";
 export const metadata: Metadata = {
   title: "Contact",
   description:
@@ -13,6 +14,7 @@ export default function Contact() {
   return (
     <main id="main" className="gateway gateway-contact">
       <div className="gateway-width">
+        <SupportingBreadcrumb current="Contact" />
         <section className="gateway-contact-hero">
           <div>
             <p className="gateway-kicker">
