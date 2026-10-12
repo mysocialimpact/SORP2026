@@ -1,0 +1,14 @@
+BEGIN;
+ALTER TABLE research_console.methodologies ADD COLUMN IF NOT EXISTS rubric jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE research_console.methodologies ADD COLUMN IF NOT EXISTS parent_id uuid REFERENCES research_console.methodologies(id);
+ALTER TABLE research_console.evidence ADD COLUMN IF NOT EXISTS import_batch_id uuid REFERENCES research_console.imports(id);
+ALTER TABLE research_console.evidence ADD COLUMN IF NOT EXISTS supported_categories text[] NOT NULL DEFAULT '{}';
+ALTER TABLE research_console.evidence ADD COLUMN IF NOT EXISTS provenance jsonb NOT NULL DEFAULT '{}';
+ALTER TABLE research_console.assessments ADD COLUMN IF NOT EXISTS import_batch_id uuid REFERENCES research_console.imports(id);
+ALTER TABLE research_console.assessments ADD COLUMN IF NOT EXISTS historical_level integer;
+ALTER TABLE research_console.assessments ADD COLUMN IF NOT EXISTS awards jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE research_console.assessments ADD COLUMN IF NOT EXISTS assessment_state text NOT NULL DEFAULT 'Assessed and scored';
+CREATE TABLE IF NOT EXISTS research_console.benchmarks(id text PRIMARY KEY,label text NOT NULL,source_url text NOT NULL,accessed_at timestamptz,statement text NOT NULL,limitations text NOT NULL);
+CREATE TABLE IF NOT EXISTS research_console.backup_runs(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),started_at timestamptz NOT NULL DEFAULT now(),completed_at timestamptz,status text NOT NULL,object_key text,sha256 text,details jsonb NOT NULL DEFAULT '{}');
+INSERT INTO research_console.migrations(version) VALUES('002') ON CONFLICT DO NOTHING;
+COMMIT;

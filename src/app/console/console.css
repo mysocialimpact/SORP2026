@@ -806,6 +806,7 @@ body:has(.research-console) .product-folder-tabs {
   background: #eeeade;
   color: #625d50;
 }
+.rc-calibration-table { min-width: 570px; }
 .rc-table td {
   padding: 18px 20px;
   border-top: 1px solid var(--rc-line);

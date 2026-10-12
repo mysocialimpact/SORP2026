@@ -26,6 +26,8 @@ try {
     "history",
     "baselines",
     "visits",
+    "benchmarks",
+    "backup_runs",
   ])
     tables[name] = (
       await client.query(`SELECT * FROM research_console.${name}`)

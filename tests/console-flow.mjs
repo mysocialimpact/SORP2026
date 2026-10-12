@@ -15,6 +15,7 @@ await client.query("DROP SCHEMA IF EXISTS research_console CASCADE");
 await client.query(
   fs.readFileSync("migrations/001_research_console.sql", "utf8"),
 );
+for(const migration of ['002_console_completion.sql','003_icaew_benchmark.sql'])await client.query(fs.readFileSync('migrations/'+migration,'utf8'));
 await client.query(
   execFileSync(process.execPath, ["scripts/console-seed.mjs"], {
     encoding: "utf8",
@@ -42,6 +43,9 @@ for (const path of [
   "export/?format=xlsx",
   "methodology/",
   "imports/",
+  "calibration/",
+  "discover/?q=example.org",
+  "export/?format=backup",
   "runs/00000000-0000-0000-0000-000000000000/",
 ]) {
   ok(
@@ -310,6 +314,41 @@ ok(
     .previous.moved.evidence.includes(mergeEvidence.id),
   "Merge history records exact moved identities for recovery",
 );
+// The historical import must not displace a newer human assessment.
+const beforePilot=(await call('firms/'+f.id+'/')).data;
+const pilotBook=new ExcelJS.Workbook();
+pilotBook.addWorksheet('Summary').addRow(['Synthetic acceptance fixture']);
+pilotBook.addWorksheet('Firm scores').addRows([
+ ['ID','Firm name','Website','Dedicated charity services /25','Specialist people /20','SORP knowledge /20','Clients & cases /20','External recognition /15','Total /100','Evidence level 0–5','Research date','Short justification','Evidence gaps','Research confidence','SORP evidence'],
+ ['QA1','QA Evidence Practice','https://example.org',15,0,0,0,0,15,0,'2025-01-01','Historical synthetic service assessment.','Other categories not established.','Medium','None found'],
+]);
+pilotBook.addWorksheet('Raw evidence').addRows([
+ ['Firm ID','Firm name','Source type','Evidence type','Raw evidence / research note','Source URL','Accessed','Score category supported'],
+ ['QA1','QA Evidence Practice','Firm website','Services','We provide charity accounting and audit services through our dedicated charity team.','https://example.org/charities/','2025-01-01','Services'],
+]);
+pilotBook.addWorksheet('Methodology').addRows([['Original fixture methodology'],['Five categories; original human judgement retained.']]);
+form=new FormData();form.append('file',new File([await pilotBook.xlsx.writeBuffer()],'pilot-fixture.xlsx'));
+resp=await fetch(base+'/api/console/imports/',{method:'POST',headers:{cookie:'console_qa=owner',origin:base},body:form});
+const pilotPreview=await resp.json();ok(resp.ok&&pilotPreview.summary.kind==='pilot','Recognised pilot multi-sheet preview');
+ok((await call('imports/'+pilotPreview.id+'/',{})).status===200,'Historical pilot import commits');
+const afterPilot=(await call('firms/'+f.id+'/')).data;
+const historical=(await client.query("SELECT * FROM research_console.assessments WHERE firm_id=$1 AND origin='Historical pilot v1.0'",[f.id])).rows[0];
+ok(historical.total===15&&new Date(historical.created_at).toISOString().startsWith('2025-01-01'),'Historical score and date preserved');
+ok(beforePilot.assessments[0]?.origin==='Manual'&&JSON.stringify(afterPilot.assessments[0])===JSON.stringify(beforePilot.assessments[0]),'Historical import preserves current human assessment');
+const calibration=(await call('calibration/',{}));
+ok(calibration.status===200&&calibration.data.length===1&&calibration.data[0].provisional_total>0,'Versioned calibration produces genuine source-linked awards');
+ok(calibration.data[0].historical_total===15&&calibration.data[0].awards.every(a=>a.evidence_id&&a.source_url&&a.justification),'Calibration retains historical score and traces every award');
+await call('calibration/',{});
+ok((await client.query("SELECT count(*)::int n FROM research_console.assessments WHERE origin='Automated pilot calibration'")).rows[0].n===1,'Calibration is idempotent for a rubric version');
+ok(JSON.stringify((await call('firms/'+f.id+'/')).data.assessments[0])===JSON.stringify(beforePilot.assessments[0]),'Calibration does not replace current human assessment');
+const direct=(await call('discover/?q=known-accountant.example'));
+ok(direct.status===200&&direct.data.website==='https://known-accountant.example/','Direct website fallback works without search credentials');
+const unknown=(await call('discover/?q=Unfamiliar%20QA%20Accountants'));
+ok(unknown.status===200&&!unknown.data.configured&&unknown.data.message.includes('Brave'),'Missing search provider is reported without fake results');
+ok((await call('dashboard/')).data.benchmark.label.includes('12,000'),'Authoritative benchmark is separate from pending baseline');
+const portable=(await call('export/?format=backup')).data;
+ok(portable.tables.evidence.length>0&&portable.tables.assessments.length>0&&portable.tables.history.length>0&&portable.tables.imports.length>0,'Complete private backup contains evidence, assessments, archives and audit history');
+ok((await fetch(base+'/api/internal/console-backup/')).status===401,'Scheduled backup rejects unauthenticated requests');
 const browser = await chromium.launch({
   executablePath: fs.existsSync("/usr/bin/chromium")
     ? "/usr/bin/chromium"
@@ -384,6 +423,14 @@ for (const width of [1440, 390]) {
     fullPage: true,
     animations: "disabled",
   });
+  for(const route of ['methodology','calibration']){
+    await page.goto(base+'/console/'+route+'/');
+    await page.getByRole('heading',{name:route==='calibration'?'Ten firms. Two perspectives.':'What justifies a score?'}).waitFor();
+    const audit=await new AxeBuilder({page}).analyze();
+    ok(audit.violations.filter(v=>['serious','critical'].includes(v.impact)).length===0,route+' accessibility at '+width);
+    ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),route+' fits viewport '+width);
+    await page.screenshot({path:'/tmp/console-'+route+'-'+width+'.png',fullPage:true});
+  }
   ok(errors.length === 0, "No browser exceptions at " + width);
   await context.close();
 }

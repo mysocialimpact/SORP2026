@@ -3,6 +3,7 @@ import { load } from "cheerio";
 import { query, transaction } from "./db";
 import { checkRobots, fetchPublic, safeResearchUrl } from "./fetch-public";
 import { type Category } from "./model";
+import { automaticAssessment } from "./automatic-assessment";
 const terms: Record<Category, RegExp> = {
   services: /charit|not.for.profit|independent examination/i,
   people:
@@ -28,12 +29,12 @@ export async function startResearch(firmId: string, actor: string) {
       );
     safeResearchUrl(firm.website);
     await c.query(
-      "UPDATE research_console.runs SET status='interrupted',stage='Interrupted — retry available',completed_at=now(),limitations=array_append(limitations,'Previous run exceeded its time limit.') WHERE firm_id=$1 AND status='running' AND started_at<now()-interval '5 minutes'",
+      "UPDATE research_console.runs SET status='interrupted',stage='Interrupted — retry available',completed_at=now(),limitations=array_append(limitations,'Previous run exceeded its time limit.') WHERE firm_id=$1 AND status IN ('running','assessing') AND started_at<now()-interval '5 minutes'",
       [firmId],
     );
     const current = (
       await c.query(
-        "SELECT id FROM research_console.runs WHERE firm_id=$1 AND status='running'",
+        "SELECT id FROM research_console.runs WHERE firm_id=$1 AND status IN ('running','assessing')",
         [firmId],
       )
     ).rows[0];
@@ -52,6 +53,7 @@ export async function startResearch(firmId: string, actor: string) {
   });
 }
 export async function runResearch(runId: string) {
+  const started = Date.now();
   const run = (
     await query<{ id: string; firm_id: string; status: string }>(
       "SELECT * FROM research_console.runs WHERE id=$1",
@@ -66,7 +68,7 @@ export async function runResearch(runId: string) {
     )
   )[0];
   const limitations = [
-    "Focused website collection, not an exhaustive search. Extracts are keyword matches awaiting human verification. No automatic points awarded: detailed scoring rubric is unresolved.",
+    "Focused website collection, not an exhaustive search. Source passages support conservative provisional v1.1 scoring; human review is required.",
     "External talks, qualifications, clients and office details need human verification; a missing match is not absence of expertise.",
   ];
   let examined = 0;
@@ -80,7 +82,22 @@ export async function runResearch(runId: string) {
       if (!page.type.includes("text/html"))
         throw new Error("This source is not an HTML page; inspect manually.");
       const $ = load(page.body);
+      const links = $("a[href]")
+        .map((_, a) => $(a).attr("href") || "")
+        .get();
       const title = $("title").first().text().trim().slice(0, 500) || url;
+      // Retain explicitly marked-up office addresses, including footer addresses.
+      // They remain unverified leads and never replace an existing office.
+      const addresses = type==='Firm website' ? [...new Set($('address').map((_,a)=>$(a).text().replace(/\s+/g,' ').trim()).get())].filter(a=>a.length>15&&a.length<500).slice(0,8) : [];
+      for (const address of addresses) {
+        const postcode=address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase();
+        if (!postcode) continue;
+        await transaction(async c=>{
+          await c.query('SELECT id FROM research_console.firms WHERE id=$1 FOR UPDATE',[run.firm_id]);
+          const added=(await c.query("INSERT INTO research_console.offices(firm_id,address,postcode,source_url,verification) SELECT $1,$2,$3,$4,'Unverified — retrieved from official website' WHERE NOT EXISTS(SELECT 1 FROM research_console.offices WHERE firm_id=$1 AND (lower(address)=lower($2) OR regexp_replace(upper(postcode),'\\s','','g')=regexp_replace($3,'\\s','','g'))) RETURNING *",[run.firm_id,address,postcode,page.url])).rows[0];
+          if(added)await c.query("INSERT INTO research_console.history(firm_id,entity,entity_id,next,reason,actor) VALUES($1,'office',$2,$3,$4,'Website research')",[run.firm_id,added.id,JSON.stringify(added),'Explicit HTML address retained as an unverified office lead; research run '+runId]);
+        });
+      }
       $("script,style,nav,footer,header,noscript,svg").remove();
       const text = $("main").length ? $("main").text() : $("body").text();
       const clean = text.replace(/\s+/g, " ").trim();
@@ -93,34 +110,43 @@ export async function runResearch(runId: string) {
         [runId, page.url, title, "Examined", 200],
       );
       examined++;
+      const passages = [
+        ...new Set(
+          $("main p,main li,article p,article li,p")
+            .map((_, p) => $(p).text().replace(/\s+/g, " ").trim())
+            .get()
+            .filter((p) => p.length >= 60 && p.length <= 2400),
+        ),
+      ];
+      if (!passages.length)
+        passages.push(
+          ...(clean.match(/.{1,1600}(?:[.!?]\s|$)/g) || [clean.slice(0, 1600)]),
+        );
       for (const [category, regex] of Object.entries(terms)) {
-        const match = regex.exec(clean);
-        if (!match) continue;
-        const extract = clean.slice(
-          Math.max(0, match.index - 90),
-          match.index + 310,
-        );
-        await query(
-          "INSERT INTO research_console.evidence(firm_id,run_id,source_type,category,title,summary,url,accessed_at,sorp,confidence,notes) VALUES($1,$2,$3,$4,$5,$6,$7,now(),$8,$9,$10)",
-          [
-            run.firm_id,
-            runId,
-            type,
-            category,
-            title,
-            extract,
-            page.url,
-            "Not assessed",
-            "Needs review",
-            "Automatically collected verbatim extract; verify context and classification before scoring.",
-          ],
-        );
+        for (const extract of passages
+          .map((p,i) => category==='sorp'&&regex.test(p) ? passages.slice(Math.max(0,i-1),i+3).join(' ').slice(0,6000) : p)
+          .filter((p) => regex.test(p))
+          .slice(0, 4)) {
+          await query(
+            "INSERT INTO research_console.evidence(firm_id,run_id,source_type,category,title,summary,url,accessed_at,sorp,confidence,notes) VALUES($1,$2,$3,$4,$5,$6,$7,now(),$8,$9,$10)",
+            [
+              run.firm_id,
+              runId,
+              type,
+              category,
+              title,
+              extract,
+              page.url,
+              "Not assessed",
+              "Needs review",
+              "Automatically retrieved verbatim passage. Provisional scoring requires explicit criterion support; human confirmation remains necessary.",
+            ],
+          );
+        }
       }
       return {
         url: page.url,
-        links: $("a[href]")
-          .map((_, a) => $(a).attr("href") || "")
-          .get(),
+        links,
       };
     } catch (error) {
       const reason =
@@ -144,35 +170,48 @@ export async function runResearch(runId: string) {
     const home = await examine(firm.website, "Firm website");
     if (home) {
       const host = new URL(home.url).hostname.replace(/^www\./, "");
-      const urls = [
-        ...new Set(
-          home.links.flatMap((href) => {
-            try {
-              const u = new URL(href, home.url);
-              u.hash = "";
-              if (
-                u.hostname.replace(/^www\./, "") !== host ||
-                u.protocol !== "https:" ||
-                u.search ||
-                !/(charit|not-for-profit|sorp|team|people|sector|about|office)/i.test(
-                  u.pathname,
+      const seen = new Set([home.url]);
+      const discover = (links: string[], base: string) =>
+        [
+          ...new Set(
+            links.flatMap((href) => {
+              try {
+                const u = new URL(href, base);
+                u.hash = "";
+                if (
+                  u.hostname.replace(/^www\./, "") !== host ||
+                  u.protocol !== "https:" ||
+                  u.search ||
+                  !/(charit|not-for-profit|sorp|team|people|sector|about|office|service|insight|publication|contact)/i.test(
+                    u.pathname,
+                  )
                 )
-              )
+                  return [];
+                return [u.href];
+              } catch {
                 return [];
-              return [u.href];
-            } catch {
-              return [];
-            }
-          }),
-        ),
-      ]
-        .filter((u) => u !== home.url)
-        .sort(
-          (a, b) =>
-            Number(/charit|sorp/.test(b)) - Number(/charit|sorp/.test(a)),
-        )
-        .slice(0, 6);
-      for (const url of urls) {
+              }
+            }),
+          ),
+        ]
+          .filter((u) => !seen.has(u))
+          .sort(
+            (a, b) =>
+              Number(/charit|sorp/.test(b)) - Number(/charit|sorp/.test(a)),
+          )
+          .slice(0, 25);
+      const urls = discover(home.links, home.url).map((url) => ({
+        url,
+        depth: 1,
+      }));
+      for (
+        let pageCount = 0;
+        urls.length && pageCount < 11 && Date.now() - started < 105000;
+        pageCount++
+      ) {
+        const { url, depth } = urls.shift()!;
+        if (seen.has(url)) continue;
+        seen.add(url);
         await stage(
           /sorp/i.test(url)
             ? "Checking SORP publications"
@@ -181,20 +220,46 @@ export async function runResearch(runId: string) {
               : "Looking for charity expertise",
         );
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        await examine(url, "Firm website");
+        const found = await examine(url, "Firm website");
+        if (found && depth < 2)
+          urls.push(
+            ...discover(found.links, found.url)
+              .filter((u) => !urls.some((p) => p.url === u))
+              .map((url) => ({ url, depth: 2 })),
+          );
+        urls.sort(
+          (a, b) =>
+            Number(/charit|sorp/.test(b.url)) -
+            Number(/charit|sorp/.test(a.url)),
+        );
       }
     }
     await stage("Preparing the evidence dossier");
     await transaction(async (c) => {
       await c.query(
         "UPDATE research_console.runs SET status=$2,stage='Collection finished — human assessment needed',completed_at=now(),limitations=$3 WHERE id=$1",
-        [runId, examined ? "collected" : "failed", limitations],
+        [runId, examined ? "assessing" : "failed", limitations],
       );
       await c.query(
-        "UPDATE research_console.firms SET status='Needs more evidence',approved_at=NULL,updated_at=now() WHERE id=$1",
-        [run.firm_id],
+        "UPDATE research_console.firms SET status=$2,approved_at=NULL,updated_at=now() WHERE id=$1",
+        [run.firm_id,examined?'Researching':'Needs more evidence'],
       );
     });
+    if (examined) {
+      await stage("Applying provisional evidence criteria");
+      const assessment = await automaticAssessment(
+        run.firm_id,
+        "Website research engine",
+        { runId },
+      );
+      await stage(
+        assessment.total === null
+          ? "Research saved — more evidence needed before scoring"
+          : "Report ready — provisional score awaits your review",
+      );
+      if(assessment.total===null)await query("UPDATE research_console.firms SET status='Needs more evidence' WHERE id=$1",[run.firm_id]);
+      await query("UPDATE research_console.runs SET status='collected',completed_at=now() WHERE id=$1",[runId]);
+    }
   } catch {
     await query(
       "UPDATE research_console.runs SET status='failed',stage='Research interrupted',completed_at=now(),limitations=array_append(limitations,'Research could not finish. Retry is available; collected sources are retained.') WHERE id=$1",

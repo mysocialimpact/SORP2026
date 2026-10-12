@@ -113,6 +113,8 @@ export type Firm = {
   merged_into?: string | null;
 };
 export type Evidence = {
+  supported_categories?: string[];
+  provenance?: Record<string, unknown>;
   id: string;
   firm_id: string;
   run_id: string | null;
@@ -130,6 +132,9 @@ export type Evidence = {
   notes: string;
 };
 export type Assessment = {
+  awards?: import("./scoring-engine").Award[];
+  assessment_state?: string;
+  historical_level?: number;
   id: string;
   firm_id: string;
   run_id: string | null;
@@ -146,6 +151,7 @@ export type Assessment = {
   previous_id: string | null;
 };
 export type Methodology = {
+  rubric?: import("./rubric").Criterion[];
   id: string;
   name: string;
   categories: typeof categories;
