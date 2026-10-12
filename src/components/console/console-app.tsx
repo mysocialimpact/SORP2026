@@ -145,8 +145,7 @@ function Mission() {
           </p>
           <h1>
             Let’s discover the UK’s
-            <br />
-            <em>charity-accounting expertise.</em>
+            <br /> <em>charity-accounting expertise.</em>
           </h1>
           <p className="rc-intro">
             Thousands of accountancy firms. One growing body of evidence.
