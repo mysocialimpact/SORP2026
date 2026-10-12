@@ -1,0 +1,3 @@
+// Local QA identity service only. The production application has no test auth bypass.
+import http from 'node:http';
+http.createServer((req,res)=>{res.setHeader('content-type','application/json');if(req.url==='/api/readiness-account'){const cookie=req.headers.cookie||'';const email=cookie.includes('console_qa=owner')?'owner@example.invalid':cookie.includes('console_qa=other')?'other@example.invalid':null;res.end(JSON.stringify(email?{signedIn:true,account:{email,name:'QA Owner'}}:{signedIn:false}));}else{res.statusCode=404;res.end('{}');}}).listen(4319,'127.0.0.1',()=>console.log('Local console QA identity service ready'));

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FounderConsoleLink } from "./console/founder-link";
 import { Arrow } from "@/components/ui";
 
 type Account = { name: string; email: string; position: string; organisation?: string; lastSavedAt?: string };
@@ -139,6 +140,7 @@ export function PlatformDashboard() {
     { number: "06", name: "My Impact Director", status: "Not started", percentage: 0 },
   ];
   return <>
+    <FounderConsoleLink />
     <header className="dashboard-welcome">
       <div><p className="gateway-kicker">My SORP2026</p><h1>Welcome back, <span>{firstName}.</span></h1><p>{data.account.organisation || data.account.email}</p></div>
       <button type="button" onClick={signOut} disabled={busy}>{busy ? "Signing out…" : "Sign out"}</button>
