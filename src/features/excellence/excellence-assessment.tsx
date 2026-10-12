@@ -76,7 +76,9 @@ export function ExcellenceAssessment() {
       let local: SnapshotDraft | null = null;
       try { local = safeDraft(JSON.parse(localStorage.getItem(LOCAL_KEY) || "null")); } catch { /* account copy remains authoritative */ }
       const remote = safeDraft(payload.productProgress?.data);
-      const chosen = mergeSnapshotDrafts([remote, local].filter((value): value is SnapshotDraft => Boolean(value))) || newDraft();
+      const chosenDraft = mergeSnapshotDrafts([remote, local].filter((value): value is SnapshotDraft => Boolean(value))) || newDraft();
+      const requestedQuestion = Number(new URLSearchParams(window.location.search).get("question"));
+      const chosen = Number.isInteger(requestedQuestion) && requestedQuestion >= 1 && requestedQuestion <= 25 ? { ...chosenDraft, index: requestedQuestion - 1 } : chosenDraft;
       setAccount(payload.account);
       setProductData(payload.productProgress?.data || {});
       setDraft(chosen);
