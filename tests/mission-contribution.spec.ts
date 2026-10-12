@@ -11,7 +11,9 @@ test("homepage presents the social enterprise mission and agreed vision", async 
   await expect(footer.getByText("Imagine a world where curiosity and creativity were valued as highly as certainty.")).toBeVisible();
   await expect(footer.getByRole("link", { name: "See what else is in the Shed!" })).toHaveAttribute("href", "https://www.theideasshed.com/");
   await expect(footer).not.toContainText("Independent tools");
-  await expect(footer.getByRole("link", { name: /Our mission|Privacy|Contact/ })).toHaveCount(0);
+  await expect(footer.getByRole("link", { name: "Our Mission", exact: true })).toHaveAttribute("href", "/our-mission/");
+  await expect(footer.getByRole("link", { name: "Contact", exact: true })).toHaveAttribute("href", "/contact/");
+  await expect(footer.getByRole("link", { name: "Privacy & accessibility", exact: true })).toHaveAttribute("href", "/privacy/");
 });
 
 test("mission page is concise, partner-friendly and accessible", async ({ page }) => {

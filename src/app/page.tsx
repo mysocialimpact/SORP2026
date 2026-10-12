@@ -135,6 +135,10 @@ export default function Home() {
             </Link>
           </aside>
         </section>
+        <section className="gateway-signature" aria-label="Our approach">
+          <p>SORP is the requirement.</p>
+          <h2>Better impact is the opportunity.</h2>
+        </section>
         <section className="platform-family" aria-labelledby="platform-family-title">
           <header className="platform-family-head">
             <p className="gateway-kicker">Beyond SORP</p>
@@ -163,6 +167,7 @@ export default function Home() {
             Imagine a world where nothing stood in the way of our potential
             to make a difference.
           </h2>
+          <Link className="gateway-vision-link" href="/our-mission/">Our mission <Arrow diagonal /></Link>
         </section>
       </div>
       <ExperienceCloud />

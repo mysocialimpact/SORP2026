@@ -69,6 +69,12 @@
   justify-content: space-between;
   gap: 28px;
 }
+.gateway-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  color: inherit;
+}
 .gateway-wordmark {
   display: inline-flex;
   align-items: baseline;
@@ -87,6 +93,16 @@
   background: var(--g-orange);
   border-radius: 50%;
   margin-left: 1px;
+}
+.gateway-tagline {
+  padding-left: 18px;
+  border-left: 1px solid var(--g-line);
+  color: #565158;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 17px;
+  font-style: italic;
+  letter-spacing: -.015em;
+  white-space: nowrap;
 }
 .gateway-nav {
   display: flex;
@@ -118,6 +134,16 @@
 .gateway-menu {
   display: none;
 }
+.supporting-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-top: 24px;
+  color: var(--g-muted);
+  font-size: 12px;
+  letter-spacing: .035em;
+}
+.supporting-breadcrumb a { color: var(--g-ink); text-decoration: underline; text-underline-offset: 4px; }
 .gateway-opening {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
@@ -874,6 +900,17 @@
   background: #242329;
   color: #faf9f6;
 }
+.gateway-footer-nav {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  padding: 25px 0;
+  border-bottom: 1px solid #ffffff24;
+  font-size: 13px;
+}
+.gateway-footer-nav a { color: #d8d4db; text-decoration: underline; text-decoration-color: #ffffff40; text-underline-offset: 4px; }
+.gateway-footer-nav a:hover { color: #d8ff52; }
 .gateway-studio {
   display: inline-flex;
   align-items: center;
@@ -1292,6 +1329,20 @@
   }
   .gateway-wordmark {
     font-size: 26px;
+  }
+  .gateway-brand-lockup { gap: 11px; }
+  .gateway-tagline {
+    max-width: 108px;
+    padding-left: 11px;
+    font-size: 12px;
+    line-height: 1.05;
+    white-space: normal;
+  }
+  .gateway-header .gateway-account-control {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 8px 11px !important;
+    font-size: 12px;
   }
   .gateway-menu {
     display: block;
@@ -1715,6 +1766,9 @@
     text-align: left;
     line-height: 1.6;
   }
+}
+@media (max-width: 380px) {
+  .gateway-tagline { display: none; }
 }
 @media (max-width: 360px) {
   .mission-hero-copy h1 {
