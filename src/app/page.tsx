@@ -10,12 +10,14 @@ import { excellenceProducts } from "@/lib/products";
 import { HomepageAudience, HomepageHello } from "@/components/homepage-welcome";
 import "./homepage.css";
 export const metadata: Metadata = {
-  title: "SORP 2026. Made simpler.",
+  title: "SORP 2026 — Reporting for greater impact",
+  description: "Explore SORP 2026 charity reporting tools for charities, trustees, accountants and advisers. A My Social Impact social enterprise initiative: free tools, stronger evidence and support for greater impact.",
+  openGraph: { title: "SORP 2026 — Reporting for greater impact", description: "SORP is the requirement. Better impact is the opportunity. Practical tools and human expertise from My Social Impact." },
   ...(site.live ? { alternates: { canonical: "/" } } : {}),
 };
 export default function Home() {
   return (
-    <main id="main" className="gateway">
+    <main id="main" className="gateway homepage-story">
       <div className="gateway-home-cover">
       <div className="gateway-width">
         <section className="gateway-opening" aria-labelledby="gateway-title">
@@ -29,14 +31,12 @@ export default function Home() {
           <div className="gateway-intro-aside">
             <span className="gateway-enterprise-label">A social enterprise initiative</span>
             <p>
-              Practical tools for charities, accountants and advisers—helping
-              you meet the new reporting requirements and use them as a
-              springboard for greater impact.
+              We’re excited about SORP 2026 and better charity reporting. Even more so about
+              what charities can achieve with the insight it brings.
             </p>
             <MsiBrand attribution="Developed by" />
             <p className="gateway-enterprise-note">
-              Using technology to make professional-quality tools accessible—
-              especially to smaller charities.
+              Specialist knowledge. Useful technology. Within reach of smaller charities.
             </p>
           </div>
         </section>
@@ -49,8 +49,7 @@ export default function Home() {
             <p className="gateway-kicker">Your SORP 2026 toolkit</p>
             <h2 id="sorp-tools-title">Start here. Get SORP ready.</h2>
             <p>
-              Two practical products to help you understand what matters, see
-              where you stand and move forward with confidence.
+              Understand the requirements. Find your starting point.
             </p>
           </header>
           <div className="gateway-products">
@@ -136,40 +135,47 @@ export default function Home() {
               See how we work together <Arrow diagonal />
             </Link>
           </aside>
+          <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/">Read the official Charities SORP <Arrow diagonal /></a></p>
         </section>
-        <section className="gateway-signature" aria-label="Our approach">
-          <p>SORP is the requirement.</p>
-          <h2>Better impact is the opportunity.</h2>
+        <section className="homepage-impact" aria-labelledby="impact-story-title">
+          <div className="homepage-impact-heading">
+            <h2 id="impact-story-title">Too useful to leave<br /><em>in a filing cabinet.</em></h2>
+            <p>A report captures a year. Its insight can shape what happens next.</p>
+          </div>
+          <ol className="homepage-impact-sheets">
+            <li><span className="homepage-sheet-tab" aria-hidden="true">01</span><span className="homepage-evidence-lines" aria-hidden="true"><i /><i /><i /><i /></span><h3>Better evidence.</h3><p>Understand what’s working.<br />And what needs to change.</p></li>
+            <li><span className="homepage-sheet-tab" aria-hidden="true">02</span><span className="homepage-decision" aria-hidden="true"><svg viewBox="0 0 72 62" fill="none"><path d="M8 54 56 6M20 6h36v36" stroke="currentColor" strokeWidth="3" /></svg></span><h3>Better decisions.</h3><p>Put that knowledge to work.<br />Choose where to focus next.</p></li>
+            <li><span className="homepage-sheet-tab" aria-hidden="true">03</span><span className="homepage-impact-bars" aria-hidden="true"><i /><i /><i /></span><h3>Greater impact.</h3><p>Learn, improve and show the difference<br />to funders and supporters.</p></li>
+          </ol>
         </section>
-        <section className="platform-family" aria-labelledby="platform-family-title">
+        <section className="platform-family homepage-family" aria-labelledby="platform-family-title">
           <header className="platform-family-head">
-            <p className="gateway-kicker">Beyond SORP</p>
-            <h2 id="platform-family-title">Four more ways to strengthen your impact.</h2>
-            <p>Smaller, focused tools for the work that comes after compliance.</p>
+            <h2 id="platform-family-title">From Compliance<br /><em>to Excellence.</em></h2>
+            <p>Take the next step with our wider family of tools and human expertise.</p>
           </header>
           <div className="platform-family-grid">
             {excellenceProducts.map(product => (
-              <Link href={product.href} className={`platform-family-card ${product.className}`} key={product.slug}>
-                <span className="platform-family-meta"><b>{product.number}</b>{product.status}</span>
-                {product.slug === "social-impact-excellence" && <Image className="platform-family-logo is-excellence" src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} />}
-                {product.slug === "charity-impact-reports" && <Image className="platform-family-logo is-reports" src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887} />}
-                {product.slug === "purpose-works" && <Image className="platform-family-logo is-purpose" src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809} />}
-                {product.slug === "my-impact-director" && <h3 className="platform-family-director">My <em>Impact</em><br/>Director</h3>}
-                <div className="platform-family-card-copy">
-                  <p>{product.short}</p>
-                  <span>Explore <Arrow /></span>
-                </div>
+              <Link href={product.href} className={`homepage-product-index ${product.className}`} key={product.slug}>
+                <span className="homepage-product-index-number" aria-hidden="true">{product.number}</span>
+                <span><strong>{product.name}</strong><small>{product.status}</small></span><Arrow diagonal />
               </Link>
             ))}
           </div>
         </section>
-        <section className="gateway-opening-vision gateway-home-vision" aria-labelledby="home-vision-title">
+        <section className="homepage-access" aria-labelledby="access-title">
+          <div className="homepage-access-copy">
+            <h2 id="access-title">Big possibilities.<br /><em>Smaller barriers.</em></h2>
+            <p>Smaller charities deserve powerful tools, too. We bring technology and specialist expertise together to put them within reach.</p>
+            <p className="homepage-access-promise">Free wherever possible.<br />Affordable expert support where needed.</p>
+            <Link className="gateway-quiet-link" href="/our-mission/">The mission behind My Social Impact <Arrow diagonal /></Link>
+          </div>
+        <div className="gateway-opening-vision gateway-home-vision" aria-labelledby="home-vision-title">
           <p className="gateway-kicker">Our social enterprise vision</p>
           <h2 id="home-vision-title">
             Imagine a world where nothing stood in the way of our potential
             to make a difference.
           </h2>
-          <Link className="gateway-vision-link" href="/our-mission/">Our mission <Arrow diagonal /></Link>
+        </div>
         </section>
       </div>
       <ExperienceCloud />

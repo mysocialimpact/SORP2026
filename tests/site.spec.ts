@@ -51,9 +51,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     );
     expect(productColumns).toBe(2);
   }
-  await expect(
-    page.getByRole("img", { name: "Social Impact Excellence" }).first(),
-  ).toHaveAttribute("src", /social-impact-excellence-transparent\.png/);
+  await expect(page.locator('.homepage-product-index[href="/social-impact-excellence/"]')).toContainText("Social Impact Excellence");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
