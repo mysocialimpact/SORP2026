@@ -408,6 +408,15 @@
 .account-checking { min-height: 160px; padding-top: 40px; }
 
 .dashboard-page { min-height: 75vh; padding: 70px 0 95px; }
+.dashboard-signed-in { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; margin: -22px 0 48px; padding: 22px 24px; overflow: hidden; border-radius: 5px; background: #d8ff52; color: var(--g-ink); animation: dashboard-welcome-in .45s cubic-bezier(.2,.75,.25,1) both; }
+.dashboard-signed-in::after { content: ""; position: absolute; inset: auto 0 0; height: 4px; background: var(--g-orange); transform-origin: left; animation: dashboard-welcome-timer 5s linear both; }
+.dashboard-signed-in-mark { display: grid; width: 54px; height: 54px; place-items: center; border-radius: 50%; background: var(--g-ink); color: #d8ff52; font-size: 27px; font-weight: 700; }
+.dashboard-signed-in .gateway-kicker { margin-bottom: 4px; }
+.dashboard-signed-in h2 { font-size: clamp(32px, 4vw, 50px); line-height: .95; }
+.dashboard-signed-in p:last-child { margin-top: 7px; font-size: 14px; }
+.dashboard-signed-in button { align-self: start; border: 0; background: transparent; padding: 0 2px; color: currentColor; font: 400 30px/1 sans-serif; cursor: pointer; }
+@keyframes dashboard-welcome-in { from { opacity: 0; transform: translateY(-12px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes dashboard-welcome-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .dashboard-welcome { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 48px; }
 .dashboard-welcome h1 { font-size: clamp(54px, 6.5vw, 92px); }
 .dashboard-welcome > div > p:last-child { color: var(--g-muted); margin-top: 18px; }
@@ -616,6 +625,10 @@
   .account-portal form { grid-template-columns: 1fr; }
   .account-portal form > * { grid-column: 1 / -1 !important; }
   .dashboard-page { padding-block: 48px 65px; }
+  .dashboard-signed-in { grid-template-columns: auto 1fr auto; gap: 14px; margin: -18px 0 34px; padding: 18px 16px; }
+  .dashboard-signed-in-mark { width: 44px; height: 44px; font-size: 22px; }
+  .dashboard-signed-in h2 { font-size: 36px; }
+  .dashboard-signed-in p:last-child { grid-column: 1 / -1; font-size: 13px; }
   .dashboard-welcome { align-items: flex-start; flex-direction: column; }
   .dashboard-welcome h1 { font-size: 56px; }
   .dashboard-progress { margin-bottom: 62px; padding: 26px 20px; }
@@ -642,6 +655,10 @@
   .review-intake-grid { grid-template-columns: 1fr; }
   .review-upload, .review-order, .review-intake-state { padding: 24px 20px; }
   .review-order { position: static; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-signed-in, .dashboard-signed-in::after { animation: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .experience-name { animation: none; }

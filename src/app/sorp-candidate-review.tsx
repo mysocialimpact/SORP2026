@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { tierFromSetup, tierLabel, type AssessmentSetup } from "./sorp-questionnaire";
 import { answers, answerScores, groups, methodologyVersion, reportingStrengthBands, requirementFor, scoreCanonical, tests, type CanonicalAnswer, type MethodologyTier } from "./sorp-methodology-v1";
@@ -253,6 +254,7 @@ function GoogleMark() {
 const GOOGLE_ACCOUNT_SIGN_IN_ENABLED = false;
 
 export function SorpCandidateReview() {
+  const router = useRouter();
   const [saved, setSaved] = useState<Saved>(initial);
   const [navigation, setNavigation] = useState<ReviewHistory>({ past: [], current: locationOf(initial), future: [] });
   const [loaded, setLoaded] = useState(false);
@@ -485,13 +487,19 @@ export function SorpCandidateReview() {
       if (!response.ok || !data.account) throw new Error(data.error || "The secure account service could not complete sign-in.");
       setAccount(data.account);
       const accountPosition = data.account.position && data.account.position !== "TO CONFIRM" ? data.account.position : "";
-      if (action === "login") setSaved(current => {
-        const restored = data.progress?.sessionId ? { ...current, ...data.progress } : current;
-        return { ...restored, email: data.account!.email, emailConfirm: data.account!.email, name: restored.name || data.account!.name, role: restored.role || (roles.includes(accountPosition) ? accountPosition : accountPosition ? "OTHER" : ""), roleOther: restored.roleOther || (accountPosition && !roles.includes(accountPosition) ? accountPosition : ""), step: accountPosition ? restored.step : "account" };
-      });
+      if (action === "login") {
+        const restored = data.progress?.sessionId ? { ...saved, ...data.progress } : saved;
+        const signedInProgress: Saved = { ...restored, email: data.account.email, emailConfirm: data.account.email, name: restored.name || data.account.name, role: restored.role || (roles.includes(accountPosition) ? accountPosition : accountPosition ? "OTHER" : ""), roleOther: restored.roleOther || (accountPosition && !roles.includes(accountPosition) ? accountPosition : "") };
+        setSaved(signedInProgress);
+        try { localStorage.setItem(KEY, JSON.stringify(signedInProgress)); } catch { /* The server copy remains authoritative. */ }
+        setAccountPassword(""); setAccountPasswordConfirm("");
+        event("account_signed_in");
+        router.replace("/dashboard/?signed-in=1");
+        router.refresh();
+        return;
+      }
       setAccountPassword(""); setAccountPasswordConfirm("");
       event(action === "signup" ? "account_created" : "account_signed_in");
-      if (action === "login" && (!accountPosition || data.progress?.candidate)) return;
       if (!saved.candidate && !data.progress?.candidate) { go("find"); return; }
       await startHomework();
     } catch (cause) { setAccountError(cause instanceof Error ? cause.message : "Sign-in did not complete. Your progress remains safe on this device."); }

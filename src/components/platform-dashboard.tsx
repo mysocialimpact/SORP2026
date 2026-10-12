@@ -65,7 +65,7 @@ function ProductProgressBar({ products }: { products: ProductProgress[] }) {
   </section>;
 }
 
-export function PlatformDashboard() {
+export function PlatformDashboard({ signedInCelebration = false }: { signedInCelebration?: boolean }) {
   const router = useRouter();
   const [data, setData] = useState<AccountResponse | null>(null);
   const [error, setError] = useState("");
@@ -73,6 +73,15 @@ export function PlatformDashboard() {
   const [excellence, setExcellence] = useState<ExcellenceProgress | null>(null);
   const [reportReviews, setReportReviews] = useState<ReportReview[]>([]);
   const [teamWorkspace, setTeamWorkspace] = useState<TeamWorkspaceSummary | null>(null);
+  const [showSignedIn, setShowSignedIn] = useState(signedInCelebration);
+  useEffect(() => {
+    if (!signedInCelebration) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("signed-in");
+    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    const timer = window.setTimeout(() => setShowSignedIn(false), 5000);
+    return () => window.clearTimeout(timer);
+  }, [signedInCelebration]);
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
@@ -141,6 +150,11 @@ export function PlatformDashboard() {
   ];
   return <>
     <FounderConsoleLink />
+    {showSignedIn ? <section className="dashboard-signed-in" role="status" aria-live="polite">
+      <span className="dashboard-signed-in-mark" aria-hidden="true">✓</span>
+      <div><p className="gateway-kicker">Signed in successfully</p><h2>You’re in, {firstName}.</h2><p>Your progress is safe. Here’s your complete SORP2026 dashboard.</p></div>
+      <button type="button" onClick={() => setShowSignedIn(false)} aria-label="Dismiss signed-in confirmation">×</button>
+    </section> : null}
     <header className="dashboard-welcome">
       <div><p className="gateway-kicker">My SORP2026</p><h1>Welcome back, <span>{firstName}.</span></h1><p>{data.account.organisation || data.account.email}</p></div>
       <button type="button" onClick={signOut} disabled={busy}>{busy ? "Signing out…" : "Sign out"}</button>

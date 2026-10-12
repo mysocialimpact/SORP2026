@@ -69,16 +69,23 @@ test("unconfigured backend fails closed without offering a pretend email send", 
 });
 
 test("fresh-device sign-in can restore saved work after a reset without repeating charity selection", async ({ page }) => {
+  let signedIn = false;
   await page.route("**/api/**", route => {
     const r = route.request();
-    if (r.url().includes("readiness-account") && r.method() === "POST" && r.postDataJSON().action === "login") return route.fulfill({ json: { account: { name: "Person", email: saved.email, position: "Trustee" }, progress: { ...saved, step: "find" } } });
+    if (r.url().includes("readiness-account") && r.method() === "POST" && r.postDataJSON().action === "login") {
+      signedIn = true;
+      return route.fulfill({ json: { account: { name: "Person", email: saved.email, position: "Trustee" }, progress: { ...saved, step: "find" } } });
+    }
+    if (r.url().includes("readiness-account") && signedIn) return route.fulfill({ json: { signedIn: true, account: { name: "Person", email: saved.email, position: "Trustee", organisation: "Example Charity" }, progress: { ...saved, step: "find" } } });
     return route.fulfill({ json: { signedIn: false } });
   });
   await page.goto("/are-you-sorp-ready/review/?entry=login");
   await page.getByLabel("Email address", { exact: true }).fill(saved.email);
   await page.getByLabel("Password", { exact: true }).fill("New secure password");
   await page.getByRole("button", { name: "SIGN IN AND CONTINUE" }).click();
-  await expect(page.getByLabel("Charity name or number")).toBeVisible();
+  await expect(page).toHaveURL(/\/dashboard\/$/);
+  await expect(page.getByRole("status")).toContainText("You’re in, Person.");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Welcome back, Person");
   await expect.poll(() => page.evaluate(KEY => JSON.parse(localStorage.getItem(KEY) || "{}").sessionId, KEY)).toBe(saved.sessionId);
   expect(await page.evaluate(KEY => JSON.parse(localStorage.getItem(KEY)!).comments, KEY)).toEqual(saved.comments);
 });
