@@ -23,6 +23,9 @@ const service =
   /account(?:ing|s)|audit|independent examin|financial reporting/i;
 const technical =
   /tier(?:ed|s)?|leases?|revenue recognition|income recognition|cash.flow|disclosures?|restricted funds|reporting requirements|thresholds?|FRS\s*102|trustees.? (?:annual )?report/i;
+// A topic label or promise of advice is not technical analysis. Require an
+// identifiable rule, accounting treatment or reporting implication.
+const substantive = /(?:three|3)[ -]tier|tiers?.{0,80}(?:£|\d)|leases?.{0,100}(?:balance sheet|right.of.use|liabilit|recogn)|(?:recognis|recogniz).{0,100}(?:leases?|revenue|income)|reserves.{0,60}(?:disclos|required)|(?:eligible|exempt|threshold).{0,100}(?:accrual|receipts|£|\d)|(?:income|revenue).{0,100}(?:recognition|contract|performance)|disclosures?.{0,80}(?:must|required|threshold)/i;
 const negative =
   /\b(?:no|not|without|lacks?|unverified|unconfirmed)\b.{0,45}(?:evidence|website|named|specialist|DChA|qualification|SORP|client|publication|service|case stud|speaking)|\bnot necessarily\b|\bnetwork.wide\b/i;
 const names = (text: string) => [
@@ -131,7 +134,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
     case "C1":
       return (
         /\bSORP\b.{0,100}\b2026\b|2026.{0,30}\bSORP\b/i.test(text) &&
-        technical.test(text) &&
+        substantive.test(text) &&
         /explain|discuss|guidance|require|appl|change|reporting|impact|covers|analysis/i.test(
           text,
         )
@@ -140,11 +143,11 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
       return (
         /\bSORP\b/i.test(text) &&
         !/(?:SORP\s*2026|2026.{0,15}SORP)/i.test(text) &&
-        technical.test(text) &&
+        substantive.test(text) &&
         /guidance|explain|require|prepar|reporting|accounting|disclos/i.test(
           text,
         ) &&
-        text.length > 160
+        text.length > 100
       );
     case "C3":
       return (

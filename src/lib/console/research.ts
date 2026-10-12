@@ -86,6 +86,18 @@ export async function runResearch(runId: string) {
         .map((_, a) => $(a).attr("href") || "")
         .get();
       const title = $("title").first().text().trim().slice(0, 500) || url;
+      // Retain explicitly marked-up office addresses, including footer addresses.
+      // They remain unverified leads and never replace an existing office.
+      const addresses = type==='Firm website' ? [...new Set($('address').map((_,a)=>$(a).text().replace(/\s+/g,' ').trim()).get())].filter(a=>a.length>15&&a.length<500).slice(0,8) : [];
+      for (const address of addresses) {
+        const postcode=address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase();
+        if (!postcode) continue;
+        await transaction(async c=>{
+          await c.query('SELECT id FROM research_console.firms WHERE id=$1 FOR UPDATE',[run.firm_id]);
+          const added=(await c.query("INSERT INTO research_console.offices(firm_id,address,postcode,source_url,verification) SELECT $1,$2,$3,$4,'Unverified — retrieved from official website' WHERE NOT EXISTS(SELECT 1 FROM research_console.offices WHERE firm_id=$1 AND (lower(address)=lower($2) OR regexp_replace(upper(postcode),'\\s','','g')=regexp_replace($3,'\\s','','g'))) RETURNING *",[run.firm_id,address,postcode,page.url])).rows[0];
+          if(added)await c.query("INSERT INTO research_console.history(firm_id,entity,entity_id,next,reason,actor) VALUES($1,'office',$2,$3,$4,'Website research')",[run.firm_id,added.id,JSON.stringify(added),'Explicit HTML address retained as an unverified office lead; research run '+runId]);
+        });
+      }
       $("script,style,nav,footer,header,noscript,svg").remove();
       const text = $("main").length ? $("main").text() : $("body").text();
       const clean = text.replace(/\s+/g, " ").trim();
@@ -112,6 +124,7 @@ export async function runResearch(runId: string) {
         );
       for (const [category, regex] of Object.entries(terms)) {
         for (const extract of passages
+          .map((p,i) => category==='sorp'&&regex.test(p) ? passages.slice(Math.max(0,i-1),i+3).join(' ').slice(0,6000) : p)
           .filter((p) => regex.test(p))
           .slice(0, 4)) {
           await query(

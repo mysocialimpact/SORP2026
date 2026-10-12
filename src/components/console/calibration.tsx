@@ -47,8 +47,8 @@ export function CalibrationPage() {
               Original: {f.historical_total}/100 · Provisional:{" "}
               {f.provisional_total ?? "Not assessed"}/100
             </p>
-            <div className="rc-table-wrap">
-              <table>
+            <div className="rc-table-scroll" tabIndex={0} role="region" aria-label={f.name+' score comparison'}>
+              <table className="rc-table rc-calibration-table">
                 <thead>
                   <tr>
                     <th>Category</th>
