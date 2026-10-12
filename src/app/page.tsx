@@ -90,7 +90,10 @@ export default function Home() {
             </article>
             <article className="gateway-ask">
             <div className="gateway-product-top">
-              <span className="gateway-status">Coming soon</span>
+              <span className="gateway-status">
+                <i />
+                Live beta · Available now
+              </span>
               <span className="gateway-product-number" aria-hidden="true">
                 02
               </span>
@@ -106,12 +109,11 @@ export default function Home() {
               </span>
             </div>
             <p>
-              Have a question about SORP 2026?
-              <br />
-              Ask SORP.
+              SORP questions? Just ask. Get evidence-led answers grounded in
+              the official SORP.
             </p>
             <Link className="gateway-line-link" href="/ask-sorp/">
-              A first look <Arrow />
+              Ask SORP now <Arrow />
             </Link>
             <span className="gateway-product-scope">
               AI-supported guidance across the whole SORP.

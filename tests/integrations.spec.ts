@@ -57,7 +57,7 @@ for (const service of ["free", "readiness", "wider"])
       if (url.includes("/availability"))
         return route.fulfill({ json: { slots: [slot] } });
       const data = route.request().postDataJSON();
-      writes.push({ url, data });
+      if (data) writes.push({ url, data });
       if (url.includes("/payment/create"))
         return route.fulfill({
           json: {

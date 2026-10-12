@@ -1,4 +1,4 @@
-export type ProductStatus = "Live beta" | "Coming soon" | "Available" | "Explore";
+export type ProductStatus = "Live beta" | "Available" | "Explore";
 
 export type PlatformProduct = {
   number: string;
@@ -32,7 +32,7 @@ export const primaryProducts: PlatformProduct[] = [
     slug: "ask-sorp",
     name: "Ask SORP",
     short: "Questions about the whole SORP, from accounting and disclosures to impact.",
-    status: "Coming soon",
+    status: "Live beta",
     href: "/ask-sorp/",
     className: "is-ask",
     tabLabel: "Ask SORP",

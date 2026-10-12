@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
+import { ProductAdviserNote } from "@/components/product-adviser-note";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -13,10 +14,11 @@ export default function MyImpactDirectorPage() {
   return <main id="main" className="gateway product-page product-director">
     <section className="product-hero gateway-width">
       <div className="product-hero-copy">
-        <p className="gateway-kicker">06 · Ongoing impact support</p>
-        <h1>Imagine having your own <em>Impact Director.</em></h1>
-        <p className="product-lead">Senior impact expertise, ongoing support and useful tools—without needing a full-time appointment.</p>
-        <a className="gateway-action" href="mailto:marcus@mysocialimpact.org?subject=My%20Impact%20Director%20enquiry">Talk to My Social Impact <Arrow /></a>
+        <p className="gateway-kicker">06 · Human-led service · Available now</p>
+        <h1>Your charity’s Impact Director. <em>Without the full-time salary.</em></h1>
+        <p className="product-lead">Flexible expert support to help your charity measure, manage and improve its impact throughout the year.</p>
+        <a className="gateway-action" href="#director-support">Explore My Impact Director <Arrow /></a>
+        <p className="product-hero-note">Human expertise now. Intelligent agents and tools are clearly labelled while in development.</p>
       </div>
       <div className="director-lockup" aria-label="My Impact Director">
         <span>MY</span><strong>Impact</strong><b>DIRECTOR</b><i>Human expertise × intelligent tools</i>
@@ -27,7 +29,7 @@ export default function MyImpactDirectorPage() {
       <h2>Someone who keeps impact moving.</h2>
       <p>An Impact Director helps connect purpose, leadership, evidence, delivery and communications. For many smaller charities, that senior capability matters—but a permanent specialist role may not be realistic.</p>
     </section>
-    <section className="product-three gateway-width" aria-label="How My Impact Director can help">
+    <section id="director-support" className="product-three gateway-width" aria-label="How My Impact Director can help">
       {[
         ["01", "Direction", "Clarify the change you exist to create and what useful progress looks like."],
         ["02", "Practice", "Build impact into decisions, evidence, trustee conversations and delivery throughout the year."],
@@ -37,9 +39,10 @@ export default function MyImpactDirectorPage() {
     <section className="product-split product-dark">
       <div className="gateway-width">
         <div><p className="gateway-kicker">An extension of your team</p><h2>Expert support.<br/>Responsibility stays with you.</h2></div>
-        <div><p>My Impact Director is an honest service proposition in development: flexible senior expertise combining My Social Impact’s human judgement with practical digital tools.</p><p>We do not replace executive leadership or trustee responsibility. We help your people make impact a stronger part of how the charity is run.</p><a href="mailto:marcus@mysocialimpact.org?subject=Explore%20My%20Impact%20Director">Explore the service <Arrow diagonal /></a></div>
+        <div><p>The human-led service is available now, ranging from light-touch periodic reviews to more substantial ongoing involvement. Scope is agreed around the charity’s size, resources and needs.</p><p>Intelligent agents, assistants and tools are in development. We do not replace executive leadership or trustee responsibility; we help your people keep impact moving.</p><a href="mailto:marcus@mysocialimpact.org?subject=Explore%20My%20Impact%20Director">Discuss the right level of support <Arrow diagonal /></a></div>
       </div>
     </section>
+    <ProductAdviserNote title="An impact specialist alongside your existing team.">My Impact Director complements trustees, finance teams, accountants and consultants. It adds flexible impact expertise while responsibility and established adviser relationships remain with the charity.</ProductAdviserNote>
     <nav className="product-next gateway-width" aria-label="Product navigation"><span>Back to the index</span><Link href="/#products">Explore all six products <Arrow /></Link></nav>
   </main>;
 }
