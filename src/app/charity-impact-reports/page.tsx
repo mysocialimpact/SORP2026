@@ -14,7 +14,7 @@ export default function CharityImpactReportsPage() {
   return <main id="main" className="gateway product-page product-reports">
     <section className="product-hero gateway-width">
       <div className="product-hero-copy">
-        <p className="gateway-kicker">05 · Evidence · clarity · improvement</p>
+        <p className="gateway-kicker">03 · Evidence · clarity · improvement</p>
         <h1>Improve your charity’s <em>impact report.</em></h1>
         <p className="product-lead">Upload your existing report. Receive a professional written review. Discuss the findings with an expert.</p>
         <Link className="gateway-action" href="/charity-impact-reports/review/">Start a £100 report review <Arrow /></Link>
@@ -30,7 +30,7 @@ export default function CharityImpactReportsPage() {
       <p className="report-caveat">A professional review of an existing document—not a regulatory audit, formal assurance engagement or AI-generated analysis.</p>
     </section>
     <section className="product-split product-dark is-reports"><div className="gateway-width"><div><p className="gateway-kicker">A more substantial project</p><h2>Need the full report?</h2><strong className="product-price">From £1,000</strong></div><div><p>My Social Impact can help develop your Charity Impact Report: shaping the evidence, structure, analysis, writing and story around the difference your charity makes.</p><p>This is separate from the £100 review of an existing document.</p><a href="mailto:marcus@mysocialimpact.org?subject=Full%20Charity%20Impact%20Report%20from%20%C2%A31%2C000">Enquire about full report development <Arrow diagonal /></a></div></div></section>
-    <nav className="product-next gateway-width" aria-label="Next product"><span>Also explore</span><Link href="/purpose-works/">Purpose Works <Arrow /></Link></nav>
+    <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow /></Link></nav>
   </main>;
 }
 

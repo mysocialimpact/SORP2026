@@ -11,6 +11,7 @@ import "./gateway.css";
 import "./platform.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { ProductFolderTabs } from "@/components/product-folder-tabs";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
@@ -50,6 +51,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <Header />
+        <ProductFolderTabs />
         {children}
         <Footer />
       </body>

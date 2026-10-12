@@ -13,7 +13,7 @@ export default function MyImpactDirectorPage() {
   return <main id="main" className="gateway product-page product-director">
     <section className="product-hero gateway-width">
       <div className="product-hero-copy">
-        <p className="gateway-kicker">03 · From compliance to excellence</p>
+        <p className="gateway-kicker">06 · Ongoing impact support</p>
         <h1>Imagine having your own <em>Impact Director.</em></h1>
         <p className="product-lead">Senior impact expertise, ongoing support and useful tools—without needing a full-time appointment.</p>
         <a className="gateway-action" href="mailto:marcus@mysocialimpact.org?subject=My%20Impact%20Director%20enquiry">Talk to My Social Impact <Arrow /></a>
@@ -40,7 +40,7 @@ export default function MyImpactDirectorPage() {
         <div><p>My Impact Director is an honest service proposition in development: flexible senior expertise combining My Social Impact’s human judgement with practical digital tools.</p><p>We do not replace executive leadership or trustee responsibility. We help your people make impact a stronger part of how the charity is run.</p><a href="mailto:marcus@mysocialimpact.org?subject=Explore%20My%20Impact%20Director">Explore the service <Arrow diagonal /></a></div>
       </div>
     </section>
-    <nav className="product-next gateway-width" aria-label="Next product"><span>Also explore</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow /></Link></nav>
+    <nav className="product-next gateway-width" aria-label="Product navigation"><span>Back to the index</span><Link href="/#products">Explore all six products <Arrow /></Link></nav>
   </main>;
 }
 

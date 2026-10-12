@@ -18,8 +18,8 @@ test("homepage, product destinations and accessible mobile navigation", async ({
       "/are-you-sorp-ready/review/?entry=intro",
     );
   }
-  await expect(page.getByText("Coming soon", { exact: true })).toBeVisible();
   const sorpSection = page.locator("section.gateway-sorp-section");
+  await expect(sorpSection.getByText("Coming soon", { exact: true })).toBeVisible();
   await expect(
     sorpSection.getByRole("heading", { name: "Start here. Get SORP ready." }),
   ).toBeVisible();
@@ -121,6 +121,60 @@ test("all supporting pages render accessibly, without overflow or broken interna
       .analyze();
     expect(results.violations, path).toEqual([]);
   }
+});
+
+test("the digital filing folder keeps all six products in one accessible sequence", async ({
+  page,
+}, testInfo) => {
+  const products = [
+    ["Home", "/"],
+    ["Are You SORP Ready?", "/are-you-sorp-ready/"],
+    ["Ask SORP", "/ask-sorp/"],
+    ["Charity Impact Reports", "/charity-impact-reports/"],
+    ["Social Impact Excellence", "/social-impact-excellence/"],
+    ["Purpose Works", "/purpose-works/"],
+    ["My Impact Director", "/my-impact-director/"],
+  ] as const;
+
+  for (const [name, path] of products) {
+    await page.goto(path);
+    const folder = page.getByRole("navigation", { name: "SORP2026 products" });
+    await expect(folder).toBeVisible();
+    await expect(folder.getByRole("link")).toHaveCount(7);
+    await expect(page.locator(".gateway-header .gateway-account-control")).toHaveCount(1);
+    await expect(folder.getByRole("link").allTextContents()).resolves.toEqual(
+      products.map(([productName], index) =>
+        `${index === 0 ? "Index" : String(index).padStart(2, "0")}${productName}${productName === name ? "Current section" : index === 0 ? "Platform index" : index === 1 ? "Live beta" : index === 2 ? "Coming soon" : index === 3 || index === 4 ? "Available" : "Explore"}`,
+      ),
+    );
+    await expect(folder.getByRole("link", { name: new RegExp(name) })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBeTruthy();
+  }
+
+  if (testInfo.project.name === "mobile") {
+    await page.goto("/are-you-sorp-ready/");
+    const folder = page.getByRole("navigation", { name: "SORP2026 products" });
+    const touchTarget = await folder.getByRole("link").first().evaluate((link) => {
+      const rect = link.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    });
+    expect(touchTarget.width).toBeGreaterThanOrEqual(160);
+    expect(touchTarget.height).toBeGreaterThanOrEqual(60);
+    await folder.getByRole("link", { name: /My Impact Director/ }).click();
+    await expect(page).toHaveURL(/my-impact-director/);
+  }
+
+  const axe = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(axe.violations).toEqual([]);
 });
 test("preview stays out of search engines and unknown routes return 404", async ({
   request,

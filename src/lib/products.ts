@@ -9,6 +9,9 @@ export type PlatformProduct = {
   href: string;
   external?: boolean;
   className: string;
+  tabLabel: string;
+  tabColour: string;
+  tabInk: string;
 };
 
 export const primaryProducts: PlatformProduct[] = [
@@ -20,6 +23,9 @@ export const primaryProducts: PlatformProduct[] = [
     status: "Live beta",
     href: "/are-you-sorp-ready/",
     className: "is-ready",
+    tabLabel: "Are You SORP Ready?",
+    tabColour: "#ff633b",
+    tabInk: "#242329",
   },
   {
     number: "02",
@@ -29,18 +35,24 @@ export const primaryProducts: PlatformProduct[] = [
     status: "Coming soon",
     href: "/ask-sorp/",
     className: "is-ask",
+    tabLabel: "Ask SORP",
+    tabColour: "#d9e4f2",
+    tabInk: "#242329",
   },
 ];
 
 export const excellenceProducts: PlatformProduct[] = [
   {
     number: "03",
-    slug: "my-impact-director",
-    name: "My Impact Director",
-    short: "Ongoing senior impact expertise, made more accessible to charities.",
-    status: "Explore",
-    href: "/my-impact-director/",
-    className: "is-director",
+    slug: "charity-impact-reports",
+    name: "Charity Impact Reports",
+    short: "Improve an existing report, or work with us to create a stronger one.",
+    status: "Available",
+    href: "/charity-impact-reports/",
+    className: "is-reports",
+    tabLabel: "Charity Impact Reports",
+    tabColour: "#ffd567",
+    tabInk: "#242329",
   },
   {
     number: "04",
@@ -50,24 +62,33 @@ export const excellenceProducts: PlatformProduct[] = [
     status: "Available",
     href: "/social-impact-excellence/",
     className: "is-excellence",
+    tabLabel: "Social Impact Excellence",
+    tabColour: "#f0a7c1",
+    tabInk: "#242329",
   },
   {
     number: "05",
-    slug: "charity-impact-reports",
-    name: "Charity Impact Reports",
-    short: "Improve an existing report, or work with us to create a stronger one.",
-    status: "Available",
-    href: "/charity-impact-reports/",
-    className: "is-reports",
-  },
-  {
-    number: "06",
     slug: "purpose-works",
     name: "Purpose Works",
     short: "Turn purpose into meaningful action, credible claims and communications.",
     status: "Explore",
     href: "/purpose-works/",
     className: "is-purpose",
+    tabLabel: "Purpose Works",
+    tabColour: "#493b72",
+    tabInk: "#ffffff",
+  },
+  {
+    number: "06",
+    slug: "my-impact-director",
+    name: "My Impact Director",
+    short: "Ongoing senior impact expertise, made more accessible to charities.",
+    status: "Explore",
+    href: "/my-impact-director/",
+    className: "is-director",
+    tabLabel: "My Impact Director",
+    tabColour: "#d8ff52",
+    tabInk: "#242329",
   },
 ];
 
