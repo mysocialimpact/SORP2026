@@ -20,7 +20,26 @@
   background: linear-gradient(150deg, #cfddcf22, #e3e8dd55 50%, #faf9f600 80%);
   pointer-events: none;
 }
-.gateway-home-cover h1 span { color: #486352; }
+.gateway-home-cover .gateway-hero-context {
+  display: block;
+  margin-bottom: .22em;
+  color: #242329;
+  font-size: .62em;
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -.055em;
+}
+.gateway-home-cover .gateway-hero-opportunity {
+  display: block;
+  max-width: 940px;
+  color: #355747;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 1.03em;
+  font-style: italic;
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: -.055em;
+}
 .gateway-home-cover .gateway-enterprise-label { color: #78301c; }
 .gateway-home-cover .gateway-opening { padding-bottom: 80px; }
 .homepage-audience {
@@ -89,6 +108,8 @@
   .homepage-hello-layout { gap: 40px; }
 }
 @media (max-width: 700px) {
+  .gateway-home-cover .gateway-hero-context { font-size: .6em; margin-bottom: .3em; }
+  .gateway-home-cover .gateway-hero-opportunity { font-size: 1em; line-height: .92; }
   .gateway-home-cover .gateway-opening { padding-bottom: 64px; }
   .homepage-audience { margin-top: 30px; padding: 10px; }
   .homepage-audience-options { grid-template-columns: 1fr; gap: 10px; }

@@ -29,13 +29,27 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
     return {
       edge: getComputedStyle(edge).backgroundColor,
       cover: getComputedStyle(cover).backgroundColor,
+      edgeBorder: getComputedStyle(edge).borderTopWidth,
       gap: cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
       sequence: [".gateway-opening", ".homepage-audience", ".gateway-sorp-section", ".platform-family", ".gateway-home-vision"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
     };
   });
   expect(surfaces.edge).toBe(surfaces.cover);
+  expect(surfaces.edgeBorder).toBe("0px");
   expect(surfaces.gap).toBe(0);
   expect(surfaces.sequence).toEqual([...surfaces.sequence].sort((a, b) => a - b));
+});
+
+test("hero frames SORP as the requirement and better impact as the opportunity", async ({ page }) => {
+  await page.goto("/");
+  const heading = page.getByRole("heading", { level: 1 });
+  await expect(heading).toContainText("SORP is the requirement.");
+  await expect(heading).toContainText("Better impact is the opportunity.");
+  const sizes = await heading.evaluate(element => ({
+    context: parseFloat(getComputedStyle(element.querySelector(".gateway-hero-context")!).fontSize),
+    opportunity: parseFloat(getComputedStyle(element.querySelector(".gateway-hero-opportunity")!).fontSize),
+  }));
+  expect(sizes.opportunity).toBeGreaterThan(sizes.context);
 });
 
 test("contact form recognises accounts and confirms only an accepted server response", async ({ page }) => {
