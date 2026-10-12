@@ -1,0 +1,866 @@
+{
+  "AL1 2HA": {
+    "postcode": "AL1 2HA",
+    "lat": 51.736015,
+    "lng": -0.327933,
+    "area": "St Albans",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/AL1%202HA"
+  },
+  "AL5 3NS": {
+    "postcode": "AL5 3NS",
+    "lat": 51.833312,
+    "lng": -0.37629,
+    "area": "Central Bedfordshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/AL5%203NS"
+  },
+  "AL5 4EE": {
+    "postcode": "AL5 4EE",
+    "lat": 51.815235,
+    "lng": -0.354728,
+    "area": "St Albans",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/AL5%204EE"
+  },
+  "B10 0JS": {
+    "postcode": "B10 0JS",
+    "lat": 52.469266,
+    "lng": -1.858119,
+    "area": "Birmingham",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/B10%200JS"
+  },
+  "B63 3TT": {
+    "postcode": "B63 3TT",
+    "lat": 52.450973,
+    "lng": -2.052848,
+    "area": "Dudley",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/B63%203TT"
+  },
+  "BA2 2UU": {
+    "postcode": "BA2 2UU",
+    "lat": 51.358127,
+    "lng": -2.379111,
+    "area": "Bath and North East Somerset",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BA2%202UU"
+  },
+  "BH2 6NE": {
+    "postcode": "BH2 6NE",
+    "lat": 50.723664,
+    "lng": -1.882242,
+    "area": "Bournemouth, Christchurch and Poole",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BH2%206NE"
+  },
+  "BN1 6SB": {
+    "postcode": "BN1 6SB",
+    "lat": 50.842161,
+    "lng": -0.15242,
+    "area": "Brighton and Hove",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BN1%206SB"
+  },
+  "BN21 4SH": {
+    "postcode": "BN21 4SH",
+    "lat": 50.766665,
+    "lng": 0.281683,
+    "area": "Eastbourne",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BN21%204SH"
+  },
+  "BR3 1AJ": {
+    "postcode": "BR3 1AJ",
+    "lat": 51.406047,
+    "lng": -0.028776,
+    "area": "Bromley",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BR3%201AJ"
+  },
+  "BS2 0JA": {
+    "postcode": "BS2 0JA",
+    "lat": 51.455175,
+    "lng": -2.584733,
+    "area": "Bristol, City of",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BS2%200JA"
+  },
+  "BS48 1UR": {
+    "postcode": "BS48 1UR",
+    "lat": 51.42279,
+    "lng": -2.694487,
+    "area": "North Somerset",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BS48%201UR"
+  },
+  "BS7 0SJ": {
+    "postcode": "BS7 0SJ",
+    "lat": 51.502232,
+    "lng": -2.578621,
+    "area": "South Gloucestershire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/BS7%200SJ"
+  },
+  "CA1 2RW": {
+    "postcode": "CA1 2RW",
+    "lat": 54.89259,
+    "lng": -2.893623,
+    "area": "Cumberland",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CA1%202RW"
+  },
+  "CB21 5DQ": {
+    "postcode": "CB21 5DQ",
+    "lat": 52.187315,
+    "lng": 0.2093,
+    "area": "South Cambridgeshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CB21%205DQ"
+  },
+  "CB4 1XE": {
+    "postcode": "CB4 1XE",
+    "lat": 52.220472,
+    "lng": 0.133438,
+    "area": "Cambridge",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CB4%201XE"
+  },
+  "CM23 2YU": {
+    "postcode": "CM23 2YU",
+    "lat": 51.88065,
+    "lng": 0.143985,
+    "area": "East Hertfordshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CM23%202YU"
+  },
+  "CR3 5UA": {
+    "postcode": "CR3 5UA",
+    "lat": 51.286657,
+    "lng": -0.088976,
+    "area": "Tandridge",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CR3%205UA"
+  },
+  "CR7 7PW": {
+    "postcode": "CR7 7PW",
+    "lat": 51.398043,
+    "lng": -0.112271,
+    "area": "Croydon",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CR7%207PW"
+  },
+  "CR8 3NJ": {
+    "postcode": "CR8 3NJ",
+    "lat": 51.336399,
+    "lng": -0.145628,
+    "area": "Croydon",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CR8%203NJ"
+  },
+  "CV4 8HX": {
+    "postcode": "CV4 8HX",
+    "lat": 52.388134,
+    "lng": -1.576669,
+    "area": "Coventry",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CV4%208HX"
+  },
+  "CV8 1GX": {
+    "postcode": "CV8 1GX",
+    "lat": 52.333342,
+    "lng": -1.582752,
+    "area": "Warwick",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/CV8%201GX"
+  },
+  "DE14 2BZ": {
+    "postcode": "DE14 2BZ",
+    "lat": 52.798579,
+    "lng": -1.664687,
+    "area": "East Staffordshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/DE14%202BZ"
+  },
+  "DH3 3UP": {
+    "postcode": "DH3 3UP",
+    "lat": 54.859669,
+    "lng": -1.575171,
+    "area": "County Durham",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/DH3%203UP"
+  },
+  "DL6 2XQ": {
+    "postcode": "DL6 2XQ",
+    "lat": 54.3459,
+    "lng": -1.447539,
+    "area": "North Yorkshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/DL6%202XQ"
+  },
+  "DY6 9HS": {
+    "postcode": "DY6 9HS",
+    "lat": 52.498688,
+    "lng": -2.169895,
+    "area": "Dudley",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/DY6%209HS"
+  },
+  "E18 1BD": {
+    "postcode": "E18 1BD",
+    "lat": 51.594432,
+    "lng": 0.02482,
+    "area": "Redbridge",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/E18%201BD"
+  },
+  "E2 7PR": {
+    "postcode": "E2 7PR",
+    "lat": 51.527736,
+    "lng": -0.077386,
+    "area": "Hackney",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/E2%207PR"
+  },
+  "E6 2BT": {
+    "postcode": "E6 2BT",
+    "lat": 51.538642,
+    "lng": 0.057356,
+    "area": "Newham",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/E6%202BT"
+  },
+  "EC1V 2NX": {
+    "postcode": "EC1V 2NX",
+    "lat": 51.527304,
+    "lng": -0.088894,
+    "area": "Islington",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/EC1V%202NX"
+  },
+  "EC1Y 0TA": {
+    "postcode": "EC1Y 0TA",
+    "lat": 51.523687,
+    "lng": -0.096513,
+    "area": "Islington",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/EC1Y%200TA"
+  },
+  "EX31 1EU": {
+    "postcode": "EX31 1EU",
+    "lat": 51.078872,
+    "lng": -4.06026,
+    "area": "North Devon",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/EX31%201EU"
+  },
+  "EX5 5JN": {
+    "postcode": "EX5 5JN",
+    "lat": 50.784593,
+    "lng": -3.519772,
+    "area": "East Devon",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/EX5%205JN"
+  },
+  "FY4 5GP": {
+    "postcode": "FY4 5GP",
+    "lat": 53.786695,
+    "lng": -2.989773,
+    "area": "Fylde",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/FY4%205GP"
+  },
+  "GL4 3GG": {
+    "postcode": "GL4 3GG",
+    "lat": 51.866113,
+    "lng": -2.204431,
+    "area": "Gloucester",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/GL4%203GG"
+  },
+  "GU15 3SY": {
+    "postcode": "GU15 3SY",
+    "lat": 51.338529,
+    "lng": -0.743434,
+    "area": "Surrey Heath",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/GU15%203SY"
+  },
+  "GU16 7ER": {
+    "postcode": "GU16 7ER",
+    "lat": 51.316595,
+    "lng": -0.74828,
+    "area": "Surrey Heath",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/GU16%207ER"
+  },
+  "GU4 7DX": {
+    "postcode": "GU4 7DX",
+    "lat": 51.250657,
+    "lng": -0.529171,
+    "area": "Guildford",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/GU4%207DX"
+  },
+  "HA1 1BQ": {
+    "postcode": "HA1 1BQ",
+    "lat": 51.580208,
+    "lng": -0.339533,
+    "area": "Harrow",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA1%201BQ"
+  },
+  "HA1 2BQ": {
+    "postcode": "HA1 2BQ",
+    "lat": 51.577545,
+    "lng": -0.333785,
+    "area": "Harrow",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA1%202BQ"
+  },
+  "HA1 3EX": {
+    "postcode": "HA1 3EX",
+    "lat": 51.57813,
+    "lng": -0.342033,
+    "area": "Harrow",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA1%203EX"
+  },
+  "HA2 7NX": {
+    "postcode": "HA2 7NX",
+    "lat": 51.581591,
+    "lng": -0.368292,
+    "area": "Harrow",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA2%207NX"
+  },
+  "HA3 0AH": {
+    "postcode": "HA3 0AH",
+    "lat": 51.58002,
+    "lng": -0.320618,
+    "area": "Brent",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA3%200AH"
+  },
+  "HA3 7EZ": {
+    "postcode": "HA3 7EZ",
+    "lat": 51.599155,
+    "lng": -0.333181,
+    "area": "Harrow",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA3%207EZ"
+  },
+  "HA4 7BD": {
+    "postcode": "HA4 7BD",
+    "lat": 51.575203,
+    "lng": -0.425294,
+    "area": "Hillingdon",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA4%207BD"
+  },
+  "HA6 2GU": {
+    "postcode": "HA6 2GU",
+    "lat": 51.609607,
+    "lng": -0.426544,
+    "area": "Hillingdon",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA6%202GU"
+  },
+  "HA7 2AH": {
+    "postcode": "HA7 2AH",
+    "lat": 51.602117,
+    "lng": -0.323961,
+    "area": "Harrow",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/HA7%202AH"
+  },
+  "IG2 6HY": {
+    "postcode": "IG2 6HY",
+    "lat": 51.574647,
+    "lng": 0.066688,
+    "area": "Redbridge",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/IG2%206HY"
+  },
+  "KT16 9BE": {
+    "postcode": "KT16 9BE",
+    "lat": 51.388416,
+    "lng": -0.507256,
+    "area": "Runnymede",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/KT16%209BE"
+  },
+  "KT2 7BN": {
+    "postcode": "KT2 7BN",
+    "lat": 51.416464,
+    "lng": -0.280268,
+    "area": "Kingston upon Thames",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/KT2%207BN"
+  },
+  "L12 2AH": {
+    "postcode": "L12 2AH",
+    "lat": 53.421851,
+    "lng": -2.897311,
+    "area": "Liverpool",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/L12%202AH"
+  },
+  "L39 2AY": {
+    "postcode": "L39 2AY",
+    "lat": 53.573648,
+    "lng": -2.879727,
+    "area": "West Lancashire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/L39%202AY"
+  },
+  "LA9 4JB": {
+    "postcode": "LA9 4JB",
+    "lat": 54.323206,
+    "lng": -2.751297,
+    "area": "Westmorland and Furness",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/LA9%204JB"
+  },
+  "LE11 2EH": {
+    "postcode": "LE11 2EH",
+    "lat": 52.767252,
+    "lng": -1.208202,
+    "area": "Charnwood",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/LE11%202EH"
+  },
+  "LE19 1RJ": {
+    "postcode": "LE19 1RJ",
+    "lat": 52.613369,
+    "lng": -1.192001,
+    "area": "Blaby",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/LE19%201RJ"
+  },
+  "LN1 1XW": {
+    "postcode": "LN1 1XW",
+    "lat": 53.229545,
+    "lng": -0.544644,
+    "area": "Lincoln",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/LN1%201XW"
+  },
+  "LS16 5LQ": {
+    "postcode": "LS16 5LQ",
+    "lat": 53.832586,
+    "lng": -1.591969,
+    "area": "Leeds",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/LS16%205LQ"
+  },
+  "LU1 2RD": {
+    "postcode": "LU1 2RD",
+    "lat": 51.879683,
+    "lng": -0.419774,
+    "area": "Luton",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/LU1%202RD"
+  },
+  "M1 4FD": {
+    "postcode": "M1 4FD",
+    "lat": 53.478914,
+    "lng": -2.239414,
+    "area": "Manchester",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/M1%204FD"
+  },
+  "M2 3BB": {
+    "postcode": "M2 3BB",
+    "lat": 53.480511,
+    "lng": -2.240704,
+    "area": "Manchester",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/M2%203BB"
+  },
+  "M8 5DT": {
+    "postcode": "M8 5DT",
+    "lat": 53.517203,
+    "lng": -2.249131,
+    "area": "Manchester",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/M8%205DT"
+  },
+  "ME14 5SF": {
+    "postcode": "ME14 5SF",
+    "lat": 51.271626,
+    "lng": 0.53776,
+    "area": "Maidstone",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/ME14%205SF"
+  },
+  "MK7 7DZ": {
+    "postcode": "MK7 7DZ",
+    "lat": 52.019256,
+    "lng": -0.697939,
+    "area": "Milton Keynes",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/MK7%207DZ"
+  },
+  "N12 8JY": {
+    "postcode": "N12 8JY",
+    "lat": 51.615231,
+    "lng": -0.176955,
+    "area": "Barnet",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/N12%208JY"
+  },
+  "N21 1TH": {
+    "postcode": "N21 1TH",
+    "lat": 51.646159,
+    "lng": -0.112274,
+    "area": "Enfield",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/N21%201TH"
+  },
+  "N22 5BN": {
+    "postcode": "N22 5BN",
+    "lat": 51.602456,
+    "lng": -0.09894,
+    "area": "Haringey",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/N22%205BN"
+  },
+  "NE12 8EG": {
+    "postcode": "NE12 8EG",
+    "lat": 55.017864,
+    "lng": -1.593959,
+    "area": "North Tyneside",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NE12%208EG"
+  },
+  "NE5 1NB": {
+    "postcode": "NE5 1NB",
+    "lat": 55.003117,
+    "lng": -1.695539,
+    "area": "Newcastle upon Tyne",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NE5%201NB"
+  },
+  "NG24 1AX": {
+    "postcode": "NG24 1AX",
+    "lat": 53.078281,
+    "lng": -0.810667,
+    "area": "Newark and Sherwood",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NG24%201AX"
+  },
+  "NG7 5EH": {
+    "postcode": "NG7 5EH",
+    "lat": 52.967303,
+    "lng": -1.172112,
+    "area": "Nottingham",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NG7%205EH"
+  },
+  "NN1 5AN": {
+    "postcode": "NN1 5AN",
+    "lat": 52.237894,
+    "lng": -0.886713,
+    "area": "West Northamptonshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NN1%205AN"
+  },
+  "NN2 7AZ": {
+    "postcode": "NN2 7AZ",
+    "lat": 52.260368,
+    "lng": -0.900758,
+    "area": "West Northamptonshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NN2%207AZ"
+  },
+  "NW11 7RJ": {
+    "postcode": "NW11 7RJ",
+    "lat": 51.571465,
+    "lng": -0.192055,
+    "area": "Barnet",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NW11%207RJ"
+  },
+  "NW11 8HJ": {
+    "postcode": "NW11 8HJ",
+    "lat": 51.574282,
+    "lng": -0.202175,
+    "area": "Barnet",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NW11%208HJ"
+  },
+  "NW8 9EB": {
+    "postcode": "NW8 9EB",
+    "lat": 51.532721,
+    "lng": -0.18132,
+    "area": "Westminster",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NW8%209EB"
+  },
+  "NW8 9NR": {
+    "postcode": "NW8 9NR",
+    "lat": 51.530524,
+    "lng": -0.17763,
+    "area": "Westminster",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/NW8%209NR"
+  },
+  "OX14 4YA": {
+    "postcode": "OX14 4YA",
+    "lat": 51.639976,
+    "lng": -1.238028,
+    "area": "Vale of White Horse",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/OX14%204YA"
+  },
+  "OX16 9DS": {
+    "postcode": "OX16 9DS",
+    "lat": 52.044668,
+    "lng": -1.331895,
+    "area": "Cherwell",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/OX16%209DS"
+  },
+  "OX9 3EH": {
+    "postcode": "OX9 3EH",
+    "lat": 51.748459,
+    "lng": -0.979505,
+    "area": "South Oxfordshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/OX9%203EH"
+  },
+  "PE1 2UF": {
+    "postcode": "PE1 2UF",
+    "lat": 52.581561,
+    "lng": -0.238048,
+    "area": "Peterborough",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/PE1%202UF"
+  },
+  "PO20 2EW": {
+    "postcode": "PO20 2EW",
+    "lat": 50.830498,
+    "lng": -0.738801,
+    "area": "Chichester",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/PO20%202EW"
+  },
+  "PO5 1LU": {
+    "postcode": "PO5 1LU",
+    "lat": 50.789502,
+    "lng": -1.08324,
+    "area": "Portsmouth",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/PO5%201LU"
+  },
+  "PO5 2SN": {
+    "postcode": "PO5 2SN",
+    "lat": 50.786606,
+    "lng": -1.077452,
+    "area": "Portsmouth",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/PO5%202SN"
+  },
+  "RG25 2PR": {
+    "postcode": "RG25 2PR",
+    "lat": 51.193113,
+    "lng": -1.017997,
+    "area": "Basingstoke and Deane",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/RG25%202PR"
+  },
+  "RH10 9PJ": {
+    "postcode": "RH10 9PJ",
+    "lat": 51.135593,
+    "lng": -0.166133,
+    "area": "Crawley",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/RH10%209PJ"
+  },
+  "RM3 8EN": {
+    "postcode": "RM3 8EN",
+    "lat": 51.598064,
+    "lng": 0.217487,
+    "area": "Havering",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/RM3%208EN"
+  },
+  "S10 2GB": {
+    "postcode": "S10 2GB",
+    "lat": 53.379526,
+    "lng": -1.4855,
+    "area": "Sheffield",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/S10%202GB"
+  },
+  "S40 4AA": {
+    "postcode": "S40 4AA",
+    "lat": 53.23846,
+    "lng": -1.438541,
+    "area": "Chesterfield",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/S40%204AA"
+  },
+  "SE11 5QU": {
+    "postcode": "SE11 5QU",
+    "lat": 51.486711,
+    "lng": -0.113884,
+    "area": "Lambeth",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SE11%205QU"
+  },
+  "SE16 2XB": {
+    "postcode": "SE16 2XB",
+    "lat": 51.498663,
+    "lng": -0.054506,
+    "area": "Southwark",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SE16%202XB"
+  },
+  "SE8 5DR": {
+    "postcode": "SE8 5DR",
+    "lat": 51.490512,
+    "lng": -0.042407,
+    "area": "Southwark",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SE8%205DR"
+  },
+  "SK8 1PY": {
+    "postcode": "SK8 1PY",
+    "lat": 53.393401,
+    "lng": -2.219026,
+    "area": "Stockport",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SK8%201PY"
+  },
+  "SN13 9RS": {
+    "postcode": "SN13 9RS",
+    "lat": 51.421297,
+    "lng": -2.199949,
+    "area": "Wiltshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SN13%209RS"
+  },
+  "SW12 0DR": {
+    "postcode": "SW12 0DR",
+    "lat": 51.449628,
+    "lng": -0.141706,
+    "area": "Lambeth",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SW12%200DR"
+  },
+  "SW17 7QT": {
+    "postcode": "SW17 7QT",
+    "lat": 51.440746,
+    "lng": -0.160125,
+    "area": "Wandsworth",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SW17%207QT"
+  },
+  "SW1W 0EX": {
+    "postcode": "SW1W 0EX",
+    "lat": 51.498108,
+    "lng": -0.145701,
+    "area": "Westminster",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SW1W%200EX"
+  },
+  "SW8 4BG": {
+    "postcode": "SW8 4BG",
+    "lat": 51.477429,
+    "lng": -0.146539,
+    "area": "Wandsworth",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/SW8%204BG"
+  },
+  "TA18 8AB": {
+    "postcode": "TA18 8AB",
+    "lat": 50.882206,
+    "lng": -2.791606,
+    "area": "Somerset",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/TA18%208AB"
+  },
+  "TF11 8SP": {
+    "postcode": "TF11 8SP",
+    "lat": 52.709055,
+    "lng": -2.354146,
+    "area": "Shropshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/TF11%208SP"
+  },
+  "TN40 1HE": {
+    "postcode": "TN40 1HE",
+    "lat": 50.839056,
+    "lng": 0.47457,
+    "area": "Rother",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/TN40%201HE"
+  },
+  "W13 8BQ": {
+    "postcode": "W13 8BQ",
+    "lat": 51.522387,
+    "lng": -0.319957,
+    "area": "Ealing",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/W13%208BQ"
+  },
+  "WA1 1JW": {
+    "postcode": "WA1 1JW",
+    "lat": 53.387783,
+    "lng": -2.599081,
+    "area": "Warrington",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/WA1%201JW"
+  },
+  "WC2A 2JR": {
+    "postcode": "WC2A 2JR",
+    "lat": 51.514455,
+    "lng": -0.111772,
+    "area": "Westminster",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/WC2A%202JR"
+  },
+  "WD23 4GF": {
+    "postcode": "WD23 4GF",
+    "lat": 51.641216,
+    "lng": -0.337853,
+    "area": "Hertsmere",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/WD23%204GF"
+  },
+  "WS11 7LT": {
+    "postcode": "WS11 7LT",
+    "lat": 52.691013,
+    "lng": -2.010235,
+    "area": "Cannock Chase",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/WS11%207LT"
+  },
+  "WS4 2LA": {
+    "postcode": "WS4 2LA",
+    "lat": 52.590003,
+    "lng": -1.979596,
+    "area": "Walsall",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/WS4%202LA"
+  },
+  "WS9 8QT": {
+    "postcode": "WS9 8QT",
+    "lat": 52.607299,
+    "lng": -1.915928,
+    "area": "Walsall",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/WS9%208QT"
+  },
+  "YO26 8DH": {
+    "postcode": "YO26 8DH",
+    "lat": 53.999316,
+    "lng": -1.279002,
+    "area": "North Yorkshire",
+    "checked": "2026-10-12",
+    "source": "https://api.postcodes.io/postcodes/YO26%208DH"
+  }
+}

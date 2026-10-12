@@ -1,5 +1,6 @@
 import sourceFirms from "@/data/accountants.json";
 import researchedFirms from "@/data/accountants-research.json";
+import currentGeocodes from "@/data/accountants-geocodes.json";
 
 export const serviceLabels = {
   accounts: "Charity accounts",
@@ -39,7 +40,10 @@ export type Firm = {
 export const firms: Firm[] = [...(sourceFirms as Firm[]).map(firm => firm.slug === "tittensor-and-co-limited" ? {
   ...firm, coordinates: { lat: 51.88065, lng: 0.143985 },
   coordinateSource: "https://www.doogal.co.uk/LSOA21/E01023453",
-} : firm), ...researchedFirms as Firm[]];
+} : firm), ...researchedFirms as Firm[]].map(firm => {
+  const point = (currentGeocodes as Record<string, {lat:number;lng:number;source:string}>)[firm.postcode];
+  return point ? { ...firm, coordinates: { lat: point.lat, lng: point.lng }, coordinateSource: point.source } : firm;
+});
 export const directoryPath = "/accountants-advisers/";
 export const firmPath = (firm: Pick<Firm, "slug">) => `${directoryPath}${firm.slug}/`;
 

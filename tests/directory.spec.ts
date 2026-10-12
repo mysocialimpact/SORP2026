@@ -23,6 +23,7 @@ test("all original firms, evidence and postcode coordinates are preserved", () =
     expect(firm.coordinates!.lng).toBeGreaterThan(-9);
     expect(firm.coordinates!.lng).toBeLessThan(2);
     expect(firm.coordinateSource).toMatch(/^https:/);
+    expect(firm.coordinateSource).toMatch(/^https:\/\/api.postcodes.io\/postcodes\//);
     expect(firm.icaewUrl).toMatch(/^https:\/\/find.icaew.com/);
     for (const s of firm.services) { expect(s.source).toMatch(/^https?:/); expect(s.evidence.length).toBeGreaterThan(10); expect(s.id in serviceLabels).toBe(true); }
   }
@@ -73,7 +74,7 @@ test("directory shows ten, loads more, filters, and preserves three-firm shortli
   await expect(page.locator('dialog')).not.toBeVisible();
   await page.reload();
   await expect(page.getByRole('button',{name:/Shortlist & compare/})).toContainText('3/3');
-  await page.getByLabel('Or search by name or town').fill('Burton');
+  await page.getByLabel('Or search by name or town').fill('Burton Sweet');
   await expect(page.locator('.directory-result')).toHaveCount(1);
   await page.getByLabel('Or search by name or town').fill('zz-no-such-firm');
   await expect(page.getByRole('heading',{name:'A little further afield?'})).toBeVisible();

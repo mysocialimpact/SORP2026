@@ -18,7 +18,7 @@ export function PartnerEnquiry({ firmName = "" }: { firmName?: string }) {
       }) });
       const result = await response.json();
       if (!response.ok || !result.accepted) throw new Error(result.error || "We couldn’t accept your enquiry. Please try again.");
-      setState("sent"); setFeedback(result.emailSent ? "Your enquiry has been emailed to My Social Impact. We’ll review the details before changing a listing." : result.queued ? "Your enquiry has been saved and queued for delivery. We’ll review the details before changing a listing." : "Your enquiry has been logged for review. No listing ownership has changed.");
+      setState("sent"); setFeedback(result.emailSent ? "Your enquiry has been emailed to My Social Impact. We’ll review the details before changing a listing." : result.queued ? "Your enquiry has been saved and queued for delivery. We’ll review the details before changing a listing." : "Your enquiry has been accepted for review. Email delivery has not been confirmed, and no listing ownership has changed.");
     } catch (error) { setState("error"); setFeedback(error instanceof Error ? error.message : "Please try again."); }
   }
   return <form className="directory-enquiry" method="post" onSubmit={submit}>

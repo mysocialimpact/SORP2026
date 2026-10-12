@@ -116,9 +116,9 @@ export function DirectoryExplorer({ firms }: { firms: Firm[] }) {
       </details><button className="directory-text-button" onClick={nationwide}>Reset to nationwide</button></div>
     </div>
     <div className="directory-results-toolbar"><p aria-live="polite"><strong>{results.length}</strong> {results.length === 1 ? "firm" : "firms"}{origin ? ` · nearest to ${origin.postcode}` : " · across the directory"}{area ? " · within this map area" : ""}</p><button onClick={() => comparison.current?.showModal()}>Shortlist & compare <span>{saved.length}/3</span></button></div>
-    <div className="directory-mobile-toggle" aria-label="Choose results view"><button aria-pressed={mode === "list"} onClick={() => setMode("list")}>List</button><button aria-pressed={mode === "map"} onClick={() => setMode("map")}>Map</button></div>
+    <div className="directory-mobile-toggle" role="group" aria-label="Choose results view"><button aria-pressed={mode === "list"} onClick={() => setMode("list")}>List</button><button aria-pressed={mode === "map"} onClick={() => setMode("map")}>Map</button></div>
     <div className={`directory-workspace is-${mode}`}>
-      <div className="directory-results" ref={list} aria-label="Accountant results">
+      <div className="directory-results" ref={list} role="region" aria-label="Accountant results">
         {origin && <p className="directory-distance-note">Straight-line miles from postcode centres. Nearest first; featured status does not override distance.</p>}
         {area && <button className="directory-text-button" onClick={() => { setArea(null); changeFilters(); }}>Clear map area ×</button>}
         {!results.length && <div className="directory-empty"><h2>A little further afield?</h2><p>No firms match these filters. Try a different area or fewer services.</p><button onClick={nationwide}>Show all firms</button></div>}
