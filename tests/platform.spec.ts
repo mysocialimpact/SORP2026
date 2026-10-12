@@ -93,6 +93,45 @@ test("Social Impact Excellence uses the SORP account and saves real assessment p
   expect(results.violations).toEqual([]);
 });
 
+test("signed-in Social Impact Excellence is a personal workspace with saved answers and team progress", async ({ page }) => {
+  const answers = Array.from({ length: 25 }, (_, index) => index % 5 + 1);
+  const result = {
+    overall: 3, maturity: "Partly established",
+    pillarScores: ["purpose", "leadership", "data", "delivery", "communication"].map(pillar => ({ pillar, score: 3 })),
+    strengths: [], opportunities: [], recommendation: "Build on the baseline.",
+  };
+  await page.route("**/api/readiness-account/**", async route => {
+    const input = route.request().method() === "POST" ? route.request().postDataJSON() as Record<string, unknown> : {};
+    if (input.action === "load-product") return route.fulfill({ json: { signedIn: true, account: { id: "will", name: "Will Example", organisation: "Brainstrust" }, productProgress: { status: "complete", data: { answers, result, migration: { source: "legacy-social-impact-excellence" } } } } });
+    if (input.action === "team-workspace") return route.fulfill({ json: { organisation: { name: "Brainstrust", programme: "team", seatLimit: 15 }, invitations: [{ status: "completed" }, { status: "started" }, { status: "invited" }], aggregate: { available: false, completed: 1, required: 3 } } });
+    return route.fulfill({ json: { signedIn: true, account: { id: "will", name: "Will Example", organisation: "Brainstrust" } } });
+  });
+  await page.goto("/social-impact-excellence/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Welcome back, Will");
+  await expect(page.getByText("Brainstrust’s place to see what you have completed")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Open Brainstrust’s Team Perspective/ }).first()).toHaveAttribute("href", "/social-impact-excellence/team/");
+  await expect(page.getByText("Your previous MSI assessment is safely connected")).toBeVisible();
+  await expect(page.locator(".excellence-answer-pillars details")).toHaveCount(5);
+  await expect(page.locator(".excellence-answer-pillars li")).toHaveCount(25);
+  await page.locator(".excellence-answer-pillars details").nth(1).locator("summary").click();
+  await expect(page.locator(".excellence-answer-pillars details").nth(1).locator("li")).toHaveCount(5);
+  await expect(page.getByText("Completed", { exact: true }).last()).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
+});
+
+test("a saved answer opens on the selected assessment question", async ({ page }) => {
+  const answers = Array<number | null>(25).fill(3);
+  await page.route("**/api/readiness-account/**", async route => {
+    const input = route.request().method() === "POST" ? route.request().postDataJSON() as Record<string, unknown> : {};
+    if (input.action === "load-product") return route.fulfill({ json: { signedIn: true, account: { id: "qa", name: "QA Person", organisation: "QA Charity" }, productProgress: { status: "in_progress", data: { answers, index: 0, requestId: "qa", route: "assessment", startedAt: "2026-10-12T10:00:00Z" } } } });
+    return route.fulfill({ json: { signedIn: true } });
+  });
+  await page.goto("/social-impact-excellence/assessment/?question=11");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("collect data to understand and track our impact");
+  await expect(page.getByText("11", { exact: true })).toBeVisible();
+});
+
 test("Social Impact Excellence returns a private scored report and downloadable PDF", async ({ page }) => {
   const result = {
     overall: 3.4, maturity: "Partly established",

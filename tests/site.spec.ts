@@ -8,7 +8,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   await page.goto("/");
   await expect(page.getByText("Brainstrust", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "SORP 2026.Made simpler.",
+    "SORP is the requirement.Better impact is the opportunity.",
   );
   for (const link of await page
     .getByRole("link", { name: "Start your free review" })

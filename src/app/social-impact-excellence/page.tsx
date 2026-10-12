@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui";
 import { ProductAdviserNote } from "@/components/product-adviser-note";
 import { pillars, site } from "@/lib/site";
+import { ExcellenceHome } from "@/features/excellence/excellence-home";
 
 export const metadata: Metadata = {
   title: "Social Impact Excellence",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function ExcellencePage() {
-  return <main id="main" className="gateway product-page product-excellence">
+  const publicPage = <main id="main" className="gateway product-page product-excellence">
     <section className="product-hero gateway-width">
       <div className="product-hero-copy">
         <p className="gateway-kicker">04 · My Social Impact’s flagship approach</p>
@@ -40,5 +41,6 @@ export default function ExcellencePage() {
     <ProductAdviserNote title="Help clients move from reporting to better management.">Use the five pillars to support charity clients beyond accounts preparation—into stronger purpose, leadership, evidence, delivery and communication. The approach complements existing professional relationships.</ProductAdviserNote>
     <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/purpose-works/">Purpose Works <Arrow /></Link></nav>
   </main>;
+  return <ExcellenceHome publicPage={publicPage}/>;
 }
 
