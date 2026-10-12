@@ -72,5 +72,5 @@ export function selectFirms(all: Firm[], options: { query: string; services: Ser
   }).map(firm => ({ firm, distance: options.origin && firm.coordinates ? milesBetween(options.origin, firm.coordinates) : null }))
     .sort((a, b) => options.origin
       ? (a.distance ?? Infinity) - (b.distance ?? Infinity) || a.firm.name.localeCompare(b.firm.name)
-      : Number(!!b.firm.featured) - Number(!!a.firm.featured) || a.firm.name.localeCompare(b.firm.name));
+      : a.firm.name.localeCompare(b.firm.name));
 }

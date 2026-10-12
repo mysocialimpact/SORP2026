@@ -2,13 +2,13 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { directoryPath, firmPath, normalisePostcode, selectFirms, serviceLabels, type Bounds, type Firm, type Point, type Service } from "@/lib/accountants";
 import type { MapView } from "./directory-map";
 const DirectoryMap = dynamic(() => import("./directory-map"), { ssr: false, loading: () => <div className="directory-map-loading">Opening your UK map…</div> });
 const storageKey = "sorp2026.accountant-shortlist";
 
-export function DirectoryExplorer({ firms }: { firms: Firm[] }) {
+export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlight?: ReactNode }) {
   const [query, setQuery] = useState("");
   const [postcode, setPostcode] = useState("");
   const [origin, setOrigin] = useState<(Point & { postcode: string; area: string }) | null>(null);
@@ -16,7 +16,7 @@ export function DirectoryExplorer({ firms }: { firms: Firm[] }) {
   const [evidenced, setEvidenced] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [limit, setLimit] = useState(10);
-  const [mode, setMode] = useState("list");
+  const [mode, setMode] = useState("map");
   const [area, setArea] = useState<Bounds | null>(null);
   const [mapBounds, setMapBounds] = useState<Bounds | null>(null);
   const [view, setView] = useState<MapView>({ nationwide: true, revision: 0 });
@@ -79,15 +79,16 @@ export function DirectoryExplorer({ firms }: { firms: Firm[] }) {
     event.preventDefault();
     request.current?.abort();
     const value = normalisePostcode(postcode);
-    if (!value) { setPostcodeError("Enter a full UK postcode, such as BS1 4DJ."); setBusy(false); return; }
+    if (!value) { setQuery(postcode); setOrigin(null); setArea(null); changeFilters(); setBusy(false); setPostcodeError(""); document.getElementById("directory")?.scrollIntoView(); return; }
     const controller = new AbortController(); request.current = controller;
     setBusy(true); setPostcodeError("");
     try {
       const response = await fetch(`/api/directory/postcode/?q=${encodeURIComponent(value)}`, { signal: controller.signal });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Postcode search is unavailable.");
-      setOrigin(data); setPostcode(data.postcode); setArea(null); setSelected(null); setLimit(10);
+      setOrigin(data); setQuery(""); setPostcode(data.postcode); setArea(null); setSelected(null); setLimit(10);
       setView(current => ({ point: data, revision: current.revision + 1 }));
+      document.getElementById("directory")?.scrollIntoView();
     } catch (error) { if (!controller.signal.aborted) setPostcodeError(error instanceof Error ? error.message : "Please try again."); }
     finally { if (!controller.signal.aborted) setBusy(false); }
   }
@@ -96,17 +97,31 @@ export function DirectoryExplorer({ firms }: { firms: Firm[] }) {
     setView(current => ({ nationwide: true, revision: current.revision + 1 }));
   }
 
-  return <section className="directory-app" aria-label="Find and compare charity accountants">
+  return <>
+    <header className="adviser-hero">
+      <div className="directory-width adviser-hero-grid">
+        <div className="adviser-hero-copy">
+          <p className="directory-eyebrow">For charities. For the people who advise them.</p>
+          <h1>Find the people<br/>behind the <em>numbers.</em></h1>
+          <p className="adviser-intro">Your charity deserves the right accountant.<br/>Let’s help you find them.</p>
+          <form onSubmit={findNearby} className="adviser-search">
+            <label htmlFor="directory-query">Find a charity accountant</label>
+            <div><input id="directory-query" name="query" type="search" placeholder="Firm, town, village or postcode" value={postcode} onChange={e => { request.current?.abort(); setBusy(false); setPostcode(e.target.value); setQuery(normalisePostcode(e.target.value) ? "" : e.target.value); setOrigin(null); setArea(null); setPostcodeError(""); changeFilters(); }} aria-describedby={postcodeError ? "directory-postcode-error" : "directory-search-hint"}/><button disabled={busy} type="submit">{busy ? "Finding…" : "Search ↗"}</button></div>
+            <p id="directory-search-hint">{firms.length} listings · postcode search finds your nearest firms</p>
+            {postcodeError && <p id="directory-postcode-error" role="alert" className="directory-error">{postcodeError}</p>}
+          </form>
+          <nav className="adviser-quick-links" aria-label="Directory shortcuts"><a href="#directory">Browse the A–Z ↓</a><button onClick={() => { setMode("map"); document.getElementById("directory")?.scrollIntoView(); }}>Explore the map ↗</button><button onClick={() => comparison.current?.showModal()}>Your shortlist ({saved.length})</button></nav>
+        </div>
+        <aside className="adviser-invite"><div className="adviser-price">£39<span>/month</span></div><p className="directory-eyebrow">For accountancy firms</p><h2>Be seen by charities looking for your expertise.</h2><p>Claim your listing. Tell a richer story. Put your firm where charities look for help.</p><Link href={`${directoryPath}partners/`}>Make room for your firm ↗</Link><small>Proposed founding membership. Professional tools planned. Enquiries open; no payment taken.</small></aside>
+        <div className="adviser-icaew"><a href="https://www.icaew.com/" target="_blank" rel="noopener noreferrer">ICAEW<span>Chartered Accountants</span></a><p>We’re starting with ICAEW firms because our founder, Marcus Warry, is an ICAEW Chartered Accountant. ICAEW is the Institute of Chartered Accountants in England and Wales. This is an independent directory, not an ICAEW endorsement.</p><details><summary>About the directory</summary><p>We haven’t personally assessed every firm. Inclusion is based on stated charity specialisms and public information. The original 110 records and researched Burton Sweet listing are preserved. Each profile links to its sources. Map pins represent office postcode centres, not entrances.</p></details></div>
+      </div>
+    </header>
+    {spotlight}
+    <section id="directory" className="adviser-directory-stage directory-width" aria-label="Find and compare charity accountants">
+    <header className="adviser-directory-heading"><div><p className="directory-eyebrow">The directory · A–Z</p><h2>Your next conversation<br/>starts here.</h2></div><p>Choose a firm on the map or in the list.<br/>Save up to three. Find your fit.</p></header>
+    <div className="directory-app">
     <div className="directory-search">
       <div className="directory-scope"><span aria-hidden="true">✓</span> ICAEW firms with specialist charity offerings <small>Directory specialism, not an endorsement</small></div>
-      <div className="directory-search-fields">
-        <form onSubmit={findNearby} className="directory-postcode-form">
-          <label htmlFor="directory-postcode">Find specialists near you</label>
-          <div><input id="directory-postcode" name="postcode" autoComplete="postal-code" maxLength={10} placeholder="Enter your UK postcode" value={postcode} onChange={e => setPostcode(e.target.value)} aria-describedby={postcodeError ? "directory-postcode-error" : undefined} aria-invalid={!!postcodeError}/><button disabled={busy} type="submit">{busy ? "Finding…" : "Find nearby →"}</button></div>
-        </form>
-        <label className="directory-name-search" htmlFor="directory-name">Or search by name or town<input id="directory-name" type="search" placeholder="Firm, town or postcode…" value={query} onChange={e => { setQuery(e.target.value); changeFilters(); }}/></label>
-      </div>
-      {postcodeError && <p id="directory-postcode-error" role="alert" className="directory-error">{postcodeError}</p>}
       <div className="directory-filter-row"><details className="directory-filters"><summary>Services & evidence {services.length || evidenced ? `(${services.length + Number(evidenced)})` : "＋"}</summary>
         <fieldset><legend>Services supported by source evidence · match all selected</legend>
           {availableServices.map(id => <label key={id}><input type="checkbox" checked={services.includes(id)} onChange={() => { setServices(current => current.includes(id) ? current.filter(s => s !== id) : [...current,id]); changeFilters(); }}/>{serviceLabels[id]}</label>)}
@@ -141,8 +156,11 @@ export function DirectoryExplorer({ firms }: { firms: Firm[] }) {
     </div>
     <p className="directory-notice" role="status">{notice || "Save up to three firms to compare. Your shortlist stays in this browser tab for this visit."}</p>
     <div className="directory-help"><p>Not sure what accounting help you need?</p><Link href="/ask-sorp/">Ask SORP → <small>Live beta</small></Link><Link href={`${directoryPath}partners/`}>For Accountants & Advisers ↗</Link></div>
+    </div>
     <dialog className="directory-comparison" ref={comparison} aria-labelledby="compare-title"><button className="directory-dialog-close" onClick={() => comparison.current?.close()}>Close ×</button><p className="directory-eyebrow">Your shortlist</p><h2 id="compare-title">Find your fit.</h2><p>Compare up to three firms. Confirm services and suitability directly before appointing anyone.</p>
       {!compared.length ? <p>Use “Save +” on any result to start your shortlist.</p> : <div className="directory-compare-grid">{compared.map(f => <article key={f.slug}><h3>{f.name}</h3><p>{f.location} · {f.postcode}</p><dl><dt>Charity expertise</dt><dd>{f.classification === "Verified" ? "Website evidence recorded" : "ICAEW specialism; further checks pending"}</dd><dt>Services with evidence</dt><dd>{f.services.length ? f.services.map(s => serviceLabels[s.id]).join(" · ") : "Ask the firm to confirm"}</dd><dt>Named contact</dt><dd>{f.contact || "Not yet verified"}</dd></dl><Link href={firmPath(f)}>Full profile →</Link><button onClick={() => save(f.slug)}>Remove</button></article>)}</div>}
     </dialog>
-  </section>;
+  </section>
+  <section className="adviser-future"><div className="directory-width"><div><p className="directory-eyebrow">A little further down the line</p><h2>Accountants first.<br/><em>Wider expertise next.</em></h2></div><p>From legal advice to specialist consultancy.<br/>More of the right people, in the same place.<small>Accountants · Here now &nbsp; / &nbsp; Lawyers & other advisers · Future</small></p></div></section>
+  </>;
 }
