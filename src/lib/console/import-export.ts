@@ -78,19 +78,37 @@ export async function previewImport(file: File, actor: string) {
     });
     sheets[sheet.name] = rows;
   }
-  const candidateRows = Object.values(sheets).flatMap((rows) =>
-    rows.filter((row) =>
-      Object.keys(row).some((key) =>
-        /^(firm|firm name|name|canonical name)$/i.test(key),
+  const eligible = Object.entries(sheets).filter(([name, rows]) =>
+    rows.some((row) =>
+      Object.keys(row).some(
+        (key) =>
+          /^(firm|firm name|canonical name)$/i.test(key) ||
+          (/^(firms|candidates|accountants)$/i.test(name) &&
+            key.toLowerCase() === "name"),
       ),
     ),
   );
+  const preferred = eligible.filter(([name]) =>
+    /^(firms|candidates|accountants)$/i.test(name),
+  );
+  const chosen =
+    preferred.length === 1
+      ? preferred[0]
+      : eligible.length === 1
+        ? eligible[0]
+        : null;
+  if (!chosen)
+    throw new Error(
+      "Use one sheet named Firms or Candidates with a Firm name column. People and evidence sheets are preserved but never treated as firms.",
+    );
+  const [candidateSheet, candidateRows] = chosen;
   if (!candidateRows.length)
     throw new Error(
       "Add a column headed Firm name. All other columns and sheets will be preserved in the import archive.",
     );
   const summary = {
     candidates: candidateRows.length,
+    candidateSheet,
     sheets: Object.keys(sheets),
     warnings: [
       "Imports add unreviewed candidates only. Existing records are never overwritten. All original sheets, research and score columns are retained in the import archive; reviewing and mapping pilot scores into assessments remains a separate step.",
@@ -103,10 +121,15 @@ export async function previewImport(file: File, actor: string) {
     )
   )[0];
 }
-const cell = (row: Row, keys: string[]) =>
-  Object.entries(row).find(([key]) =>
-    keys.includes(key.toLowerCase().trim()),
-  )?.[1] || "";
+const cell = (row: Row, keys: string[]) => {
+  for (const key of keys) {
+    const found = Object.entries(row).find(
+      ([heading]) => heading.toLowerCase().trim() === key,
+    );
+    if (found) return found[1];
+  }
+  return "";
+};
 export async function commitImport(id: string, actor: string) {
   return transaction(async (c) => {
     const batch = (
@@ -123,9 +146,12 @@ export async function commitImport(id: string, actor: string) {
     let imported = 0,
       duplicates = 0;
     const issues: string[] = [];
-    for (const row of Object.values(
-      batch.raw_rows as Record<string, Row[]>,
-    ).flat()) {
+    const candidateSheet = batch.summary.candidateSheet;
+    if (!candidateSheet || !batch.raw_rows[candidateSheet])
+      throw new Error(
+        "This older preview needs a new file preview before import.",
+      );
+    for (const row of batch.raw_rows[candidateSheet] as Row[]) {
       const name = cell(row, [
         "firm",
         "firm name",
