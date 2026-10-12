@@ -1,0 +1,133 @@
+[
+  {
+    "slug": "burton-sweet",
+    "name": "Burton Sweet",
+    "website": "https://www.burton-sweet.co.uk/",
+    "postcode": "BS48 1UR",
+    "location": "Flax Bourton, Bristol",
+    "classification": "Verified",
+    "evidence": "Dedicated charity team and published charity accounts, audit, independent examination and advisory services.",
+    "contact": "Josh Kingston — Director & Partner; Ed Marsh — Senior Charity Adviser",
+    "icaewUrl": "https://find.icaew.com/firms/bristol/burton-sweet-ltd-bas/Z2oGmaU",
+    "evidenceUrl": "https://www.burton-sweet.co.uk/business-sectors/charities/",
+    "spreadsheetRow": null,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.42279,
+      "lng": -2.694487
+    },
+    "coordinateSource": "https://www.doogal.co.uk/ShowMap?postcode=BS48+1UR",
+    "featured": true,
+    "overview": "Burton Sweet is a South West accountancy practice with a dedicated charities and civil society team. Its work includes charity accounts, external scrutiny and practical advice for trustees. It serves a range of charitable structures, with particular experience in faith-based organisations.",
+    "services": [
+      {
+        "id": "accounts",
+        "source": "https://www.burton-sweet.co.uk/services/charity-accounts-preparation/",
+        "evidence": "Preparation of charity financial statements and support with fund accounting."
+      },
+      {
+        "id": "sorp",
+        "source": "https://www.burton-sweet.co.uk/services/charity-accounts-preparation/",
+        "evidence": "Support applying the Charities SORP and preparing trustees’ annual reports."
+      },
+      {
+        "id": "audit",
+        "source": "https://www.burton-sweet.co.uk/business-sectors/charities/",
+        "evidence": "Audit and assurance are included among its charity-sector services."
+      },
+      {
+        "id": "examination",
+        "source": "https://www.burton-sweet.co.uk/services/independent-examination-charity/",
+        "evidence": "Independent examination by the firm’s charity team."
+      },
+      {
+        "id": "tax",
+        "source": "https://www.burton-sweet.co.uk/services/charity-advice-training-development/",
+        "evidence": "Charity-specific Corporation Tax, VAT and Gift Aid advice."
+      },
+      {
+        "id": "outsourced",
+        "source": "https://www.burton-sweet.co.uk/services/bookkeeping/",
+        "evidence": "Bookkeeping, financial control and outsourced support for businesses and charities."
+      },
+      {
+        "id": "management",
+        "source": "https://www.burton-sweet.co.uk/cc8/",
+        "evidence": "Support with charity financial controls and management accounts."
+      }
+    ],
+    "people": [
+      {
+        "name": "Josh Kingston",
+        "role": "Director & Partner; leads the Bristol office and works within the charity team.",
+        "source": "https://www.burton-sweet.co.uk/welcome-to-our-team/"
+      },
+      {
+        "name": "Ed Marsh",
+        "role": "Senior Charity Adviser; holds the ICAEW Diploma in Charity Accounting.",
+        "source": "https://www.burton-sweet.co.uk/welcome-to-our-team/"
+      },
+      {
+        "name": "Paul Cadwallader",
+        "role": "Accounts & Audit Manager; works with charities and holds the Diploma in Charity Accounting.",
+        "source": "https://www.burton-sweet.co.uk/welcome-to-our-team/"
+      },
+      {
+        "name": "Thomas Bacon",
+        "role": "Assistant Charity Account Manager; works on independent examinations.",
+        "source": "https://www.burton-sweet.co.uk/welcome-to-our-team/"
+      }
+    ],
+    "offices": [
+      {
+        "address": "The Clock Tower, 5 Farleigh Court, Old Weston Road, Flax Bourton, Bristol",
+        "postcode": "BS48 1UR",
+        "source": "https://www.burton-sweet.co.uk/offices/",
+        "phone": "0117 973 8441"
+      },
+      {
+        "address": "Cooper House, Lower Charlton Estate, Shepton Mallet, Somerset",
+        "postcode": "BA4 5QE",
+        "source": "https://www.burton-sweet.co.uk/offices/",
+        "phone": "01749 342255"
+      },
+      {
+        "address": "Spencer House, Morston Court, Aisecome Way, Weston-super-Mare",
+        "postcode": "BS22 8NG",
+        "source": "https://www.burton-sweet.co.uk/offices/",
+        "phone": "01934 620011"
+      },
+      {
+        "address": "37 Silver Street, Dursley, Gloucestershire",
+        "postcode": "GL11 4NA",
+        "source": "https://www.burton-sweet.co.uk/offices/",
+        "phone": "01453 701802"
+      },
+      {
+        "address": "The Old Church School, Butts Hill, Frome, Somerset (market day office)",
+        "postcode": "BA11 1HR",
+        "source": "https://www.burton-sweet.co.uk/offices/",
+        "phone": "01749 342255"
+      }
+    ],
+    "email": "info@burton-sweet.co.uk",
+    "researchSources": [
+      {
+        "title": "Charities and civil society",
+        "url": "https://www.burton-sweet.co.uk/business-sectors/charities/"
+      },
+      {
+        "title": "Charity accounts and SORP",
+        "url": "https://www.burton-sweet.co.uk/services/charity-accounts-preparation/"
+      },
+      {
+        "title": "Meet the team",
+        "url": "https://www.burton-sweet.co.uk/welcome-to-our-team/"
+      },
+      {
+        "title": "Office addresses and contact information",
+        "url": "https://www.burton-sweet.co.uk/offices/"
+      }
+    ]
+  }
+]

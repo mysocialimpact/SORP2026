@@ -11,6 +11,7 @@ export function Header() {
           </span>
           <span className="gateway-tagline">Reporting for greater impact.</span>
         </Link>
+        <nav className="gateway-directory-nav" aria-label="Find professional support"><Link href="/accountants-advisers/">Accountants & Advisers <span aria-hidden="true">↗</span></Link></nav>
         <AccountControl />
       </div>
     </header>
