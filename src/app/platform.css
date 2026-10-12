@@ -125,6 +125,18 @@
     var(--folder-paper);
   box-shadow: 0 7px 13px #24232912;
 }
+/* Home is a continuous sage divider; product sheets keep their existing themes. */
+.product-folder[data-active-product="/"] { --folder-paper: #cfddcf; }
+.product-folder[data-active-product="/"] .product-folder-sheet-edge {
+  background: var(--folder-paper);
+  box-shadow: none;
+}
+.product-folder[data-active-product="/"] .product-folder-tab.is-home {
+  background: linear-gradient(165deg, #ffffff20, transparent 38%), var(--tab-colour);
+}
+.product-folder[data-active-product="/"] .product-folder-tab.is-home::after {
+  background: var(--folder-paper);
+}
 .product-folder + .product-page,
 .product-folder + .gateway-ask-page,
 .product-folder + .sr-story {

@@ -25,6 +25,14 @@ export default function Privacy() {
           content needed to create and deliver that report.
         </p>
         <p>
+          If you choose “I work in a charity” or “I advise charities” on the
+          homepage, your choice is kept in this browser tab’s session storage.
+          It is optional, is not sent to our analytics service, and can be
+          cleared by selecting the same option again. The current “Say hello”
+          form preview does not submit or save anything you type or subscribe
+          you to updates. You can contact us using the separate email link.
+        </p>
+        <p>
           Optional booking and payment actions use Google Calendar and Stripe.
           Those providers process the information needed to complete the action
           under their own privacy terms. Links to other websites also take you
