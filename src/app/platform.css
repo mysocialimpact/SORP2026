@@ -32,7 +32,7 @@
 }
 .product-folder-tabs-track {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: .72fr repeat(6, minmax(0, 1fr));
   align-items: end;
   gap: 5px;
   min-height: 76px;
@@ -78,6 +78,10 @@
   font-weight: 700;
   letter-spacing: .08em;
   opacity: .68;
+}
+.product-folder-tab.is-home > span {
+  font-size: 8px;
+  text-transform: uppercase;
 }
 .product-folder-tab strong {
   min-width: 0;
