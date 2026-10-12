@@ -658,6 +658,7 @@ export async function mergeFirms(
       "UPDATE research_console.firms SET aliases=array(SELECT DISTINCT unnest(aliases||$2::text[])),approved_at=NULL,review_status='Re-review needed',status='Needs more evidence' WHERE id=$1",
       [target, [from.name, ...from.aliases]],
     );
+    const moved: Record<string, string[]> = {};
     for (const table of [
       "offices",
       "people",
@@ -665,17 +666,24 @@ export async function mergeFirms(
       "runs",
       "assessments",
       "reviews",
-    ])
+    ]) {
+      moved[table] = (
+        await c.query(
+          `SELECT id FROM research_console.${table} WHERE firm_id=$1`,
+          [source],
+        )
+      ).rows.map((row) => row.id);
       await c.query(
         `UPDATE research_console.${table} SET firm_id=$2 WHERE firm_id=$1`,
         [source, target],
       );
+    }
     await audit(
       c,
       target,
       "merge",
       source,
-      { source: from, target: to },
+      { source: from, target: to, moved },
       { source, target },
       "Explicit merge; original identity and full history retained",
       actor,

@@ -30,7 +30,7 @@ Neon's observed point-in-time history window is six hours, not an unlimited back
 
 ## Verification
 
-The release passed 53 console flow checks, including desktop/mobile accessibility, plus the existing public homepage and account/product tests. Review-page real owner sign-in remains a user check; no password was requested.
+The release passed 55 console flow checks, including desktop/mobile accessibility, plus the existing public homepage and account/product tests. Review-page real owner sign-in remains a user check; no password was requested.
 
 - `npm run build`, `npm run typecheck`, `npm run lint` (one pre-existing warning in public/design-preview/accountants-advisers/preview.js).
 - `npm run test:product-unit` checks existing product behaviour.

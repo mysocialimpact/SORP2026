@@ -287,6 +287,29 @@ ok(
   protectedQuery.rows[0].count >= 5,
   "Recoverable change trail persisted in Postgres",
 );
+const mergeSource = (await call("firms/", { name: "QA Merge Source" })).data
+  .firm;
+const mergeTarget = (await call("firms/", { name: "QA Merge Target" })).data
+  .firm;
+const mergeEvidence = (
+  await call(`firms/${mergeSource.id}/evidence/`, {
+    title: "Merge provenance",
+    summary: "QA merge fixture, not public research.",
+    source_type: "Internal note",
+  })
+).data;
+await call(`firms/${mergeSource.id}/merge/`, { target: mergeTarget.id });
+const mergedReport = (await call(`firms/${mergeTarget.id}/`)).data;
+ok(
+  mergedReport.evidence.some((e) => e.id === mergeEvidence.id),
+  "Confirmed merge retains source evidence",
+);
+ok(
+  mergedReport.history
+    .find((h) => h.entity === "merge")
+    .previous.moved.evidence.includes(mergeEvidence.id),
+  "Merge history records exact moved identities for recovery",
+);
 const browser = await chromium.launch({
   executablePath: fs.existsSync("/usr/bin/chromium")
     ? "/usr/bin/chromium"
