@@ -30,9 +30,11 @@ Neon's observed point-in-time history window is six hours, not an unlimited back
 
 ## Verification
 
+The release passed 53 console flow checks, including desktop/mobile accessibility, plus the existing public homepage and account/product tests. Review-page real owner sign-in remains a user check; no password was requested.
+
 - `npm run build`, `npm run typecheck`, `npm run lint` (one pre-existing warning in public/design-preview/accountants-advisers/preview.js).
 - `npm run test:product-unit` checks existing product behaviour.
-- `node --experimental-strip-types --test tests/console-security.test.mjs` checks private-network rejection, URL restrictions and scoring boundaries.
+- `node --experimental-strip-types --test tests/product-unit/console-security.test.mjs` checks private-network rejection, URL restrictions and scoring boundaries.
 - `tests/console-flow.mjs` exercises actual API routes and Postgres plus desktop/mobile browser flows. It uses a disposable PostgreSQL container on loopback port 5433 and explicitly resets **only that local QA schema**. `tests/console-auth-fixture.mjs` is a local stand-in for the trusted account backend; no application auth bypass exists. Run the app with `ADMIN_EMAIL=owner@example.invalid`, `SORP_BACKEND_ORIGIN=http://127.0.0.1:4319`, and the local QA database URL. These fixture identities and research records never enter production.
 - `npm run console:verify-live` is an explicit release check on Vercel. It collects real Burton Sweet sources into the selected database and awards no scores. It is not part of the ordinary build command.
 

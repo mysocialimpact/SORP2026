@@ -288,7 +288,9 @@ ok(
   "Recoverable change trail persisted in Postgres",
 );
 const browser = await chromium.launch({
-  executablePath: "/usr/bin/chromium",
+  executablePath: fs.existsSync("/usr/bin/chromium")
+    ? "/usr/bin/chromium"
+    : undefined,
   args: ["--no-sandbox"],
 });
 for (const width of [1440, 390]) {

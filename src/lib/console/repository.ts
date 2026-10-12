@@ -381,7 +381,7 @@ export async function saveAssessment(
       );
     const prev = (
       await c.query(
-        "SELECT id FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC LIMIT 1",
+        "SELECT id,run_id FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC LIMIT 1",
         [id],
       )
     ).rows[0];
@@ -419,8 +419,8 @@ export async function saveAssessment(
       )
     ).rows[0];
     await c.query(
-      "UPDATE research_console.firms SET research_completed_at=now(),status='Ready for Marcus',review_status='Awaiting review',approved_at=NULL,updated_at=now() WHERE id=$1",
-      [id],
+      "UPDATE research_console.firms SET research_completed_at=CASE WHEN $2::uuid IS DISTINCT FROM $3::uuid THEN now() ELSE COALESCE(research_completed_at,now()) END,status='Ready for Marcus',review_status='Awaiting review',approved_at=NULL,updated_at=now() WHERE id=$1",
+      [id, run?.id || null, prev?.run_id || null],
     );
     await audit(
       c,
@@ -472,7 +472,7 @@ export async function reviewFirm(
       );
     const a = (
       await c.query(
-        "SELECT id FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC LIMIT 1",
+        "SELECT id,run_id FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC LIMIT 1",
         [id],
       )
     ).rows[0];

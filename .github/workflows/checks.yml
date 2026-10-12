@@ -36,3 +36,39 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 14
+  research-console:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      CONSOLE_DATABASE_URL: postgresql://postgres@127.0.0.1:5433/postgres
+      ADMIN_EMAIL: owner@example.invalid
+      SORP_BACKEND_ORIGIN: http://127.0.0.1:4319
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: |
+          node tests/console-auth-fixture.mjs > /tmp/console-auth.log 2>&1 &
+          npm run start > /tmp/console-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:3000/console/login/ > /dev/null; then break; fi
+            sleep 1
+          done
+          node tests/console-flow.mjs
