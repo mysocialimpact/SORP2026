@@ -1563,3 +1563,14 @@ body:has(.research-console) > .product-folder {
 .research-console h3 {
   font-family: "DM Sans", sans-serif;
 }
+
+.rc-check-foot,
+.rc-population-foot,
+.rc-milestone p,
+.rc-milestone > span:last-child,
+.rc-action-card > span,
+.rc-footer,
+.rc-category-number {
+  color: #625c50;
+}
+.rc-achievements{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px;font-size:11px;color:#625c50}.rc-achievements p{margin-right:auto}

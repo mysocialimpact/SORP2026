@@ -31,7 +31,7 @@ async function handle(
     const url = new URL(request.url);
     if (get && resource === "access") return json({ authorised: true });
     if (get && resource === "dashboard")
-      return json(await repository.dashboard());
+      return json(await repository.dashboard(actor));
     if (get && resource === "status") {
       await query("SELECT 1");
       return json({
@@ -105,7 +105,16 @@ async function handle(
     }
     if (Number(request.headers.get("content-length") || 0) > 100000)
       throw new Error("Request is too large.");
-    const body = await request.json();
+    const text = await request.text();
+    if (text.length > 100000) throw new Error("Request is too large.");
+    const body = JSON.parse(text);
+    if (resource === "visit") {
+      await query(
+        "INSERT INTO research_console.visits(actor,researched) SELECT $1,count(*)::int FROM research_console.firms WHERE merged_into IS NULL AND research_completed_at IS NOT NULL ON CONFLICT(actor) DO UPDATE SET visited_at=now(),researched=excluded.researched",
+        [actor],
+      );
+      return json({ ok: true });
+    }
     if (resource === "firms" && !id)
       return json(await repository.createFirm(body, actor));
     if (resource === "firms" && action === "research") {

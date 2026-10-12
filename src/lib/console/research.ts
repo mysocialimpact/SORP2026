@@ -191,7 +191,7 @@ export async function runResearch(runId: string) {
         [runId, examined ? "collected" : "failed", limitations],
       );
       await c.query(
-        "UPDATE research_console.firms SET status='Needs more evidence',updated_at=now() WHERE id=$1",
+        "UPDATE research_console.firms SET status='Needs more evidence',approved_at=NULL,updated_at=now() WHERE id=$1",
         [run.firm_id],
       );
     });

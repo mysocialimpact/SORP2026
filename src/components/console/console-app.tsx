@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   categories,
   levelNames,
@@ -22,9 +22,11 @@ import {
 } from "./ui";
 import { Report, Compare } from "./report";
 type Dashboard = {
+  sinceLastVisit: number | null;
   counts: {
     imported: number;
     researched: number;
+    icaew_researched: number;
     scored: number;
     awaiting: number;
     approved: number;
@@ -127,6 +129,9 @@ export function ConsoleApp() {
 function Mission() {
   const { data, error } = useData<Dashboard>("dashboard");
   const count = data?.counts;
+  useEffect(() => {
+    if (data) void api("visit", {}).catch(() => {});
+  }, [data]);
   const milestones = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
   const next =
     milestones.find((n) => n > (count?.researched || 0)) ||
@@ -229,7 +234,8 @@ function Mission() {
                       "--progress": data.baseline
                         ? Math.min(
                             100,
-                            (data.counts.researched / data.baseline.total) *
+                            (data.counts.icaew_researched /
+                              data.baseline.total) *
                               100,
                           ) + "%"
                         : "0%",
@@ -240,7 +246,8 @@ function Mission() {
                     <strong>
                       {data.baseline
                         ? Math.round(
-                            (data.counts.researched / data.baseline.total) *
+                            (data.counts.icaew_researched /
+                              data.baseline.total) *
                               100,
                           ) + "%"
                         : "—"}
@@ -353,6 +360,25 @@ function Mission() {
           </>
         )}
       </section>
+      {data && (
+        <div className="rc-achievements">
+          <p>
+            {data.sinceLastVisit === null
+              ? "Your mission begins here."
+              : `${data.sinceLastVisit} more completed research records since your last visit.`}
+          </p>
+          {[10, 25, 50, 100, 250, 500, 1000]
+            .filter((n) => data.counts.researched >= n)
+            .map((n) => (
+              <Badge key={"r" + n}>✦ {n} firms researched</Badge>
+            ))}
+          {[1, 10, 25, 50, 100]
+            .filter((n) => data.counts.approved >= n)
+            .map((n) => (
+              <Badge key={"a" + n}>✦ {n} approved</Badge>
+            ))}
+        </div>
+      )}
       <section className="rc-section">
         <div className="rc-section-heading">
           <div>

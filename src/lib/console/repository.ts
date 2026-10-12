@@ -20,10 +20,10 @@ export async function methodology() {
     )
   )[0];
 }
-export async function dashboard() {
+export async function dashboard(actor?: string) {
   const [counts, flows, recent, baseline, method] = await Promise.all([
     query(
-      `SELECT count(*)::int imported,count(*) FILTER(WHERE research_completed_at IS NOT NULL)::int researched,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.assessments a WHERE a.firm_id=f.id))::int scored,count(*) FILTER(WHERE status='Ready for Marcus')::int awaiting,count(*) FILTER(WHERE approved_at IS NOT NULL)::int approved,count(*) FILTER(WHERE research_completed_at IS NULL)::int remaining,count(*) FILTER(WHERE research_completed_at>=date_trunc('week',now()))::int week,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.evidence e WHERE e.firm_id=f.id AND e.sorp='Specific SORP 2026' AND e.url IS NOT NULL AND e.source_type IN ('Firm website','ICAEW','External') AND e.state='Current' AND e.confidence IN ('High','Verified')))::int specialists FROM research_console.firms f WHERE merged_into IS NULL`,
+      `SELECT count(*)::int imported,count(*) FILTER(WHERE research_completed_at IS NOT NULL AND credentials->>'icaewListingVerified'='true')::int icaew_researched,count(*) FILTER(WHERE research_completed_at IS NOT NULL)::int researched,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.assessments a WHERE a.firm_id=f.id))::int scored,count(*) FILTER(WHERE status='Ready for Marcus')::int awaiting,count(*) FILTER(WHERE approved_at IS NOT NULL)::int approved,count(*) FILTER(WHERE research_completed_at IS NULL)::int remaining,count(*) FILTER(WHERE research_completed_at>=date_trunc('week',now()))::int week,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.evidence e WHERE e.firm_id=f.id AND e.sorp='Specific SORP 2026' AND e.url IS NOT NULL AND e.source_type IN ('Firm website','ICAEW','External') AND e.state='Current' AND e.confidence IN ('High','Verified')))::int specialists FROM research_console.firms f WHERE merged_into IS NULL`,
     ),
     query(
       `SELECT status,count(*)::int count FROM research_console.firms WHERE merged_into IS NULL GROUP BY status`,
@@ -37,7 +37,18 @@ export async function dashboard() {
     ),
     methodology(),
   ]);
+  const visit = actor
+    ? (
+        await query<{ researched: number }>(
+          "SELECT researched FROM research_console.visits WHERE actor=$1",
+          [actor],
+        )
+      )[0]
+    : null;
   return {
+    sinceLastVisit: visit
+      ? Math.max(0, Number(counts[0].researched) - visit.researched)
+      : null,
     counts: counts[0],
     flows,
     recent,
@@ -448,6 +459,17 @@ export async function reviewFirm(
       )
     ).rows[0];
     if (!f) throw new Error("Firm not found.");
+    if (
+      f.status === "Researching" &&
+      [
+        "Approved",
+        "Agree with assessment",
+        "Research completed — unscored",
+      ].includes(decision)
+    )
+      throw new Error(
+        "Wait for the current research run to finish before completing this review.",
+      );
     const a = (
       await c.query(
         "SELECT id FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC LIMIT 1",
