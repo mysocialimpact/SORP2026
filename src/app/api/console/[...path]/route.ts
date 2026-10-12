@@ -4,6 +4,17 @@ import * as repository from "@/lib/console/repository";
 import { query } from "@/lib/console/db";
 import { startResearch, runResearch } from "@/lib/console/research";
 import {
+  automaticAssessment,
+  calibrationReport,
+  pilotCalibration,
+} from "@/lib/console/automatic-assessment";
+import { discoverFirm, discoveryConfigured } from "@/lib/console/discovery";
+import {
+  backupConfiguration,
+  completeBackup,
+  runBackup,
+} from "@/lib/console/backups";
+import {
   previewImport,
   commitImport,
   exportData,
@@ -32,15 +43,34 @@ async function handle(
     if (get && resource === "access") return json({ authorised: true });
     if (get && resource === "dashboard")
       return json(await repository.dashboard(actor));
+    if (get && resource === "discover")
+      return json(await discoverFirm(url.searchParams.get("q") || ""));
+    if (get && resource === "calibration")
+      return json(await calibrationReport());
     if (get && resource === "status") {
       await query("SELECT 1");
       return json({
         database: true,
         auth: true,
         research: "Website collection available; access varies by source.",
-        automaticScoring: false,
-        nameDiscovery: false,
-        pilot: false,
+        automaticScoring: true,
+        nameDiscovery: discoveryConfigured(),
+        pilot: Number(
+          (
+            await query<{ count: string }>(
+              "SELECT count(*) FROM research_console.assessments WHERE origin='Historical pilot v1.0'",
+            )
+          )[0].count,
+        ),
+        backup: {
+          ...backupConfiguration(),
+          last:
+            (
+              await query(
+                "SELECT status,completed_at FROM research_console.backup_runs ORDER BY started_at DESC LIMIT 1",
+              )
+            )[0] ?? null,
+        },
       });
     }
     if (get && resource === "methodology")
@@ -70,6 +100,15 @@ async function handle(
         ),
       );
     if (get && resource === "export") {
+      if (url.searchParams.get("format") === "backup")
+        return new Response(JSON.stringify(await completeBackup()), {
+          headers: {
+            "Cache-Control": "private, no-store",
+            "Content-Type": "application/json",
+            "Content-Disposition":
+              'attachment; filename="sorp-console-complete-backup.json"',
+          },
+        });
       const format = url.searchParams.get("format") === "csv" ? "csv" : "xlsx";
       const buffer = await exportData(
         format,
@@ -108,6 +147,10 @@ async function handle(
     const text = await request.text();
     if (text.length > 100000) throw new Error("Request is too large.");
     const body = JSON.parse(text);
+    if (resource === "backup") return json(await runBackup());
+    if (resource === "calibration") return json(await pilotCalibration());
+    if (resource === "firms" && action === "auto-score")
+      return json(await automaticAssessment(id, actor));
     if (resource === "visit") {
       await query(
         "INSERT INTO research_console.visits(actor,researched) SELECT $1,count(*)::int FROM research_console.firms WHERE merged_into IS NULL AND research_completed_at IS NOT NULL ON CONFLICT(actor) DO UPDATE SET visited_at=now(),researched=excluded.researched",

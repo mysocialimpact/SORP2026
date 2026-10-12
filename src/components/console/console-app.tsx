@@ -1,4 +1,5 @@
 "use client";
+import { CalibrationPage } from "./calibration";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -44,6 +45,15 @@ type Dashboard = {
     limitations: string;
   };
   method: Methodology;
+  benchmark: {
+    label: string;
+    source_url: string;
+    accessed_at: string;
+    limitations: string;
+  } | null;
+  reviewed: number;
+  discovered: number;
+  backup:{status:string;started_at:string;completed_at:string|null}|null;
 };
 export function ConsoleApp() {
   const path = usePathname();
@@ -106,6 +116,8 @@ export function ConsoleApp() {
           <Database queue={view === "queue"} />
         ) : view === "methodology" ? (
           <MethodologyPage />
+        ) : view === "calibration" ? (
+          <CalibrationPage />
         ) : view === "import" ? (
           <ImportPage />
         ) : view === "compare" ? (
@@ -180,13 +192,28 @@ function Mission() {
         ) : (
           <>
             <div className="rc-mission-grid">
+              {data.backup&&(data.backup.status==='failed'||Date.now()-new Date(data.backup.completed_at||data.backup.started_at).getTime()>36*3600000)&&<div className="rc-notice" role="alert">Your latest backup needs attention. <Link href="/console/status/">Inspect recovery status and retry →</Link></div>}
               <div className="rc-population">
                 <Badge>THE STARTING POPULATION</Badge>
-                <h3>
-                  Total UK ICAEW
-                  <br />
-                  accountancy firms
-                </h3>
+                <h3>The published ICAEW benchmark</h3>
+                {data.benchmark && (
+                  <>
+                    <strong className="rc-baseline-number">
+                      12,000+
+                    </strong>
+                    <p>
+                      ICAEW firms: published directory figure — UK-only unique total
+                      not yet verified.
+                    </p>
+                    <Source
+                      url={data.benchmark.source_url}
+                      label="ICAEW’s published directory figure ↗"
+                    />
+                    <p>
+                      Accessed <DateText value={data.benchmark.accessed_at} />
+                    </p>
+                  </>
+                )}
                 {data.baseline ? (
                   <>
                     <strong className="rc-baseline-number">
@@ -205,10 +232,11 @@ function Mission() {
                   </>
                 ) : (
                   <>
-                    <div className="rc-unverified">
-                      Awaiting a<br />
-                      <em>verified baseline.</em>
-                    </div>
+                    <h3>
+                      Verified unique UK ICAEW firms:
+                      <br />
+                      <em>Baseline pending</em>
+                    </h3>
                     <p>
                       We’re counting unique firms, not branch offices. A
                       complete, authorised UK population has not yet been
@@ -237,7 +265,16 @@ function Mission() {
                               data.baseline.total) *
                               100,
                           ) + "%"
-                        : "0%",
+                        : Math.min(
+                            100,
+                            (data.counts.researched /
+                              ([10, 25, 50, 100, 250, 500, 1000].find(
+                                (n) => n > data.counts.researched,
+                              ) ||
+                                Math.ceil((data.counts.researched + 1) / 1000) *
+                                  1000)) *
+                              100,
+                          ) + "%",
                     } as React.CSSProperties
                   }
                 >
@@ -249,11 +286,13 @@ function Mission() {
                               data.baseline.total) *
                               100,
                           ) + "%"
-                        : "—"}
+                        : data.counts.researched}
                     </strong>
                     <span>
-                      UK coverage
-                      {!data.baseline && <small>Baseline needed</small>}
+                      {data.baseline ? "UK coverage" : "Firms researched"}
+                      {!data.baseline && (
+                        <small>Every firm adds to the picture</small>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -303,6 +342,8 @@ function Mission() {
                 ],
                 ["Researched", data.counts.researched, "Completed assessments"],
                 ["Scored", data.counts.scored, "Evidence-linked scores"],
+                ["Reviewed", data.reviewed, "Your recorded decisions"],
+                ["Newly discovered", data.discovered, "Firms added on demand"],
                 [
                   "Awaiting Marcus",
                   data.counts.awaiting,
@@ -449,16 +490,27 @@ function CheckAccountant() {
   const [newFirm, setNewFirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [discovery, setDiscovery] = useState<{
+    message: string;
+    website: string | null;
+    candidates: { name: string; website: string; description: string }[];
+  } | null>(null);
+  const [selectedWebsite, setSelectedWebsite] = useState("");
   async function find(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError("");
     try {
-      const result = await api<{ rows: Firm[] }>(
-        "firms?q=" + encodeURIComponent(input.trim()),
-      );
-      setMatches(result.rows);
-      setNewFirm(!result.rows.length);
+      const result = await api<{
+        matches: Firm[];
+        message: string;
+        website: string | null;
+        candidates: { name: string; website: string; description: string }[];
+      }>("discover?q=" + encodeURIComponent(input.trim()));
+      setMatches(result.matches);
+      setDiscovery(result);
+      setSelectedWebsite(result.website || "");
+      setNewFirm(!result.matches.length);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -525,10 +577,22 @@ function CheckAccountant() {
       {newFirm && (
         <div className="rc-panel rc-add">
           <p>
-            Name-only web discovery is not connected. Confirm the official
-            website below, then the console can collect accessible pages. Never
-            choose a similarly named firm without checking.
+            {discovery?.message ||
+              "Confirm the official website and firm identity to start research."}
           </p>
+          {discovery?.candidates.map((candidate) => (
+            <div className="rc-panel" key={candidate.website}>
+              <h3>{candidate.name}</h3>
+              <p>{candidate.description}</p>
+              <Source url={candidate.website} />
+              <button
+                className="rc-text-button"
+                onClick={() => setSelectedWebsite(candidate.website)}
+              >
+                Use this website and confirm identity →
+              </button>
+            </div>
+          ))}
           <a
             href={
               "https://www.google.com/search?q=" +
@@ -540,7 +604,8 @@ function CheckAccountant() {
             Find the official website →
           </a>
           <Form
-            label="Save firm and open research"
+            key={selectedWebsite}
+            label="Confirm identity and start research"
             submit={async (data) => {
               const response = await api<{ firm?: Firm; matches?: Firm[] }>(
                 "firms",
@@ -552,6 +617,7 @@ function CheckAccountant() {
                   "A similar record already exists. Open it above, or confirm this is a separate firm.",
                 );
               }
+              await api("firms/" + response.firm!.id + "/research", {});
               router.push("/console/firm/" + response.firm!.id + "/");
             }}
           >
@@ -570,8 +636,11 @@ function CheckAccountant() {
                 <input
                   name="website"
                   type="url"
+                  required
                   placeholder="https://…"
-                  defaultValue={/^https?:/.test(input) ? input : ""}
+                  defaultValue={
+                    selectedWebsite || (/^https?:/.test(input) ? input : "")
+                  }
                 />
               </label>
             </div>
@@ -824,14 +893,80 @@ function MethodologyPage() {
           inspect, not verified findings. Specific SORP 2026 classification
           needs a dated or explicitly named source.
         </p>
-        <h3>What remains unresolved?</h3>
+        <h3>Provisional, and open to improvement</h3>
         <p>
-          Detailed points within each category, calibration against the missing
-          pilot, confidence thresholds, coverage required for a negative finding
-          and the treatment of older publications. Manual scores are reviewer
-          judgements, not a claimed objective rubric.
+          The explicit v1.1 criteria are applied conservatively to retrieved
+          passages or imported pilot notes. Some valid evidence needs human
+          interpretation. Original v1.0 scores remain unchanged. Differences
+          help identify missing evidence and rubric weaknesses.
         </p>
+        <Link href="/console/calibration/">
+          Compare the ten pilot assessments with v1.1 →
+        </Link>
       </section>
+      {!!m.rubric?.length && (
+        <section className="rc-panel rc-section">
+          <h2>The twenty scoring criteria</h2>
+          <p>
+            Each criterion is awarded once. Change its points or disable it to
+            create a new version. Historical assessments retain the rules used
+            at the time.
+          </p>
+          <Form
+            key={m.id}
+            label="Save a new rubric version"
+            submit={async (f) => {
+              await api("methodology", {
+                boundaries: m.boundaries,
+                notes: f.get("notes"),
+                rubric: m.rubric!.map((r) => ({
+                  ...r,
+                  points: Number(f.get(r.id)),
+                  enabled: f.get(r.id + "-enabled") === "on",
+                })),
+              });
+              reload();
+            }}
+          >
+            {categories.map((c) => (
+              <fieldset key={c.id}>
+                <legend>
+                  {c.name} · maximum {c.max}
+                </legend>
+                {m
+                  .rubric!.filter((r) => r.category === c.id)
+                  .map((r) => (
+                    <div className="rc-two" key={r.id}>
+                      <label className="rc-checkbox">
+                        <input
+                          type="checkbox"
+                          name={r.id + "-enabled"}
+                          defaultChecked={r.enabled}
+                        />
+                        {r.id} · {r.label}
+                      </label>
+                      <label>
+                        Points for {r.id}
+                        <input
+                          type="number"
+                          name={r.id}
+                          defaultValue={r.points}
+                          min={0}
+                          max={c.max}
+                          required
+                        />
+                      </label>
+                    </div>
+                  ))}
+              </fieldset>
+            ))}
+            <label>
+              Reason for this version
+              <textarea name="notes" required minLength={10} />
+            </label>
+          </Form>
+        </section>
+      )}
       <section className="rc-two rc-section">
         <div className="rc-panel">
           <h2>Evidence levels</h2>
@@ -986,9 +1121,9 @@ function ImportPage() {
             </label>
           </Form>
           <p className="rc-muted">
-            All sheets and values are archived. This first import flow creates
-            unreviewed candidates; it does not automatically approve or score
-            them.
+            All sheets and values are archived. Recognised pilot workbooks retain
+            their original scores, dates and evidence. Directory imports add
+            missing information without replacing existing research or reviews.
           </p>
         </section>
         <section className="rc-panel">
@@ -1021,13 +1156,19 @@ function ImportPage() {
             {Object.entries(preview.raw_rows).map(([name, rows]) => (
               <div key={name}>
                 <h3>{name}</h3>
-                <pre>{JSON.stringify(rows.slice(0, 10), null, 2)}</pre>
+                <pre>
+                  {JSON.stringify(
+                    Array.isArray(rows) ? rows.slice(0, 10) : rows,
+                    null,
+                    2,
+                  )}
+                </pre>
               </div>
             ))}
           </details>
           {preview.status !== "committed" && (
             <Form
-              label="Confirm candidate import"
+              label="Confirm import"
               submit={async () => {
                 await api("imports/" + preview.id, {});
                 setPreview(null);
@@ -1057,9 +1198,17 @@ function ImportPage() {
   );
 }
 function FeatureStatus() {
-  const { data, error } = useData<{ database: boolean; auth: boolean }>(
-    "status",
-  );
+  const { data, error, reload } = useData<{
+    database: boolean;
+    auth: boolean;
+    nameDiscovery: boolean;
+    pilot: number;
+    backup: {
+      configured: boolean;
+      missing: string[];
+      last: { status: string; completed_at: string } | null;
+    };
+  }>("status");
   const rows = [
     [
       "Private access",
@@ -1082,13 +1231,15 @@ function FeatureStatus() {
     ],
     [
       "Find any firm by name",
-      "Needs configuration",
-      "Searches your database now. For an unknown firm, confirm its identity and official website yourself; automatic web discovery is not connected.",
+      data?.nameDiscovery ? "Working" : "Needs configuration",
+      data?.nameDiscovery
+        ? "Live search suggests possible identities; confirm the right firm before research."
+        : "Existing firm-name search works. Unknown names need BRAVE_SEARCH_API_KEY in the server settings. A confirmed official website works immediately.",
     ],
     [
-      "Automatic scores / AI analysis",
-      "Needs configuration",
-      "No AI assessment service is configured. The detailed scoring rubric is unresolved. Source-linked manual scoring is available.",
+      "Provisional automatic scoring",
+      "Working",
+      "Twenty explicit v1.1 criteria produce source-linked provisional awards. These are conservative rule-based findings, not an AI opinion or a service-quality rating. You can adjust and approve assessments.",
     ],
     [
       "ICAEW population baseline",
@@ -1097,8 +1248,22 @@ function FeatureStatus() {
     ],
     [
       "Pilot workbook",
-      "Needs configuration",
-      "The ten-firm pilot was not attached. Import preserves all sheets; automatic mapping of pilot scores, people and office sheets into structured assessments is coming later.",
+      data?.pilot === 10 ? "Working" : "Needs attention",
+      `${data?.pilot ?? 0} original pilot assessments preserved with original scores, dates, evidence and methodology. Calibration compares v1.1 separately.`,
+    ],
+    [
+      "Encrypted off-site backups",
+      data?.backup.last?.status === "failed"
+        ? "Needs attention"
+        : data?.backup.last?.status === "verified"
+          ? "Working"
+          : "Needs configuration",
+      data?.backup.last?.status === "verified"
+        ? "Encrypted snapshots are stored privately in the existing Neon project. Each backup is downloaded and checked; recovery tests use an isolated environment. See backup history below."
+        : data?.backup.configured
+          ? "Storage is connected; a complete backup/recovery check must succeed before this is marked working."
+          : "Off-site backups — awaiting storage configuration. " +
+            (data?.backup.missing.join(", ") || "Checking configuration…"),
     ],
     [
       "Review, history and comparison",
@@ -1137,6 +1302,32 @@ function FeatureStatus() {
         sources and services can still fail; failures are shown where they
         occur.
       </p>
+      <section className="rc-panel rc-section">
+        <h2>Your recovery tools</h2>
+        <p>
+          Daily backup schedule: 06:00 UTC. Target retention: 30 days. Neon’s
+          six-hour recovery history and existing snapshot remain separate
+          protections.
+        </p>
+        <a
+          className="rc-button rc-secondary"
+          href="/api/console/export/?format=backup" download
+        >
+          Download complete private backup →
+        </a>
+        <Form
+          label="Run and verify an encrypted backup"
+          submit={async () => {
+            await api("backup", {});
+            reload();
+          }}
+        >
+          <p>
+            Last run: {data?.backup.last?.status || "No verified run yet"} ·{" "}
+            <DateText value={data?.backup.last?.completed_at} />
+          </p>
+        </Form>
+      </section>
     </>
   );
 }

@@ -4,6 +4,12 @@ import { createHash } from "node:crypto";
 import { query, transaction } from "./db";
 import { canonicalName, publicUrl, websiteDomain } from "./model";
 import { audit } from "./repository";
+import { readWorkbook } from "./workbook";
+import {
+  workbookKind,
+  validateStructured,
+  importStructured,
+} from "./structured-import";
 type Row = Record<string, string>;
 function value(input: ExcelJS.CellValue): string {
   if (input === null || input === undefined) return "";
@@ -48,8 +54,74 @@ export async function previewImport(file: File, actor: string) {
     ])
   )[0];
   if (existing) return existing;
-  const book = new ExcelJS.Workbook();
   if (file.name.toLowerCase().endsWith(".xlsx")) {
+    const grid = await readWorkbook(data);
+    const kind = workbookKind(grid);
+    if (kind) {
+      const { firms, raw } = validateStructured(grid);
+      const matches = await query<{
+        id: string;
+        name: string;
+        name_key: string;
+        icaew_url: string;
+      }>(
+        "SELECT id,name,name_key,icaew_url FROM research_console.firms WHERE merged_into IS NULL",
+      );
+      const preview = firms.map((r) => ({
+        name: r["Firm name"],
+        matches: matches
+          .filter(
+            (f) =>
+              f.name_key === canonicalName(r["Firm name"]) ||
+              f.icaew_url ===
+                (r["ICAEW directory URL"] || r["ICAEW source URL"]),
+          )
+          .map((f) => ({ id: f.id, name: f.name })),
+      }));
+      const summary = {
+        kind,
+        candidates: firms.length,
+        evidence: raw.length,
+        sheets: Object.keys(grid),
+        preview,
+        warnings: [
+          kind === "pilot"
+            ? "Original v1.0 scores and dates will be appended unchanged. Newer research, manual decisions and existing offices are preserved."
+            : "Only missing information will be added. Existing scores, decisions and offices are retained.",
+        ],
+      };
+      return (
+        await query(
+          "INSERT INTO research_console.imports(filename,fingerprint,raw_rows,summary,actor) VALUES($1,$2,$3,$4,$5) RETURNING *",
+          [
+            file.name,
+            hash,
+            JSON.stringify({ __grid: grid }),
+            JSON.stringify(summary),
+            actor,
+          ],
+        )
+      )[0];
+    }
+    // Use the namespace-aware reader for ordinary candidate workbooks too.
+    const book = new ExcelJS.Workbook();
+    for (const [name, rows] of Object.entries(grid)) {
+      const s = book.addWorksheet(name);
+      for (const row of rows) s.addRow(row);
+    }
+    const normalised = Buffer.from(await book.xlsx.writeBuffer());
+    return previewGeneric(file.name, hash, normalised, actor);
+  }
+  return previewGeneric(file.name, hash, data, actor);
+}
+async function previewGeneric(
+  filename: string,
+  hash: string,
+  data: Buffer,
+  actor: string,
+) {
+  const book = new ExcelJS.Workbook();
+  if (filename.toLowerCase().endsWith(".xlsx")) {
     checkZip(data);
     await book.xlsx.load(
       data as unknown as Parameters<typeof book.xlsx.load>[0],
@@ -111,13 +183,13 @@ export async function previewImport(file: File, actor: string) {
     candidateSheet,
     sheets: Object.keys(sheets),
     warnings: [
-      "Imports add unreviewed candidates only. Existing records are never overwritten. All original sheets, research and score columns are retained in the import archive; reviewing and mapping pilot scores into assessments remains a separate step.",
+      "This generic format adds unreviewed candidates without overwriting existing records. All original sheets are archived. The recognised multi-sheet pilot format also imports historical assessments and evidence.",
     ],
   };
   return (
     await query(
       "INSERT INTO research_console.imports(filename,fingerprint,raw_rows,summary,actor) VALUES($1,$2,$3,$4,$5) RETURNING *",
-      [file.name, hash, JSON.stringify(sheets), JSON.stringify(summary), actor],
+      [filename, hash, JSON.stringify(sheets), JSON.stringify(summary), actor],
     )
   )[0];
 }
@@ -143,6 +215,8 @@ export async function commitImport(id: string, actor: string) {
     await c.query(
       "SELECT pg_advisory_xact_lock(hashtext('console-firm-identity'))",
     );
+    if (batch.summary.kind === "pilot" || batch.summary.kind === "directory")
+      return importStructured(c, batch, actor);
     let imported = 0,
       duplicates = 0;
     const issues: string[] = [];

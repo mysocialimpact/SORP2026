@@ -12,7 +12,8 @@ import {
   type Assessment,
 } from "./model";
 import type { PoolClient } from "pg";
-export const firmSelect = `SELECT f.*,a.id assessment_id,a.total,a.scores,a.sorp,a.gaps,a.confidence,(SELECT count(*)::int FROM research_console.offices o WHERE o.firm_id=f.id) office_count,(SELECT town FROM research_console.offices o WHERE o.firm_id=f.id LIMIT 1) location FROM research_console.firms f LEFT JOIN LATERAL (SELECT * FROM research_console.assessments WHERE firm_id=f.id ORDER BY created_at DESC,id DESC LIMIT 1) a ON true`;
+import { validateRubric } from "./rubric";
+export const firmSelect = `SELECT f.*,a.id assessment_id,a.total,a.scores,a.sorp,a.gaps,a.confidence,(SELECT count(*)::int FROM research_console.offices o WHERE o.firm_id=f.id) office_count,(SELECT town FROM research_console.offices o WHERE o.firm_id=f.id LIMIT 1) location FROM research_console.firms f LEFT JOIN LATERAL (SELECT * FROM research_console.assessments WHERE firm_id=f.id AND origin<>'Automated pilot calibration' ORDER BY created_at DESC,id DESC LIMIT 1) a ON true`;
 export async function methodology() {
   return (
     await query<Methodology>(
@@ -50,10 +51,31 @@ export async function dashboard(actor?: string) {
       ? Math.max(0, Number(counts[0].researched) - visit.researched)
       : null,
     counts: counts[0],
+    benchmark:
+      (
+        await query(
+          "SELECT * FROM research_console.benchmarks WHERE id='icaew-directory-published'",
+        )
+      )[0] ?? null,
+    reviewed: Number(
+      (
+        await query<{ count: string }>(
+          "SELECT count(*) FROM research_console.firms f WHERE merged_into IS NULL AND EXISTS(SELECT 1 FROM research_console.reviews r WHERE r.firm_id=f.id AND r.decision<>'Note')",
+        )
+      )[0].count,
+    ),
+    discovered: Number(
+      (
+        await query<{ count: string }>(
+          "SELECT count(*) FROM research_console.firms WHERE merged_into IS NULL AND credentials->>'addedOnDemand'='true'",
+        )
+      )[0].count,
+    ),
     flows,
     recent,
     baseline: baseline[0] || null,
     method,
+    backup:(await query('SELECT status,started_at,completed_at FROM research_console.backup_runs ORDER BY started_at DESC LIMIT 1'))[0]??null,
   };
 }
 export async function listFirms(params: URLSearchParams) {
@@ -139,7 +161,7 @@ export async function report(id: string) {
       [id],
     ),
     query<Assessment>(
-      "SELECT * FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC",
+      "SELECT * FROM research_console.assessments WHERE firm_id=$1 ORDER BY (origin='Automated pilot calibration'),created_at DESC,id DESC",
       [id],
     ),
     query(
@@ -228,7 +250,7 @@ export async function createFirm(
     if (candidates.length && !input.distinct) return { matches: candidates };
     const f = (
       await c.query(
-        "INSERT INTO research_console.firms(name,name_key,website,domain,icaew_url) VALUES($1,$2,$3,$4,$5) RETURNING *",
+        "INSERT INTO research_console.firms(name,name_key,website,domain,icaew_url,credentials) VALUES($1,$2,$3,$4,$5,'{\"addedOnDemand\":true}') RETURNING *",
         [name, canonicalName(name), website, domain, icaew],
       )
     ).rows[0];
@@ -361,27 +383,36 @@ export async function saveAssessment(
     );
     const ev = (
       await c.query(
-        "SELECT id,category,sorp FROM research_console.evidence WHERE firm_id=$1 AND state='Current' AND url IS NOT NULL",
+        "SELECT id,category,supported_categories,sorp FROM research_console.evidence WHERE firm_id=$1 AND state='Current' AND url IS NOT NULL",
         [id],
       )
     ).rows;
     for (const cat of categories) {
       if (
         refs[cat.id].some(
-          (ref) => !ev.some((e) => e.id === ref && e.category === cat.id),
+          (ref) =>
+            !ev.some(
+              (e) =>
+                e.id === ref &&
+                (e.category === cat.id ||
+                  e.supported_categories.includes(cat.id)),
+            ),
         )
       )
         throw new Error(
           "Use current public evidence from the same firm and category.",
         );
     }
-    if (sorp === "Specific SORP 2026" && !ev.some((e) => e.sorp === sorp))
+    if (
+      sorp === "Specific SORP 2026" &&
+      !ev.some((e) => e.sorp === sorp)
+    )
       throw new Error(
         "Add specific SORP 2026 evidence before awarding this classification.",
       );
     const prev = (
       await c.query(
-        "SELECT id,run_id FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC LIMIT 1",
+        "SELECT id,run_id FROM research_console.assessments WHERE firm_id=$1 AND origin<>'Automated pilot calibration' ORDER BY created_at DESC,id DESC LIMIT 1",
         [id],
       )
     ).rows[0];
@@ -392,7 +423,7 @@ export async function saveAssessment(
     ).rows[0];
     const run = (
       await c.query(
-        "SELECT id FROM research_console.runs WHERE firm_id=$1 AND status<>'running' ORDER BY started_at DESC LIMIT 1",
+        "SELECT id FROM research_console.runs WHERE firm_id=$1 AND status NOT IN ('running','assessing') ORDER BY started_at DESC LIMIT 1",
         [id],
       )
     ).rows[0];
@@ -472,7 +503,7 @@ export async function reviewFirm(
       );
     const a = (
       await c.query(
-        "SELECT id,run_id FROM research_console.assessments WHERE firm_id=$1 ORDER BY created_at DESC,id DESC LIMIT 1",
+        "SELECT id,run_id FROM research_console.assessments WHERE firm_id=$1 AND origin<>'Automated pilot calibration' ORDER BY created_at DESC,id DESC LIMIT 1",
         [id],
       )
     ).rows[0];
@@ -532,13 +563,17 @@ export async function reviseMethod(
     ).rows[0];
     const next = (
       await c.query(
-        "INSERT INTO research_console.methodologies(name,categories,boundaries,rules,notes) VALUES($1,$2,$3,$4,$5) RETURNING *",
+        "INSERT INTO research_console.methodologies(name,categories,boundaries,rules,notes,rubric,parent_id) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
         [
           old.name,
           JSON.stringify(old.categories),
           JSON.stringify(boundaries),
           old.rules,
           notes,
+          JSON.stringify(
+            input.rubric ? validateRubric(input.rubric) : old.rubric || [],
+          ),
+          old.id,
         ],
       )
     ).rows[0];
@@ -644,7 +679,7 @@ export async function mergeFirms(
     const to = rows.find((f) => f.id === target);
     const active = (
       await c.query(
-        "SELECT id FROM research_console.runs WHERE firm_id=ANY($1::uuid[]) AND status='running'",
+        "SELECT id FROM research_console.runs WHERE firm_id=ANY($1::uuid[]) AND status IN ('running','assessing')",
         [[source, target]],
       )
     ).rows;

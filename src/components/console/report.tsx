@@ -87,16 +87,16 @@ export function Report({ id }: { id: string }) {
   const { data, error, reload } = useData<ReportData>("firms/" + id);
   const [runUpdate, setActiveRun] = useState<Run | null>(null);
   const activeRun =
-    runUpdate || data?.runs.find((r) => r.status === "running") || null;
+    runUpdate || data?.runs.find((r) => ['running','assessing'].includes(r.status)) || null;
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
   useEffect(() => {
-    if (!activeRun || activeRun.status !== "running") return;
+    if (!activeRun || !['running','assessing'].includes(activeRun.status)) return;
     const timer = setInterval(() => {
       api<Run>("runs/" + activeRun.id)
         .then((r) => {
           setActiveRun(r);
-          if (r.status !== "running") reload();
+          if (!['running','assessing'].includes(r.status)) reload();
         })
         .catch((e) => setActionError(e.message));
     }, 2200);
@@ -107,7 +107,7 @@ export function Report({ id }: { id: string }) {
   const a = data.assessments[0];
   const m = data.methods[0];
   const level = evidenceLevel(f.total, m.boundaries);
-  const running = activeRun?.status === "running";
+  const running = Boolean(activeRun&&['running','assessing'].includes(activeRun.status));
   async function research() {
     setBusy(true);
     setActionError("");
@@ -163,7 +163,7 @@ export function Report({ id }: { id: string }) {
             <DateText value={f.research_completed_at} />
             <br />
             Confidence: {f.confidence || "Not assessed"} ·{" "}
-            {a ? "Manual assessment" : "Incomplete — no score awarded"}
+            {a ? a.origin : "Incomplete — no score awarded"}
           </p>
         </div>
         <div className="rc-overall">
@@ -183,6 +183,9 @@ export function Report({ id }: { id: string }) {
         </div>
       </section>
       <div className="rc-notice">
+        {a?.origin.startsWith("Automated") && (
+          <strong>Provisional — awaiting Marcus’s review. </strong>
+        )}
         This assessment measures publicly available evidence of
         charity-accounting experience. It is not a rating of service quality.
       </div>
@@ -205,6 +208,31 @@ export function Report({ id }: { id: string }) {
           Review & decide ↓
         </a>
         <a href="#add-evidence">Add evidence →</a>
+        <button
+          className="rc-text-button"
+          disabled={running || busy}
+          onClick={async () => {
+            setBusy(true);
+            setActionError("");
+            try {
+              const result = await api<{ total: number | null }>(
+                "firms/" + id + "/auto-score",
+                {},
+              );
+              if (result.total === null)
+                setActionError(
+                  "More source coverage is needed before scoring. Run website research or add further evidence.",
+                );
+              reload();
+            } catch (e) {
+              setActionError((e as Error).message);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          Apply provisional scoring →
+        </button>
         {!f.website && (
           <small>Confirm the official website below to enable research.</small>
         )}
@@ -246,7 +274,12 @@ export function Report({ id }: { id: string }) {
         </div>
         <div className="rc-category-list">
           {categories.map((c, i) => {
-            const supporting = data.evidence.filter((e) => e.category === c.id);
+            const supporting = data.evidence.filter(
+              (e) =>
+                e.category === c.id ||
+                e.supported_categories?.includes(c.id) ||
+                a?.evidence_ids[c.id]?.includes(e.id),
+            );
             const score = a?.scores[c.id];
             return (
               <details className="rc-category" key={c.id}>
@@ -281,10 +314,25 @@ export function Report({ id }: { id: string }) {
                     <strong>Standard:</strong> {c.description}
                   </p>
                   <p>
-                    Confidence: {a?.confidence || "Not assessed"}. Detailed
-                    point thresholds remain unresolved; manual awards are
-                    explicitly reviewer judgements.
+                    Confidence: {a?.confidence || "Not assessed"}. Automated
+                    awards are provisional; historical and manual assessments
+                    retain their original reasoning.
                   </p>
+                  {a?.awards
+                    ?.filter((w) => w.category === c.id)
+                    .map((w) => (
+                      <div className="rc-panel" key={w.criterion_id}>
+                        <strong>
+                          {w.criterion_id} · +{w.points} points
+                        </strong>
+                        <p>{w.justification}</p>
+                        <p>{w.quote}</p>
+                        <Source url={w.source_url} />
+                        <p className="rc-muted">
+                          {w.confidence} · {w.origin}
+                        </p>
+                      </div>
+                    ))}
                   {a && (
                     <p>
                       Evidence cited for this award:{" "}
@@ -971,7 +1019,11 @@ function AssessmentForm({
           <span>Supporting public sources</span>
           {evidence
             .filter(
-              (e) => e.category === c.id && e.url && e.state === "Current",
+              (e) =>
+                (e.category === c.id ||
+                  e.supported_categories?.includes(c.id)) &&
+                e.url &&
+                e.state === "Current",
             )
             .map((e) => (
               <label className="rc-checkbox" key={e.id}>
