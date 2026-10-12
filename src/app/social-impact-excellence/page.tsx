@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
+import { ProductAdviserNote } from "@/components/product-adviser-note";
 import { pillars, site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -14,10 +15,11 @@ export default function ExcellencePage() {
   return <main id="main" className="gateway product-page product-excellence">
     <section className="product-hero gateway-width">
       <div className="product-hero-copy">
-        <p className="gateway-kicker">04 · A practical management discipline</p>
-        <h1>Make impact part of <em>how your charity works.</em></h1>
-        <p className="product-lead">Assess where you are. Understand what needs attention. Build a stronger, more systematic approach to impact.</p>
-        <Link className="gateway-action" href="/social-impact-excellence/assessment/">Start the 10–15 minute assessment <Arrow /></Link>
+        <p className="gateway-kicker">04 · My Social Impact’s flagship approach</p>
+        <h1>Make social impact part of <em>how your charity is run.</em></h1>
+        <p className="product-lead">Embed impact as a management discipline across your organisation—not merely something measured when an annual report is due.</p>
+        <Link className="gateway-action" href="/social-impact-excellence/assessment/">Explore Social Impact Excellence <Arrow /></Link>
+        <p className="product-hero-note">Start with the established five-pillar Social Impact Maturity Assessment.</p>
       </div>
       <div className="product-brand-panel is-excellence"><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority /></div>
     </section>
@@ -35,6 +37,7 @@ export default function ExcellencePage() {
       <div><p className="gateway-kicker">One platform account</p><h2>Start here.<br/>Continue the full journey.</h2></div>
       <div><p>Your SORP2026 account saves the maturity assessment, Purpose diagnostic and supporting evidence independently from your readiness review. The original Social Impact Excellence platform remains unchanged.</p><Link href="/social-impact-excellence/assessment/">Start or continue the assessment <Arrow /></Link><Link href="/social-impact-excellence/journey/">Open your Excellence journey <Arrow /></Link><a href={site.platform!}>Visit the original platform <Arrow diagonal /></a></div>
     </section>
+    <ProductAdviserNote title="Help clients move from reporting to better management.">Use the five pillars to support charity clients beyond accounts preparation—into stronger purpose, leadership, evidence, delivery and communication. The approach complements existing professional relationships.</ProductAdviserNote>
     <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/purpose-works/">Purpose Works <Arrow /></Link></nav>
   </main>;
 }

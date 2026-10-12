@@ -132,7 +132,7 @@ export function PlatformDashboard() {
   const reportPercent = reportReviewPercentage(latestReportReview);
   const productProgress: ProductProgress[] = [
     { number: "01", name: "Are You SORP Ready?", status: readinessComplete ? "Complete" : readinessStarted ? "In progress" : "Not started", percentage: readinessPercent },
-    { number: "02", name: "Ask SORP", status: "Coming soon", percentage: 0, unavailable: true },
+    { number: "02", name: "Ask SORP", status: "Live beta · separate service", percentage: 0, unavailable: true },
     { number: "03", name: "Charity Impact Reports", status: reportPercent === 100 ? "Complete" : reportPercent > 0 ? "In progress" : "Not started", percentage: reportPercent },
     { number: "04", name: "Social Impact Excellence", status: excellencePercent === 100 ? "Complete" : excellencePercent > 0 ? "In progress" : "Not started", percentage: excellencePercent },
     { number: "05", name: "Purpose Works", status: "Not started", percentage: 0 },
@@ -153,7 +153,7 @@ export function PlatformDashboard() {
           {progress.candidate?.name && <p className="dashboard-context">{progress.candidate.name}</p>}
           <Link href={readinessHref}>{readinessLabel} <Arrow /></Link>
         </article>
-        <article className="dashboard-card is-ask"><div className="dashboard-card-top"><span>02</span><b>Coming soon</b></div><h2>Ask SORP.</h2><p>Whole-SORP guidance is in development. No inactive chatbot, no fictional history.</p><Link href="/ask-sorp/">See what’s coming <Arrow /></Link></article>
+        <article className="dashboard-card is-ask"><div className="dashboard-card-top"><span>02 · Live beta</span><b>Available now</b></div><h2>Ask SORP.</h2><p>Ask evidence-led questions across the whole SORP. The live beta currently keeps its conversation access separate, so no fictional history is shown here.</p><Link href="/ask-sorp/">Open Ask SORP <Arrow /></Link></article>
       </div>
     </section>
     <section className="dashboard-product-group dashboard-product-group--impact" aria-labelledby="dashboard-impact-title">

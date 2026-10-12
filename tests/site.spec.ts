@@ -19,7 +19,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     );
   }
   const sorpSection = page.locator("section.gateway-sorp-section");
-  await expect(sorpSection.getByText("Coming soon", { exact: true })).toBeVisible();
+  await expect(sorpSection.getByText("Live beta · Available now", { exact: true })).toHaveCount(2);
   await expect(
     sorpSection.getByRole("heading", { name: "Start here. Get SORP ready." }),
   ).toBeVisible();
@@ -136,7 +136,7 @@ test("the digital filing folder keeps all six products in one accessible sequenc
     await expect(page.locator(".gateway-header .gateway-account-control")).toHaveCount(1);
     await expect(folder.getByRole("link").allTextContents()).resolves.toEqual(
       products.map(([productName], index) =>
-        `${index === 0 ? "Index" : String(index).padStart(2, "0")}${productName}${productName === name ? "Current section" : index === 0 ? "Platform index" : index === 1 ? "Live beta" : index === 2 ? "Coming soon" : index === 3 || index === 4 ? "Available" : "Explore"}`,
+        `${index === 0 ? "Index" : String(index).padStart(2, "0")}${productName}${productName === name ? "Current section" : index === 0 ? "Platform index" : index === 1 || index === 2 ? "Live beta" : index === 3 || index === 4 ? "Available" : "Explore"}`,
       ),
     );
     await expect(folder.getByRole("link", { name: new RegExp(name) })).toHaveAttribute(
@@ -188,8 +188,8 @@ test("the compact header uses the folder as primary navigation", async ({ page }
   const header = page.getByRole("banner");
   await expect(header.getByRole("link", { name: /SORP 2026 home/ })).toContainText("Reporting for greater impact.");
   await expect(header.getByRole("link", { name: /SORP 2026 home/ })).toHaveAttribute("href", "/");
-  await expect(header.getByRole("navigation")).toHaveCount(0);
-  await expect(header.getByRole("link", { name: /Log in|My Dashboard|Account/ })).toHaveCount(1);
+  await expect(header.getByRole("navigation", { name: "Find professional support" })).toHaveCount(1);
+  await expect(header.locator(".gateway-account-control")).toHaveCount(1);
 });
 test("preview stays out of search engines and unknown routes return 404", async ({
   request,

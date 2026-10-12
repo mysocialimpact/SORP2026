@@ -2,10 +2,10 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 const productPages = [
-  ["/my-impact-director/", "Imagine having your own Impact Director."],
-  ["/social-impact-excellence/", "Make impact part of how your charity works."],
-  ["/charity-impact-reports/", "Improve your charity’s impact report."],
-  ["/purpose-works/", "Purpose isn’t what you say.It’s what you make happen."],
+  ["/my-impact-director/", "Your charity’s Impact Director. Without the full-time salary."],
+  ["/social-impact-excellence/", "Make social impact part of how your charity is run."],
+  ["/charity-impact-reports/", "Is your impact report telling the whole story?"],
+  ["/purpose-works/", "Creative campaigns that make a difference."],
 ] as const;
 
 test("all six products have distinct working destinations", async ({ page }) => {
@@ -59,7 +59,7 @@ test("dashboard shows genuine readiness and native Social Impact Excellence stat
   const readinessProgress = progressOverview.getByRole("progressbar", { name: "Are You SORP Ready?: In progress" });
   await expect(readinessProgress).toHaveAttribute("aria-valuenow", "63");
   await expect(readinessProgress.locator("xpath=..")).toContainText("In progress63%");
-  await expect(progressOverview.locator("li").filter({ hasText: "Coming soon" })).toHaveCount(1);
+  await expect(progressOverview.locator("li").filter({ hasText: "Live beta · separate service" })).toHaveCount(1);
   await expect(progressOverview.locator("li").filter({ hasText: "Not started" })).toHaveCount(4);
   await expect(page.getByRole("heading", { name: "Your SORP tools." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Strengthen your impact." })).toBeVisible();

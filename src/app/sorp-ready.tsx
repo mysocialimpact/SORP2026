@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SorpFilm from "./sorp-film/sorp-film";
 import { sorpSource } from "./sorp-methodology-v1";
+import { ProductAdviserNote } from "@/components/product-adviser-note";
 
 const conversationUrl = "/are-you-sorp-ready/review/?entry=intro";
 
@@ -14,8 +15,8 @@ export function SorpReadyPage() {
     <main id="main" className="sr-story">
       <header className="sr-hero" id="top">
         <div><p className="sr-eyebrow">Impact &amp; Sustainability Reporting Readiness for SORP 2026</p>
-          <h1>Are you <em>SORP ready?</em></h1>
-          <p>SORP is the requirement. <strong>Better impact is the opportunity.</strong></p>
+          <h1>How ready is your charity for <em>SORP 2026?</em></h1>
+          <p>A free review of your impact and sustainability reporting readiness—highlighting strengths, gaps and practical next steps.</p>
         </div>
         <StartReview />
       </header>
@@ -80,6 +81,7 @@ export function SorpReadyPage() {
           <h3>Does a strong result certify compliance or impact?</h3><p>No. It describes the reporting evidence and your current readiness within this review’s scope. It is neither full SORP certification nor independent verification of your impact.</p>
         </div></details>
       </section>
+      <ProductAdviserNote title="Review readiness together.">Accountants and advisers can use the tool with charity clients to explore impact and sustainability reporting readiness. It is not a complete financial accounting compliance assessment and does not replace professional judgement.</ProductAdviserNote>
       <section className="sr-final"><div><p className="sr-eyebrow">YOUR NEXT STEP</p><h2>Find your charity.<br /><em>Know what to do next.</em></h2><p>No card. No surprise paywall. No obligation.</p></div><StartReview /></section>
     </main>
   </>;

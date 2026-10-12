@@ -31,7 +31,7 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/are-you-sorp-ready/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("SORP ready?");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("How ready is your charity for SORP 2026?");
   const deck = page.locator(".sorp-film");
   await expect(deck).toHaveAttribute("data-ready", "true");
   await expect(deck.locator(".sf-chapters button")).toHaveCount(9);

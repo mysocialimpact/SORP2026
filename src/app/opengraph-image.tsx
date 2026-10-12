@@ -49,7 +49,7 @@ export default function SocialImage() {
               padding: "20px 25px",
             }}
           >
-            Ask SORP · Coming soon
+            Ask SORP · Live beta
           </div>
         </div>
         <div style={{ display: "flex", marginTop: 35, fontSize: 21 }}>
