@@ -53,7 +53,7 @@ type Dashboard = {
   } | null;
   reviewed: number;
   discovered: number;
-  backup:{status:string;started_at:string;completed_at:string|null}|null;
+  backup:{status:string;started_at:string;completed_at:string|null;needs_attention:boolean}|null;
 };
 export function ConsoleApp() {
   const path = usePathname();
@@ -192,7 +192,7 @@ function Mission() {
         ) : (
           <>
             <div className="rc-mission-grid">
-              {data.backup&&(data.backup.status==='failed'||Date.now()-new Date(data.backup.completed_at||data.backup.started_at).getTime()>36*3600000)&&<div className="rc-notice" role="alert">Your latest backup needs attention. <Link href="/console/status/">Inspect recovery status and retry →</Link></div>}
+              {data.backup?.needs_attention&&<div className="rc-notice" role="alert">Your latest backup needs attention. <Link href="/console/status/">Inspect recovery status and retry →</Link></div>}
               <div className="rc-population">
                 <Badge>THE STARTING POPULATION</Badge>
                 <h3>The published ICAEW benchmark</h3>
