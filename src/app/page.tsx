@@ -20,18 +20,18 @@ export default function Home() {
       <div className="gateway-width">
         <section className="gateway-opening" aria-labelledby="gateway-title">
           <div className="gateway-intro">
-            <p className="gateway-kicker">A new chapter in charity reporting</p>
+            <p className="gateway-kicker">SORP 2026 · A new chapter in charity reporting</p>
             <h1 id="gateway-title">
-              SORP 2026.
-              <br />
-              <span>Made simpler.</span>
+              <span className="gateway-hero-context">SORP is the requirement.</span>
+              <span className="gateway-hero-opportunity">Better impact is the opportunity.</span>
             </h1>
           </div>
           <div className="gateway-intro-aside">
             <span className="gateway-enterprise-label">A social enterprise initiative</span>
             <p>
-              Practical tools for charities, accountants and advisers navigating
-              reporting requirements and creating greater impact.
+              Practical tools for charities, accountants and advisers—helping
+              you meet the new reporting requirements and use them as a
+              springboard for greater impact.
             </p>
             <MsiBrand attribution="Developed by" />
             <p className="gateway-enterprise-note">

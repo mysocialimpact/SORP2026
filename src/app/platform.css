@@ -129,8 +129,10 @@
 .product-folder[data-active-product="/"] { --folder-paper: #cfddcf; }
 .product-folder[data-active-product="/"] .product-folder-sheet-edge {
   background: var(--folder-paper);
+  border-top: 0;
   box-shadow: none;
 }
+.product-folder[data-active-product="/"] { box-shadow: none; }
 .product-folder[data-active-product="/"] .product-folder-tab.is-home {
   background: linear-gradient(165deg, #ffffff20, transparent 38%), var(--tab-colour);
 }
