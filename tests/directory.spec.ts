@@ -31,7 +31,7 @@ test("all original firms, evidence and postcode coordinates are preserved", () =
 });
 
 test("distance sorting, evidence filters and map bounds are truthful", () => {
-  expect(selectFirms(firms, baseFilters)[0].firm.slug).toBe("burton-sweet");
+  expect(selectFirms(firms, baseFilters).map(r => r.firm.name)).toEqual(firms.map(f => f.name).sort((a,b) => a.localeCompare(b)));
   const origin = {lat:55.9533,lng:-3.1883};
   const nearest = selectFirms(firms, {...baseFilters, origin});
   expect(nearest[0].firm.slug).not.toBe("burton-sweet");
@@ -61,7 +61,7 @@ test("postcode handler validates, forwards and handles provider failures", async
 test("directory shows ten, loads more, filters, and preserves three-firm shortlist", async ({page}) => {
   await page.goto(path);
   await expect(page.locator('.directory-result')).toHaveCount(10);
-  await expect(page.locator('.directory-result').first()).toContainText('Burton Sweet');
+  await expect(page.locator('.directory-result').first()).toContainText(selectFirms(firms,baseFilters)[0].firm.name);
   await page.getByRole('button',{name:/Show 10 more/}).click();
   await expect(page.locator('.directory-result')).toHaveCount(20);
   for(let i=0;i<4;i++) await page.locator('.directory-result').nth(i).getByRole('button',{name:/^Save .* shortlist$/}).click();
@@ -74,9 +74,9 @@ test("directory shows ten, loads more, filters, and preserves three-firm shortli
   await expect(page.locator('dialog')).not.toBeVisible();
   await page.reload();
   await expect(page.getByRole('button',{name:/Shortlist & compare/})).toContainText('3/3');
-  await page.getByLabel('Or search by name or town').fill('Burton Sweet');
+  await page.getByLabel('Find a charity accountant',{exact:true}).fill('Burton Sweet');
   await expect(page.locator('.directory-result')).toHaveCount(1);
-  await page.getByLabel('Or search by name or town').fill('zz-no-such-firm');
+  await page.getByLabel('Find a charity accountant',{exact:true}).fill('zz-no-such-firm');
   await expect(page.getByRole('heading',{name:'A little further afield?'})).toBeVisible();
   await page.getByRole('button',{name:'Reset to nationwide'}).click();
   await page.locator('.directory-filters summary').click();
@@ -92,6 +92,7 @@ test("real map pins, selection, map-area search and mobile toggle work", async (
   expect(await page.locator('.directory-map-panel').getByText('The map couldn’t load.').count()).toBe(0);
   // Select from list, then ensure the corresponding real Leaflet marker becomes selected.
   if(info.project.name==='mobile') await page.getByRole('button',{name:'List',exact:true}).click();
+  await page.getByLabel('Find a charity accountant',{exact:true}).fill('Burton Sweet');
   await page.locator('.directory-firm-focus').first().click();
   await expect(page.locator('.directory-map-preview')).toContainText('Burton Sweet');
   await expect(page.locator('.directory-pin.is-selected')).toBeVisible();
@@ -112,8 +113,8 @@ for(const fixture of [
 ]) test(`postcode UI orders results for ${fixture.area} (fixture response)`,async({page})=>{
   await page.route('**/api/directory/postcode/**',r=>r.fulfill({json:fixture}));
   await page.goto(path);
-  await page.getByLabel('Find specialists near you').fill(fixture.postcode);
-  await page.getByRole('button',{name:'Find nearby →'}).click();
+  await page.getByLabel('Find a charity accountant',{exact:true}).fill(fixture.postcode);
+  await page.getByRole('button',{name:'Search ↗',exact:true}).click();
   await expect(page.locator('.directory-results-toolbar')).toContainText(`nearest to ${fixture.postcode}`);
   await expect(page.locator('.directory-result').first()).toHaveAttribute('id',`firm-${selectFirms(firms,{...baseFilters,origin:fixture})[0].firm.slug}`);
   await expect(page.locator('.directory-result').first()).toContainText('miles');
@@ -121,12 +122,12 @@ for(const fixture of [
 
 test("postcode errors and reset do not hide the directory", async ({page})=>{
   await page.goto(path);
-  await page.getByLabel('Find specialists near you').fill('invalid');
-  await page.getByRole('button',{name:'Find nearby →'}).click();
-  await expect(page.locator('#directory-postcode-error')).toContainText('full UK postcode');
+  await page.getByLabel('Find a charity accountant',{exact:true}).fill('no-matching-place');
+  await page.getByRole('button',{name:'Search ↗',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'A little further afield?'})).toBeVisible();
   await page.route('**/api/directory/postcode/**',r=>r.fulfill({status:503,json:{error:'Postcode search is temporarily unavailable.'}}));
-  await page.getByLabel('Find specialists near you').fill('BS1 4DJ');
-  await page.getByRole('button',{name:'Find nearby →'}).click();
+  await page.getByLabel('Find a charity accountant',{exact:true}).fill('BS1 4DJ');
+  await page.getByRole('button',{name:'Search ↗',exact:true}).click();
   await expect(page.locator('#directory-postcode-error')).toContainText('temporarily unavailable');
   await expect(page.locator('.directory-result')).toHaveCount(10);
   await page.getByRole('button',{name:'Reset to nationwide'}).click();
@@ -168,4 +169,17 @@ test("directory and showcase have no serious accessibility violations", async({p
     const result=await new AxeBuilder({page}).include('main').analyze();
     expect(result.violations.filter(v=>['serious','critical'].includes(v.impact||''))).toEqual([]);
   }
+});
+
+test("redesign retains a visible real map, all five spotlights and one search", async ({page}) => {
+  await page.goto(path);
+  await expect(page.locator('.directory-map-canvas')).toBeVisible();
+  await expect(page.locator('.leaflet-control-zoom-in')).toBeVisible();
+  await expect(page.locator('.adviser-feature')).toHaveCount(5);
+  await expect(page.locator('main input[type=search]')).toHaveCount(1);
+  for (const name of ['Burton Sweet','ECOVIS Wingrave Yeats','Moore Kingston Smith','Forvis Mazars','Lanham & Francis']) {
+    await expect(page.locator('.adviser-spotlight').getByRole('heading',{name,exact:true})).toBeVisible();
+  }
+  await expect(page.getByRole('link',{name:'Make room for your firm ↗'})).toHaveAttribute('href','/accountants-advisers/partners/');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
