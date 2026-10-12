@@ -16,6 +16,13 @@ function safeReturn(value: string | null) {
   return value?.startsWith("/") && !value.startsWith("//") ? value : "/dashboard/";
 }
 
+function signedInDestination(destination: string) {
+  if (!destination.startsWith("/dashboard")) return destination;
+  const url = new URL(destination, "https://sorp2026.org");
+  url.searchParams.set("signed-in", "1");
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 export function AccountPortal() {
   const params = useSearchParams();
   const router = useRouter();
@@ -61,7 +68,7 @@ export function AccountPortal() {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "We could not complete that request. Please try again.");
-      router.replace(destination);
+      router.replace(signedInDestination(destination));
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "We could not complete that request. Please try again.");
