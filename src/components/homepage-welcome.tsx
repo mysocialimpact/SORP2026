@@ -70,6 +70,8 @@ export function HomepageAudience() {
 export function HomepageHello() {
   const [email, setEmail] = useState("");
   const [recognised, setRecognised] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [feedback, setFeedback] = useState("");
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
@@ -84,6 +86,46 @@ export function HomepageHello() {
     return () => controller.abort();
   }, []);
 
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (status === "sending" || status === "sent") return;
+    setStatus("sending");
+    setFeedback("");
+    const form = new FormData(event.currentTarget);
+    let audience: Audience | null = null;
+    try { audience = readAudience(); } catch { /* Audience remains optional. */ }
+    let submissionId = "";
+    try {
+      submissionId = sessionStorage.getItem("sorp2026.hello-submission") || crypto.randomUUID();
+      sessionStorage.setItem("sorp2026.hello-submission", submissionId);
+    } catch { submissionId = crypto.randomUUID(); }
+    try {
+      const response = await fetch("/api/hello", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          email,
+          message: String(form.get("message") || ""),
+          audience,
+          newsletter: form.get("newsletter") === "on",
+          website: String(form.get("website") || ""),
+          submissionId,
+        }),
+      });
+      const result = await response.json() as { accepted?: boolean; emailSent?: boolean; queued?: boolean; logged?: boolean; error?: string };
+      if (!response.ok || !result.accepted) throw new Error(result.error || "Your message was not accepted.");
+      setStatus("sent");
+      setFeedback(result.emailSent
+        ? "Thank you — your hello has been emailed to My Social Impact."
+        : result.queued
+          ? "Thank you — your hello is saved and queued for delivery to My Social Impact."
+          : "Thank you — your hello has been securely logged for My Social Impact.");
+    } catch (cause) {
+      setStatus("error");
+      setFeedback(cause instanceof Error ? cause.message : "We could not send your message. Please try again.");
+    }
+  }
+
   return (
     <section className="homepage-hello" id="say-hello" aria-labelledby="hello-title">
       <div className="gateway-width homepage-hello-layout">
@@ -93,23 +135,21 @@ export function HomepageHello() {
           <p>We’d love to know who’s visiting. Whether you have a question, an idea, some feedback or simply want to introduce yourself, we’d love to hear from you.</p>
           <p className="homepage-hello-signature">Marcus &amp; Chris<span>My Social Impact</span></p>
         </div>
-        <form className="homepage-hello-form" aria-describedby="hello-availability" onSubmit={event => event.preventDefault()}>
-          <p className="homepage-hello-availability" id="hello-availability">
-            <strong>A first look — sending isn’t connected yet.</strong>
-            This form won’t send or save your details. In the meantime, <a href="mailto:marcus@mysocialimpact.org">email Marcus directly <span aria-hidden="true">↗</span></a>.
-          </p>
+        <form className="homepage-hello-form" onSubmit={submit}>
           {recognised && <p className="homepage-hello-account">We’ve filled in the email from your existing account.</p>}
           <label htmlFor="hello-email">Email address <span>Required</span></label>
           <input id="hello-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} />
           <label htmlFor="hello-message">Anything you’d like to share? <span>Optional</span></label>
           <textarea id="hello-message" name="message" rows={3} maxLength={3000} placeholder="A question, an idea, some feedback — or just hello!" />
+          <label className="homepage-hello-honeypot" htmlFor="hello-website" aria-hidden="true">Website<input id="hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
           <label className="homepage-hello-consent" htmlFor="hello-newsletter">
             <input id="hello-newsletter" type="checkbox" name="newsletter" />
             <span>I’d also like occasional updates about SORP 2026 and our free tools.</span>
           </label>
           <p className="homepage-hello-privacy">Saying hello doesn’t create an account or sign you up for updates. <Link href="/privacy/">Privacy notice</Link>.</p>
-          <button className="gateway-action" type="submit" disabled aria-describedby="hello-availability">Say hello <Arrow /></button>
-          <p className="homepage-hello-small">Preview only. Nothing entered here is submitted.</p>
+          <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Hello sent ✓" : "Say hello"} <Arrow /></button>
+          {feedback && <p className={`homepage-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
+          {status === "error" && <p className="homepage-hello-small">You can also <a href="mailto:marcus@mysocialimpact.org">email Marcus directly</a>.</p>}
         </form>
       </div>
     </section>

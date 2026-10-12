@@ -38,10 +38,13 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
   expect(surfaces.sequence).toEqual([...surfaces.sequence].sort((a, b) => a - b));
 });
 
-test("contact preview recognises accounts but never claims to send or enrol", async ({ page }) => {
+test("contact form recognises accounts and confirms only an accepted server response", async ({ page }) => {
   await page.route("**/api/readiness-account/", route => route.fulfill({ json: { signedIn: true, account: { email: "preview@example.org" } } }));
-  const writes: string[] = [];
-  page.on("request", request => { if (request.method() === "POST") writes.push(request.url()); });
+  const writes: Record<string, unknown>[] = [];
+  await page.route("**/api/hello", async route => {
+    writes.push(route.request().postDataJSON());
+    await route.fulfill({ json: { accepted: true, emailSent: true } });
+  });
   await page.goto("/");
   const form = page.locator(".homepage-hello-form");
   await expect(form.getByLabel("Email address")).toHaveValue("preview@example.org");
@@ -51,8 +54,8 @@ test("contact preview recognises accounts but never claims to send or enrol", as
   await expect(consent).not.toBeChecked();
   await consent.check();
   await expect(consent).toBeChecked();
-  await expect(form.getByRole("button", { name: "Say hello" })).toBeDisabled();
-  await expect(form).toContainText("This form won’t send or save your details.");
-  await expect(form.getByRole("link", { name: /email Marcus directly/ })).toHaveAttribute("href", "mailto:marcus@mysocialimpact.org");
-  expect(writes).toEqual([]);
+  await form.getByRole("button", { name: "Say hello" }).click();
+  await expect(form).toContainText("has been emailed to My Social Impact");
+  expect(writes).toHaveLength(1);
+  expect(writes[0]).toMatchObject({ email: "preview@example.org", newsletter: true });
 });

@@ -51,6 +51,9 @@
 .homepage-hello-privacy, .homepage-hello-small, .homepage-hello-account { font-size: 12px; color: #625f65; }
 .homepage-hello-form .gateway-action { justify-self: start; margin-top: 10px; border: 0; font: inherit; }
 .homepage-hello-form .gateway-action:disabled { background: #dedbd3; color: #5c5953; cursor: not-allowed; }
+.homepage-hello-honeypot { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.homepage-hello-feedback { margin-top: 8px; padding: 13px 15px; border-left: 3px solid #355747; background: #e3e9de; font-size: 14px; }
+.homepage-hello-feedback.is-error { border-color: #a93616; background: #fff0eb; color: #76260f; }
 @media (max-width: 900px) {
   .homepage-hello-layout { gap: 40px; }
 }
