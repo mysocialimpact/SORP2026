@@ -93,13 +93,13 @@ export function ConsoleApp() {
           </Link>
         ))}
         <Link className="rc-nav-end" href="/console/import/">
-          Import data <span>↗</span>
+          Import data <span>→</span>
         </Link>
       </nav>
       <main id="main" className="rc-main">
         {logoutError && <p role="alert">{logoutError}</p>}
         {view === "firm" ? (
-          <Report id={path.split("/").filter(Boolean)[2]} />
+          <Report key={path} id={path.split("/").filter(Boolean)[2]} />
         ) : view === "firms" || view === "queue" ? (
           <Database queue={view === "queue"} />
         ) : view === "methodology" ? (
@@ -118,8 +118,8 @@ export function ConsoleApp() {
         <span>
           One growing body of evidence. <em>For a greater impact.</em>
         </span>
-        <Link href="/console/status/">What’s working? ↗</Link>
-        <Link href="/">Visit the public website ↗</Link>
+        <Link href="/console/status/">What’s working? →</Link>
+        <Link href="/">Visit the public website →</Link>
       </footer>
     </>
   );
@@ -155,7 +155,7 @@ function Mission() {
           <div />
           <span>
             Every firm.
-            <br />A little clearer.<i>↗</i>
+            <br />A little clearer.<i>→</i>
           </span>
           <b>✦</b>
         </div>
@@ -167,7 +167,7 @@ function Mission() {
             <p className="rc-eyebrow">THE BIG PICTURE</p>
             <h2>Our journey through UK accountancy.</h2>
           </div>
-          <Link href="/console/methodology/">Evidence first. Always. ↗</Link>
+          <Link href="/console/methodology/">Evidence first. Always. →</Link>
         </div>
         {error ? (
           <State error={error} />
@@ -211,7 +211,7 @@ function Mission() {
                       established.
                     </p>
                     <Link href="/console/methodology/#baseline">
-                      Why this number matters ↗
+                      Why this number matters →
                     </Link>
                   </>
                 )}
@@ -383,7 +383,7 @@ function Mission() {
           ].map(([href, title, sub, n]) => (
             <Link key={n} href={"/console/" + href} className="rc-action-card">
               <span>
-                {n} <i>↗</i>
+                {n} <i>→</i>
               </span>
               <h3>{title}</h3>
               <p>{sub}</p>
@@ -397,7 +397,7 @@ function Mission() {
             <p className="rc-eyebrow">THE LATEST CHAPTER</p>
             <h2>Recently researched.</h2>
           </div>
-          <Link href="/console/firms/">Explore all firms ↗</Link>
+          <Link href="/console/firms/">Explore all firms →</Link>
         </div>
         {data?.recent.length ? (
           <FirmTable firms={data.recent} boundaries={data.method.boundaries} />
@@ -410,7 +410,7 @@ function Mission() {
               <br />
               Every completed report adds to the bigger picture.
             </p>
-            <a href="#check">Check an accountant ↗</a>
+            <a href="#check">Check an accountant →</a>
           </div>
         )}
       </section>
@@ -443,7 +443,7 @@ function CheckAccountant() {
   return (
     <section className="rc-check" id="check">
       <div className="rc-check-label">
-        <span>↗</span>
+        <span>→</span>
         <div>
           <h2>Who shall we discover next?</h2>
           <p>
@@ -471,7 +471,7 @@ function CheckAccountant() {
       </form>
       <div className="rc-check-foot">
         <span>Real sources. Open questions. Your judgement.</span>
-        <Link href="/console/firms/">Find an existing report ↗</Link>
+        <Link href="/console/firms/">Find an existing report →</Link>
       </div>
       {error && <p role="alert">{error}</p>}
       {matches && (
@@ -486,7 +486,7 @@ function CheckAccountant() {
               <strong>{f.name}</strong>
               <span>{f.website || "Website unknown"}</span>
               <Link href={"/console/firm/" + f.id + "/"}>
-                View existing research / refresh ↗
+                View existing research / refresh →
               </Link>
             </div>
           ))}
@@ -512,7 +512,7 @@ function CheckAccountant() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Find the official website ↗
+            Find the official website →
           </a>
           <Form
             label="Save firm and open research"
@@ -888,7 +888,7 @@ function MethodologyPage() {
         </p>
         <Source
           url="https://find.icaew.com/"
-          label="Open the ICAEW directory ↗"
+          label="Open the ICAEW directory →"
         />
       </section>
       <section className="rc-panel rc-section">
@@ -908,16 +908,15 @@ function MethodologyPage() {
   );
 }
 function ImportPage() {
-  const { data, reload } =
-    useData<
-      {
-        id: string;
-        filename: string;
-        status: string;
-        summary: Record<string, unknown>;
-        created_at: string;
-      }[]
-    >("imports");
+  const { data, reload } = useData<
+    {
+      id: string;
+      filename: string;
+      status: string;
+      summary: Record<string, unknown>;
+      created_at: string;
+    }[]
+  >("imports");
   const [preview, setPreview] = useState<{
     id: string;
     filename: string;
@@ -976,13 +975,13 @@ function ImportPage() {
           </p>
           <div className="rc-export-links">
             <a download href="/api/console/export/?format=xlsx">
-              Export research workbook ↗
+              Export research workbook →
             </a>
             <a download href="/api/console/export/?format=csv">
-              Export firms as CSV ↗
+              Export firms as CSV →
             </a>
             <a download href="/api/console/export/?format=xlsx&approved=true">
-              Export approved firms & evidence ↗
+              Export approved firms & evidence →
             </a>
           </div>
         </section>

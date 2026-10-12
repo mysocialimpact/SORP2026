@@ -31,6 +31,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
 export function useData<T>(path: string) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState("");
+  const [loadedPath, setLoadedPath] = useState("");
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let active = true;
@@ -38,18 +39,26 @@ export function useData<T>(path: string) {
       .then((value) => {
         if (active) {
           setData(value);
+          setLoadedPath(path);
           setError("");
         }
       })
       .catch((e) => {
-        if (active) setError(e.message);
+        if (active) {
+          setLoadedPath(path);
+          setError(e.message);
+        }
       });
     return () => {
       active = false;
     };
   }, [path, revision]);
   const reload = useCallback(() => setRevision((n) => n + 1), []);
-  return { data, error, reload };
+  return {
+    data: loadedPath === path ? data : null,
+    error: loadedPath === path ? error : "",
+    reload,
+  };
 }
 export function State({ error }: { error?: string }) {
   return (
@@ -114,7 +123,7 @@ export function Form({
       )}
       <button className="rc-button" disabled={busy}>
         {busy ? "Saving…" : label}
-        <span>↗</span>
+        <span>→</span>
       </button>
     </form>
   );
@@ -125,7 +134,7 @@ export function Badge({ children }: { children: ReactNode }) {
 }
 export function Source({
   url,
-  label = "Open original source ↗",
+  label = "Open original source →",
 }: {
   url: string | null | undefined;
   label?: string;
@@ -225,13 +234,13 @@ export function FirmTable({
                   href={"/console/firm/" + f.id + "/"}
                 >
                   {f.name}
-                  <span>↗</span>
+                  <span>→</span>
                 </Link>
                 <small>
                   {f.location || "Location unverified"}
                   {f.office_count > 1 ? ` · ${f.office_count} offices` : ""}
                 </small>
-                <Source url={f.website} label="Website ↗" />
+                <Source url={f.website} label="Website →" />
               </td>
               <td>
                 <Score firm={f} boundaries={boundaries} />

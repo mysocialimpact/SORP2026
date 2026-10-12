@@ -113,6 +113,8 @@ async function handle(
       if (run.created) after(() => runResearch(run.id));
       return json(run, 202);
     }
+    if (resource === "firms" && (action === "people" || action === "offices"))
+      return json(await repository.saveDetail(id, action, body, actor));
     if (resource === "firms" && action === "evidence")
       return json(await repository.saveEvidence(id, body, actor));
     if (resource === "firms" && action === "assessment")

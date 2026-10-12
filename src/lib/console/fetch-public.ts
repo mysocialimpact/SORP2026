@@ -44,7 +44,10 @@ export async function fetchPublic(
           Accept: "text/html,text/plain;q=0.9",
           "Accept-Encoding": "identity",
         },
-        lookup: (_h, _o, cb) => cb(null, address.address, address.family),
+        lookup: (_h, options, cb) =>
+          options.all
+            ? cb(null, [address])
+            : cb(null, address.address, address.family),
         timeout: 8000,
       },
       (res) => {

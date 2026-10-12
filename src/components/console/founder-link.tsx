@@ -21,7 +21,7 @@ export function FounderConsoleLink() {
         your shortlist.
       </p>
       <Link className="gateway-action" href="/console/">
-        Open research console ↗
+        Open research console →
       </Link>
     </aside>
   ) : null;

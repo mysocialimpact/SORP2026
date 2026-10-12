@@ -1,4 +1,5 @@
 import Link from "next/link";
+export const dynamic = "force-dynamic";
 export default function Login() {
   const configured = Boolean(
     process.env.ADMIN_EMAIL && process.env.SORP_BACKEND_ORIGIN,
@@ -28,7 +29,7 @@ export default function Login() {
         </p>
         {configured ? (
           <Link className="rc-button" href="/login/?return=/console/">
-            Log in to SORP2026 <span>↗</span>
+            Log in to SORP2026 <span>→</span>
           </Link>
         ) : (
           <p role="status">

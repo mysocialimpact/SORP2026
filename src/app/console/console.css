@@ -1557,3 +1557,9 @@ body:has(.research-console) .product-folder-tabs {
 body:has(.research-console) > .product-folder {
   display: none;
 }
+
+.research-console h1,
+.research-console h2,
+.research-console h3 {
+  font-family: "DM Sans", sans-serif;
+}

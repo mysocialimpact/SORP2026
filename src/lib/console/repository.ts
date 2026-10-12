@@ -23,7 +23,7 @@ export async function methodology() {
 export async function dashboard() {
   const [counts, flows, recent, baseline, method] = await Promise.all([
     query(
-      `SELECT count(*)::int imported,count(*) FILTER(WHERE research_completed_at IS NOT NULL)::int researched,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.assessments a WHERE a.firm_id=f.id))::int scored,count(*) FILTER(WHERE status='Ready for Marcus')::int awaiting,count(*) FILTER(WHERE approved_at IS NOT NULL)::int approved,count(*) FILTER(WHERE research_completed_at IS NULL)::int remaining,count(*) FILTER(WHERE research_completed_at>=date_trunc('week',now()))::int week,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.evidence e WHERE e.firm_id=f.id AND e.sorp='Specific SORP 2026' AND e.state='Current' AND e.confidence IN ('High','Verified')))::int specialists FROM research_console.firms f WHERE merged_into IS NULL`,
+      `SELECT count(*)::int imported,count(*) FILTER(WHERE research_completed_at IS NOT NULL)::int researched,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.assessments a WHERE a.firm_id=f.id))::int scored,count(*) FILTER(WHERE status='Ready for Marcus')::int awaiting,count(*) FILTER(WHERE approved_at IS NOT NULL)::int approved,count(*) FILTER(WHERE research_completed_at IS NULL)::int remaining,count(*) FILTER(WHERE research_completed_at>=date_trunc('week',now()))::int week,count(*) FILTER(WHERE EXISTS(SELECT 1 FROM research_console.evidence e WHERE e.firm_id=f.id AND e.sorp='Specific SORP 2026' AND e.url IS NOT NULL AND e.source_type IN ('Firm website','ICAEW','External') AND e.state='Current' AND e.confidence IN ('High','Verified')))::int specialists FROM research_console.firms f WHERE merged_into IS NULL`,
     ),
     query(
       `SELECT status,count(*)::int count FROM research_console.firms WHERE merged_into IS NULL GROUP BY status`,
@@ -432,6 +432,7 @@ export async function reviewFirm(
   const decision = String(input.decision);
   const allowed = [
     "Agree with assessment",
+    "Research completed — unscored",
     "Approved",
     "Not qualified",
     "Recheck later",
@@ -459,9 +460,23 @@ export async function reviewFirm(
       "INSERT INTO research_console.reviews(firm_id,assessment_id,decision,notes,actor) VALUES($1,$2,$3,$4,$5)",
       [id, a?.id || null, decision, String(input.notes || ""), actor],
     );
+    if (decision === "Research completed — unscored") {
+      if (String(input.notes || "").length < 20)
+        throw new Error(
+          "Explain the sources checked and remaining limitations.",
+        );
+      await c.query(
+        "UPDATE research_console.firms SET research_completed_at=now() WHERE id=$1",
+        [id],
+      );
+    }
     if (decision !== "Note") {
-      const status =
-        decision === "Agree with assessment" ? "Ready for Marcus" : decision;
+      const status = [
+        "Agree with assessment",
+        "Research completed — unscored",
+      ].includes(decision)
+        ? "Ready for Marcus"
+        : decision;
       await c.query(
         "UPDATE research_console.firms SET status=$2,review_status=$3,approved_at=CASE WHEN $2='Approved' THEN now() ELSE NULL END,recheck_at=$4,updated_at=now() WHERE id=$1",
         [id, status, decision, input.recheck_at || null],
@@ -644,5 +659,86 @@ export async function mergeFirms(
       actor,
     );
     return { ok: true };
+  });
+}
+
+export async function saveDetail(
+  firmId: string,
+  kind: "people" | "offices",
+  input: Record<string, unknown>,
+  actor: string,
+) {
+  return transaction(async (c) => {
+    const old = input.id
+      ? (
+          await c.query(
+            `SELECT * FROM research_console.${kind} WHERE id=$1 AND firm_id=$2`,
+            [input.id, firmId],
+          )
+        ).rows[0]
+      : null;
+    if (input.id && !old) throw new Error("Record not found for this firm.");
+    const source = input.source_url
+      ? publicUrl(String(input.source_url))
+      : null;
+    if (!source)
+      throw new Error("Add the public source for this person or office.");
+    let row;
+    if (kind === "people") {
+      const name = String(input.name || "").trim();
+      if (!name || name.length > 200)
+        throw new Error("Enter the person’s name.");
+      const values = [
+        firmId,
+        name,
+        String(input.role || ""),
+        String(input.office || ""),
+        String(input.qualifications || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        input.dcha === "true" ? true : input.dcha === "false" ? false : null,
+        String(input.responsibilities || ""),
+        source,
+        String(input.notes || ""),
+      ];
+      row = (
+        await c.query(
+          "INSERT INTO research_console.people(firm_id,name,role,office,qualifications,dcha,responsibilities,profile_url,notes) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
+          values,
+        )
+      ).rows[0];
+    } else {
+      if (!String(input.address || "").trim())
+        throw new Error("Add an office address.");
+      row = (
+        await c.query(
+          "INSERT INTO research_console.offices(firm_id,address,town,region,country,postcode,telephone,source_url,verification) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
+          [
+            firmId,
+            String(input.address),
+            String(input.town || ""),
+            String(input.region || ""),
+            String(input.country || ""),
+            String(input.postcode || ""),
+            String(input.telephone || ""),
+            source,
+            "Confirmed by reviewer",
+          ],
+        )
+      ).rows[0];
+    }
+    await audit(
+      c,
+      firmId,
+      kind,
+      row.id,
+      old,
+      row,
+      "Source-linked detail recorded",
+      actor,
+    );
+    await invalidateApproval(c, firmId);
+    return row;
   });
 }

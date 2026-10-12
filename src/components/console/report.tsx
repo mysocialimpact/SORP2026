@@ -149,7 +149,7 @@ export function Report({ id }: { id: string }) {
             url={f.website}
             label={
               f.website
-                ? new URL(f.website).hostname + " ↗"
+                ? new URL(f.website).hostname + " →"
                 : "Website not recorded"
             }
           />
@@ -178,7 +178,7 @@ export function Report({ id }: { id: string }) {
               : `Level ${level} · ${levelNames[level]}`}
           </p>
           <Link href="/console/methodology/">
-            How the evidence is assessed ↗
+            How the evidence is assessed →
           </Link>
         </div>
       </section>
@@ -199,12 +199,12 @@ export function Report({ id }: { id: string }) {
               : data.runs.length
                 ? "Refresh website research"
                 : "Research this accountant"}{" "}
-          <span>↗</span>
+          <span>→</span>
         </button>
         <a className="rc-button rc-secondary" href="#review">
           Review & decide ↓
         </a>
-        <a href="#add-evidence">Add evidence ↗</a>
+        <a href="#add-evidence">Add evidence →</a>
         {!f.website && (
           <small>Confirm the official website below to enable research.</small>
         )}
@@ -291,7 +291,7 @@ export function Report({ id }: { id: string }) {
                       {a.evidence_ids[c.id]?.length || 0}.{" "}
                       {a.evidence_ids[c.id]?.map((eid) => (
                         <a key={eid} href={"#evidence-" + eid}>
-                          View cited evidence ↗{" "}
+                          View cited evidence →{" "}
                         </a>
                       ))}
                     </p>
@@ -326,7 +326,7 @@ export function Report({ id }: { id: string }) {
                       "Full source coverage and a documented category assessment are still needed."}
                   </p>
                   <Link href="/console/methodology/">
-                    Open the methodology ↗
+                    Open the methodology →
                   </Link>
                 </div>
               </details>
@@ -342,7 +342,7 @@ export function Report({ id }: { id: string }) {
             <span>ICAEW listing</span>
             <b>{f.icaew_url ? "Source supplied; inspect" : "Unverified"}</b>
           </div>
-          <Source url={f.icaew_url} label="Open ICAEW record ↗" />
+          <Source url={f.icaew_url} label="Open ICAEW record →" />
           <div className="rc-level-row">
             <span>ICAEW charity tag</span>
             <b>
@@ -521,6 +521,7 @@ export function Report({ id }: { id: string }) {
                   {[
                     "Note",
                     "Agree with assessment",
+                    "Research completed — unscored",
                     "Approved",
                     "Not qualified",
                     "Needs more evidence",
@@ -670,6 +671,79 @@ export function Report({ id }: { id: string }) {
             </label>
           </Form>
         </section>
+        <div className="rc-two rc-section">
+          <details className="rc-panel">
+            <summary>Add a verified person</summary>
+            <Form
+              label="Save person"
+              onDone={reload}
+              submit={(form) => api("firms/" + id + "/people", fields(form))}
+            >
+              <label>
+                Name
+                <input name="name" required />
+              </label>
+              <label>
+                Role
+                <input name="role" />
+              </label>
+              <label>
+                Office
+                <input name="office" />
+              </label>
+              <label>
+                Verified qualifications (comma-separated)
+                <input name="qualifications" />
+              </label>
+              <label>
+                DChA
+                <select name="dcha">
+                  <option value="">Unverified</option>
+                  <option value="true">Verified in source</option>
+                  <option value="false">Not recorded in source</option>
+                </select>
+              </label>
+              <label>
+                Charity responsibilities
+                <textarea name="responsibilities" />
+              </label>
+              <label>
+                Professional profile / source URL
+                <input type="url" name="source_url" required />
+              </label>
+              <label>
+                Evidence notes
+                <textarea name="notes" />
+              </label>
+            </Form>
+          </details>
+          <details className="rc-panel">
+            <summary>Add a confirmed office</summary>
+            <Form
+              label="Save office"
+              onDone={reload}
+              submit={(form) => api("firms/" + id + "/offices", fields(form))}
+            >
+              {[
+                ["address", "Full address"],
+                ["town", "Town / city"],
+                ["region", "County / region"],
+                ["country", "Country"],
+                ["postcode", "Postcode"],
+                ["telephone", "Telephone"],
+              ].map(([name, label]) => (
+                <label key={name}>
+                  {label}
+                  <input name={name} required={name === "address"} />
+                </label>
+              ))}
+              <label>
+                Office source URL
+                <input type="url" name="source_url" required />
+              </label>
+            </Form>
+          </details>
+        </div>
         <details className="rc-panel rc-section">
           <summary>Merge a confirmed duplicate</summary>
           <p>
@@ -990,7 +1064,7 @@ function ComparisonResults({ ids }: { ids: string }) {
           return (
             <article className="rc-panel" key={r.firm.id}>
               <Link href={"/console/firm/" + r.firm.id + "/"}>
-                <h2>{r.firm.name} ↗</h2>
+                <h2>{r.firm.name} →</h2>
               </Link>
               <div className="rc-compare-score">
                 {a?.total ?? "—"}

@@ -36,7 +36,7 @@ for (const f of all) {
   );
   const id = `(SELECT id FROM research_console.firms WHERE name_key=${q(key(f.name))} ORDER BY created_at LIMIT 1)`;
   const imported = `NOT EXISTS(SELECT 1 FROM research_console.history WHERE entity='initial-import' AND entity_id=${q(f.slug)})`;
-  if (f.location)
+  if (f.location && !f.offices?.length)
     lines.push(
       `INSERT INTO research_console.offices(firm_id,town,postcode,source_url,verification) SELECT ${id},${q(f.location)},${q(f.postcode)},${q(f.icaewUrl)},'Imported — unverified' WHERE ${imported}`,
     );

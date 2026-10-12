@@ -47,7 +47,8 @@ export async function protectRequest(request: Request) {
   const email = await authenticate(request.headers.get("cookie") || "");
   if (!["GET", "HEAD"].includes(request.method)) {
     if (
-      request.headers.get("origin") !== `${request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "")}://${request.headers.get("host")}` ||
+      request.headers.get("origin") !==
+        `${request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "")}://${request.headers.get("host")}` ||
       request.headers.get("sec-fetch-site") === "cross-site"
     )
       throw new AccessError(403, "Please submit from this website.");
