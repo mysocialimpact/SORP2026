@@ -1,0 +1,2263 @@
+[
+  {
+    "slug": "shorts",
+    "name": "Shorts",
+    "website": "https://www.shorts.uk.com/",
+    "postcode": "S40 4AA",
+    "location": "Chesterfield, Derbyshire",
+    "classification": "Verified",
+    "evidence": "Dedicated Charity Audit page",
+    "contact": "Howard Freeman — Audit and Accounts Partner",
+    "icaewUrl": "https://find.icaew.com/firms/chesterfield/shorts/1eRafE",
+    "evidenceUrl": "https://www.shorts.uk.com/audit/charity-audit",
+    "spreadsheetRow": 2,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.2384404592401,
+      "lng": -1.43854225981136
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "audit",
+        "source": "https://www.shorts.uk.com/audit/charity-audit",
+        "evidence": "Dedicated Charity Audit page"
+      }
+    ]
+  },
+  {
+    "slug": "fuller-harvey-ltd",
+    "name": "Fuller Harvey Ltd",
+    "website": "https://www.fuller-spurling.co.uk/",
+    "postcode": "KT16 9BE",
+    "location": "Chertsey, Surrey",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/chertsey/fuller-harvey-ltd-bas/Z2oq2XX",
+    "evidenceUrl": "https://www.fuller-spurling.co.uk/specialist/charities/",
+    "spreadsheetRow": 3,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.3883315159247,
+      "lng": -0.507275
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "aks-advisers-limited",
+    "name": "AKS Advisers Limited",
+    "website": "",
+    "postcode": "SW1W 0EX",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/aks-advisers-limited/Z1GibPn",
+    "evidenceUrl": "",
+    "spreadsheetRow": 4,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.4980389635817,
+      "lng": -0.145725
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "rostance-edwards-limited",
+    "name": "Rostance Edwards Limited",
+    "website": "https://www.rostance.co.uk/",
+    "postcode": "WS11 7LT",
+    "location": "Cannock",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear independent service-line evidence",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/cannock/rostance-edwards-limited-bas/1cyr4K",
+    "evidenceUrl": "https://www.rostance.co.uk/",
+    "spreadsheetRow": 5,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.691023097954,
+      "lng": -2.01018060489129
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "armstrongs-accountancy-ltd",
+    "name": "Armstrongs Accountancy Ltd",
+    "website": "",
+    "postcode": "CV4 8HX",
+    "location": "Coventry",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/coventry/armstrongs-accountancy-ltd/50aKt",
+    "evidenceUrl": "",
+    "spreadsheetRow": 6,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.388118,
+      "lng": -1.576679
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "sally-knight-consulting-ltd",
+    "name": "Sally Knight Consulting Ltd",
+    "website": "",
+    "postcode": "BR3 1AJ",
+    "location": "Beckenham, Kent",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/beckenham/sally-knight-consulting-ltd/iTMVh",
+    "evidenceUrl": "",
+    "spreadsheetRow": 7,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.40604722,
+      "lng": -0.028845712
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "caton-fry-and-co-limited",
+    "name": "Caton Fry & Co Limited",
+    "website": "http://www.catonfry.com/",
+    "postcode": "E18 1BD",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; supplied website inaccessible in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/caton-fry-and-co-limited/1n22rH",
+    "evidenceUrl": "http://www.catonfry.com/",
+    "spreadsheetRow": 8,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.594366,
+      "lng": 0.024892
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "profile-accountants-ltd",
+    "name": "Profile Accountants Ltd",
+    "website": "http://www.profileca.co.uk/",
+    "postcode": "EC1V 2NX",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/profile-accountants-ltd/Z1A6zWc",
+    "evidenceUrl": "http://www.profileca.co.uk/",
+    "spreadsheetRow": 9,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5272681438089,
+      "lng": -0.08892
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "williamson-and-croft-audit-limited",
+    "name": "Williamson & Croft Audit Limited",
+    "website": "https://www.williamsoncroft.co.uk/",
+    "postcode": "M2 3BB",
+    "location": "Manchester",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities and not-for-profit page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/manchester/williamson-and-croft-audit-limited/12kN5L",
+    "evidenceUrl": "https://www.williamsoncroft.co.uk/charities-and-not-for-profit/",
+    "spreadsheetRow": 10,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.4805122569883,
+      "lng": -2.2407364672921
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "michael-perry",
+    "name": "Michael Perry",
+    "website": "",
+    "postcode": "CV8 1GX",
+    "location": "Kenilworth, Warwickshire",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/kenilworth/michael-perry/Z1wzYGY",
+    "evidenceUrl": "",
+    "spreadsheetRow": 11,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.3333345183321,
+      "lng": -1.5827784224955
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "fr4good-ltd",
+    "name": "FR4Good Ltd",
+    "website": "http://www.fr4good.co.uk/",
+    "postcode": "TF11 8SP",
+    "location": "Shifnal, Shropshire",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/shifnal/fr4good-ltd/Ug6Xr",
+    "evidenceUrl": "http://www.fr4good.co.uk/",
+    "spreadsheetRow": 12,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.709039499933,
+      "lng": -2.35414776150055
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "khi-albury-limited",
+    "name": "KHI Albury Limited",
+    "website": "http://www.alburyassociates.com/",
+    "postcode": "HA1 3EX",
+    "location": "Harrow",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harrow/khi-albury-limited/JnviN",
+    "evidenceUrl": "http://www.alburyassociates.com/",
+    "spreadsheetRow": 13,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.577979,
+      "lng": -0.341657
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "src-audit-limited",
+    "name": "SRC Audit Limited",
+    "website": "",
+    "postcode": "BN1 6SB",
+    "location": "Brighton",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/brighton/src-audit-limited/2td2pJ",
+    "evidenceUrl": "",
+    "spreadsheetRow": 14,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.84216559,
+      "lng": -0.152447313
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "gravita-audit-western-limited",
+    "name": "Gravita Audit Western Limited",
+    "website": "https://www.gravita.com/",
+    "postcode": "BS2 0JA",
+    "location": "Bristol",
+    "classification": "Verified",
+    "evidence": "Dedicated Charity and NFP audit and sector pages",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bristol/gravita-audit-western-limited-bas/ZhxQ3O",
+    "evidenceUrl": "https://www.gravita.com/our-sectors/charities/",
+    "spreadsheetRow": 15,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.455177,
+      "lng": -2.584731
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "godfrey-wilson-limited",
+    "name": "Godfrey Wilson Limited",
+    "website": "http://www.godfreywilson.co.uk/",
+    "postcode": "BS2 0JA",
+    "location": "Bristol",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bristol/godfrey-wilson-limited/7XUD3",
+    "evidenceUrl": "http://www.godfreywilson.co.uk/",
+    "spreadsheetRow": 16,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.455177,
+      "lng": -2.584731
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "gravita-western-limited",
+    "name": "Gravita Western Limited",
+    "website": "https://www.gravita.com/",
+    "postcode": "BS2 0JA",
+    "location": "Bristol",
+    "classification": "Verified",
+    "evidence": "Dedicated Charity and NFP audit and sector pages",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bristol/gravita-western-limited-bas/Z1mb6Cb",
+    "evidenceUrl": "https://www.gravita.com/our-sectors/charities/",
+    "spreadsheetRow": 17,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.455177,
+      "lng": -2.584731
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "whittaker-plane-limited",
+    "name": "Whittaker Plane Limited",
+    "website": "http://www.whittakerplane.com/",
+    "postcode": "LU1 2RD",
+    "location": "Luton",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/luton/whittaker-plane-limited/2fEJC2",
+    "evidenceUrl": "http://www.whittakerplane.com/",
+    "spreadsheetRow": 18,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.8796551407179,
+      "lng": -0.419813985216264
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "jackson-and-graham",
+    "name": "Jackson & Graham",
+    "website": "http://www.jacksongraham.co.uk/",
+    "postcode": "LA9 4JB",
+    "location": "Kendal, Cumbria",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/kendal/jackson-and-graham-bas/1yH8Hr",
+    "evidenceUrl": "http://www.jacksongraham.co.uk/",
+    "spreadsheetRow": 19,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 54.323468,
+      "lng": -2.751023
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "turner-and-smith",
+    "name": "Turner & Smith",
+    "website": "http://www.turnerandsmith.co.uk/",
+    "postcode": "LE11 2EH",
+    "location": "Loughborough",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/loughborough/turner-and-smith/Z2uPICx",
+    "evidenceUrl": "http://www.turnerandsmith.co.uk/",
+    "spreadsheetRow": 20,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.7672306705644,
+      "lng": -1.20819402229732
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "mclachlan-and-tiffin",
+    "name": "McLachlan & Tiffin",
+    "website": "http://www.tiffin.co.uk/",
+    "postcode": "SE8 5DR",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/mclachlan-and-tiffin/Z1NmcID",
+    "evidenceUrl": "http://www.tiffin.co.uk/",
+    "spreadsheetRow": 21,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.4905097197881,
+      "lng": -0.042433102654435
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "alton-and-co",
+    "name": "Alton & Co",
+    "website": "http://www.alton.co.uk/",
+    "postcode": "SE11 5QU",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/alton-and-co-bas/Z1dWQa4",
+    "evidenceUrl": "http://www.alton.co.uk/",
+    "spreadsheetRow": 22,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.4867381679873,
+      "lng": -0.113533299876363
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "groman-and-company",
+    "name": "Groman & Company",
+    "website": "https://www.groman.info/",
+    "postcode": "NW8 9EB",
+    "location": "London",
+    "classification": "Verified",
+    "evidence": "Website states firm works with many local charities and community centres",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/groman-and-company-bas/ZTMkx8",
+    "evidenceUrl": "https://www.groman.info/",
+    "spreadsheetRow": 23,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5327178435128,
+      "lng": -0.181344910236605
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "jassal-and-company",
+    "name": "Jassal & Company",
+    "website": "http://www.jassalandco.co.uk/",
+    "postcode": "WS4 2LA",
+    "location": "Walsall",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/walsall/jassal-and-company/Z1tG229",
+    "evidenceUrl": "http://www.jassalandco.co.uk/",
+    "spreadsheetRow": 24,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.590022420635,
+      "lng": -1.97963093695165
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "price-and-company",
+    "name": "Price & Company",
+    "website": "https://www.price.co.uk/",
+    "postcode": "BN21 4SH",
+    "location": "Eastbourne",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/eastbourne/price-and-company-bas/Z1CzDQx",
+    "evidenceUrl": "https://www.price.co.uk/charities/",
+    "spreadsheetRow": 25,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.76672236,
+      "lng": 0.281670987
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "shelley-and-partners",
+    "name": "Shelley & Partners",
+    "website": "",
+    "postcode": "HA7 2AH",
+    "location": "Stanmore",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/stanmore/shelley-and-partners-bas/ZyFTLV",
+    "evidenceUrl": "",
+    "spreadsheetRow": 26,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.6021130515267,
+      "lng": -0.323969718074584
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "mayfield-and-company",
+    "name": "Mayfield & Company",
+    "website": "http://www.mayfieldandco.co.uk/",
+    "postcode": "LE19 1RJ",
+    "location": "Leicester",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; supplied website inaccessible in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/leicester/mayfield-and-company/24asxj",
+    "evidenceUrl": "http://www.mayfieldandco.co.uk/",
+    "spreadsheetRow": 27,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.6133272498596,
+      "lng": -1.1926586796936
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "sargent-and-co",
+    "name": "Sargent & Co",
+    "website": "https://www.sargentandco.co.uk/",
+    "postcode": "CR8 3NJ",
+    "location": "Purley, Surrey",
+    "classification": "Verified",
+    "evidence": "Website expressly offers charity advisory services",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/purley/sargent-and-co/1QGTPN",
+    "evidenceUrl": "https://www.sargentandco.co.uk/",
+    "spreadsheetRow": 28,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.3363989348905,
+      "lng": -0.145653667261906
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "peter-and-co",
+    "name": "Peter & Co",
+    "website": "http://www.peterandco.co.uk/",
+    "postcode": "WS9 8QT",
+    "location": "Walsall",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/walsall/peter-and-co/Z1rpS8t",
+    "evidenceUrl": "http://www.peterandco.co.uk/",
+    "spreadsheetRow": 29,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.6073088067993,
+      "lng": -1.91594875199311
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "collins-and-co",
+    "name": "Collins & Co",
+    "website": "https://collinsco.co.uk/",
+    "postcode": "L39 2AY",
+    "location": "Ormskirk, Lancashire",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/ormskirk/collins-and-co-bas/xcM5M",
+    "evidenceUrl": "https://collinsco.co.uk/charities/",
+    "spreadsheetRow": 30,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.5740632036947,
+      "lng": -2.87967670504381
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "armstrong-and-co",
+    "name": "Armstrong & Co",
+    "website": "https://www.armco.co.uk/",
+    "postcode": "E2 7PR",
+    "location": "London",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities service page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/armstrong-and-co/ee0vG",
+    "evidenceUrl": "https://www.armco.co.uk/services-2/charity",
+    "spreadsheetRow": 31,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.527734,
+      "lng": -0.077412
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "peach-and-co",
+    "name": "Peach & Co",
+    "website": "",
+    "postcode": "DE14 2BZ",
+    "location": "Burton-on-Trent",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/burton-on-trent/peach-and-co-bas/ZaxlU",
+    "evidenceUrl": "",
+    "spreadsheetRow": 32,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.7984247790836,
+      "lng": -1.66451543463155
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "martin-heller",
+    "name": "Martin + Heller",
+    "website": "",
+    "postcode": "NW11 7RJ",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/martin-heller/ZsxzzJ",
+    "evidenceUrl": "",
+    "spreadsheetRow": 33,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5713701642466,
+      "lng": -0.192010774495936
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "george-and-co",
+    "name": "George & Co",
+    "website": "",
+    "postcode": "MK7 7DZ",
+    "location": "Milton Keynes",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/milton-keynes/george-and-co/Zeul5k",
+    "evidenceUrl": "",
+    "spreadsheetRow": 34,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.0192441200624,
+      "lng": -0.697960454428124
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "langer-and-co",
+    "name": "Langer & Co",
+    "website": "https://www.langer.co.uk/",
+    "postcode": "SK8 1PY",
+    "location": "Cheadle",
+    "classification": "Verified",
+    "evidence": "Dedicated Not For Profit page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/cheadle/langer-and-co/1VMVrL",
+    "evidenceUrl": "https://www.langer.co.uk/not-for-profit/",
+    "spreadsheetRow": 35,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.3935542237508,
+      "lng": -2.21899696717548
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "hicks-and-company",
+    "name": "Hicks and Company",
+    "website": "http://www.hicks.co.uk/",
+    "postcode": "AL5 4EE",
+    "location": "Harpenden",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; website timed out in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harpenden/hicks-and-company/16cR3h",
+    "evidenceUrl": "http://www.hicks.co.uk/",
+    "spreadsheetRow": 36,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.81521751,
+      "lng": -0.354694767
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "ioannou-and-co",
+    "name": "Ioannou & Co",
+    "website": "",
+    "postcode": "N12 8JY",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/ioannou-and-co/2plou",
+    "evidenceUrl": "",
+    "spreadsheetRow": 37,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.6152188197052,
+      "lng": -0.177023443811562
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "hollis-and-co-ltd",
+    "name": "Hollis and Co Ltd",
+    "website": "https://www.hollisco.co.uk/",
+    "postcode": "S10 2GB",
+    "location": "Sheffield",
+    "classification": "Probable",
+    "evidence": "Charities service link found but page returned not found",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/sheffield/hollis-and-co-ltd-bas/se2wk",
+    "evidenceUrl": "https://www.hollisco.co.uk/specialism/charities",
+    "spreadsheetRow": 38,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.379131,
+      "lng": -1.485625
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "kerr-and-co-limited",
+    "name": "Kerr & Co Limited",
+    "website": "https://www.johnkerraccountants.co.uk/",
+    "postcode": "L12 2AH",
+    "location": "Liverpool",
+    "classification": "Verified",
+    "evidence": "Dedicated Charity Accounting Services page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/liverpool/kerr-and-co-limited-bas/bhLS5",
+    "evidenceUrl": "https://www.johnkerraccountants.co.uk/services/chartered-accountants-registered-auditors/charity-accounts",
+    "spreadsheetRow": 39,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.4218338694683,
+      "lng": -2.89731160247558
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "accounts",
+        "source": "https://www.johnkerraccountants.co.uk/services/chartered-accountants-registered-auditors/charity-accounts",
+        "evidence": "Dedicated Charity Accounting Services page"
+      }
+    ]
+  },
+  {
+    "slug": "martin-sklan-and-co",
+    "name": "Martin Sklan & Co",
+    "website": "http://www.martinsklan.co.uk/",
+    "postcode": "NW11 8HJ",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/martin-sklan-and-co-bas/Z1cSIcw",
+    "evidenceUrl": "http://www.martinsklan.co.uk/",
+    "spreadsheetRow": 40,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5742693713535,
+      "lng": -0.202199640692292
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "kay-linnell-and-co",
+    "name": "Kay Linnell & Co",
+    "website": "https://www.klca.co.uk/",
+    "postcode": "RG25 2PR",
+    "location": "Basingstoke",
+    "classification": "Verified",
+    "evidence": "Website profile cites preparation of SORP accounts for UK charities",
+    "contact": "Andrew — website profile",
+    "icaewUrl": "https://find.icaew.com/firms/basingstoke/kay-linnell-and-co/1maGB1",
+    "evidenceUrl": "https://www.klca.co.uk/",
+    "spreadsheetRow": 41,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.1931313688294,
+      "lng": -1.01796973037029
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "accounts",
+        "source": "https://www.klca.co.uk/",
+        "evidence": "Website profile cites preparation of SORP accounts for UK charities"
+      },
+      {
+        "id": "sorp",
+        "source": "https://www.klca.co.uk/",
+        "evidence": "Website profile cites preparation of SORP accounts for UK charities"
+      }
+    ]
+  },
+  {
+    "slug": "j-afzal-and-co",
+    "name": "J. Afzal & Co",
+    "website": "",
+    "postcode": "NW8 9NR",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/j-afzal-and-co-bas/1q111H",
+    "evidenceUrl": "",
+    "spreadsheetRow": 42,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5305203815928,
+      "lng": -0.177655119023052
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "beerbal-and-co-limited",
+    "name": "BEERBAL & CO LIMITED",
+    "website": "",
+    "postcode": "NG7 5EH",
+    "location": "Nottingham",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/nottingham/beerbal-and-co-limited/Z1up5Ne",
+    "evidenceUrl": "",
+    "spreadsheetRow": 43,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.9672732255434,
+      "lng": -1.17211515097125
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "jefferis-and-boyd-ltd",
+    "name": "Jefferis & Boyd Ltd",
+    "website": "",
+    "postcode": "OX14 4YA",
+    "location": "Abingdon",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/abingdon/jefferis-and-boyd-ltd/8pvCc",
+    "evidenceUrl": "",
+    "spreadsheetRow": 44,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.6399803319438,
+      "lng": -1.23803172285729
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "harris-and-clarke-llp",
+    "name": "Harris & Clarke LLP",
+    "website": "http://www.harrisandclarke.com/",
+    "postcode": "NN1 5AN",
+    "location": "Northampton",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/northampton/harris-and-clarke-llp-bas/Z1WEmpU",
+    "evidenceUrl": "http://www.harrisandclarke.com/",
+    "spreadsheetRow": 45,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.2378778018253,
+      "lng": -0.886727180526707
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "carter-and-coley-limited",
+    "name": "Carter & Coley Limited",
+    "website": "https://acumon.com/",
+    "postcode": "BH2 6NE",
+    "location": "Bournemouth",
+    "classification": "Verified",
+    "evidence": "Dedicated charity audit and not-for-profit audit services",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bournemouth/carter-and-coley-limited/1fl9IH",
+    "evidenceUrl": "https://acumon.com/services/audit/charity-audit/",
+    "spreadsheetRow": 46,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.72367441,
+      "lng": -1.882250136
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "audit",
+        "source": "https://acumon.com/services/audit/charity-audit/",
+        "evidence": "Dedicated charity audit and not-for-profit audit services"
+      }
+    ]
+  },
+  {
+    "slug": "percy-westhead-and-company",
+    "name": "Percy Westhead & Company",
+    "website": "http://www.percywesthead.co.uk/",
+    "postcode": "M1 4FD",
+    "location": "Manchester",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; supplied website inaccessible in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/manchester/percy-westhead-and-company-bas/D9Ee",
+    "evidenceUrl": "http://www.percywesthead.co.uk/",
+    "spreadsheetRow": 47,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.4789059770478,
+      "lng": -2.23941647715391
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "sawin-and-edwards-llp",
+    "name": "Sawin & Edwards LLP",
+    "website": "https://www.sawin-edwards.co.uk/",
+    "postcode": "SW8 4BG",
+    "location": "London",
+    "classification": "Verified",
+    "evidence": "Dedicated Not for Profit Organisations and Charities page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/sawin-and-edwards-llp/ZsrDct",
+    "evidenceUrl": "https://www.sawin-edwards.co.uk/services/not-profit-organisations-and-charities/",
+    "spreadsheetRow": 48,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.4775989420688,
+      "lng": -0.146629049259588
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "sproull-and-co-limited",
+    "name": "Sproull & Co Limited",
+    "website": "",
+    "postcode": "HA4 7BD",
+    "location": "Ruislip",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/ruislip/sproull-and-co-limited/2vn8tp",
+    "evidenceUrl": "",
+    "spreadsheetRow": 49,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.575091,
+      "lng": -0.42516
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "baden-lyle-and-associates",
+    "name": "Baden-Lyle and Associates",
+    "website": "",
+    "postcode": "BA2 2UU",
+    "location": "Bath",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bath/baden-lyle-and-associates/1EMoHk",
+    "evidenceUrl": "",
+    "spreadsheetRow": 50,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.3581288,
+      "lng": -2.379097874
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "tittensor-and-co-limited",
+    "name": "Tittensor and Co. Limited",
+    "website": "http://www.tittensorandco.co.uk/",
+    "postcode": "CM23 2YU",
+    "location": "Bishop's Stortford",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bishops-stortford/tittensor-and-co-limited/Z1DtrNt",
+    "evidenceUrl": "http://www.tittensorandco.co.uk/",
+    "spreadsheetRow": 51,
+    "reviewed": "2026-10-12",
+    "coordinates": null,
+    "coordinateSource": "",
+    "services": []
+  },
+  {
+    "slug": "reardon-and-co-limited",
+    "name": "Reardon & Co Limited",
+    "website": "",
+    "postcode": "CB21 5DQ",
+    "location": "Cambridge",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/cambridge/reardon-and-co-limited-bas/17AxwV",
+    "evidenceUrl": "",
+    "spreadsheetRow": 52,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.1872738305471,
+      "lng": 0.209285001077901
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "kinnair-and-company-limited",
+    "name": "Kinnair and Company Limited",
+    "website": "https://www.kinnair.co.uk/",
+    "postcode": "NE5 1NB",
+    "location": "Newcastle upon Tyne",
+    "classification": "Probable",
+    "evidence": "Website states it serves non-profits, but no dedicated practice evidence found",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/newcastle-upon-tyne/kinnair-and-company-limited/NCDjR",
+    "evidenceUrl": "https://www.kinnair.co.uk/",
+    "spreadsheetRow": 53,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 55.00311,
+      "lng": -1.6955697520131
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "ebrahim-and-ebrahim-limited",
+    "name": "Ebrahim & Ebrahim Limited",
+    "website": "http://www.ebrahims.com/",
+    "postcode": "W13 8BQ",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/ebrahim-and-ebrahim-limited/Z1PanAw",
+    "evidenceUrl": "http://www.ebrahims.com/",
+    "spreadsheetRow": 54,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5223847369159,
+      "lng": -0.319979429934225
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "edmund-wright-and-co",
+    "name": "Edmund Wright & Co",
+    "website": "",
+    "postcode": "HA6 2GU",
+    "location": "Northwood",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/northwood/edmund-wright-and-co/k2hnk",
+    "evidenceUrl": "",
+    "spreadsheetRow": 55,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.6096114980685,
+      "lng": -0.426550530687139
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "town-and-forest-limited",
+    "name": "Town & Forest Limited",
+    "website": "http://www.townandforest.co.uk/",
+    "postcode": "AL1 2HA",
+    "location": "St Albans",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/st-albans/town-and-forest-limited/Z25F5m6",
+    "evidenceUrl": "http://www.townandforest.co.uk/",
+    "spreadsheetRow": 56,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.7359897,
+      "lng": -0.327928112
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "b-olsberg-and-co",
+    "name": "B Olsberg & Co",
+    "website": "",
+    "postcode": "M8 5DT",
+    "location": "Manchester",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/manchester/b-olsberg-and-co/1xFvzN",
+    "evidenceUrl": "",
+    "spreadsheetRow": 57,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.5170870675008,
+      "lng": -2.24907273809292
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "stephenson-nuttall-and-co",
+    "name": "Stephenson Nuttall & Co",
+    "website": "http://www.stephensonnuttall.com/",
+    "postcode": "NG24 1AX",
+    "location": "Newark",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/newark/stephenson-nuttall-and-co-bas/Z2j8l6x",
+    "evidenceUrl": "http://www.stephensonnuttall.com/",
+    "spreadsheetRow": 58,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.0782773973487,
+      "lng": -0.810714575266982
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "roger-lugg-and-co",
+    "name": "Roger Lugg & Co",
+    "website": "https://rogerlugg.co.uk/",
+    "postcode": "CR3 5UA",
+    "location": "Caterham",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/caterham/roger-lugg-and-co-bas/Z1OX0iW",
+    "evidenceUrl": "https://rogerlugg.co.uk/charity/",
+    "spreadsheetRow": 59,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.2866571424794,
+      "lng": -0.089003350063936
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "voisey-and-co-llp",
+    "name": "Voisey & Co LLP",
+    "website": "",
+    "postcode": "WA1 1JW",
+    "location": "Warrington",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/warrington/voisey-and-co-llp-bas/20nxay",
+    "evidenceUrl": "",
+    "spreadsheetRow": 60,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.3877392284522,
+      "lng": -2.59903568233325
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "accounts-and-models-ltd",
+    "name": "Accounts and Models Ltd",
+    "website": "https://www.accountsandmodels.co.uk/",
+    "postcode": "SW12 0DR",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "Charities indicated on website, but no sufficiently detailed practice evidence",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/accounts-and-models-ltd/Z1Qbnq9",
+    "evidenceUrl": "https://www.accountsandmodels.co.uk/",
+    "spreadsheetRow": 61,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.4495469508261,
+      "lng": -0.141821362147903
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "jervis-and-partners-limited",
+    "name": "Jervis & Partners Limited",
+    "website": "https://www.jervisandpartners.co.uk/",
+    "postcode": "NN2 7AZ",
+    "location": "Northampton",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; charity-related link did not evidence a service line",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/northampton/jervis-and-partners-limited/xxXIL",
+    "evidenceUrl": "https://www.jervisandpartners.co.uk/",
+    "spreadsheetRow": 62,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.260406,
+      "lng": -0.900766996310286
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "radford-and-sergeant-limited",
+    "name": "Radford & Sergeant Limited",
+    "website": "https://www.radford-sergeant.co.uk/",
+    "postcode": "GU16 7ER",
+    "location": "Camberley",
+    "classification": "Verified",
+    "evidence": "Website has a dedicated Charities support section",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/camberley/radford-and-sergeant-limited/clfcu",
+    "evidenceUrl": "https://www.radford-sergeant.co.uk/who-we-support#Charities",
+    "spreadsheetRow": 63,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.316595,
+      "lng": -0.748297
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "rawcliffe-and-co-limited",
+    "name": "Rawcliffe & Co Limited",
+    "website": "http://www.rawcliffe.co.uk/",
+    "postcode": "FY4 5GP",
+    "location": "Blackpool",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/blackpool/rawcliffe-and-co-limited-bas/1fG6M",
+    "evidenceUrl": "http://www.rawcliffe.co.uk/",
+    "spreadsheetRow": 64,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.785361,
+      "lng": -2.988607
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "griffin-and-sage-ltd",
+    "name": "Griffin & Sage Ltd",
+    "website": "http://www.griffinandsage.co.uk/",
+    "postcode": "PE1 2UF",
+    "location": "Peterborough",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/peterborough/griffin-and-sage-ltd/8ivJu",
+    "evidenceUrl": "http://www.griffinandsage.co.uk/",
+    "spreadsheetRow": 65,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.5815406430016,
+      "lng": -0.238033106079523
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "alif-and-co-limited",
+    "name": "Alif & Co Limited",
+    "website": "http://www.alifandco.co.uk/",
+    "postcode": "B10 0JS",
+    "location": "Birmingham",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/birmingham/alif-and-co-limited/Zk5Mw9",
+    "evidenceUrl": "http://www.alifandco.co.uk/",
+    "spreadsheetRow": 66,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.46925019,
+      "lng": -1.858123991
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "dodd-and-co-limited",
+    "name": "Dodd & Co Limited",
+    "website": "https://www.doddaccountants.co.uk/",
+    "postcode": "CA1 2RW",
+    "location": "Carlisle",
+    "classification": "Probable",
+    "evidence": "Charity-sector content found, but no dedicated service line confirmed",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/carlisle/dodd-and-co-limited-bas/k8Xey",
+    "evidenceUrl": "https://www.doddaccountants.co.uk/news/charity-senior-leadership-masterclass/",
+    "spreadsheetRow": 67,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 54.892538964717,
+      "lng": -2.893619
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "james-francis-and-company",
+    "name": "James Francis & Company",
+    "website": "",
+    "postcode": "SW17 7QT",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/james-francis-and-company-bas/1ah5Px",
+    "evidenceUrl": "",
+    "spreadsheetRow": 68,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.440753318807,
+      "lng": -0.160135979343071
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "prentis-and-co-llp",
+    "name": "Prentis & Co LLP",
+    "website": "http://www.prentis.co.uk/",
+    "postcode": "CB4 1XE",
+    "location": "Cambridge",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; supplied website inaccessible in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/cambridge/prentis-and-co-llp/ZIJSQI",
+    "evidenceUrl": "http://www.prentis.co.uk/",
+    "spreadsheetRow": 69,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.220458,
+      "lng": 0.133409
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "m-tumbridge-and-co",
+    "name": "M Tumbridge & Co",
+    "website": "https://www.m-tumbridgeandco.co.uk/",
+    "postcode": "N21 1TH",
+    "location": "London",
+    "classification": "Verified",
+    "evidence": "Website says it provides accountancy services to charities and the voluntary sector",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/m-tumbridge-and-co/Zcu2lX",
+    "evidenceUrl": "https://www.m-tumbridgeandco.co.uk/",
+    "spreadsheetRow": 70,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.6461552265652,
+      "lng": -0.11232897671906
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "accounts",
+        "source": "https://www.m-tumbridgeandco.co.uk/",
+        "evidence": "Website says it provides accountancy services to charities and the voluntary sector"
+      }
+    ]
+  },
+  {
+    "slug": "mhc-and-co-ltd",
+    "name": "MHC AND CO LTD",
+    "website": "http://www.mhcandco.co.uk/",
+    "postcode": "BS7 0SJ",
+    "location": "Bristol",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bristol/mhc-and-co-ltd-bas/Z2lc7G7",
+    "evidenceUrl": "http://www.mhcandco.co.uk/",
+    "spreadsheetRow": 71,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5022317065366,
+      "lng": -2.57861953281424
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "cocke-vellacott-and-hill",
+    "name": "Cocke, Vellacott & Hill",
+    "website": "https://cvhaccountants.co.uk/",
+    "postcode": "SE16 2XB",
+    "location": "London",
+    "classification": "Verified",
+    "evidence": "Dedicated Accounting & Auditing for Charities page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/cocke-vellacott-and-hill/GQN00",
+    "evidenceUrl": "https://cvhaccountants.co.uk/charities/",
+    "spreadsheetRow": 72,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.4986520547853,
+      "lng": -0.054561214154644
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "audit",
+        "source": "https://cvhaccountants.co.uk/charities/",
+        "evidence": "Dedicated Accounting & Auditing for Charities page"
+      },
+      {
+        "id": "accounts",
+        "source": "https://cvhaccountants.co.uk/charities/",
+        "evidence": "Dedicated Accounting & Auditing for Charities page"
+      }
+    ]
+  },
+  {
+    "slug": "s-syedain-and-co",
+    "name": "S. Syedain & Co",
+    "website": "http://www.syedain.com/",
+    "postcode": "HA3 0AH",
+    "location": "Harrow",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; supplied website inaccessible in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harrow/s-syedain-and-co/1r0doB",
+    "evidenceUrl": "http://www.syedain.com/",
+    "spreadsheetRow": 73,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5800071909154,
+      "lng": -0.320612014615592
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "david-cooke-and-co",
+    "name": "David Cooke & Co",
+    "website": "",
+    "postcode": "OX16 9DS",
+    "location": "Banbury",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/banbury/david-cooke-and-co/O6G4O",
+    "evidenceUrl": "",
+    "spreadsheetRow": 74,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.044633,
+      "lng": -1.332407
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "virash-bach-and-co-limited",
+    "name": "Virash Bach & Co Limited",
+    "website": "http://www.virashbach.co.uk/",
+    "postcode": "CR7 7PW",
+    "location": "Thornton Heath",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/thornton-heath/virash-bach-and-co-limited/rU8Af",
+    "evidenceUrl": "http://www.virashbach.co.uk/",
+    "spreadsheetRow": 75,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.3980418703284,
+      "lng": -0.112296986111823
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "prestons-and-jacksons-partnership-llp",
+    "name": "Prestons & Jacksons Partnership LLP",
+    "website": "http://www.pjllp.co.uk/",
+    "postcode": "IG2 6HY",
+    "location": "Ilford",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/ilford/prestons-and-jacksons-partnership-llp-bas/ZV3djh",
+    "evidenceUrl": "http://www.pjllp.co.uk/",
+    "spreadsheetRow": 76,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.574645,
+      "lng": 0.066697632782963
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "business-consulting-and-accounting-limited",
+    "name": "Business Consulting & Accounting Limited",
+    "website": "https://bcaaccountants.com/",
+    "postcode": "PO5 1LU",
+    "location": "Southsea",
+    "classification": "Probable",
+    "evidence": "Charity reporting content found, but no dedicated practice confirmed",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/southsea/business-consulting-and-accounting-limited-bas/ZMGHaB",
+    "evidenceUrl": "https://bcaaccountants.com/new-charity-reporting-requirements/",
+    "spreadsheetRow": 77,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.7895383912106,
+      "lng": -1.08323924511239
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "stewart-and-co-accountants-llp",
+    "name": "Stewart & Co Accountants LLP",
+    "website": "https://www.stewartco.co.uk/",
+    "postcode": "GU15 3SY",
+    "location": "Camberley",
+    "classification": "Probable",
+    "evidence": "Website mentions charity clients, but no dedicated practice evidence found",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/camberley/stewart-and-co-accountants-llp-bas/Z1ihc7V",
+    "evidenceUrl": "https://www.stewartco.co.uk/",
+    "spreadsheetRow": 78,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.338992,
+      "lng": -0.743811
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "kay-peters-and-co-limited",
+    "name": "Kay Peters & Co Limited",
+    "website": "http://www.kaypeters.co.uk/",
+    "postcode": "EC1Y 0TA",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/kay-peters-and-co-limited/ZTv6hj",
+    "evidenceUrl": "http://www.kaypeters.co.uk/",
+    "spreadsheetRow": 79,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5236923028596,
+      "lng": -0.096509871447518
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "stefan-orban-and-co-ltd",
+    "name": "Stefan Orban & Co Ltd",
+    "website": "http://www.orbantaxandaccounting.co.uk/",
+    "postcode": "GU4 7DX",
+    "location": "Guildford",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/guildford/stefan-orban-and-co-ltd/Z1DJaa6",
+    "evidenceUrl": "http://www.orbantaxandaccounting.co.uk/",
+    "spreadsheetRow": 80,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.2507004762384,
+      "lng": -0.529192
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "j-w-woodrow-and-co",
+    "name": "J W Woodrow & Co",
+    "website": "",
+    "postcode": "WD23 4GF",
+    "location": "Bushey",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bushey/j-w-woodrow-and-co-bas/Z2oHsBR",
+    "evidenceUrl": "",
+    "spreadsheetRow": 81,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.6412107944187,
+      "lng": -0.337876860322682
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "a-lock-and-co-limited",
+    "name": "A Lock & Co Limited",
+    "website": "http://www.positiveaccountants.co.uk/",
+    "postcode": "YO26 8DH",
+    "location": "York",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/york/a-lock-and-co-limited-bas/2uuS77",
+    "evidenceUrl": "http://www.positiveaccountants.co.uk/",
+    "spreadsheetRow": 82,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.9993058950747,
+      "lng": -1.27868988911564
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "david-morgan-and-co-ltd",
+    "name": "David Morgan & Co Ltd",
+    "website": "http://www.davidmorganltd.co.uk/",
+    "postcode": "HA1 2BQ",
+    "location": "Harrow",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harrow/david-morgan-and-co-ltd/ZWUlu3",
+    "evidenceUrl": "http://www.davidmorganltd.co.uk/",
+    "spreadsheetRow": 83,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5775701399881,
+      "lng": -0.333849451619364
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "gx-accountancy-and-bookkeeping-services",
+    "name": "GX Accountancy & Bookkeeping Services",
+    "website": "http://www.gxaccounts.com/",
+    "postcode": "EX5 5JN",
+    "location": "Exeter",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/exeter/gx-accountancy-and-bookkeeping-services/ZWMwgE",
+    "evidenceUrl": "http://www.gxaccounts.com/",
+    "spreadsheetRow": 84,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.7844593788542,
+      "lng": -3.52031964194797
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "godfrey-mansell-and-co-llp",
+    "name": "Godfrey Mansell & Co LLP",
+    "website": "https://www.godfreymansell.co.uk/",
+    "postcode": "B63 3TT",
+    "location": "Halesowen",
+    "classification": "Verified",
+    "evidence": "Dedicated Charity Accounts / Reporting page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/halesowen/godfrey-mansell-and-co-llp-bas/ZSGC4q",
+    "evidenceUrl": "https://www.godfreymansell.co.uk/services/charity-accounts/",
+    "spreadsheetRow": 85,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.45097453,
+      "lng": -2.05269254
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "accounts",
+        "source": "https://www.godfreymansell.co.uk/services/charity-accounts/",
+        "evidence": "Dedicated Charity Accounts / Reporting page"
+      }
+    ]
+  },
+  {
+    "slug": "pitt-godden-and-taylor-llp",
+    "name": "Pitt Godden & Taylor LLP",
+    "website": "http://www.pittgoddentaylor.co.uk/",
+    "postcode": "GL4 3GG",
+    "location": "Gloucester",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/gloucester/pitt-godden-and-taylor-llp/Z1vWLEO",
+    "evidenceUrl": "http://www.pittgoddentaylor.co.uk/",
+    "spreadsheetRow": 86,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.8661053208032,
+      "lng": -2.204943
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "graham-harvey-and-co-limited",
+    "name": "Graham Harvey & Co Limited",
+    "website": "http://www.mandairandco.co.uk/",
+    "postcode": "PO5 2SN",
+    "location": "Southsea",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/southsea/graham-harvey-and-co-limited/1MUK2H",
+    "evidenceUrl": "http://www.mandairandco.co.uk/",
+    "spreadsheetRow": 87,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.7865265115565,
+      "lng": -1.07762367996507
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "lyons-and-co-northallerton-ltd",
+    "name": "Lyons & Co (Northallerton) Ltd",
+    "website": "https://www.lyons-accountants.co.uk/",
+    "postcode": "DL6 2XQ",
+    "location": "Northallerton",
+    "classification": "Probable",
+    "evidence": "Website mentions charity clients, but no dedicated practice evidence found",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/northallerton/lyons-and-co-northallerton-ltd/10Jhr8",
+    "evidenceUrl": "https://www.lyons-accountants.co.uk/",
+    "spreadsheetRow": 88,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 54.345888,
+      "lng": -1.447529
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "charles-rippin-and-turner-ltd",
+    "name": "Charles Rippin And Turner Ltd",
+    "website": "http://www.charlesrippin.co.uk/",
+    "postcode": "HA1 1BQ",
+    "location": "Harrow",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harrow/charles-rippin-and-turner-ltd-bas/fgqOV",
+    "evidenceUrl": "http://www.charlesrippin.co.uk/",
+    "spreadsheetRow": 89,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5802264438564,
+      "lng": -0.338557
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "james-todd-and-co-limited",
+    "name": "James Todd & Co Limited",
+    "website": "https://www.jamestoddandco.co.uk/",
+    "postcode": "PO20 2EW",
+    "location": "Chichester",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities and Not-for-Profit page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/chichester/james-todd-and-co-limited/Zutd61",
+    "evidenceUrl": "https://www.jamestoddandco.co.uk/charities/",
+    "spreadsheetRow": 90,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.830542451127,
+      "lng": -0.738848027891622
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "bacha-and-bacha-audit-limited",
+    "name": "Bacha & Bacha (Audit) Limited",
+    "website": "https://www.bachaglobal.com/",
+    "postcode": "N22 5BN",
+    "location": "London",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/bacha-and-bacha-audit-limited/2jXowl",
+    "evidenceUrl": "https://www.bachaglobal.com/charities.html",
+    "spreadsheetRow": 91,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.6024523559068,
+      "lng": -0.098965188816665
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "chalmers-and-co-sw-limited",
+    "name": "Chalmers & Co (SW) Limited",
+    "website": "http://www.chalmersaccountants.co.uk/",
+    "postcode": "TA18 8AB",
+    "location": "Crewkerne",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/crewkerne/chalmers-and-co-sw-limited-bas/Z17qD27",
+    "evidenceUrl": "http://www.chalmersaccountants.co.uk/",
+    "spreadsheetRow": 92,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.8823004830071,
+      "lng": -2.79183376895573
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "ajc-accountancy-services",
+    "name": "AJC Accountancy Services",
+    "website": "http://www.ajcaccountancy.co.uk/",
+    "postcode": "AL5 3NS",
+    "location": "Harpenden",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harpenden/ajc-accountancy-services-bas/Z14CEEK",
+    "evidenceUrl": "http://www.ajcaccountancy.co.uk/",
+    "spreadsheetRow": 93,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.833265,
+      "lng": -0.376635
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "wilkes-tranter-and-co-limited",
+    "name": "Wilkes Tranter & Co Limited",
+    "website": "http://www.wilkestranter.co.uk/",
+    "postcode": "DY6 9HS",
+    "location": "Kingswinford",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; supplied website inaccessible in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/kingswinford/wilkes-tranter-and-co-limited-bas/Z1NJVcq",
+    "evidenceUrl": "http://www.wilkestranter.co.uk/",
+    "spreadsheetRow": 94,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 52.4986727006106,
+      "lng": -2.1698855232841
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "streets-whittle-and-partners-llp",
+    "name": "Streets Whittle & Partners LLP",
+    "website": "https://www.streets.uk/",
+    "postcode": "LN1 1XW",
+    "location": "Lincoln",
+    "classification": "Probable",
+    "evidence": "Website references third-sector clients, but no dedicated practice page confirmed",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/lincoln/streets-whittle-and-partners-llp-bas/Z1Yfy1j",
+    "evidenceUrl": "https://www.streets.uk/",
+    "spreadsheetRow": 95,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.2295224933349,
+      "lng": -0.544658914632564
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "gibbons-mannington-and-phipps-llp",
+    "name": "Gibbons Mannington & Phipps LLP",
+    "website": "http://www.gmpaccountants.co.uk/",
+    "postcode": "TN40 1HE",
+    "location": "Bexhill-on-Sea",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; supplied website inaccessible in review",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/bexhill-on-sea/gibbons-mannington-and-phipps-llp-bas/2bJN1y",
+    "evidenceUrl": "http://www.gmpaccountants.co.uk/",
+    "spreadsheetRow": 96,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 50.8387181371954,
+      "lng": 0.474507346853166
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "joseph-anderson-beadle-and-co",
+    "name": "Joseph Anderson Beadle & Co",
+    "website": "http://www.andersonaccountant.co.uk/",
+    "postcode": "HA3 7EZ",
+    "location": "Harrow",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harrow/joseph-anderson-beadle-and-co/Z4j6lu",
+    "evidenceUrl": "http://www.andersonaccountant.co.uk/",
+    "spreadsheetRow": 97,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5991512306253,
+      "lng": -0.333204144365095
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "khuram-barvi-and-accountants-ltd",
+    "name": "Khuram Barvi & Accountants LTD",
+    "website": "",
+    "postcode": "E6 2BT",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/khuram-barvi-and-accountants-ltd/Z24obOM",
+    "evidenceUrl": "",
+    "spreadsheetRow": 98,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5386388292644,
+      "lng": 0.057372576472971
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "couch-bright-king-and-co",
+    "name": "Couch Bright King & Co",
+    "website": "http://www.cbk.co.uk/",
+    "postcode": "ME14 5SF",
+    "location": "Kent",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/kent/couch-bright-king-and-co-bas/i7n8Q",
+    "evidenceUrl": "http://www.cbk.co.uk/",
+    "spreadsheetRow": 99,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.2716259282925,
+      "lng": 0.537730551029492
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "oliver-and-co-c-a-limited",
+    "name": "Oliver & Co., C.A. Limited",
+    "website": "https://www.oand.co.uk/",
+    "postcode": "LS16 5LQ",
+    "location": "Leeds",
+    "classification": "Verified",
+    "evidence": "Website states firm is qualified and experienced in charity accounting",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/leeds/oliver-and-co-c-a-limited-bas/2EiIW",
+    "evidenceUrl": "https://www.oand.co.uk/",
+    "spreadsheetRow": 100,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 53.8325424390911,
+      "lng": -1.59199603880585
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "accounts",
+        "source": "https://www.oand.co.uk/",
+        "evidence": "Website states firm is qualified and experienced in charity accounting"
+      }
+    ]
+  },
+  {
+    "slug": "b-j-straughan-and-co",
+    "name": "B J Straughan and Co",
+    "website": "http://www.bjstraughan.co.uk/",
+    "postcode": "DH3 3UP",
+    "location": "Chester-le-Street",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/chester-le-street/b-j-straughan-and-co-bas/mTtjL",
+    "evidenceUrl": "http://www.bjstraughan.co.uk/",
+    "spreadsheetRow": 101,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 54.8596324446805,
+      "lng": -1.57515863620344
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "reza-motazedi-and-co-llp",
+    "name": "Reza Motazedi and Co LLP",
+    "website": "https://www.motazedi.co.uk/",
+    "postcode": "WC2A 2JR",
+    "location": "London",
+    "classification": "Verified",
+    "evidence": "Website offers Charity & Not-for-Profit Services",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/reza-motazedi-and-co-llp/ZAh0DF",
+    "evidenceUrl": "https://www.motazedi.co.uk/",
+    "spreadsheetRow": 102,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5142538741586,
+      "lng": -0.111762571673787
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "kimber-william-and-co-limited",
+    "name": "Kimber William & Co Limited",
+    "website": "http://www.kimberwilliam.co.uk/",
+    "postcode": "RH10 9PJ",
+    "location": "Gatwick",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/gatwick/kimber-william-and-co-limited/24Epuq",
+    "evidenceUrl": "http://www.kimberwilliam.co.uk/",
+    "spreadsheetRow": 103,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.1356494519974,
+      "lng": -0.166100585632751
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "g-ali-and-co-ltd",
+    "name": "G Ali & Co Ltd",
+    "website": "https://agaaccountants.com/",
+    "postcode": "HA2 7NX",
+    "location": "Harrow",
+    "classification": "Verified",
+    "evidence": "Dedicated Charities service page",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/harrow/g-ali-and-co-ltd/rJ1pG",
+    "evidenceUrl": "https://agaaccountants.com/service/charities-2/",
+    "spreadsheetRow": 104,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5815880777747,
+      "lng": -0.368299106353885
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "h-graham-king-and-co",
+    "name": "H. Graham King & Co",
+    "website": "",
+    "postcode": "KT2 7BN",
+    "location": "Kingston upon Thames",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/kingston-upon-thames/h-graham-king-and-co-bas/1kb571",
+    "evidenceUrl": "",
+    "spreadsheetRow": 105,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.4164544662648,
+      "lng": -0.280290559932184
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "wills-and-trusts-accounting-limited",
+    "name": "Wills & Trusts Accounting Limited",
+    "website": "http://willsandtrustspartnership.com/",
+    "postcode": "OX9 3EH",
+    "location": "Thame",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/thame/wills-and-trusts-accounting-limited/Z2exihM",
+    "evidenceUrl": "http://willsandtrustspartnership.com/",
+    "spreadsheetRow": 106,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.748606,
+      "lng": -0.979453187777293
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "lowe-and-company-accounting-limited",
+    "name": "Lowe & Company Accounting Limited",
+    "website": "http://loweandcompany.co.uk/",
+    "postcode": "EC1V 2NX",
+    "location": "London",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/london/lowe-and-company-accounting-limited/1o13b3",
+    "evidenceUrl": "http://loweandcompany.co.uk/",
+    "spreadsheetRow": 107,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5272681438089,
+      "lng": -0.08892
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "clay-ratnage-daffin-and-co-ltd",
+    "name": "Clay Ratnage Daffin & Co Ltd",
+    "website": "https://clayratnage.co.uk/",
+    "postcode": "RM3 8EN",
+    "location": "Romford",
+    "classification": "Verified",
+    "evidence": "Website describes experience with charity audits",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/romford/clay-ratnage-daffin-and-co-ltd/1BgIgk",
+    "evidenceUrl": "https://clayratnage.co.uk/corporate-and-public-sector/",
+    "spreadsheetRow": 108,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.5980788259054,
+      "lng": 0.217433589372391
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": [
+      {
+        "id": "audit",
+        "source": "https://clayratnage.co.uk/corporate-and-public-sector/",
+        "evidence": "Website describes experience with charity audits"
+      }
+    ]
+  },
+  {
+    "slug": "mark-garrett-tax-and-accountancy-ltd",
+    "name": "Mark Garrett Tax and Accountancy Ltd",
+    "website": "",
+    "postcode": "SN13 9RS",
+    "location": "Corsham",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no website supplied",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/corsham/mark-garrett-tax-and-accountancy-ltd/Z1s3jO5",
+    "evidenceUrl": "",
+    "spreadsheetRow": 109,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.42173,
+      "lng": -2.20043
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "swift-accounting-and-bookkeeping-services-ltd",
+    "name": "Swift Accounting & Bookkeeping Services Ltd",
+    "website": "http://www.swiftbks.co.uk/",
+    "postcode": "EX31 1EU",
+    "location": "Barnstaple",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/barnstaple/swift-accounting-and-bookkeeping-services-ltd/lJFop",
+    "evidenceUrl": "http://www.swiftbks.co.uk/",
+    "spreadsheetRow": 110,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 51.0789563466437,
+      "lng": -4.06014077756279
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  },
+  {
+    "slug": "rmt-accountants-and-business-advisors-ltd",
+    "name": "RMT Accountants & Business Advisors Ltd",
+    "website": "https://r-m-t.co.uk/",
+    "postcode": "NE12 8EG",
+    "location": "Newcastle upon Tyne",
+    "classification": "Probable",
+    "evidence": "ICAEW specialism; no clear evidence on accessible homepage",
+    "contact": "",
+    "icaewUrl": "https://find.icaew.com/firms/newcastle-upon-tyne/rmt-accountants-and-business-advisors-ltd/Z2osrcR",
+    "evidenceUrl": "https://r-m-t.co.uk/",
+    "spreadsheetRow": 111,
+    "reviewed": "2026-10-12",
+    "coordinates": {
+      "lat": 55.017568,
+      "lng": -1.593447
+    },
+    "coordinateSource": "https://github.com/dwyl/uk-postcodes-latitude-longitude-complete-csv (October 2017 postcode centroid)",
+    "services": []
+  }
+]

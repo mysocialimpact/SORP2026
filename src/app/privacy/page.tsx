@@ -50,6 +50,11 @@ export default function Privacy() {
         </p>
       </section>
       <section>
+        <h2>Charity accountants directory</h2>
+        <p>The directory needs no account. Your shortlist is stored only in this browser tab for this visit. A postcode you submit is sent to Postcodes.io to find its approximate location; we do not request your device’s location. OpenStreetMap supplies map tiles and receives ordinary connection information when the map loads. External firm and source links have their own privacy terms.</p>
+        <p>Listing claims and professional partner enquiries send your name, email, firm, role and message through our existing SORP message service for My Social Impact to review and respond. Claims do not automatically transfer ownership or change a listing, and enquiries do not subscribe you to marketing or create a payment.</p>
+      </section>
+      <section>
         <h2>Designed for access</h2>
         <p>
           We aim for WCAG 2.2 AA accessibility. The site supports keyboard
