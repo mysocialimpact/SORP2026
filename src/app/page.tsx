@@ -7,6 +7,8 @@ import { ExperienceCloud } from "@/components/experience-cloud";
 import { HomepageContribution } from "@/components/voluntary-contribution";
 import { site } from "@/lib/site";
 import { excellenceProducts } from "@/lib/products";
+import { HomepageAudience, HomepageHello } from "@/components/homepage-welcome";
+import "./homepage.css";
 export const metadata: Metadata = {
   title: "SORP 2026. Made simpler.",
   ...(site.live ? { alternates: { canonical: "/" } } : {}),
@@ -14,6 +16,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main id="main" className="gateway">
+      <div className="gateway-home-cover">
       <div className="gateway-width">
         <section className="gateway-opening" aria-labelledby="gateway-title">
           <div className="gateway-intro">
@@ -36,14 +39,11 @@ export default function Home() {
               especially to smaller charities.
             </p>
           </div>
-          <div className="gateway-opening-vision">
-            <p className="gateway-kicker">Our social enterprise vision</p>
-            <h2>
-              Imagine a world where nothing stood in the way of our potential
-              to make a difference.
-            </h2>
-          </div>
         </section>
+        <HomepageAudience />
+      </div>
+      </div>
+      <div className="gateway-width">
         <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
           <header className="gateway-section-head gateway-sorp-head">
             <p className="gateway-kicker">Your SORP 2026 toolkit</p>
@@ -157,6 +157,13 @@ export default function Home() {
             ))}
           </div>
         </section>
+        <section className="gateway-opening-vision gateway-home-vision" aria-labelledby="home-vision-title">
+          <p className="gateway-kicker">Our social enterprise vision</p>
+          <h2 id="home-vision-title">
+            Imagine a world where nothing stood in the way of our potential
+            to make a difference.
+          </h2>
+        </section>
       </div>
       <ExperienceCloud />
       <div className="gateway-width">
@@ -169,7 +176,7 @@ export default function Home() {
               monitoring and evaluation, technology, practical charity
               experience and creative thinking.
             </p>
-            <Link className="gateway-quiet-link" href="/contact/">
+            <Link className="gateway-quiet-link" href="#say-hello">
               Say hello <Arrow diagonal />
             </Link>
           </div>
@@ -244,6 +251,7 @@ export default function Home() {
         </section>
       </div>
       <HomepageContribution />
+      <HomepageHello />
     </main>
   );
 }

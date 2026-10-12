@@ -25,6 +25,16 @@ export default function Privacy() {
           content needed to create and deliver that report.
         </p>
         <p>
+          If you choose “I work in a charity” or “I advise charities” on the
+          homepage, your choice is kept in this browser tab’s session storage.
+          It is optional, is not sent to our analytics service, and can be
+          cleared by selecting the same option again. If you use “Say hello”,
+          we send the email address, optional message, selected audience and
+          source to the existing SORP message service so My Social Impact can
+          respond. Newsletter consent is recorded separately only when you
+          actively select it; saying hello alone does not subscribe you.
+        </p>
+        <p>
           Optional booking and payment actions use Google Calendar and Stripe.
           Those providers process the information needed to complete the action
           under their own privacy terms. Links to other websites also take you
