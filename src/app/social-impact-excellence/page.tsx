@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function ExcellencePage() {
   const publicPage = <main id="main" className="gateway product-page product-excellence">
-    <section id="excellence-overview" className="product-hero gateway-width">
+    <FolderHero product="social-impact-excellence" id="excellence-overview" className="product-hero gateway-width">
       <div className="product-hero-copy">
         <p className="gateway-kicker">04 · My Social Impact’s flagship approach</p>
         <h1>Make social impact part of <em>how your charity is run.</em></h1>
@@ -23,7 +24,7 @@ export default function ExcellencePage() {
         <p className="product-hero-note">Start with the established five-pillar Social Impact Maturity Assessment.</p>
       </div>
       <div className="product-brand-panel is-excellence"><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority /></div>
-    </section>
+    </FolderHero>
     <section className="product-statement gateway-width"><p className="gateway-kicker">Five connected pillars</p><h2>One honest baseline.<br/>A better way forward.</h2><p>The established Social Impact Maturity Assessment, private results and the complete existing Purpose pathway now sit inside SORP2026. Other deeper pillar pathways remain clearly marked until the original product releases them.</p></section>
     <section id="excellence-start" className="excellence-programmes gateway-width" aria-labelledby="excellence-programmes-title">
       <div><p className="gateway-kicker">Choose how deeply to explore</p><h2 id="excellence-programmes-title">Three programmes.<br/>One Excellence journey.</h2><p>These are Social Impact Excellence programmes—not extra SORP2026 memberships. Your platform account remains free.</p></div>

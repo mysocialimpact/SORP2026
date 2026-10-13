@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FolderHero } from "@/components/folder-hero";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Arrow } from "@/components/ui";
 import { PILLARS, QUESTIONS } from "./questions";
@@ -71,12 +72,12 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
         : { href: "/social-impact-excellence/journey/", label: "Choose your next pillar" };
 
   return <main id="main" className="gateway product-page product-excellence excellence-account-home">
-    <section id="excellence-overview" className="excellence-account-hero">
+    <FolderHero product="social-impact-excellence" id="excellence-overview" className="excellence-account-hero">
       <div className="gateway-width excellence-account-hero-grid">
         <div><p className="gateway-kicker">04 · Your Social Impact Excellence workspace</p><h1>Welcome back, <span>{firstName}.</span></h1><p className="excellence-account-lead">This is {organisation}’s place to see what you have completed, revisit every answer and decide what to do next.</p><div className="excellence-account-actions"><Link className="gateway-action" href={primary.href}>{primary.label} <Arrow /></Link><Link href="/dashboard/">All five products</Link></div></div>
         <aside aria-label="Your maturity baseline"><p>{complete ? "Your five-pillar baseline" : "Your baseline progress"}</p><strong>{result ? result.overall.toFixed(1) : answered}</strong><span>{result ? `${result.maturity} · out of 5` : `${answered} of 25 questions answered`}</span><i><b style={{ width: `${result ? result.overall * 20 : answered * 4}%` }}/></i>{data.migration?.source === "legacy-social-impact-excellence" ? <small>✓ Your previous MSI assessment is safely connected to this account.</small> : null}</aside>
       </div>
-    </section>
+    </FolderHero>
 
     <section id="excellence-start" className="excellence-now gateway-width" aria-labelledby="excellence-now-title">
       <header><div><p className="gateway-kicker">Your next step</p><h2 id="excellence-now-title">Pick up exactly<br/>where you left off.</h2></div><p>{teamActive ? `${organisation} has an active Team Perspective. You can invite colleagues, see who has responded and view the combined result when enough people have completed it.` : complete ? "Your baseline is complete. Review any answer below, open your results or continue into deeper pillar work." : "Your answers are saved as you go. Continue the next unanswered question or open any pillar below."}</p></header>

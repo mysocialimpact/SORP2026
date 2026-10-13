@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FolderHero } from "@/components/folder-hero";
 import { AskSorpLive } from "@/components/ask-sorp-live";
 import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
@@ -16,7 +17,7 @@ export default function AskSorp() {
   return (
     <>
       <main id="main" className="ask-page product-page product-ask">
-        <section id="ask-overview" className="ask-hero">
+        <FolderHero product="ask-sorp" paper="#fbfaf7" id="ask-overview" className="ask-hero">
           <div className="ask-hero-copy">
             <p className="ask-eyebrow"><span className="ask-live-dot" />Live beta · Available now</p>
             <h1>Ask SORP 2026.<br /><span>Get the answers you need.</span></h1>
@@ -31,7 +32,7 @@ export default function AskSorp() {
             <div className="ask-visual-card is-answer"><small>Ask SORP finds</small><strong>A clear answer.</strong><span>Source paragraphs included.</span></div>
             <div className="ask-source-stamp"><span>Charities SORP</span><strong>2026</strong></div>
           </div>
-        </section>
+        </FolderHero>
 
         <section id="ask-sorp-live" className="ask-live-section" aria-labelledby="ask-live-section-title">
           <div className="ask-live-intro">

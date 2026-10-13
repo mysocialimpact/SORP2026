@@ -11,11 +11,12 @@ import "./gateway.css";
 import "./platform.css";
 import "./typography.css";
 import "./refinement.css";
+import "./folder-continuity.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProductFolderTabs } from "@/components/product-folder-tabs";
 import { PlatformNavigation } from "@/components/platform-navigation";
-import { ProductSectionNavigation } from "@/components/product-section-navigation";
+import { ProductActionBar } from "@/components/product-action-bar";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
 };
-export const viewport: Viewport = { themeColor: "#faf9f6" };
+export const viewport: Viewport = { themeColor: "#faf9f6", viewportFit: "cover" };
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -55,9 +56,9 @@ export default function RootLayout({
           Skip to content
         </a>
         <PlatformNavigation><Header /><ProductFolderTabs /></PlatformNavigation>
-        <ProductSectionNavigation />
         {children}
         <Footer />
+        <ProductActionBar />
       </body>
     </html>
   );
