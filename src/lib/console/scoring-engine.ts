@@ -61,8 +61,12 @@ function qualifies(
       .split(/\s+/)
       .filter(Boolean),
   );
-  const personNames = names(text).filter(
+  const personNames = (e.provenance?.kind === "openai-search"
+    ? (e.people ?? []).filter((name) => text.includes(name))
+    : names(text)).filter(
     (n) =>
+      n.toLowerCase().replace(/[^a-z]/g, "") !==
+        new URL(url).hostname.replace(/^www\./, "").split(".")[0].replace(/[^a-z]/g, "") &&
       !n
         .toLowerCase()
         .split(/\s+/)
@@ -77,9 +81,9 @@ function qualifies(
     return false;
   const namedInContext =
     named ||
-    /\/(?:team|people|meet-the-speakers)\/[a-z]+-[a-z]+\/?$/i.test(
+    (e.provenance?.kind !== "openai-search" && /\/(?:team|people|meet-the-speakers)\/[a-z]+-[a-z]+\/?$/i.test(
       new URL(url).pathname,
-    ); // A person-profile URL only corroborates identity; responsibility is still required.
+    )); // A person-profile URL only corroborates identity; responsibility is still required.
   switch (id) {
     case "A1":
       return (
@@ -134,7 +138,7 @@ function qualifies(
       return (
         c &&
         namedInContext &&
-        /partner|director|head|lead|senior|principal|consultant|presenter/i.test(
+        /\b(?:partners?|directors?|head|lead|senior|principal|consultant|presenter)\b/i.test(
           text,
         ) &&
         /(?:specialis|responsib|head|lead).{0,55}(?:charit|not[ -]for[ -]profit)|charit(?:y|ies).{0,30}(?:audit|account|work|team)|third sector|charit(?:y|ies).{0,35}(?:course|training)/i.test(

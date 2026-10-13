@@ -41,3 +41,13 @@ test('historic charity employment does not establish a current senior charity re
  const r=score([evidence('The people page names Jonathan Coyle as Partner. In his profile, he says he first worked at a youth charity, was responsible for getting the books in order, and joined the firm as a trainee accountant.',{category:'people',url:'https://firm.example/people/'})]);
  assert.equal(r.awards.some(a=>a.criterion_id==='B1'),false);
 });
+
+test('a firm name and a factsheet heading never identify a senior professional',()=>{
+ const r=scoreEvidence([evidence('On the official Specialist areas page, Fraser Powell publishes charity-related material headed Charities trustees responsibilities, focusing on accounting and audit requirements.',{url:'https://www.fraserpowell.co.uk/factsheets/specialist-areas'})],{sufficient:true,firmName:'fraser powel'});
+ assert.equal(r.scores.people,0);
+});
+test('AI people awards require an extracted named person linked to the passage',()=>{
+ const e=evidence('Jane Smith FCA is the senior partner responsible for charity audit.',{provenance:{kind:'openai-search'}});
+ assert.equal(score([e]).scores.people,0);
+ assert.ok(score([{...e,people:['Jane Smith']}]).awards.some(a=>a.criterion_id==='B1'));
+});

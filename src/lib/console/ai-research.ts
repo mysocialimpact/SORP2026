@@ -98,7 +98,7 @@ export async function runAIResearch(
             ? "ICAEW"
             : "External";
       await c.query(
-        "INSERT INTO research_console.evidence(firm_id,run_id,source_type,category,title,summary,url,accessed_at,confidence,notes,provenance,supported_categories) VALUES($1,$2,$3,$4,$5,$6,$7,now(),'Medium — AI paraphrase',$8,$9,$10)",
+        "INSERT INTO research_console.evidence(firm_id,run_id,source_type,category,title,summary,url,accessed_at,confidence,notes,provenance,supported_categories,people) VALUES($1,$2,$3,$4,$5,$6,$7,now(),'Medium — AI paraphrase',$8,$9,$10,$11)",
         [
           firm.id,
           runId,
@@ -116,6 +116,7 @@ export async function runAIResearch(
             coverageComplete: sufficient,
           }),
           cats,
+          data.people.filter((person) => person.passage_id === id).map((person) => person.name),
         ],
       );
     }
