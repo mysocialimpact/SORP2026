@@ -80,8 +80,7 @@ export function DirectorBooking() {
           <em>your organisation.</em>
         </h2>
         <p>
-          A free 10-minute introductory call through our existing booking
-          service. Bring your snapshot and agenda; we’ll explore whether a
+          A free 10-minute introductory call. Bring your snapshot and agenda; we’ll explore whether a
           fuller conversation would help.
         </p>
         <p>

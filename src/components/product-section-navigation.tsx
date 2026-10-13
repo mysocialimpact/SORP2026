@@ -66,11 +66,11 @@ const pageIndexes: Record<string, PageIndex> = {
     colour: "#d8ff52",
     sections: [
       { id: "director-overview", label: "Overview" },
-      { id: "director-ambition", label: "The ambition" },
       { id: "assessment", label: "Free assessment" },
       { id: "director-support", label: "Support today" },
       { id: "director-measurement", label: "What matters" },
       { id: "director-future", label: "The future" },
+      { id: "director-partners", label: "Our expertise" },
       { id: "director-conversation", label: "Talk to us" },
     ],
   },

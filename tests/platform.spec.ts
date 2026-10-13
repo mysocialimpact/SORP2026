@@ -2,9 +2,9 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 const productPages = [
-  ["/my-impact-director/", "What if everyorganisation hadan Impact Director?"],
+  ["/my-impact-director/", "Your Impact Director.Without thefull-time salary."],
   ["/social-impact-excellence/", "Make social impact part of how your charity is run."],
-  ["/charity-impact-reports/", "Is your impact report telling the whole story?"],
+  ["/charity-impact-reports/", "Go beyond SORP.Tell the full story of your impact."],
 ] as const;
 
 test("all five products have distinct working destinations", async ({ page }) => {
@@ -230,7 +230,7 @@ test("Purpose evidence uses the private product upload flow and records real com
 
 test("report review intake creates a private upload record without pretending payment succeeded", async ({ page }) => {
   await page.route("**/api/readiness-account/**", route => {
-    if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: true, account: { name: "QA Person", email: "qa@example.invalid", organisation: "QA Charity" } } });
+    if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: true, account: { name: "QA Person", email: "qa@example.invalid", organisation: "QA Charity" }, progress: { sessionId: "qa-complete", step: "done" } } });
     const input = route.request().postDataJSON() as Record<string, unknown>;
     if (input.action === "list-report-reviews") return route.fulfill({ json: { reviews: [] } });
     if (input.action === "create-report-upload") return route.fulfill({ status: 201, json: { review: { id: "review-1", filename: "impact-report.pdf", sizeBytes: 13, status: "awaiting_upload", createdAt: "2026-10-11T04:00:00Z" }, upload: { url: "https://upload.example.test/report", token: "a".repeat(64) } } });

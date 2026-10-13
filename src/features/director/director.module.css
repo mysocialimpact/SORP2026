@@ -1,5 +1,5 @@
 .page {
-  --ink: #142e3c;
+  --ink: #242329;
   --pink: #f47b9d;
   --orange: #ff7340;
   --paper: #fbf7ef;
@@ -38,8 +38,8 @@
   letter-spacing: -0.025em;
 }
 .page em {
-  font-family: var(--serif), Georgia, serif;
-  font-weight: 400;
+  font: inherit;
+  font-style: normal;
 }
 .page p {
   font-size: 18px;
@@ -91,11 +91,11 @@
   grid-template-columns: 1.15fr 1fr;
   max-width: 1600px;
   margin: auto;
-  padding: 65px max(28px, 5vw) 0;
+  padding: 45px max(28px, 5vw) 0;
   background:
     radial-gradient(ellipse at 90% 60%, #ffd7c6, transparent 54%),
     linear-gradient(#d9ff68 0%, #ecf4d6 9%, var(--paper) 38%);
-  min-height: 720px;
+  min-height: 660px;
 }
 .heroCopy {
   padding: 20px 0 55px;
@@ -104,6 +104,7 @@
 }
 .hero h1 {
   font-size: clamp(48px, 5.5vw, 84px);
+  font-weight: 650;
   margin: 28px 0;
 }
 .hero h1 em {
@@ -116,6 +117,11 @@
 }
 .heroCopy > p:not(.kicker) {
   max-width: 570px;
+}
+.hero .heroPrinciple {
+  padding-left: 16px;
+  border-left: 3px solid var(--orange);
+  font-size: 16px;
 }
 .heroActions {
   display: flex;
@@ -201,10 +207,10 @@
   position: absolute;
   right: -10px;
   top: 5%;
-  font-size: 24px;
-  font-family: var(--serif), Georgia, serif;
-  font-style: italic;
-  transform: rotate(8deg);
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.25;
+  transform: rotate(5deg);
   z-index: 2;
 }
 .cowNote {
@@ -263,15 +269,16 @@
 }
 .invitation {
   display: grid;
-  grid-template-columns: 1.45fr 1fr;
+  grid-template-columns: 1.6fr 1fr;
   gap: 45px;
-  padding: 55px;
+  padding: 42px;
   background: #f4b4c7;
   border: 1.5px solid var(--ink);
   border-radius: 6px 6px 0 0;
 }
 .invitation h2 {
-  margin: 24px 0;
+  margin: 20px 0;
+  font-size: clamp(36px, 4.5vw, 66px);
 }
 .invitation > div:last-child {
   display: flex;
@@ -281,7 +288,7 @@
   gap: 22px;
 }
 .bigStar {
-  font-size: 110px;
+  font-size: 68px;
   line-height: 1;
   color: #ae2d56;
   animation: breathe 6s ease-in-out infinite;
@@ -306,7 +313,9 @@
   margin-bottom: 15px;
 }
 .frame {
-  scroll-margin-top: 18px;
+  /* The document already offsets the fixed platform header. Add only the
+     product subnavigation here, never the platform height a second time. */
+  scroll-margin-top: 58px;
   border: 1.5px solid var(--ink);
   border-top: 0;
   background: #fffdf8;
@@ -315,7 +324,29 @@
 .frame[data-mode="questions"] {
   display: grid;
   grid-template-rows: auto 5px auto minmax(0, 1fr) auto;
-  height: max(560px, min(760px, calc(100svh - 140px)));
+  height: max(360px, min(760px, calc(100svh - var(--platform-navigation-height, 0px) - 90px)));
+}
+.authPanel {
+  scroll-margin-top: 58px;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 45px;
+  padding: 40px;
+  border: 1.5px solid var(--ink);
+  border-top: 0;
+  background: #fffdf8;
+}
+.authPanel h3 {
+  margin: 16px 0 24px;
+}
+.authPanel > div {
+  min-width: 0;
+}
+.authPanel :global(.account-portal) {
+  max-width: none;
+}
+.authPanel :global(.account-note) {
+  font-size: 14px;
 }
 .frame[data-mode="questions"] .question {
   min-height: 0;
@@ -626,7 +657,8 @@
 }
 .saying {
   font-size: clamp(35px, 5vw, 72px) !important;
-  font-family: var(--serif), Georgia, serif;
+  font-family: inherit;
+  letter-spacing: -0.04em;
   line-height: 1.1 !important;
   margin-top: 28px !important;
   color: #c8c3b9;
@@ -701,11 +733,26 @@
 }
 .partnerGrid img {
   object-fit: contain;
-  object-position: left center;
+  object-position: center;
   width: auto;
   max-width: 100%;
   height: 90px;
-  margin-bottom: 25px;
+  margin: 0;
+}
+.partnerLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  padding: 26px;
+  margin-bottom: 26px;
+  border-radius: 4px;
+  background: var(--ink);
+  transition: background 0.2s, transform 0.2s;
+}
+.partnerLogo:hover {
+  background: #35303d;
+  transform: translateY(-3px);
 }
 .partnerGrid h3 {
   font-size: 25px;
@@ -756,6 +803,13 @@
 }
 .closing .primary {
   background: var(--orange);
+}
+.closingActions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
 }
 .srOnly {
   position: absolute;
@@ -818,6 +872,11 @@
   }
 }
 @media (max-width: 700px) {
+  .authPanel {
+    grid-template-columns: 1fr;
+    padding: 24px 18px;
+    gap: 25px;
+  }
   .hero {
     grid-template-columns: 1fr;
     padding-top: 30px;
@@ -837,7 +896,7 @@
     margin: 15px auto 0;
   }
   .cowStage > img {
-    height: 440px;
+    height: 330px;
     width: auto;
     max-width: 100%;
   }
@@ -890,21 +949,17 @@
     gap: 10px;
   }
   .invitation h2 {
-    font-size: 48px;
+    font-size: clamp(34px, 10vw, 44px);
   }
   .invitation > div:last-child {
     position: relative;
     gap: 18px;
   }
   .bigStar {
-    position: absolute;
-    right: 0;
-    top: -75px;
-    font-size: 55px;
-    opacity: 0.45;
+    display: none;
   }
   .frameHeader {
-    padding: 13px 16px;
+    padding: 8px 16px;
     gap: 8px;
     flex-wrap: wrap;
     font-size: 10px;
@@ -913,23 +968,34 @@
     font-size: 12px;
     padding: 6px;
   }
+  .frameHeader > span:first-child {
+    display: none;
+  }
   .chapterRail {
-    padding: 15px 18px;
-    gap: 15px;
+    display: none;
+  }
+  .frame[data-mode="questions"] {
+    grid-template-rows: auto 5px minmax(0, 1fr) auto;
   }
   .question {
-    padding: 24px 20px;
+    padding: 14px 20px;
     min-height: 420px;
   }
   .question h3 {
-    font-size: 29px;
+    font-size: 23px;
+    line-height: 1.2;
+    margin: 12px 0 16px;
+  }
+  .question > .kicker {
+    font-size: 10px;
+    margin: 0;
   }
   .stars {
     gap: 7px;
   }
   .stars label {
-    padding: 9px 2px;
-    min-height: 75px;
+    padding: 5px 2px;
+    min-height: 65px;
   }
   .stars span {
     font-size: 37px;
@@ -938,7 +1004,7 @@
     font-size: 12px;
   }
   .frameFooter {
-    padding: 17px;
+    padding: 8px 17px;
     gap: 14px;
   }
   .frameFooter > span {
@@ -995,7 +1061,7 @@
   }
   .partnerGrid img {
     height: 70px;
-    margin-bottom: 18px;
+    margin: 0;
   }
   .partnerName {
     height: auto;

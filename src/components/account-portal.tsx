@@ -23,7 +23,14 @@ function signedInDestination(destination: string) {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
-export function AccountPortal() {
+function returnToEmbeddedProduct(destination: string) {
+  // A hash-only navigation does not reload account state. Keep the product
+  // address and anchor, then refresh so its assessment and shared header agree.
+  window.history.replaceState(null, "", destination);
+  window.location.reload();
+}
+
+export function AccountPortal({ returnTo, embedded = false }: { returnTo?: string; embedded?: boolean } = {}) {
   const params = useSearchParams();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(params.get("mode") === "signup" ? "signup" : "login");
@@ -31,19 +38,22 @@ export function AccountPortal() {
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
   const [fields, setFields] = useState({ name: "", role: "", roleOther: "", email: "", password: "", confirm: "" });
-  const destination = useMemo(() => safeReturn(params.get("return")), [params]);
+  const destination = useMemo(() => safeReturn(returnTo ?? params.get("return")), [params, returnTo]);
 
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
       .then(async response => {
         const data = await response.json().catch(() => ({}));
-        if (response.ok && data.signedIn === true) router.replace(destination);
+        if (response.ok && data.signedIn === true) {
+          if (embedded) returnToEmbeddedProduct(destination);
+          else router.replace(destination);
+        }
       })
       .catch(() => undefined)
       .finally(() => setChecking(false));
     return () => controller.abort();
-  }, [destination, router]);
+  }, [destination, router, embedded]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,8 +78,13 @@ export function AccountPortal() {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "We could not complete that request. Please try again.");
-      router.replace(signedInDestination(destination));
-      router.refresh();
+      if (embedded) {
+        // Refresh the existing shared session and all account controls together.
+        returnToEmbeddedProduct(destination);
+      } else {
+        router.replace(signedInDestination(destination));
+        router.refresh();
+      }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "We could not complete that request. Please try again.");
       setBusy(false);
@@ -96,6 +111,6 @@ export function AccountPortal() {
       {mode === "login" && <Link className="account-forgot" href="/forgot-password/">Forgotten your password?</Link>}
       <button className="gateway-action account-submit" disabled={busy} type="submit">{busy ? "Please wait…" : mode === "login" ? "Log in to SORP2026 →" : "Create my SORP2026 account →"}</button>
     </form>}
-    <p className="account-note">One account for every SORP2026 product. If you previously used Social Impact Excellence, sign up with the same email address and eligible saved work will reconnect automatically. Google sign-in remains unavailable until its existing configuration is fully verified.</p>
+    <p className="account-note">{embedded ? "One free account for your eligible SORP2026 and My Social Impact tools. You’ll return straight to this assessment. No SORP review required." : "One account for every SORP2026 product. If you previously used Social Impact Excellence, sign up with the same email address and eligible saved work will reconnect automatically. Google sign-in remains unavailable until its existing configuration is fully verified."}</p>
   </div>;
 }
