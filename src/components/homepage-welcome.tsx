@@ -39,7 +39,7 @@ export function HomepageAudience() {
   }
 
   return (
-    <section className="homepage-audience" aria-label="Choose your audience">
+    <section className="homepage-audience" id="home-audience" aria-label="Choose your audience">
       <p className="homepage-audience-intro">
         We’ve built this for
       </p>

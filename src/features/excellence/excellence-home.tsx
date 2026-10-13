@@ -71,23 +71,23 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
         : { href: "/social-impact-excellence/journey/", label: "Choose your next pillar" };
 
   return <main id="main" className="gateway product-page product-excellence excellence-account-home">
-    <section className="excellence-account-hero">
+    <section id="excellence-overview" className="excellence-account-hero">
       <div className="gateway-width excellence-account-hero-grid">
         <div><p className="gateway-kicker">04 · Your Social Impact Excellence workspace</p><h1>Welcome back, <span>{firstName}.</span></h1><p className="excellence-account-lead">This is {organisation}’s place to see what you have completed, revisit every answer and decide what to do next.</p><div className="excellence-account-actions"><Link className="gateway-action" href={primary.href}>{primary.label} <Arrow /></Link><Link href="/dashboard/">All six products</Link></div></div>
         <aside aria-label="Your maturity baseline"><p>{complete ? "Your five-pillar baseline" : "Your baseline progress"}</p><strong>{result ? result.overall.toFixed(1) : answered}</strong><span>{result ? `${result.maturity} · out of 5` : `${answered} of 25 questions answered`}</span><i><b style={{ width: `${result ? result.overall * 20 : answered * 4}%` }}/></i>{data.migration?.source === "legacy-social-impact-excellence" ? <small>✓ Your previous MSI assessment is safely connected to this account.</small> : null}</aside>
       </div>
     </section>
 
-    <section className="excellence-now gateway-width" aria-labelledby="excellence-now-title">
+    <section id="excellence-start" className="excellence-now gateway-width" aria-labelledby="excellence-now-title">
       <header><div><p className="gateway-kicker">Your next step</p><h2 id="excellence-now-title">Pick up exactly<br/>where you left off.</h2></div><p>{teamActive ? `${organisation} has an active Team Perspective. You can invite colleagues, see who has responded and view the combined result when enough people have completed it.` : complete ? "Your baseline is complete. Review any answer below, open your results or continue into deeper pillar work." : "Your answers are saved as you go. Continue the next unanswered question or open any pillar below."}</p></header>
       <div className="excellence-now-grid">
         <article className="is-primary"><span>Recommended now</span><h3>{teamActive ? "Bring in the Brainstrust team." : complete ? "Turn the baseline into action." : "Complete your honest baseline."}</h3><p>{teamActive ? `${counts.completed} completed · ${counts.started} in progress · ${counts.invited} invited` : complete ? "Use the five pillar scores to choose where focused work will make the greatest difference." : `${25 - answered} questions remain. Your existing answers will not be lost.`}</p><Link href={primary.href}>{primary.label} <Arrow /></Link></article>
-        <article><span>Your evidence</span><h3>See every answer you gave.</h3><p>The questions and selected maturity levels are shown below, grouped into the five pillars.</p><a href="#your-answers">Review all answers ↓</a></article>
+        <article><span>Your evidence</span><h3>See every answer you gave.</h3><p>The questions and selected maturity levels are shown below, grouped into the five pillars.</p><a href="#excellence-pillars">Review all answers ↓</a></article>
         <article><span>Your result</span><h3>{result ? `${result.overall.toFixed(1)} · ${result.maturity}` : "Your report is still forming."}</h3><p>{result?.recommendation || "Complete all 25 questions to generate your private five-pillar report and suggested next step."}</p>{result ? <Link href="/social-impact-excellence/results/">Open baseline report <Arrow /></Link> : <Link href="/social-impact-excellence/assessment/">Continue assessment <Arrow /></Link>}</article>
       </div>
     </section>
 
-    <section id="your-answers" className="excellence-answer-section gateway-width" aria-labelledby="your-answers-title">
+    <section id="excellence-pillars" className="excellence-answer-section gateway-width" aria-labelledby="your-answers-title">
       <header><p className="gateway-kicker">Your five pillars · Your answers</p><h2 id="your-answers-title">Nothing hidden.<br/>Everything easy to revisit.</h2><p>Open a pillar to see the five original questions and the answer currently saved in {organisation}’s account.</p></header>
       <div className="excellence-answer-pillars">{PILLARS.map((pillar, pillarIndex) => {
         const pillarQuestions = QUESTIONS.slice(pillarIndex * 5, pillarIndex * 5 + 5);
@@ -101,13 +101,13 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
       })}</div>
     </section>
 
-    <section className="excellence-pathways gateway-width" aria-labelledby="excellence-pathways-title">
+    <section id="excellence-account" className="excellence-pathways gateway-width" aria-labelledby="excellence-pathways-title">
       <header><p className="gateway-kicker">From baseline to improvement</p><h2 id="excellence-pathways-title">The whole journey,<br/>in one place.</h2></header>
       <div>{PILLARS.map((pillar, index) => {
         const score = result?.pillarScores.find(item => item.pillar === pillar.key)?.score;
         const isPurpose = pillar.key === "purpose";
         const state = isPurpose ? purposeStatus === "complete" ? "Complete" : purposeStarted ? `${data.purpose?.progress || 0}% complete` : complete ? "Ready to begin" : "Complete baseline first" : complete ? "Baseline ready to review" : `${answers.slice(index * 5, index * 5 + 5).filter(Boolean).length}/5 answered`;
-        return <article key={pillar.key}><span>{pillar.number}</span><h3>{pillar.label}</h3><p>{pillar.strapline}</p><i><b style={{ width: `${score ? score * 20 : answers.slice(index * 5, index * 5 + 5).filter(Boolean).length * 20}%` }}/></i><strong>{state}</strong>{isPurpose && complete ? <Link href="/social-impact-excellence/purpose/">{purposeStarted ? "Continue" : "Begin"} Purpose pathway →</Link> : <a href={`#your-answers`}>Review pillar answers ↓</a>}</article>;
+        return <article key={pillar.key}><span>{pillar.number}</span><h3>{pillar.label}</h3><p>{pillar.strapline}</p><i><b style={{ width: `${score ? score * 20 : answers.slice(index * 5, index * 5 + 5).filter(Boolean).length * 20}%` }}/></i><strong>{state}</strong>{isPurpose && complete ? <Link href="/social-impact-excellence/purpose/">{purposeStarted ? "Continue" : "Begin"} Purpose pathway →</Link> : <a href={`#excellence-pillars`}>Review pillar answers ↓</a>}</article>;
       })}</div>
       <p className="excellence-pathway-note">The complete deeper Purpose pathway is available now. The other four pillars currently retain their full baseline questions and results here; deeper guided pathways will appear as they are released.</p>
     </section>

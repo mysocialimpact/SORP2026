@@ -14,7 +14,7 @@ export default function AskSorp() {
   const liveUrl = site.askSorp!;
   return (
     <main id="main" className="gateway product-page product-ask">
-      <section className="product-hero product-hero-ask gateway-width">
+      <section id="ask-overview" className="product-hero product-hero-ask gateway-width">
         <div className="product-hero-copy">
           <p className="gateway-kicker"><span className="product-live-dot" />02 · Live beta · Available now</p>
           <h1>SORP questions?<br /><em>Just ask.</em></h1>
@@ -25,7 +25,7 @@ export default function AskSorp() {
         <div className="ask-paper-mark" aria-hidden="true"><span>Ask</span><strong>SORP.</strong><i>?</i></div>
       </section>
 
-      <section className="ask-trust gateway-width" aria-label="How Ask SORP works">
+      <section id="ask-how" className="ask-trust gateway-width" aria-label="How Ask SORP works">
         {[
           ["01", "Ask in plain English", "Start with the question you actually need to answer."],
           ["02", "See the source", "Answers retain relevant SORP paragraph references and evidence."],
