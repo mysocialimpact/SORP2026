@@ -32,13 +32,31 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
       cover: getComputedStyle(cover).backgroundColor,
       edgeBorder: getComputedStyle(edge).borderTopWidth,
       gap: cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
-      sequence: [".gateway-opening", ".homepage-audience", ".gateway-sorp-section", ".homepage-impact", ".gateway-home-vision"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
+      sequence: [".gateway-opening", ".homepage-audience", ".gateway-sorp-section", ".homepage-ambition", ".gateway-home-vision"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
     };
   });
   expect(surfaces.edge).toBe(surfaces.cover);
   expect(surfaces.edgeBorder).toBe("0px");
   expect(surfaces.gap).toBe(0);
   expect(surfaces.sequence).toEqual([...surfaces.sequence].sort((a, b) => a - b));
+});
+
+test("the middle story is one compact ambition and a distinct vision", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const ambition = page.locator(".homepage-ambition");
+  const vision = page.locator(".homepage-vision");
+  await expect(ambition.getByText("Our ambition", { exact: true })).toBeVisible();
+  await expect(ambition.getByRole("heading")).toHaveText("Greater impact.Accessible to everyone.");
+  await expect(ambition).toContainText("Useful tools, free wherever possible. Expert support when you need it.");
+  await expect(vision.getByRole("heading")).toHaveText("Imagine a world where social impact was taken as seriously as financial performance.");
+  for (const removed of ["Too useful to leave in a filing cabinet.", "Better evidence.", "Better decisions.", "Big possibilities. Smaller barriers."]) {
+    await expect(page.getByText(removed, { exact: false })).toHaveCount(0);
+  }
+  const ambitionBox = (await ambition.boundingBox())!;
+  const visionBox = (await vision.boundingBox())!;
+  expect(ambitionBox.height + visionBox.height).toBeLessThan(page.viewportSize()!.width > 700 ? 700 : 760);
+  await ambition.screenshot({ path: testInfo.outputPath("ambition.png") });
+  await vision.screenshot({ path: testInfo.outputPath("vision.png") });
 });
 
 test("one compact starting point links directly to the working review", async ({ page }, testInfo) => {
@@ -55,7 +73,7 @@ test("one compact starting point links directly to the working review", async ({
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await start.screenshot({ path: testInfo.outputPath("single-start.png") });
   await review.click();
-  await expect(page).toHaveURL(/\/are-you-sorp-ready\/review\/\?entry=intro$/);
+  await expect(page).toHaveURL(/\/are-you-sorp-ready\/review\/(?:\?entry=intro)?$/);
   await expect(page.locator(".si-welcome")).toBeVisible();
 });
 

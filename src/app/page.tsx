@@ -60,30 +60,19 @@ export default function Home() {
           </div>
           <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/">Read the official Charities SORP <Arrow diagonal /></a></p>
         </section>
-        <section className="homepage-impact" aria-labelledby="impact-story-title">
-          <div className="homepage-impact-heading">
-            <h2 id="impact-story-title">Too useful to leave<br /><em>in a filing cabinet.</em></h2>
-            <p>A report captures a year. Its insight can shape what happens next.</p>
-          </div>
-          <ol className="homepage-impact-sheets">
-            <li><span className="homepage-sheet-tab" aria-hidden="true">01</span><span className="homepage-evidence-lines" aria-hidden="true"><i /><i /><i /><i /></span><h3>Better evidence.</h3><p>Understand what’s working.<br />And what needs to change.</p></li>
-            <li><span className="homepage-sheet-tab" aria-hidden="true">02</span><span className="homepage-decision" aria-hidden="true"><svg viewBox="0 0 72 62" fill="none"><path d="M8 54 56 6M20 6h36v36" stroke="currentColor" strokeWidth="3" /></svg></span><h3>Better decisions.</h3><p>Put that knowledge to work.<br />Choose where to focus next.</p></li>
-            <li><span className="homepage-sheet-tab" aria-hidden="true">03</span><span className="homepage-impact-bars" aria-hidden="true"><i /><i /><i /></span><h3>Greater impact.</h3><p>Learn, improve and show the difference<br />to funders and supporters.</p></li>
-          </ol>
+        <section className="homepage-ambition" aria-labelledby="ambition-title">
+          <p className="gateway-kicker">Our ambition</p>
+          <h2 id="ambition-title">
+            Greater impact.
+            <span>Accessible to everyone.</span>
+          </h2>
+          <p>Useful tools, free wherever possible. Expert support when you need it.</p>
         </section>
-        <section className="homepage-access" aria-labelledby="access-title">
-          <div className="homepage-access-copy">
-            <h2 id="access-title">Big possibilities.<br /><em>Smaller barriers.</em></h2>
-            <p>Smaller charities deserve powerful tools, too. We bring technology and specialist expertise together to put them within reach.</p>
-            <p className="homepage-access-promise">Free wherever possible.<br />Affordable expert support where needed.</p>
-            <Link className="gateway-quiet-link" href="/our-mission/">The mission behind My Social Impact <Arrow diagonal /></Link>
-          </div>
-        <div className="gateway-opening-vision gateway-home-vision" aria-labelledby="home-vision-title">
+        <section className="gateway-opening-vision gateway-home-vision homepage-vision" aria-labelledby="home-vision-title">
           <p className="gateway-kicker">Our social enterprise vision</p>
           <h2 id="home-vision-title">
             Imagine a world where social impact was taken as seriously as financial performance.
           </h2>
-        </div>
         </section>
       </div>
       <ExperienceCloud />
