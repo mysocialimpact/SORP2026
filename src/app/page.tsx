@@ -49,38 +49,15 @@ export default function Home() {
       <div className="gateway-width">
         <HomepageAudience />
         <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
-          <header className="gateway-section-head gateway-sorp-head">
-            <p className="gateway-kicker">Your SORP 2026 toolkit</p>
-            <h2 id="sorp-tools-title">Start here. Get SORP ready.</h2>
-            <p>
-              Understand the requirements. Find your starting point.
-            </p>
-          </header>
-          <div className="homepage-tool-summaries">
-            <article className="homepage-tool-summary homepage-tool-summary-ready">
-              <h3>Are You SORP Ready?</h3>
-              <p>Discover how ready your charity is for SORP 2026 impact and sustainability reporting.</p>
-            </article>
-            <article className="homepage-tool-summary homepage-tool-summary-ask">
-              <h3>Ask SORP</h3>
-              <p>Get clear, evidence-led answers to your SORP questions.</p>
-            </article>
-          </div>
-          <p className="homepage-tools-beyond">Beyond compliance, our tools help charities report their impact, manage it, communicate it and continually improve it.</p>
-          <aside className="gateway-adviser-note" aria-labelledby="adviser-note-title">
-            <p className="gateway-kicker">For accountants and advisers</p>
-            <div>
-              <strong id="adviser-note-title">Already working with an accountant or adviser? Brilliant.</strong>
-              <p>
-                These SORP tools give charities and their advisers a clearer
-                shared starting point. They support the relationship—they do
-                not replace professional judgement.
-              </p>
+          <div className="homepage-start">
+            <h2 id="sorp-tools-title">Are You SORP Ready?</h2>
+            <div className="homepage-start-action">
+              <p>Discover how prepared your charity is for impact and sustainability reporting under SORP 2026.</p>
+              <Link className="gateway-action" href={site.readiness!}>
+                Start your free review <Arrow />
+              </Link>
             </div>
-            <Link className="gateway-quiet-link" href="/for-advisers/">
-              See how we work together <Arrow diagonal />
-            </Link>
-          </aside>
+          </div>
           <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/">Read the official Charities SORP <Arrow diagonal /></a></p>
         </section>
         <section className="homepage-impact" aria-labelledby="impact-story-title">

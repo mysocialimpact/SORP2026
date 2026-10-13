@@ -1,17 +1,23 @@
 /* Homepage refinements only — no assessment or product theme overrides. */
-.homepage-tool-summaries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.homepage-tool-summary { padding: 28px 30px; border-radius: 5px; }
-.homepage-tool-summary-ready { background: var(--g-orange); }
-.homepage-tool-summary-ask { background: #e7e2f1; }
-.homepage-tool-summary h3 { margin: 0 0 14px; font-size: clamp(28px, 2.8vw, 40px); font-weight: 600; line-height: 1.08; letter-spacing: -.045em; }
-.homepage-tool-summary p { max-width: 440px; margin: 0; font-size: 17px; line-height: 1.5; }
-.homepage-tools-beyond { margin: 22px 0 0; max-width: 850px; color: #625f65; font-size: 16px; line-height: 1.6; }
+.homepage-start {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, .88fr);
+  gap: clamp(34px, 6vw, 90px);
+  align-items: center;
+  padding: clamp(34px, 4.5vw, 60px);
+  border-radius: 6px;
+  background: var(--g-orange);
+}
+.homepage-start h2 { max-width: 680px; font-size: clamp(52px, 6vw, 88px); line-height: .92; letter-spacing: -.06em; }
+.homepage-start-action { padding-left: clamp(0px, 3vw, 46px); border-left: 1px solid #24232966; }
+.homepage-start-action > p { max-width: 480px; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.45; }
+.homepage-start-action .gateway-action { width: fit-content; margin-top: 26px; }
 @media (max-width: 700px) {
-  .homepage-tool-summaries { grid-template-columns: 1fr; gap: 12px; }
-  .homepage-tool-summary { padding: 24px; }
-  .homepage-tool-summary h3 { font-size: 30px; margin-bottom: 12px; }
-  .homepage-tool-summary p { font-size: 16px; }
-  .homepage-tools-beyond { margin-top: 20px; font-size: 15px; }
+  .homepage-start { grid-template-columns: 1fr; gap: 24px; padding: 28px 24px; }
+  .homepage-start h2 { font-size: clamp(43px, 13vw, 58px); }
+  .homepage-start-action { padding: 22px 0 0; border-left: 0; border-top: 1px solid #24232966; }
+  .homepage-start-action > p { font-size: 17px; }
+  .homepage-start-action .gateway-action { width: 100%; margin-top: 22px; }
 }
 .homepage-source { margin-top: 24px; font-size: 14px; color: #625f65; }
 .homepage-source a { display: inline-flex; align-items: center; gap: 6px; color: #355747; text-decoration: underline; text-underline-offset: 4px; }
@@ -147,6 +153,15 @@
   background: #242329;
   border-radius: 8px;
 }
+.homepage-audience-intro {
+  margin: 0;
+  padding: 12px 12px 26px;
+  color: #fff;
+  font-size: clamp(23px, 2.3vw, 34px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -.035em;
+}
 .homepage-audience-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .homepage-audience-options button {
   position: relative; display: block; min-width: 0; text-align: left;
@@ -214,11 +229,12 @@
   .homepage-hero-definition { margin-top: 22px; font-size: 18px; }
   .gateway-home-cover .gateway-intro-aside { max-width: none; border-left: 0; border-top: 1px solid #718b7055; padding: 24px 0 0; }
   .homepage-audience { margin-top: 30px; padding: 10px; }
+  .homepage-audience-intro { padding: 10px 10px 20px; font-size: 24px; }
   .homepage-audience-options { grid-template-columns: 1fr; gap: 10px; }
   .homepage-audience-options button { padding: 24px 20px 22px; }
   .homepage-audience-options strong { font-size: clamp(34px, 11vw, 48px); }
   .homepage-audience-description { margin-top: 14px; font-size: 14px; }
-  .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 42px; }
+  .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 34px; }
   .gateway-signature { margin-top: 54px; padding: 35px 10px 37px; }
   .gateway-signature + .platform-family { padding-top: 56px; }
   .gateway .gateway-home-vision { margin-bottom: 58px; }

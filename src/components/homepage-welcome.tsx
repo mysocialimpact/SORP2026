@@ -41,6 +41,9 @@ export function HomepageAudience() {
 
   return (
     <section className="homepage-audience" aria-label="Choose your audience">
+      <p className="homepage-audience-intro">
+        Built for charities and the accountants and advisers who support them.
+      </p>
       <div className="homepage-audience-options">
         {([
           ["charity", "CHARITIES", "Staff · Leaders · Trustees · Volunteers"],
