@@ -8,7 +8,7 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   expect((await nav.boundingBox())!.y).toBe(0);
   expect((await nav.boundingBox())!.height).toBeLessThan(190);
   await expect(nav.getByRole("link", { name: "Our Mission" })).toBeVisible();
-  await expect(nav.locator(".product-folder-tab")).toHaveCount(7);
+  await expect(nav.locator(".product-folder-tab")).toHaveCount(6);
   await expect(page.locator(".homepage-audience-options button").first()).toContainText("Trustees · CEOs · Finance teams · Staff · Volunteers");
   await expect(page.locator(".homepage-audience-options button").nth(1)).toContainText("Accountants · Auditors · Lawyers · Consultants · Funders");
   await expect(page.locator(".gateway-portraits h3")).toHaveText(["Marcus Warry ACA", "Dr Chris Arnold", "Gareth Murphy", "Nicholas Demeter"]);

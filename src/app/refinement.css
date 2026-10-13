@@ -42,7 +42,7 @@ body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigat
   .platform-sticky-navigation .gateway-account-control { grid-column: 2; grid-row: 1; padding: 8px 12px; font-size: 12px; }
   .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; font-size: 10px; }
   .platform-sticky-navigation .product-folder-tabs { padding-top: 6px; }
-  .platform-sticky-navigation .product-folder-tab { min-height: 52px; width: 155px; flex-basis: 155px; padding: 8px 12px; }
+  .platform-sticky-navigation .product-folder-tab { min-height: 60px; width: 168px; flex-basis: 168px; padding: 8px 12px; }
   .platform-sticky-navigation .product-folder-tab strong { font-size: 13px; }
   .platform-sticky-navigation .product-folder-tab > span { display: none; }
   .platform-sticky-navigation .product-folder-sheet-edge { height: 4px; }

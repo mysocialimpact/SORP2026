@@ -7,11 +7,10 @@ const pages = [
   { path: "/ask-sorp/", title: "Ask SORP", sections: ["ask-overview", "ask-sorp-live", "ask-how"] },
   { path: "/charity-impact-reports/", title: "Charity Impact Reports", sections: ["reports-overview", "reports-why", "reports-review", "reports-full"] },
   { path: "/social-impact-excellence/", title: "Social Impact Excellence", sections: ["excellence-overview", "excellence-start", "excellence-pillars", "excellence-account"] },
-  { path: "/purpose-works/", title: "Purpose Works", sections: ["purpose-overview", "purpose-services", "purpose-expertise", "purpose-claims", "purpose-review"] },
   { path: "/my-impact-director/", title: "My Impact Director", sections: ["director-overview", "director-ambition", "assessment", "director-support", "director-measurement", "director-future", "director-conversation"] },
 ] as const;
 
-test("the shared section index stays visible and tracks all seven folder pages", async ({ page }, testInfo) => {
+test("the shared section index stays visible and tracks all six folder pages", async ({ page }, testInfo) => {
   await page.route("**/api/readiness-account/**", route => route.fulfill({ status: 401, json: { signedIn: false } }));
 
   for (const entry of pages) {
