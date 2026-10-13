@@ -103,6 +103,15 @@
   transform: translateY(calc(var(--tab-step) - 4px));
   box-shadow: 0 -7px 14px #24232916, inset 0 1px 0 #ffffff61;
 }
+.product-folder-tab.is-journey-later:not(.is-active) {
+  filter: saturate(.5) contrast(.92);
+  opacity: .72;
+}
+.product-folder-tab.is-journey-later:not(.is-active):hover,
+.product-folder-tab.is-journey-later:not(.is-active):focus-visible {
+  filter: saturate(.82) contrast(.98);
+  opacity: 1;
+}
 .product-folder-tab.is-active {
   z-index: 2;
   min-height: 74px;

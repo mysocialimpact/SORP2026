@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLayoutEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { allProducts } from "@/lib/products";
+import { isReadinessComplete } from "@/lib/readiness-status";
 
 const homeTab = {
   number: "Index",
@@ -23,10 +24,22 @@ function activeFolderPath(pathname: string) {
 
 export function ProductFolderTabs() {
   const pathname = usePathname();
+  const [readinessComplete, setReadinessComplete] = useState(false);
   const tabStrip = useRef<HTMLElement>(null);
   const selectedTab = useRef<HTMLAnchorElement>(null);
   const normalisedPath = pathname.endsWith("/") ? pathname : `${pathname}/`;
   const activePath = activeFolderPath(normalisedPath);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
+      .then(async response => {
+        const data = await response.json().catch(() => ({}));
+        setReadinessComplete(response.ok && data.signedIn === true && isReadinessComplete(data.progress));
+      })
+      .catch(() => setReadinessComplete(false));
+    return () => controller.abort();
+  }, []);
 
   useLayoutEffect(() => {
     const strip = tabStrip.current;
@@ -45,6 +58,7 @@ export function ProductFolderTabs() {
           {folderTabs.map((tab, index) => {
             const active = activePath === tab.href;
             const exact = normalisedPath === tab.href;
+            const laterJourney = tab.number !== "Index" && Number(tab.number) >= 3 && !readinessComplete;
             const style = {
               "--tab-colour": tab.tabColour,
               "--tab-ink": tab.tabInk,
@@ -55,7 +69,7 @@ export function ProductFolderTabs() {
                 key={tab.slug}
                 ref={active ? selectedTab : undefined}
                 href={tab.href}
-                className={`product-folder-tab ${tab.className}${active ? " is-active" : ""}`}
+                className={`product-folder-tab ${tab.className}${active ? " is-active" : ""}${laterJourney ? " is-journey-later" : ""}`}
                 aria-current={active ? (exact ? "page" : "location") : undefined}
                 style={style}
               >

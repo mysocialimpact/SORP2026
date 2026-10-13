@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FounderConsoleLink } from "./console/founder-link";
 import { Arrow } from "@/components/ui";
+import { isReadinessComplete, isReadinessStarted } from "@/lib/readiness-status";
 
 type Account = { name: string; email: string; position: string; organisation?: string; lastSavedAt?: string };
 type Progress = { step?: string; candidate?: { name?: string }; report?: unknown; sessionId?: string; criterion?: number; corrections?: Record<string, { reviewed?: boolean }> };
@@ -14,8 +15,6 @@ type ExcellenceProgress = { status?: string; data?: { answers?: Array<number | n
 type ReportReview = { id: string; filename: string; status: string; feedbackReady?: boolean };
 type TeamWorkspaceSummary = { organisation?: { programme?: string; name?: string }; invitations?: Array<{ status?: string }> };
 
-const completeSteps = new Set(["report-ready", "report", "email-ready", "final-feedback", "support", "before-go", "next", "help", "done"]);
-const untouchedSteps = new Set([undefined, "scope", "public-methodology", "intro", "benefits", "find"]);
 const readinessPhases = [
   ["scope", "public-methodology", "intro", "benefits"],
   ["find", "confirmation", "account"],
@@ -130,8 +129,8 @@ export function PlatformDashboard({ signedInCelebration = false }: { signedInCel
   if (!data) return <div className="dashboard-state" role="status"><h2>Opening your dashboard…</h2></div>;
   if (!data.signedIn || !data.account) return <div className="dashboard-state"><h2>Log in to see your dashboard.</h2><p>Your existing readiness review will still be there.</p><Link className="gateway-action" href="/login/?return=/dashboard/">Log in <Arrow /></Link></div>;
   const progress = data.progress || {};
-  const readinessComplete = completeSteps.has(progress.step || "");
-  const readinessStarted = Boolean(progress.sessionId) && !untouchedSteps.has(progress.step);
+  const readinessComplete = isReadinessComplete(progress);
+  const readinessStarted = isReadinessStarted(progress);
   const readinessHref = readinessComplete ? "/are-you-sorp-ready/review/" : readinessStarted ? "/are-you-sorp-ready/review/" : "/are-you-sorp-ready/review/?entry=intro";
   const readinessLabel = readinessComplete ? "Open your report" : readinessStarted ? "Continue assessment" : "Start free review";
   const firstName = data.account.name.split(/\s+/)[0];

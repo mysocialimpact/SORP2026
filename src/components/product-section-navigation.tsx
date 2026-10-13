@@ -46,9 +46,9 @@ const pageIndexes: Record<string, PageIndex> = {
     colour: "#ffd567",
     sections: [
       { id: "reports-overview", label: "Overview" },
-      { id: "reports-why", label: "Why it matters" },
-      { id: "reports-review", label: "£100 review" },
-      { id: "reports-full", label: "Full report" },
+      { id: "reports-connection", label: "SORP connection" },
+      { id: "reports-value", label: "What it brings" },
+      { id: "reports-review", label: "Report review" },
     ],
   },
   "/social-impact-excellence/": {
