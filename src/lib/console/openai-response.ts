@@ -5,7 +5,10 @@ import { query, transaction } from "./db";
 // Pricing checked 2026-10-13: $0.75/M input, $4.50/M output, $0.01/search.
 // No configurable arbitrary model: its price/context limit would invalidate this budget.
 export const researchModel = "gpt-5.4-mini-2026-03-17";
-export const openaiConfigured = () => Boolean(process.env.OPENAI_API_KEY);
+// Accept the existing Sensitive Vercel variable without copying its secret.
+// The standard provider name takes precedence if both are configured.
+const apiKey = () => process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;
+export const openaiConfigured = () => Boolean(apiKey());
 export type AIResponse = {
   id: string;
   status: string;
@@ -102,7 +105,7 @@ export async function response(
     const http = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey()}`,
         "Content-Type": "application/json",
       },
       cache: "no-store",

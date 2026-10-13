@@ -5,7 +5,7 @@ import { startResearch, runResearch } from "../src/lib/console/research";
 async function main() {
   if (process.env.VERCEL_ENV !== "preview")
     throw new Error("Use only the isolated preview database.");
-  if (process.env.OPENAI_API_KEY)
+  if (process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY)
     throw new Error(
       "OpenAI is configured: run console-verify-openai.ts instead.",
     );
