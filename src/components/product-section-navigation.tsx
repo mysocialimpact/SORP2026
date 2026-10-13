@@ -37,8 +37,8 @@ const pageIndexes: Record<string, PageIndex> = {
     colour: "#d9e4f2",
     sections: [
       { id: "ask-overview", label: "Overview" },
-      { id: "ask-how", label: "How it works" },
       { id: "ask-sorp-live", label: "Ask SORP now" },
+      { id: "ask-how", label: "How it works" },
     ],
   },
   "/charity-impact-reports/": {

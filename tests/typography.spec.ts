@@ -31,7 +31,6 @@ test("small iPhone keeps the tagline and reduced-motion layout readable", async 
 
 test("platform text uses upright sans-serif without horizontal overflow", async ({ page }, testInfo) => {
   await page.route("**/api/readiness-account/**", route => route.fulfill({ json: { signedIn: false } }));
-  await page.route("https://asksorp.mysocialimpact.org/**", route => route.abort());
   for (const path of ["/", "/are-you-sorp-ready/", "/ask-sorp/", "/charity-impact-reports/", "/social-impact-excellence/", "/purpose-works/", "/my-impact-director/", "/our-mission/", "/contact/", "/login/"]) {
     await page.goto(path);
     const failures = await page.locator("main, main *, .gateway-header *").evaluateAll(elements =>

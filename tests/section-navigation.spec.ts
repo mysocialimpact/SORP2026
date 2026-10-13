@@ -4,7 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 const pages = [
   { path: "/", title: "Home", sections: ["home-overview", "home-audience", "products", "home-experience", "home-team", "home-support", "say-hello"] },
   { path: "/are-you-sorp-ready/", title: "Are You SORP Ready?", sections: ["top", "sr-audiences", "sr-benefits", "presentation", "sr-more"] },
-  { path: "/ask-sorp/", title: "Ask SORP", sections: ["ask-overview", "ask-how", "ask-sorp-live"] },
+  { path: "/ask-sorp/", title: "Ask SORP", sections: ["ask-overview", "ask-sorp-live", "ask-how"] },
   { path: "/charity-impact-reports/", title: "Charity Impact Reports", sections: ["reports-overview", "reports-why", "reports-review", "reports-full"] },
   { path: "/social-impact-excellence/", title: "Social Impact Excellence", sections: ["excellence-overview", "excellence-start", "excellence-pillars", "excellence-account"] },
   { path: "/purpose-works/", title: "Purpose Works", sections: ["purpose-overview", "purpose-services", "purpose-expertise", "purpose-claims", "purpose-review"] },
