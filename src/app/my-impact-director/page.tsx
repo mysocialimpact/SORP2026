@@ -1,51 +1,49 @@
 import type { Metadata } from "next";
+import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
 import { DirectorAssessment } from "@/features/director/assessment";
 import { DirectorBooking } from "@/features/director/booking";
 import s from "@/features/director/director.module.css";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
-  title: "My Impact Director — human expertise, intelligent possibilities",
+  title: "My Impact Director | Expert year-round impact support",
   description:
-    "Making expert impact management affordable. Try a free digital, data and AI readiness snapshot with practical recommendations and a personalised conversation agenda.",
+    "Your Impact Director, without the full-time salary. Human-led, year-round support for charities and social enterprises. Start with a free technology, data and AI assessment.",
   ...(site.live ? { alternates: { canonical: "/my-impact-director/" } } : {}),
 };
 export default function MyImpactDirectorPage() {
   return (
     <main id="main" className={s.page}>
-      <section className={s.hero}>
+      <FolderHero product="my-impact-director" paper="#fbf7ef" id="director-overview" className={s.hero}>
         <div className={s.heroCopy}>
           <p className={s.kicker}>
-            My Impact Director · Human-led. AI-enabled.
+            My Impact Director
           </p>
           <h1>
-            What if every
-            <br />
-            organisation had
-            <br />
-            <em>an Impact Director?</em>
+            Your Impact Director.<br />
+            <em>Without the<br />full-time salary.</em>
           </h1>
           <p className={s.lead}>
-            Expert impact management.
-            <br />
-            Within reach. Not out of budget.
+            Greater impact. Accessible to everyone.
           </p>
           <p>
-            Experienced people, smarter systems and Social Impact Excellence. An
-            affordable member of your senior team—not another measurement
-            platform.
+            Expert, outsourced support throughout the year. Helping charities
+            and social enterprises measure, manage and improve their impact,
+            without employing a full-time director.
+          </p>
+          <p className={s.heroPrinciple}>
+            Because social impact deserves to be taken as seriously as financial performance.
           </p>
           <div className={s.heroActions}>
             <a className={s.primary} href="#assessment">
-              Meet Your Impact Director ↗
+              Start your free assessment ↗
             </a>
             <a className={s.textLink} href="#director-conversation">
-              Talk to a human →
+              Talk to an Impact Director →
             </a>
           </div>
           <p className={s.small}>
-            Start with your free readiness snapshot. No commitment. No robot
-            takeover.
+            Human-led today. AI-enabled. Built around your organisation.
           </p>
         </div>
         <div className={s.cowStage}>
@@ -69,51 +67,21 @@ export default function MyImpactDirectorPage() {
             <strong>The humans are still in charge.</strong>
           </p>
         </div>
-      </section>
-      <div className={s.ribbon}>
-        <span>Human judgement.</span>
-        <span>Intelligent tools.</span>
-        <span>Greater impact.</span>
-      </div>
-      <section className={s.manifesto}>
-        <p className={s.kicker}>
-          A serious ambition. A different way of getting there.
-        </p>
-        <h2>
-          Big impact thinking.
-          <br />
-          <em>Not just for big organisations.</em>
-        </h2>
-        <div>
-          <p>
-            Smaller charities and social enterprises rarely have room in the
-            budget for a dedicated Impact Director. Larger teams may have the
-            expertise, but not enough hours.
-          </p>
-          <p>
-            We’re making that capability more accessible: experienced
-            professionals working with you, supported by useful technology.
-            Human-led today. Built to grow with increasingly capable AI.
-          </p>
-        </div>
-      </section>
+      </FolderHero>
       <DirectorAssessment />
       <section id="director-support" className={s.service}>
         <div className={s.serviceIntro}>
           <p className={s.kicker}>What we can do together, today</p>
           <h2>
-            Less wrestling
-            <br />
-            with systems.
-            <br />
-            <em>
-              More making
-              <br />a difference.
-            </em>
+            A place in<br />your team.<br /><em>All year round.</em>
           </h2>
           <p>
-            Support shaped around your organisation—not a technical installation
-            you have to configure.
+            Not another impact measurement platform. An affordable member of the senior team.
+          </p>
+          <p>
+            Experienced people working alongside you, turning evidence into
+            everyday decisions. Tailored support, whether you need your first
+            Impact Director or extra capacity for an existing team.
           </p>
           <a className={s.textLink} href="#director-conversation">
             Find your starting point ↗
@@ -123,10 +91,10 @@ export default function MyImpactDirectorPage() {
           {[
             [
               "Understand the organisation",
-              "Use Social Impact Excellence diagnostics to explore maturity, priorities and leadership. Your existing work is the starting point—not something to throw away.",
+              "Use Social Impact Excellence to understand your maturity, priorities and leadership. Build on existing work and agree what needs to improve.",
             ],
             [
-              "Follow the information",
+              "Review the Data Pillar",
               "Review the Data Pillar: how evidence is collected, stored, connected and used. Spreadsheets, databases and software included.",
             ],
             [
@@ -139,7 +107,7 @@ export default function MyImpactDirectorPage() {
             ],
             [
               "Keep the momentum",
-              "Ongoing human Impact Director support, increasingly helped by automation, intelligent workflows and AI agents as capabilities develop.",
+              "Work alongside experienced professionals throughout the year on priorities, measurement, reporting and continuous improvement. Useful automation and AI support the people, not the other way round.",
             ],
           ].map(([title, text], i) => (
             <li key={title}>
@@ -152,7 +120,7 @@ export default function MyImpactDirectorPage() {
           ))}
         </ol>
       </section>
-      <section className={s.measurement}>
+      <section id="director-measurement" className={s.measurement}>
         <p className={s.kicker}>A small question with very big consequences</p>
         <p className={s.saying}>
           “What gets measured
@@ -171,10 +139,10 @@ export default function MyImpactDirectorPage() {
         </h2>
         <p>
           Impact is a management discipline. Evidence should help us understand,
-          decide and improve—not simply give us more numbers to report.
+          decide and improve, not simply give us more numbers to report.
         </p>
       </section>
-      <section className={s.future}>
+      <section id="director-future" className={s.future}>
         <div>
           <p className={s.kicker}>
             The next chapter · possibilities, not promises
@@ -195,7 +163,8 @@ export default function MyImpactDirectorPage() {
           </p>
           <p>
             In time, that could let experienced professionals support more
-            organisations—without removing human judgement or accountability.
+            organisations, while intelligent systems handle more routine work.
+            Human judgement and accountability stay at the centre.
           </p>
         </div>
         <div className={s.futureSheet}>
@@ -222,7 +191,7 @@ export default function MyImpactDirectorPage() {
           <p>
             <strong>Today:</strong> human-led, AI-enabled.
             <br />
-            <strong>Tomorrow:</strong> increasingly agentic.
+            <strong>Tomorrow:</strong> increasingly agentic, with human judgement and accountability.
           </p>
           <p className={s.small}>
             These agentic workflows are a development direction, not features
@@ -231,15 +200,14 @@ export default function MyImpactDirectorPage() {
           </p>
         </div>
       </section>
-      <section className={s.partners}>
-        <p className={s.kicker}>Good chemistry. Real people.</p>
+      <section id="director-partners" className={s.partners}>
+        <p className={s.kicker}>Complementary expertise</p>
         <h2>
-          Expertise meets
-          <br />
-          <em>possibility.</em>
+          Human intelligence meets<br /><em>artificial intelligence.</em>
         </h2>
         <div className={s.partnerGrid}>
           <article>
+            <a className={s.partnerLogo} href="https://www.mysocialimpact.org/" aria-label="Visit My Social Impact">
             <Image
               src="/brand/my-social-impact.png"
               width={280}
@@ -247,6 +215,7 @@ export default function MyImpactDirectorPage() {
               sizes="240px"
               alt="My Social Impact"
             />
+            </a>
             <h3>Impact expertise</h3>
             <p>
               Social Impact Excellence methodology, strategy, measurement and
@@ -254,6 +223,7 @@ export default function MyImpactDirectorPage() {
             </p>
           </article>
           <article>
+            <a className={s.partnerLogo} href="https://www.theideasshed.com/" aria-label="Visit The Ideas Shed">
             <Image
               src="/brand/the-ideas-shed.png"
               width={180}
@@ -261,6 +231,7 @@ export default function MyImpactDirectorPage() {
               sizes="180px"
               alt="The Ideas Shed"
             />
+            </a>
             <h3>Intelligent possibilities</h3>
             <p>
               AI agents, creative thinking, software development and intelligent
@@ -268,21 +239,29 @@ export default function MyImpactDirectorPage() {
             </p>
           </article>
           <article>
-            <p className={s.partnerName}>Fluid IT</p>
+            <a className={s.partnerLogo} href="https://www.fluiditconsulting.co.uk/" aria-label="Visit Fluid">
+              <Image
+                src="https://www.fluiditconsulting.co.uk/wp-content/uploads/2025/06/Group-160.png"
+                alt="Fluid"
+                width={240}
+                height={90}
+                unoptimized
+              />
+            </a>
             <h3>Systems that connect</h3>
             <p>
               A My Social Impact collaborator bringing IT consultancy, systems
               integration and digital transformation expertise.
             </p>
             <p className={s.small}>
-              Involvement in a particular engagement is agreed separately; this
-              is not a claim of a fully operational joint service.
+              Fluid’s involvement is agreed for each engagement, rather than
+              assumed across the whole service.
             </p>
           </article>
         </div>
       </section>
       <DirectorBooking />
-      <section className={s.closing}>
+      <section id="director-ambition" className={s.closing}>
         <p className={s.kicker}>The point isn’t clever technology.</p>
         <h2>
           Unlocking the full
@@ -296,9 +275,10 @@ export default function MyImpactDirectorPage() {
           and businesses making a greater positive difference to social and
           environmental problems.
         </p>
-        <a className={s.primary} href="#assessment">
-          Meet Your Impact Director ↗
-        </a>
+        <div className={s.closingActions}>
+          <a className={s.primary} href="#assessment">Start your free assessment ↗</a>
+          <a className={s.textLink} href="#director-conversation">Talk to an Impact Director →</a>
+        </div>
       </section>
     </main>
   );

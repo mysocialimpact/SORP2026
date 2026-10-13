@@ -26,9 +26,20 @@ test("hello rejects invalid addresses before making a backend request", async t 
   const backend = t.mock.method(globalThis, "fetch", async () => Response.json({ accepted: true }));
   const response = await POST(new Request("https://sorp2026.org/api/hello", {
     method: "POST",
-    body: JSON.stringify({ email: "not-an-email" }),
+    body: JSON.stringify({ email: "not-an-email", message: "A real message" }),
   }));
   assert.equal(response.status, 400);
+  assert.equal(backend.mock.callCount(), 0);
+});
+
+test("hello requires a non-empty message before making a backend request", async t => {
+  const backend = t.mock.method(globalThis, "fetch", async () => Response.json({ accepted: true }));
+  const response = await POST(new Request("https://sorp2026.org/api/hello", {
+    method: "POST",
+    body: JSON.stringify({ email: "person@example.org", message: "   " }),
+  }));
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: "Please enter a message." });
   assert.equal(backend.mock.callCount(), 0);
 });
 
@@ -36,7 +47,7 @@ test("hello never invents success when the message service refuses a submission"
   t.mock.method(globalThis, "fetch", async () => Response.json({ accepted: false, error: "Not accepted" }, { status: 503 }));
   const response = await POST(new Request("https://sorp2026.org/api/hello", {
     method: "POST",
-    body: JSON.stringify({ email: "person@example.org", submissionId: "hello-test-456" }),
+    body: JSON.stringify({ email: "person@example.org", message: "Please reply", submissionId: "hello-test-456" }),
   }));
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), { error: "Not accepted" });

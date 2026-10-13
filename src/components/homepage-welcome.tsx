@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import Link from "next/link";
 import { Arrow } from "@/components/ui";
 
 const audienceKey = "sorp2026.homepage-audience";
@@ -40,11 +39,14 @@ export function HomepageAudience() {
   }
 
   return (
-    <section className="homepage-audience" aria-label="Choose your audience">
+    <section className="homepage-audience" id="home-audience" aria-label="Choose your audience">
+      <p className="homepage-audience-intro">
+        We’ve built this for
+      </p>
       <div className="homepage-audience-options">
         {([
-          ["charity", "CHARITIES", "Staff · Leaders · Trustees · Volunteers"],
-          ["adviser", "ACCOUNTANTS & ADVISERS", "Accountants · Auditors · Consultants · Lawyers"],
+          ["charity", "CHARITIES", "Trustees · CEOs · Finance teams · Staff · Volunteers"],
+          ["adviser", "ACCOUNTANTS & ADVISERS", "Accountants · Auditors · Lawyers · Consultants · Funders"],
         ] as const).map(([value, title, description]) => (
           <button key={value} type="button" aria-pressed={audience === value} onClick={() => select(value)}>
             <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>
@@ -55,10 +57,6 @@ export function HomepageAudience() {
   );
 }
 
-/** Design preview only: Growth's existing events API deliberately excludes contacts.
- * Keep sending disabled until a durable contact + explicit-consent endpoint exists.
- * Never post personal information to the assessment analytics endpoint.
- */
 export function HomepageHello() {
   const [email, setEmail] = useState("");
   const [recognised, setRecognised] = useState(false);
@@ -99,7 +97,7 @@ export function HomepageHello() {
           email,
           message: String(form.get("message") || ""),
           audience,
-          newsletter: form.get("newsletter") === "on",
+          newsletter: false,
           website: String(form.get("website") || ""),
           submissionId,
         }),
@@ -108,10 +106,10 @@ export function HomepageHello() {
       if (!response.ok || !result.accepted) throw new Error(result.error || "Your message was not accepted.");
       setStatus("sent");
       setFeedback(result.emailSent
-        ? "Thank you — your hello has been emailed to My Social Impact."
+        ? "Thank you — your message has been emailed to My Social Impact."
         : result.queued
-          ? "Thank you — your hello is saved and queued for delivery to My Social Impact."
-          : "Thank you — your hello has been securely logged for My Social Impact.");
+          ? "Thank you — your message is saved and queued for delivery to My Social Impact."
+          : "Thank you — your message has been securely logged for My Social Impact.");
     } catch (cause) {
       setStatus("error");
       setFeedback(cause instanceof Error ? cause.message : "We could not send your message. Please try again.");
@@ -119,27 +117,21 @@ export function HomepageHello() {
   }
 
   return (
-    <section className="homepage-hello" id="say-hello" aria-labelledby="hello-title">
+    <section className="homepage-hello" id="lets-talk" aria-labelledby="hello-title">
       <div className="gateway-width homepage-hello-layout">
         <div className="homepage-hello-invitation">
-          <p className="gateway-kicker">A little conversation can go a long way</p>
-          <h2 id="hello-title">Just looking around?<br /><em>Say hello.</em></h2>
-          <p>We’d love to know who’s visiting. Whether you have a question, an idea, some feedback or simply want to introduce yourself, we’d love to hear from you.</p>
-          <p className="homepage-hello-signature">Marcus &amp; Chris<span>My Social Impact</span></p>
+          <h2 id="hello-title">Let’s talk.</h2>
         </div>
         <form className="homepage-hello-form" onSubmit={submit}>
           {recognised && <p className="homepage-hello-account">We’ve filled in the email from your existing account.</p>}
-          <label htmlFor="hello-email">Email address <span>Required</span></label>
+          <label htmlFor="hello-email">Email address</label>
           <input id="hello-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} />
-          <label htmlFor="hello-message">Anything you’d like to share? <span>Optional</span></label>
-          <textarea id="hello-message" name="message" rows={3} maxLength={3000} placeholder="A question, an idea, some feedback — or just hello!" />
+          <label htmlFor="hello-message">Message</label>
+          <textarea id="hello-message" name="message" rows={5} required maxLength={3000} placeholder="Request a demo, ask a question, share an idea, give feedback, or just say hello…" />
           <label className="homepage-hello-honeypot" htmlFor="hello-website" aria-hidden="true">Website<input id="hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
-          <label className="homepage-hello-consent" htmlFor="hello-newsletter">
-            <input id="hello-newsletter" type="checkbox" name="newsletter" />
-            <span>I’d also like occasional updates about SORP 2026 and our free tools.</span>
-          </label>
-          <p className="homepage-hello-privacy">Saying hello doesn’t create an account or sign you up for updates. <Link href="/privacy/">Privacy notice</Link>.</p>
-          <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Hello sent ✓" : "Say hello"} <Arrow /></button>
+          <div className="homepage-hello-actions">
+            <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Message sent ✓" : "Send message"} <Arrow /></button>
+          </div>
           {feedback && <p className={`homepage-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
           {status === "error" && <p className="homepage-hello-small">You can also <a href="mailto:marcus@mysocialimpact.org">email Marcus directly</a>.</p>}
         </form>

@@ -3,16 +3,19 @@ import AxeBuilder from "@axe-core/playwright";
 
 test("homepage presents the social enterprise mission and agreed vision", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText("A social enterprise initiative", { exact: false })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Imagine a world where nothing stood in the way of our potential to make a difference." })).toBeVisible();
-  await expect(page.getByText("Already working with an accountant or adviser? Brilliant.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Help us keep these tools free." })).toBeVisible();
+  await expect(page.getByText("UK-based social enterprise initiative", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Imagine a world where social impact was taken as seriously as financial performance." })).toBeVisible();
+  await expect(page.getByText("We’ve built this for")).toBeVisible();
+  await expect(page.locator("#ambition-title")).toBeVisible();
+  await expect(page.locator("#contribution-title")).toContainText("Found this useful?");
+  await expect(page.locator(".gateway-contribution-copy")).toContainText("helps us keep them free and reach more charities — especially smaller ones");
   const footer = page.getByRole("contentinfo");
-  await expect(footer.getByText("Imagine a world where curiosity and creativity were valued as highly as certainty.")).toBeVisible();
-  await expect(footer.getByRole("link", { name: "See what else is in the Shed!" })).toHaveAttribute("href", "https://www.theideasshed.com/");
+  await expect(footer.getByRole("link", { name: "See what else is in the Shed", exact: false })).toHaveAttribute("href", "https://www.theideasshed.com/");
+  await expect(footer.getByRole("heading", { name: "Strategy for Social Impact Excellence." })).toBeVisible();
+  await expect(footer.getByRole("link", { name: "See what else we do", exact: false })).toHaveAttribute("href", "https://mysocialimpact.org");
+  await expect(footer.getByRole("img", { name: /Cowminator/ })).toBeVisible();
   await expect(footer).not.toContainText("Independent tools");
-  await expect(footer.getByRole("link", { name: "Our Mission", exact: true })).toHaveAttribute("href", "/our-mission/");
-  await expect(footer.getByRole("link", { name: "Contact", exact: true })).toHaveAttribute("href", "/contact/");
+  await expect(page.getByRole("banner").getByRole("link", { name: "Our Mission" })).toHaveAttribute("href", "/our-mission/");
   await expect(footer.getByRole("link", { name: "Privacy & accessibility", exact: true })).toHaveAttribute("href", "/privacy/");
 });
 
@@ -26,7 +29,7 @@ test("mission page is concise, partner-friendly and accessible", async ({ page }
   await expect(page.getByRole("main").getByAltText("My Social Impact")).toHaveCount(0);
   await expect(page.getByRole("main").getByAltText("The Ideas Shed")).toHaveCount(0);
   await expect(page.getByRole("contentinfo").getByAltText("My Social Impact")).toBeVisible();
-  await expect(page.getByRole("contentinfo").getByAltText("The Ideas Shed")).toBeVisible();
+  await expect(page.getByRole("contentinfo").getByAltText("The Ideas Shed", { exact: true })).toBeVisible();
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
 });
@@ -44,7 +47,7 @@ test(`guest contribution at ${path} reuses inline checkout and verifies payment 
   });
   await page.route("**/api/sorp-payments/status", route => route.fulfill({ json: { status: "paid", paymentType: "voluntary_support", amountMinor: 1000 } }));
   await page.goto(path);
-  const section = page.getByRole("region", { name: path === "/" ? "Help us keep these tools free." : "Found the tools useful? Help us make more." });
+  const section = page.locator(".gateway-contribution");
   await section.getByRole("button", { name: "£10" }).click();
   await section.getByRole("button", { name: "Make a voluntary contribution →" }).click();
   await section.getByRole("button", { name: "Simulate safe contribution" }).click();

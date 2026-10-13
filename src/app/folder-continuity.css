@@ -1,0 +1,81 @@
+/* One sheet: the tab colour is shared with the hero, never independently tuned. */
+.folder-hero[data-folder-surface] {
+  position: relative;
+  background-color: var(--folder-colour);
+  background-image:
+    linear-gradient(180deg, var(--folder-colour) 0%, color-mix(in srgb, var(--folder-colour) 85%, transparent) 14%, color-mix(in srgb, var(--folder-page) 25%, transparent) 45%, color-mix(in srgb, var(--folder-page) 87%, transparent) 80%, var(--folder-page) 100%),
+    radial-gradient(ellipse at 90% 80%, var(--folder-page), transparent 75%);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* Keep the very top an exact match; let the asymmetric wash emerge below. */
+.folder-hero[data-folder-surface] { background-size: 100% 100%; background-repeat: no-repeat; }
+.folder-hero.gateway-home-cover::after,
+.folder-hero.sr-hero::after,
+.folder-hero.ask-hero::before { content: none; }
+.folder-hero.sr-hero h1 span { color: #672713; }
+.folder-hero.sr-hero .sr-hero-lead { margin-top: 28px; }
+.folder-hero[data-folder-surface="my-impact-director"] { max-width: none; }
+.product-excellence:has(> .folder-hero) { background: #faf9f6; }
+.folder-hero.product-hero.gateway-width { width: 100%; max-width: none; padding-inline: max(56px, calc((100% - 1280px) / 2)); }
+
+.platform-sticky-navigation { transition: box-shadow 180ms ease; }
+.platform-sticky-navigation .product-folder { background: #f1efe8; box-shadow: none; }
+.platform-sticky-navigation .product-folder[data-active-product] .product-folder-sheet-edge {
+  height: 5px; border: 0; box-shadow: none;
+  background: var(--folder-paper);
+  transition: background-color 180ms ease;
+}
+.platform-sticky-navigation .product-folder-tab.is-active {
+  background-color: var(--tab-colour);
+  background-image: linear-gradient(to bottom, #ffffff20, transparent 65%);
+  filter: none; opacity: 1;
+}
+.platform-sticky-navigation .product-folder-tab.is-active::after { background: var(--tab-colour); box-shadow: none; }
+.platform-sticky-navigation[data-beyond-hero="true"] { box-shadow: 0 5px 18px #2222220c; }
+.platform-sticky-navigation[data-beyond-hero="true"] .product-folder { background: #faf9f6; }
+.platform-sticky-navigation[data-beyond-hero="true"] .product-folder[data-active-product] .product-folder-sheet-edge { background: color-mix(in srgb, var(--folder-paper) 24%, #faf9f6); }
+.platform-sticky-navigation[data-compact="true"] .gateway-header-inner { min-height: 58px; padding-block: 7px; }
+.platform-sticky-navigation[data-compact="true"] .product-folder-tabs { padding-top: 5px; }
+.platform-sticky-navigation[data-compact="true"] .product-folder-tabs-track { min-height: 52px; }
+.platform-sticky-navigation[data-compact="true"] .product-folder-tab { min-height: 48px; padding-block: 7px; }
+.platform-sticky-navigation[data-compact="true"] .product-folder-tab.is-active { min-height: 52px; transform: none; }
+
+.folder-action-bar {
+  position: fixed; inset: auto 0 0; z-index: 100;
+  display: flex; align-items: center; justify-content: flex-end; gap: 20px;
+  padding: 10px max(24px, calc((100vw - 1280px) / 2)) calc(10px + env(safe-area-inset-bottom));
+  background: #faf9f6f5; border-top: 1px solid #25252a1c;
+  box-shadow: 0 -4px 22px #25252a08;
+}
+.folder-action-bar a { display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 44px; font-size: 14px; font-weight: 600; text-decoration: none; }
+.folder-action-primary { padding: 10px 22px; background: #242428; color: #fff; border-radius: 4px; }
+.folder-action-secondary { color: #242428; padding: 10px 0; }
+.folder-action-bar a:focus-visible { outline: 3px solid #486453; outline-offset: 3px; }
+.folder-action-clearance { height: var(--folder-action-height, 76px); background: #242428; }
+/* Task controls take precedence while completing the inline assessment or typing. */
+body:has(#assessment [data-mode]) .folder-action-bar[data-action-page="/my-impact-director/"],
+body:has(#assessment .account-portal) .folder-action-bar[data-action-page="/my-impact-director/"],
+body:has(#director-conversation form) .folder-action-bar[data-action-page="/my-impact-director/"],
+body:has(form:focus-within) .folder-action-bar { visibility: hidden; pointer-events: none; }
+
+body .sr-fixed-action, body .ask-fixed-action {
+  background: #faf9f6f5; border-top-color: #25252a1c;
+  box-shadow: 0 -4px 22px #25252a08;
+}
+body .sr-fixed-action .sr-start, body .ask-fixed-action > a { border-radius: 4px; }
+
+@media (max-width: 900px) {
+  .folder-hero.product-hero.gateway-width { padding-inline: 24px; }
+  .platform-sticky-navigation[data-compact="true"] .gateway-header-inner { min-height: 48px; padding-block: 6px; }
+  .platform-sticky-navigation[data-compact="true"] .gateway-directory-nav { gap: 18px; }
+  .platform-sticky-navigation[data-compact="true"] .product-folder-tab { flex-basis: 150px; min-width: 150px; }
+  .folder-action-bar { padding-inline: 12px; gap: 12px; }
+  .folder-action-bar a { font-size: 12px; gap: 8px; }
+  .folder-action-primary { padding-inline: 12px; flex: 1; }
+  .folder-action-secondary { flex-shrink: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .platform-sticky-navigation, .platform-sticky-navigation * { transition: none; animation: none; }
+}

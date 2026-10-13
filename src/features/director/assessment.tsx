@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AccountPortal } from "@/components/account-portal";
 import {
   ANCHORS,
   AREAS,
@@ -71,7 +72,7 @@ export function DirectorAssessment() {
           const local = readDraft(GUEST);
           if (local) setDraft(local);
           setStatus(
-            "Guest draft · kept in this browser tab until you save to an account.",
+            "A free account keeps your answers, report and next steps together.",
           );
         } else {
           if (!response.ok || !data.account?.id)
@@ -84,6 +85,7 @@ export function DirectorAssessment() {
             ? data.progress.data
             : {
                 ...emptyDraft(),
+                step: window.location.hash === "#assessment" ? 0 : -1,
                 organisation: data.account.organisation || "",
               };
           saved.current = JSON.stringify(remote);
@@ -232,6 +234,7 @@ export function DirectorAssessment() {
     return () => window.removeEventListener("beforeunload", warn);
   }, [owner]);
   function move(step: number) {
+    if (!owner || locked) return;
     setDraft((d) => ({
       ...d,
       step,
@@ -256,21 +259,19 @@ export function DirectorAssessment() {
     <section
       id="assessment"
       className={s.assessment}
-      aria-label="Meet Your Impact Director assessment"
+      aria-label="My Impact Director technology readiness assessment"
     >
       <div className={s.invitation}>
         <div>
           <p className={s.kicker}>
-            Free · 21 stars-based questions · about 8 minutes
+            Free assessment · 21 star-rating questions · about 8 minutes
           </p>
           <h2>
-            Meet your
-            <br />
-            <em>Impact Director.</em>
+            How tech-savvy is<br /> <em>your organisation?</em>
           </h2>
           <p>
-            Discover how smarter systems, AI and expert support could help your
-            organisation achieve more. No technical knowledge required.
+            Discover how you’re already using technology, data and AI, and where
+            you could do more. No technical knowledge required.
           </p>
         </div>
         <div>
@@ -282,19 +283,18 @@ export function DirectorAssessment() {
             disabled={!ready || locked}
             onClick={() => {
               setExpanded(true);
-              if (draft.completed) move(25);
-              else if (draft.step < 0) move(0);
+              if (owner && draft.completed) move(25);
+              else if (owner && draft.step < 0) move(0);
             }}
           >
-            {draft.completed
+            {owner && draft.completed
               ? "Open my snapshot ↗"
-              : answered
+              : owner && answered
                 ? "Continue my snapshot ↗"
-                : "Let’s find out ↗"}
+                : "Start your free assessment ↗"}
           </button>
           <p className={s.small}>
-            Your report and conversation agenda are free. No account needed to
-            see them.
+            {owner ? "Your report, practical recommendations and conversation agenda are free." : "Simply register for free or log in to begin. Your account opens the door to our wider tools and assessments."}
           </p>
         </div>
       </div>
@@ -375,7 +375,19 @@ export function DirectorAssessment() {
           )}
         </div>
       )}
-      {expanded && ready && (
+      {expanded && ready && !owner && !locked && (
+        <div className={s.authPanel} ref={frame}>
+          <div>
+            <p className={s.kicker}>Your own space to explore</p>
+            <h3 ref={heading} tabIndex={-1}>A free account.<br />A smarter starting point.</h3>
+            <p>Keep your progress and return whenever you like. This is your technology snapshot, not another Social Impact Excellence assessment.</p>
+          </div>
+          <Suspense fallback={<p role="status">Opening your account options…</p>}>
+            <AccountPortal embedded returnTo="/my-impact-director/#assessment" />
+          </Suspense>
+        </div>
+      )}
+      {expanded && ready && owner && (
         <div
           className={s.frame}
           ref={frame}

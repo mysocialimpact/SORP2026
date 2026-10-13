@@ -113,7 +113,7 @@ test("all supporting pages render accessibly, without overflow or broken interna
   }
 });
 
-test("the digital filing folder keeps all six products in one accessible sequence", async ({
+test("the digital filing folder keeps all five products in one accessible sequence", async ({
   page,
 }, testInfo) => {
   const products = [
@@ -122,7 +122,6 @@ test("the digital filing folder keeps all six products in one accessible sequenc
     ["Ask SORP", "/ask-sorp/"],
     ["Charity Impact Reports", "/charity-impact-reports/"],
     ["Social Impact Excellence", "/social-impact-excellence/"],
-    ["Purpose Works", "/purpose-works/"],
     ["My Impact Director", "/my-impact-director/"],
   ] as const;
 
@@ -130,7 +129,7 @@ test("the digital filing folder keeps all six products in one accessible sequenc
     await page.goto(path);
     const folder = page.getByRole("navigation", { name: "SORP2026 products" });
     await expect(folder).toBeVisible();
-    await expect(folder.getByRole("link")).toHaveCount(7);
+    await expect(folder.getByRole("link")).toHaveCount(6);
     await expect(page.locator(".gateway-header .gateway-account-control")).toHaveCount(1);
     await expect(folder.getByRole("link").allTextContents()).resolves.toEqual(
       products.map(([productName], index) =>

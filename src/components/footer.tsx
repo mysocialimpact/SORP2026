@@ -2,6 +2,7 @@ import { site } from "@/lib/site";
 import { IdeasBrand, MsiBrand } from "./brand";
 import { Arrow } from "./ui";
 import Link from "next/link";
+import Image from "next/image";
 export function Footer() {
   const builtAt = process.env.NEXT_PUBLIC_SITE_BUILT_AT!;
   const buildDate = new Intl.DateTimeFormat("en-GB", {
@@ -19,36 +20,29 @@ export function Footer() {
   return (
     <footer className="footer gateway-footer">
       <div className="gateway-width">
-        <nav className="gateway-footer-nav" aria-label="Information">
-          <Link href="/our-mission/">Our Mission</Link>
-          <Link href="/contact/">Contact</Link>
-          <Link href="/privacy/">Privacy &amp; accessibility</Link>
-          <Link href="/">Folder index</Link>
-        </nav>
-        <div className="gateway-footer-intro">
-          <p className="gateway-kicker">Ideas made useful</p>
-          <h2>Greater impact takes expertise, curiosity and creativity.</h2>
-        </div>
         <div className="gateway-footer-partnership">
-          <div className="gateway-footer-msi">
+          <section className="gateway-footer-msi" aria-labelledby="footer-msi-title">
             <MsiBrand attribution="Developed by" />
-            <p>Practical tools and human expertise for organisations determined to make a greater difference.</p>
-          </div>
-          <span className="gateway-footer-plus" aria-hidden="true">+</span>
-          <div className="gateway-footer-shed">
-            <IdeasBrand />
-            <blockquote>Imagine a world where curiosity and creativity were valued as highly as certainty.</blockquote>
-            <a className="gateway-footer-shed-link" href={site.studio!}>
-              See what else is in the Shed! <Arrow diagonal />
+            <h2 id="footer-msi-title">Strategy for Social Impact Excellence.</h2>
+            <a className="gateway-footer-partner-link" href={site.msi} target="_blank" rel="noopener noreferrer">
+              See what else we do <Arrow />
             </a>
-            <p className="gateway-company-details">
-              <a href={site.studio!}>The Ideas Shed Limited</a>
-              <span>Registered in England and Wales · Company number 17380053</span>
-            </p>
-          </div>
+          </section>
+          <section className="gateway-footer-shed" aria-labelledby="footer-shed-title">
+            <div className="gateway-footer-shed-copy">
+              <IdeasBrand eager />
+              <h2 id="footer-shed-title">Ideas, technology and a little mischief.</h2>
+              <a className="gateway-footer-shed-link" href={site.studio!} target="_blank" rel="noopener noreferrer">
+                See what else is in the Shed <Arrow />
+              </a>
+            </div>
+            <Image className="gateway-footer-cow" src="/images/impact-director-cow.webp" alt="Cowminator, The Ideas Shed’s pink cyborg cow" width={900} height={1350} sizes="(max-width: 600px) 150px, 220px" loading="eager" />
+          </section>
         </div>
         <div className="gateway-footer-record">
           <p>© {new Date().getFullYear()} My Social Impact</p>
+          <Link href="/privacy/">Privacy &amp; accessibility</Link>
+          <p>The Ideas Shed Limited · Company 17380053</p>
           <p className="gateway-build" aria-label="Website build information">
             <strong>Build {process.env.NEXT_PUBLIC_SITE_BUILD_NUMBER}</strong>
             {" · "}

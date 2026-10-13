@@ -4,6 +4,7 @@ test("audience choice is optional, reversible and retained without tracking", as
   const writes: string[] = [];
   page.on("request", request => { if (request.method() === "POST") writes.push(request.url()); });
   await page.goto("/");
+  await expect(page.getByText("We’ve built this for")).toBeVisible();
   const charity = page.getByRole("button", { name: /CHARITIES/ });
   const adviser = page.getByRole("button", { name: /ACCOUNTANTS & ADVISERS/ });
   await expect(charity).toHaveAttribute("aria-pressed", "false");
@@ -30,48 +31,62 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
       edge: getComputedStyle(edge).backgroundColor,
       cover: getComputedStyle(cover).backgroundColor,
       edgeBorder: getComputedStyle(edge).borderTopWidth,
-      gap: cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
-      sequence: [".gateway-opening", ".homepage-audience", ".gateway-sorp-section", ".homepage-impact", ".gateway-home-vision"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
+      gaps: [
+        cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
+      ],
+      sequence: [".gateway-opening", ".homepage-audience", ".homepage-ambition", ".gateway-home-vision", ".gateway-sorp-section"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
     };
   });
   expect(surfaces.edge).toBe(surfaces.cover);
   expect(surfaces.edgeBorder).toBe("0px");
-  expect(surfaces.gap).toBe(0);
+  expect(surfaces.gaps).toEqual([0]);
   expect(surfaces.sequence).toEqual([...surfaces.sequence].sort((a, b) => a - b));
 });
 
-test("flagship summaries are compact, informational and responsive", async ({ page }, testInfo) => {
+test("the middle story is one compact ambition and a distinct vision", async ({ page }, testInfo) => {
   await page.goto("/");
-  const cards = page.locator(".homepage-tool-summary");
-  await expect(cards).toHaveCount(2);
-  await expect(cards.nth(0).getByRole("heading")).toHaveText("Are You SORP Ready?");
-  await expect(cards.nth(1).getByRole("heading")).toHaveText("Ask SORP");
-  await expect(cards.locator("a, button, [tabindex], [role=button], svg, img")).toHaveCount(0);
-  await expect(page.locator(".homepage-tools-beyond")).toHaveText("Beyond compliance, our tools help charities report their impact, manage it, communicate it and continually improve it.");
-  await expect(page.locator(".homepage-product-index")).toHaveCount(0);
-  const first = (await cards.nth(0).boundingBox())!;
-  const second = (await cards.nth(1).boundingBox())!;
-  expect(first.height).toBeLessThan(230);
-  expect(second.height).toBeLessThan(230);
-  if (testInfo.project.name === "mobile") expect(second.y).toBeGreaterThan(first.y + first.height);
-  else {
-    expect(second.y).toBe(first.y);
-    expect(second.width).toBeCloseTo(first.width, 0);
+  const ambition = page.locator(".homepage-ambition");
+  const vision = page.locator(".homepage-vision");
+  await expect(ambition.getByText("Our ambition", { exact: true })).toBeVisible();
+  await expect(ambition.getByRole("heading")).toHaveText("Greater impact.Accessible to everyone.");
+  await expect(vision.getByRole("heading")).toHaveText("Imagine a world where social impact was taken as seriously as financial performance.");
+  for (const removed of ["Too useful to leave in a filing cabinet.", "Better evidence.", "Better decisions.", "Big possibilities. Smaller barriers."]) {
+    await expect(page.getByText(removed, { exact: false })).toHaveCount(0);
   }
+  const ambitionBox = (await ambition.boundingBox())!;
+  const visionBox = (await vision.boundingBox())!;
+  expect(ambitionBox.height + visionBox.height).toBeLessThan(page.viewportSize()!.width > 700 ? 700 : 760);
+  await ambition.screenshot({ path: testInfo.outputPath("ambition.png") });
+  await vision.screenshot({ path: testInfo.outputPath("vision.png") });
+});
+
+test("one compact starting point links directly to the working review", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const start = page.locator(".homepage-start");
+  await expect(start.getByRole("heading")).toHaveText("Are You SORP Ready?");
+  await expect(start).toContainText("A free assessment of your charity’s impact and sustainability reporting readiness.");
+  const review = start.getByRole("link", { name: "Start your free review" });
+  await expect(review).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
+  await expect(start.getByText("Ask SORP")).toHaveCount(0);
+  await expect(page.getByText("Already working with an accountant or adviser? Brilliant.")).toHaveCount(0);
+  const box = (await start.boundingBox())!;
+  expect(box.height).toBeLessThan(page.viewportSize()!.width > 700 ? 340 : 470);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.locator(".homepage-tool-summaries").screenshot({ path: testInfo.outputPath("compact-products.png") });
+  await start.screenshot({ path: testInfo.outputPath("single-start.png") });
+  await review.click();
+  await expect(page).toHaveURL(/\/are-you-sorp-ready\/review\/(?:\?entry=intro)?$/);
+  await expect(page.locator(".si-welcome")).toBeVisible();
 });
 
 test("hero frames SORP as the requirement and better impact as the opportunity", async ({ page }) => {
   await page.goto("/");
-  const heading = page.getByRole("heading", { level: 1 });
-  await expect(heading).toContainText("SORP is the requirement.");
-  await expect(heading).toContainText("Better impact is the opportunity.");
-  const sizes = await heading.evaluate(element => ({
-    context: parseFloat(getComputedStyle(element.querySelector(".gateway-hero-context")!).fontSize),
-    opportunity: parseFloat(getComputedStyle(element.querySelector(".gateway-hero-opportunity")!).fontSize),
-  }));
-  expect(sizes.opportunity).toBeGreaterThan(sizes.context);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Free tools. Affordable expertise.");
+  await expect(page.locator(".homepage-editorial")).toContainText("SORP is the requirement.");
+  await expect(page.locator(".homepage-editorial")).toContainText("Better impact is the opportunity.");
+  const enthusiasm = page.locator(".homepage-sorp-enthusiasm");
+  await expect(enthusiasm).toHaveText("We’re excited about SORP 2026 and better charity reporting. Even more so about what charities can achieve with the insight it brings.");
+  const positions = await page.locator(".gateway-home-cover, .homepage-sorp-enthusiasm, .homepage-audience").evaluateAll(elements => elements.map(element => element.getBoundingClientRect().top));
+  expect(positions).toEqual([...positions].sort((a, b) => a - b));
 });
 
 test("contact form recognises accounts and confirms only an accepted server response", async ({ page }) => {
@@ -85,13 +100,48 @@ test("contact form recognises accounts and confirms only an accepted server resp
   const form = page.locator(".homepage-hello-form");
   await expect(form.getByLabel("Email address")).toHaveValue("preview@example.org");
   await expect(form.getByLabel("Email address")).toHaveAttribute("required", "");
-  await expect(form.getByLabel("Anything you’d like to share?")).not.toHaveAttribute("required");
-  const consent = form.getByRole("checkbox");
-  await expect(consent).not.toBeChecked();
-  await consent.check();
-  await expect(consent).toBeChecked();
-  await form.getByRole("button", { name: "Say hello" }).click();
-  await expect(form).toContainText("has been emailed to My Social Impact");
+  await expect(form.getByLabel("Message")).toHaveAttribute("required", "");
+  await expect(form.getByRole("checkbox")).toHaveCount(0);
+  await form.getByLabel("Message").fill("Please show us a demo.");
+  await form.getByRole("button", { name: "Send message" }).click();
+  await expect(form).toContainText("message has been emailed to My Social Impact");
   expect(writes).toHaveLength(1);
-  expect(writes[0]).toMatchObject({ email: "preview@example.org", newsletter: true });
+  expect(writes[0]).toMatchObject({ email: "preview@example.org", message: "Please show us a demo.", newsletter: false });
+});
+
+test("pricing is free-first, honest about planned plans and leads directly into Let’s talk", async ({ page }) => {
+  await page.goto("/");
+  const pricing = page.locator(".homepage-pricing");
+  await expect(pricing.getByRole("heading", { name: /Powerful tools/ })).toBeVisible();
+  const plans = pricing.locator(".homepage-plan");
+  await expect(plans).toHaveCount(4);
+  await expect(plans.first()).toContainText("FREE");
+  await expect(plans.first()).toContainText("£0");
+  await expect(plans.first()).toContainText("Available now");
+  await expect(plans.nth(1)).toContainText("Planned");
+  await expect(plans.nth(2)).toContainText("Planned");
+  await expect(pricing).toContainText("exclude VAT where applicable");
+  await expect(plans.getByRole("link")).toHaveCount(0);
+  const track = pricing.locator(".homepage-plan-track");
+  const geometry = await track.evaluate(element => ({ left: element.scrollLeft, width: element.clientWidth, scroll: element.scrollWidth }));
+  expect(geometry.left).toBe(0);
+  expect(geometry.scroll).toBeGreaterThan(geometry.width);
+  await plans.first().getByText("See everything included").click();
+  await expect(plans.first()).toContainText("No numeric allowance is currently published");
+  await pricing.getByRole("button", { name: "Next plan" }).click();
+  await expect.poll(() => track.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  await expect(pricing.getByRole("link", { name: /£50/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/booking/?session=30");
+  await expect(pricing.getByRole("link", { name: /Find Accountants & Advisers/ })).toHaveAttribute("href", "/accountants-advisers/");
+  expect(await pricing.evaluate(element => element.nextElementSibling?.id)).toBe("lets-talk");
+});
+
+test("Let’s talk has exactly two visible fields and keeps the prompt inside the message box", async ({ page }) => {
+  await page.goto("/");
+  const talk = page.locator(".homepage-hello");
+  await expect(talk.getByRole("heading", { name: "Let’s talk." })).toBeVisible();
+  await expect(talk.getByPlaceholder("Request a demo, ask a question, share an idea, give feedback, or just say hello…")).toBeVisible();
+  await expect(talk.getByText("Request a demo, ask a question, share an idea, give feedback, or just say hello…", { exact: true })).toHaveCount(0);
+  await expect(talk.locator(".homepage-hello-form > input, .homepage-hello-form > textarea")).toHaveCount(2);
+  await expect(talk.getByRole("button", { name: "Send message" })).toBeVisible();
+  await expect(talk.getByRole("button", { name: /Copy/ })).toHaveCount(0);
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { SorpPublicSupportCheckout } from "@/app/sorp-public-support-checkout";
 import { supportPence, type SupportChoice } from "@/app/sorp-payment-amounts";
 
@@ -125,24 +126,25 @@ export function HomepageContribution({ mission = false }: { mission?: boolean })
   });
   const [paid, setPaid] = useState(false);
   const contribution = useVoluntaryContribution({ sessionId, onPaid: () => setPaid(true) });
-  return <section className="gateway-contribution" aria-labelledby="contribution-title">
+  return <section className="gateway-contribution" id="home-support" aria-labelledby="contribution-title">
     <div className="gateway-width gateway-contribution-inner">
       <div className="gateway-contribution-copy">
-        <p className="gateway-kicker">Support our social enterprise</p>
-        <h2 id="contribution-title">{mission ? "Found the tools useful? Help us make more." : "Help us keep these tools free."}</h2>
+        <p className="gateway-kicker">Help the next charity</p>
+        <h2 id="contribution-title">{mission ? "Found the tools useful? Help us make more." : <>Found this useful?<br />Help us keep it free.</>}</h2>
         {mission ? <>
           <p>You don’t need to use our consultancy services to be part of this. If our free tools give you what you need, that’s a result we’re proud of.</p>
           <p>If you’d like to support our mission, a few pounds helps us keep these tools free, improve them and build more for smaller charities and organisations.</p>
           <p>Use what helps. Give if you can. Every contribution is entirely voluntary.</p>
         </> : <>
-          <p>We’re building practical tools to help charities create greater impact, and we’re determined to make them free wherever possible.</p>
-          <p>If you’ve found them useful, your contribution helps us improve them, maintain them and make more tools available to everyone.</p>
+          <p>We make as much of this platform free as we possibly can. Human review is there if you want it.</p>
+          <p>If the free tools have helped you, an entirely voluntary contribution helps us keep them free and reach more charities — especially smaller ones.</p>
+          <Link className="gateway-quiet-link" href="/our-mission/">Our Mission →</Link>
         </>}
       </div>
       <div className="gateway-contribution-panel">
         <span>Entirely voluntary</span>
-        <h3>Choose what feels right.</h3>
-        <p>Our tools remain free whether you contribute or not.</p>
+        <h3>Help the next charity.</h3>
+        <p>Give only if you want to. The tools remain free either way.</p>
         <VoluntaryContributionControls contribution={contribution} paid={paid} variant="homepage" showSubmit />
         <small>One-off voluntary contribution through Stripe. This is not described as a charitable donation or Gift Aid contribution.</small>
       </div>

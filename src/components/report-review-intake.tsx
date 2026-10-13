@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Arrow } from "@/components/ui";
+import { isReadinessComplete, type ReadinessProgress } from "@/lib/readiness-status";
 
-type AccountState = { loading: boolean; signedIn: boolean; name: string; email: string; organisation: string; error: string };
+type AccountState = { loading: boolean; signedIn: boolean; readinessComplete: boolean; name: string; email: string; organisation: string; error: string };
 type Review = { id: string; filename: string; sizeBytes: number; status: string; feedbackReady?: boolean; createdAt: string };
 
 export function ReportReviewIntake() {
-  const [account, setAccount] = useState<AccountState>({ loading: true, signedIn: false, name: "", email: "", organisation: "", error: "" });
+  const [account, setAccount] = useState<AccountState>({ loading: true, signedIn: false, readinessComplete: false, name: "", email: "", organisation: "", error: "" });
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [organisation, setOrganisation] = useState("");
@@ -21,18 +22,18 @@ export function ReportReviewIntake() {
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
       .then(async response => {
         const data = await response.json().catch(() => ({}));
-        if (response.ok && data.signedIn && data.account) { setAccount({ loading: false, signedIn: true, name: data.account.name || "", email: data.account.email || "", organisation: data.account.organisation || "", error: "" }); setOrganisation(data.account.organisation || ""); }
-        else setAccount({ loading: false, signedIn: false, name: "", email: "", organisation: "", error: "" });
+        if (response.ok && data.signedIn && data.account) { setAccount({ loading: false, signedIn: true, readinessComplete: isReadinessComplete(data.progress as ReadinessProgress), name: data.account.name || "", email: data.account.email || "", organisation: data.account.organisation || "", error: "" }); setOrganisation(data.account.organisation || ""); }
+        else setAccount({ loading: false, signedIn: false, readinessComplete: false, name: "", email: "", organisation: "", error: "" });
       })
       .catch(() => { if (!controller.signal.aborted) setAccount(current => ({ ...current, loading: false, error: "We could not check your account just now." })); });
     return () => controller.abort();
   }, []);
   useEffect(() => {
-    if (!account.signedIn) return;
+    if (!account.signedIn || !account.readinessComplete) return;
     void fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "list-report-reviews" }), cache: "no-store" })
       .then(async response => { const data = await response.json(); if (response.ok) setReviews(data.reviews || []); })
       .catch(() => undefined);
-  }, [account.signedIn]);
+  }, [account.signedIn, account.readinessComplete]);
   function choose(event: ChangeEvent<HTMLInputElement>) {
     const selected = event.target.files?.[0] || null;
     setFileError("");
@@ -63,7 +64,8 @@ export function ReportReviewIntake() {
   }
   if (account.loading) return <div className="review-intake-state" role="status">Checking your SORP2026 account…</div>;
   if (account.error) return <div className="review-intake-state" role="alert">{account.error}</div>;
-  if (!account.signedIn) return <div className="review-intake-state"><p className="gateway-kicker">Your report stays private</p><h2>Log in before uploading.</h2><p>Use your existing SORP2026 account, or create one once for the whole platform.</p><Link className="gateway-action" href="/login/?return=/charity-impact-reports/review/">Log in or create account <Arrow /></Link></div>;
+  if (!account.signedIn) return <div className="review-intake-state"><p className="gateway-kicker">Your journey starts with readiness</p><h2>First, complete your free SORP review.</h2><p>It gives us the context to make every next step more useful. You can create your account without losing your answers as part of that journey.</p><Link className="gateway-action" href="/are-you-sorp-ready/review/?entry=intro">Start your free readiness review <Arrow /></Link><Link className="gateway-quiet-link" href="/login/?return=/charity-impact-reports/review/">Already completed it? Log in</Link></div>;
+  if (!account.readinessComplete) return <div className="review-intake-state"><p className="gateway-kicker">One useful step first</p><h2>Finish your SORP readiness review.</h2><p>Your progress is saved. Complete the review to unlock the report-review service and the wider impact journey.</p><Link className="gateway-action" href="/are-you-sorp-ready/review/">Continue your readiness review <Arrow /></Link></div>;
   return <div className="review-intake-grid">
     <section className="review-upload" aria-labelledby="upload-title">
       <p className="gateway-kicker">Step 1 · Your report</p>

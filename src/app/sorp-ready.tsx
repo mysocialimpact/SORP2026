@@ -1,88 +1,113 @@
 import Link from "next/link";
-import Image from "next/image";
+import { FolderHero } from "@/components/folder-hero";
 import SorpFilm from "./sorp-film/sorp-film";
 import { sorpSource } from "./sorp-methodology-v1";
-import { ProductAdviserNote } from "@/components/product-adviser-note";
 
-const conversationUrl = "/are-you-sorp-ready/review/?entry=intro";
+const reviewUrl = "/are-you-sorp-ready/review/?entry=intro";
 
-function StartReview() {
-  return <Link className="sr-start" href={conversationUrl}>START THE FREE REVIEW <span aria-hidden="true">→</span></Link>;
+function StartReview({ compact = false }: { compact?: boolean }) {
+  return (
+    <Link className={compact ? "sr-start sr-start-compact" : "sr-start"} href={reviewUrl}>
+      Start Free Review <span aria-hidden="true">→</span>
+    </Link>
+  );
 }
 
 export function SorpReadyPage() {
-  return <>
-    <main id="main" className="sr-story">
-      <header className="sr-hero" id="top">
-        <div><p className="sr-eyebrow">Impact &amp; Sustainability Reporting Readiness for SORP 2026</p>
-          <h1>How ready is your charity for <em>SORP 2026?</em></h1>
-          <p>A free review of your impact and sustainability reporting readiness—highlighting strengths, gaps and practical next steps.</p>
-        </div>
-        <StartReview />
-      </header>
+  return (
+    <>
+      <main id="main" className="sr-story">
+        <FolderHero product="sorp-ready" as="header" paper="#fbfaf7" className="sr-hero" id="top">
+          <div className="sr-hero-copy">
+            <p className="sr-eyebrow">A completely free SORP 2026 readiness review</p>
+            <h1>Are You<br /><span>SORP Ready?</span></h1>
+            <p className="sr-hero-lead">Find out how prepared your charity is for SORP 2026.</p>
+          </div>
+          <div className="sr-hero-intro">
+            <p>Take our completely free readiness review. Get your score, identify what needs attention and discover what to do next.</p>
+            <strong>100% free. No obligation.</strong>
+            <div className="sr-hero-actions">
+              <StartReview />
+              <a className="sr-play" href="#presentation">Play Presentation <span aria-hidden="true">▶</span></a>
+            </div>
+          </div>
+        </FolderHero>
 
-      <section className="sr-presentation" aria-label="The SORP readiness story">
-        <SorpFilm embedded startHref={conversationUrl} />
-      </section>
+        <section id="sr-audiences" className="sr-audiences" aria-labelledby="sr-audiences-title">
+          <div className="sr-section-heading">
+            <p className="sr-eyebrow">Who is it for?</p>
+            <h2 id="sr-audiences-title">For charities—and the people who help them.</h2>
+          </div>
+          <div className="sr-audience-grid">
+            <article>
+              <h3>Charities</h3>
+              <p>For trustees, charity leaders, finance teams and staff who want to understand their readiness and identify gaps.</p>
+            </article>
+            <article>
+              <h3>Accountants &amp; Advisers</h3>
+              <p>For professionals who want to assess their charity clients and help them prepare for SORP 2026.</p>
+            </article>
+          </div>
+        </section>
 
-      <section className="sr-details" aria-labelledby="sr-detail-heading">
-        <header><p className="sr-eyebrow">THE DETAIL, WHEN YOU NEED IT</p><h2 id="sr-detail-heading">A little more certainty.</h2><p>Explore the scope, the method and the people behind your report.</p></header>
-        <div className="sr-free" id="assessment">
-          <h3>What you get for free</h3>
-          <dl>
-            <div><dt>Historical Snapshot</dt><dd>What your latest published Trustees’ Annual Report and accounts evidenced then.</dd></div>
-            <div><dt>Current Readiness</dt><dd>Your answers to 19 focused questions, comments and context bring the picture up to date.</dd></div>
-            <div><dt>Personalised Report</dt><dd>Your strengths, gaps and priorities: what to do now, improve when practical and keep doing well.</dd></div>
-          </dl>
-          <p>Free assessment. Free personalised report. No obligation.</p>
-        </div>
+        <section id="sr-benefits" className="sr-benefits" aria-labelledby="sr-benefits-title">
+          <div className="sr-section-heading">
+            <p className="sr-eyebrow">What you’ll get</p>
+            <h2 id="sr-benefits-title">A clear picture.<br />A practical way forward.</h2>
+          </div>
+          <ol>
+            <li><span>01</span><h3>Your readiness score</h3><p>Understand how prepared you are.</p></li>
+            <li><span>02</span><h3>Your gaps and priorities</h3><p>See what needs attention.</p></li>
+            <li><span>03</span><h3>Your next steps</h3><p>Know where to focus, with optional expert human support.</p></li>
+          </ol>
+        </section>
 
-        <details id="scope"><summary>What does the review cover?</summary><div className="sr-expanded">
-          <p>Impact and sustainability reporting aspects of SORP 2026, focused on Module 1 — the Trustees’ Annual Report. We distinguish published evidence from your current, self-reported position.</p>
-          <h3>What it does not cover</h3><p>This is not a full SORP compliance review, statutory audit, audit opinion, assessment of every accounting requirement, or certification by a regulator or the SORP-making body.</p>
-        </div></details>
-        <details id="language"><summary>MUST / SHOULD / MAY — what do they mean?</summary><div className="sr-expanded">
-          <dl><dt>MUST · Required</dt><dd>A requirement where it applies to your charity.</dd><dt>SHOULD · Recommended</dt><dd>A recommendation intended to advance good reporting practice.</dd><dt>MAY · Optional</dt><dd>A choice about adopting an approach, treatment or disclosure.</dd></dl>
-          <p>MSI’s evidence judgements are labelled separately. “Judgement” is not an official fourth SORP term.</p>
-        </div></details>
-        <details id="eligibility"><summary>Does SORP apply, and which tier am I in?</summary><div className="sr-expanded">
-          <p>SORP generally applies to UK charities preparing accruals accounts, not receipts-and-payments accounts. Legal form and jurisdiction matter; a CIC is not automatically a charity.</p>
-          <p>SORP 2026 applies to reporting periods beginning on or after 1 January 2026. Requirements depend partly on annual gross income:</p>
-          <dl><dt>Tier 1</dt><dd>Up to £500,000.</dd><dt>Tier 2</dt><dd>Over £500,000 and up to £15 million.</dd><dt>Tier 3</dt><dd>Over £15 million.</dd></dl>
-          <p>Unsure? The review helps establish your public reporting context. Where income is provisional, we explain what a tier change would mean. Organisations outside SORP can still find the impact questions useful.</p>
-        </div></details>
-        <details id="methodology"><summary>How does the methodology work?</summary><div className="sr-expanded">
-          <p>The Historical Snapshot maps exact published evidence to applicable SORP requirements and a defined assessment rubric. Reporting Strength reflects that evidence; it is not proof of the charity’s real-world effectiveness.</p>
-          <p>Your 19 answers and comments add your current position. The personalised report keeps THEN and NOW distinct and explains the evidence, reasoning and result behind each conclusion.</p>
-          <p>Requirements are tier-aware. MUST, SHOULD and MAY retain their SORP meanings; MSI methodology and human judgement are identified separately.</p>
-          <p><Link href={conversationUrl}>Read the full methodology in the review introduction →</Link></p>
-          <p><a href={sorpSource} target="_blank" rel="noreferrer">Read the authoritative SORP 2026 source ↗</a></p>
-        </div></details>
-        <details id="path"><summary>Why My Social Impact? What comes beyond readiness?</summary><div className="sr-expanded">
-          <p>We believe social impact should be taken as seriously as financial performance. Better reporting grows from better evidence, learning and decisions throughout the year.</p>
-          <h3>Get ready → Get better → Get excellent</h3><p>Start with SORP readiness. Strengthen measurement, data and learning. Then embed impact in how your organisation is managed.</p>
-          <h3>Social Impact Excellence</h3><dl><dt>Purpose</dt><dd>Be clear about the change you exist to create.</dd><dt>Leadership</dt><dd>Make impact part of governance and decisions.</dd><dt>Data</dt><dd>Gather useful evidence and measure what matters.</dd><dt>Delivery</dt><dd>Use learning to improve programmes and services.</dd><dt>Communication</dt><dd>Explain your impact clearly and credibly.</dd></dl>
-          <Link href="/#beyond-compliance">Explore Social Impact Excellence →</Link>
-        </div></details>
-        <details id="review"><summary>Optional human support — what does it cost?</summary><div className="sr-expanded">
-          <p>Your assessment and personalised report are free. Afterwards, you can choose to discuss them with Marcus.</p>
-          <dl><dt>10-minute initial conversation · Free</dt><dd>Discuss whether further help would be useful.</dd><dt>30-minute review · £50</dt><dd>Review the findings and agree practical priorities.</dd><dt>60-minute review · £100</dt><dd>A wider discussion, including a light-touch review of one Impact Report or key wider-evidence source supplied beforehand.</dd><dt>Implementation support · From £250</dt><dd>Practical help where appropriate, agreed through a human conversation.</dd></dl>
-          <p>The assessment does not prescribe consultancy. Marcus discusses what help, if any, you need. Paid booking remains optional after the free report.</p>
-          <p>If a review leads directly to a larger MSI engagement, its fee can be credited against that work. If cost is a barrier, <a href="mailto:marcus@mysocialimpact.org">contact Marcus</a>.</p>
-        </div></details>
-        <details id="about"><summary>Who is accountable for this review?</summary><div className="sr-expanded sr-marcus">
-          <Image src="/images/marcus-warry-msi.webp" alt="Marcus Warry" width={112} height={140} />
-          <div><h3>Marcus Warry ACA</h3><p>Chartered Accountant · Social Impact Consultant<br />Co-founder, My Social Impact</p><p>Marcus brings accounting and social impact expertise to the review and its optional human support.</p><a href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org</a></div>
-        </div></details>
-        <details id="faq"><summary>A few practical questions</summary><div className="sr-expanded">
-          <h3>Is there a paywall for my report?</h3><p>No. The assessment and personalised report are free, with no card and no obligation to buy support.</p>
-          <h3>Why answer questions after you have read our report?</h3><p>A published report is historical evidence. Your answers explain what has changed, what exists elsewhere and what is still being developed.</p>
-          <h3>What if our latest report cannot be found?</h3><p>The review provides a report-recovery step so you can help supply the correct published report. Missing evidence is not proof that your charity does no impact work.</p>
-          <h3>Does a strong result certify compliance or impact?</h3><p>No. It describes the reporting evidence and your current readiness within this review’s scope. It is neither full SORP certification nor independent verification of your impact.</p>
-        </div></details>
-      </section>
-      <ProductAdviserNote title="Review readiness together.">Accountants and advisers can use the tool with charity clients to explore impact and sustainability reporting readiness. It is not a complete financial accounting compliance assessment and does not replace professional judgement.</ProductAdviserNote>
-      <section className="sr-final"><div><p className="sr-eyebrow">YOUR NEXT STEP</p><h2>Find your charity.<br /><em>Know what to do next.</em></h2><p>No card. No surprise paywall. No obligation.</p></div><StartReview /></section>
-    </main>
-  </>;
+        <section className="sr-presentation" id="presentation" aria-labelledby="sr-presentation-title">
+          <div className="sr-presentation-intro">
+            <div>
+              <p className="sr-eyebrow">Want to know more?</p>
+              <h2 id="sr-presentation-title">Watch our short presentation.</h2>
+            </div>
+            <div>
+              <p>Find out how the review works, what it covers and how it can help your charity prepare.</p>
+              <a className="sr-text-link" href="#presentation-player">Play Presentation <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+          <div id="presentation-player" className="sr-presentation-player">
+            <SorpFilm embedded startHref={reviewUrl} />
+          </div>
+        </section>
+
+        <section id="sr-more" className="sr-more" aria-label="More information about the review">
+          <details>
+            <summary>More about the review <span aria-hidden="true">↓</span></summary>
+            <div className="sr-more-content">
+              <div>
+                <h3>What it covers</h3>
+                <p>The impact and sustainability reporting aspects of SORP 2026, focused on Module 1 of the Trustees’ Annual Report. It is not a full accounting compliance review, audit or regulatory certification.</p>
+              </div>
+              <div>
+                <h3>How your score works</h3>
+                <p>We combine evidence from your latest published report with your answers to focused questions. Published evidence and your current, self-reported position remain clearly distinguished.</p>
+              </div>
+              <div>
+                <h3>What happens next</h3>
+                <p>You receive a free personalised report showing strengths, gaps, priorities and practical next steps. There is no card, paywall or obligation.</p>
+              </div>
+              <div>
+                <h3>Optional human support</h3>
+                <p>If useful, you can choose to discuss your results with Marcus Warry ACA. Expert advice is entirely optional and always agreed through a human conversation.</p>
+              </div>
+              <p className="sr-more-links"><Link href={reviewUrl}>Read the full methodology in the review →</Link><a href={sorpSource} target="_blank" rel="noreferrer">Official SORP 2026 source ↗</a></p>
+            </div>
+          </details>
+        </section>
+      </main>
+
+      <aside className="sr-fixed-action" aria-label="Start the free SORP readiness review">
+        <span>Free readiness review</span>
+        <StartReview compact />
+      </aside>
+    </>
+  );
 }

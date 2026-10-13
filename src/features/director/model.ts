@@ -205,7 +205,7 @@ export function buildReport(draft: Draft) {
 export function reportText(draft: Draft) {
   const r = buildReport(draft);
   return [
-    `MY IMPACT DIRECTOR — YOUR READINESS SNAPSHOT`,
+    `MY IMPACT DIRECTOR: YOUR READINESS SNAPSHOT`,
     draft.organisation,
     r.summary,
     `Overall: ${r.overall}/5`,
@@ -221,7 +221,7 @@ export function reportText(draft: Draft) {
     "YOUR ANSWERS",
     ...QUESTIONS.map(
       (q, i) =>
-        `${q[1]} — ${draft.ratings[i]}/5 (${ANCHORS[draft.ratings[i] - 1]})`,
+        `${q[1]}: ${draft.ratings[i]}/5 (${ANCHORS[draft.ratings[i] - 1]})`,
     ),
     ...REFLECTIONS.map(
       (q, i) => `${q}\n${draft.reflections[i] || "Not provided"}`,

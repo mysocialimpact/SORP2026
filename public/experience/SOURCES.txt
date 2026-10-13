@@ -1,0 +1,8 @@
+Greenpeace: official Greenpeace Planet 4 theme artwork
+https://github.com/greenpeace/planet4-master-theme/blob/main/images/gp-logo.svg
+
+Starbucks: Simple Icons brand library (source: starbucks.com; guidelines: creative.starbucks.com)
+https://github.com/simple-icons/simple-icons/blob/develop/icons/starbucks.svg
+
+Retrieved 13 October 2026. Original proportions preserved. Logos identify historical
+collective team experience, not endorsement of SORP2026.

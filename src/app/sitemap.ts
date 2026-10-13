@@ -14,7 +14,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         "/my-impact-director/",
         "/social-impact-excellence/",
         "/charity-impact-reports/",
-        "/purpose-works/",
         "/our-mission/",
         "/contact/",
         "/are-you-sorp-ready/",
