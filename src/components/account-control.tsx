@@ -16,7 +16,7 @@ export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
         const active=response.ok && data.signedIn === true;
         setSignedIn(active);
         setFounder(active && data.platformAccess?.founder === true);
-        setAdviser(active && Array.isArray(data.platformAccess?.memberships) && data.platformAccess.memberships.some((item:{type?:string})=>item.type==="Adviser"));
+        setAdviser(active && Array.isArray(data.platformAccess?.memberships) && data.platformAccess.memberships.some((item:{type?:string;entitlement?:{plan?:string}})=>item.type==="Adviser"&&["Adviser","Enterprise"].includes(item.entitlement?.plan||"")));
       })
       .catch(() => setSignedIn(false));
     return () => controller.abort();
