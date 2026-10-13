@@ -24,7 +24,8 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   await expect(page.locator(".gateway-contribution-amounts").getByRole("button", { name: "£5", exact: true })).toHaveAttribute("aria-pressed", "true");
   const hello = page.locator(".homepage-hello");
   await expect(hello.getByRole("heading", { name: "Say hello!" })).toBeVisible();
-  await expect(hello).toContainText("We’d love to hear from you. A question, an idea, some feedback — or just hello.");
+  await expect(hello.getByPlaceholder("We’d love to hear from you. A question, an idea, some feedback — or just hello.")).toBeVisible();
+  await expect(hello.locator(".homepage-hello-invitation p")).toHaveCount(0);
   await expect(hello).not.toContainText("Just looking around?");
   await expect(hello).not.toContainText("occasional updates");
   expect((await hello.boundingBox())!.height).toBeLessThan(info.project.name === "mobile" ? 680 : 560);

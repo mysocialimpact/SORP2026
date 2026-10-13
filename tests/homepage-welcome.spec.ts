@@ -26,18 +26,22 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
   await page.goto("/");
   const surfaces = await page.evaluate(() => {
     const edge = document.querySelector(".product-folder-sheet-edge")!;
+    const sectionNavigation = document.querySelector(".product-section-navigation")!;
     const cover = document.querySelector(".gateway-home-cover")!;
     return {
       edge: getComputedStyle(edge).backgroundColor,
       cover: getComputedStyle(cover).backgroundColor,
       edgeBorder: getComputedStyle(edge).borderTopWidth,
-      gap: cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
+      gaps: [
+        sectionNavigation.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
+        cover.getBoundingClientRect().top - sectionNavigation.getBoundingClientRect().bottom,
+      ],
       sequence: [".gateway-opening", ".homepage-audience", ".homepage-ambition", ".gateway-home-vision", ".gateway-sorp-section"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
     };
   });
   expect(surfaces.edge).toBe(surfaces.cover);
   expect(surfaces.edgeBorder).toBe("0px");
-  expect(surfaces.gap).toBe(0);
+  expect(surfaces.gaps).toEqual([0, 0]);
   expect(surfaces.sequence).toEqual([...surfaces.sequence].sort((a, b) => a - b));
 });
 
