@@ -24,7 +24,7 @@ export function Footer() {
           <section className="gateway-footer-msi" aria-labelledby="footer-msi-title">
             <MsiBrand attribution="Developed by" />
             <h2 id="footer-msi-title">Strategy for Social Impact Excellence.</h2>
-            <a className="gateway-footer-partner-link" href={site.msi}>
+            <a className="gateway-footer-partner-link" href={site.msi} target="_blank" rel="noopener noreferrer">
               See what else we do <Arrow />
             </a>
           </section>
@@ -32,7 +32,7 @@ export function Footer() {
             <div className="gateway-footer-shed-copy">
               <IdeasBrand eager />
               <h2 id="footer-shed-title">Ideas, technology and a little mischief.</h2>
-              <a className="gateway-footer-shed-link" href={site.studio!}>
+              <a className="gateway-footer-shed-link" href={site.studio!} target="_blank" rel="noopener noreferrer">
                 See what else is in the Shed <Arrow />
               </a>
             </div>
