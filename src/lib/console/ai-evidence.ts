@@ -119,7 +119,15 @@ export type ResearchExtraction = {
 // Formatting marks may separate otherwise identical words in a cited passage.
 // Normalise presentation only; do not paraphrase or infer missing information.
 const evidenceText = (value: string) =>
-  value.replace(/[*_`]/g, "").replace(/\s+/g, " ").trim();
+  value
+    .normalize("NFKC")
+    .replace(/[*_`]/g, "")
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[–—]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 export function validateExtraction(
   data: ResearchExtraction,
   passages: CitedPassage[],

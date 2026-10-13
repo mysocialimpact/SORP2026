@@ -32,6 +32,11 @@ test("actual PwC research accepts supported roles across bold formatting, never 
       .output[0].content[0].text,
   );
   assert.equal(validateExtraction(data, passages).people.length, 6);
+  const typography = structuredClone(data);
+  typography.people[2].role = typography.people[2].role
+    .replaceAll("’", "'")
+    .toUpperCase();
+  assert.equal(validateExtraction(typography, passages).people.length, 6);
   const people = preferredPeople(data, passages, "pwc.co.uk");
   assert.equal(people.length, 2);
   assert.match(
