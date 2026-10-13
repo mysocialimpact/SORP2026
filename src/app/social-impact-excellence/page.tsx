@@ -75,7 +75,7 @@ export default function ExcellencePage() {
         <div><p className="gateway-kicker">Your starting point on SORP2026.org</p><h2 id="excellence-access-title">Start with<br />SORP readiness.</h2></div>
         <div>
           <p>Begin with SORP readiness, create your account and discover the next steps towards Social Impact Excellence.</p>
-          <Link className="gateway-action" href={site.readiness!}>Start with Are You SORP Ready? <Arrow /></Link>
+          <Link className="gateway-action" href="/are-you-sorp-ready/">Start with Are You SORP Ready? <Arrow /></Link>
           <p className="excellence-access-note">The Social Impact Maturity Assessment is available inside your registered SORP2026 account.</p>
           <Link className="excellence-login-link" href="/login/?return=/social-impact-excellence/">Already registered? Log in <Arrow /></Link>
         </div>
