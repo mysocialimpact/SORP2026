@@ -1,0 +1,128 @@
+[
+  {
+    "purpose": "firm-research",
+    "response": {
+      "id": "resp_06595c87367c6242016acea4ab644c87d2a0fd1565544bc42c",
+      "output": [
+        {
+          "id": "msg_06595c87367c6242016acea4c8055487d280bce9b6f6091a68",
+          "role": "assistant",
+          "type": "message",
+          "phase": "final_answer",
+          "status": "completed",
+          "content": [
+            {
+              "text": "**Identity check against the official domain:** PwC’s own “About us” page is on `pwc.co.uk` and states that “PwC refers to the PwC network and/or one or more of its member firms,” which is consistent with the JSON identity for **PricewaterhouseCoopers LLP** being the UK firm behind the official domain. ([pwc.co.uk](https://www.pwc.co.uk/who-we-are.html))\n\n**Category A — services:** PwC has a dedicated **Charities** industry page. It explicitly says “Our charities team” draws on “multi-disciplinary expertise” to help charities with strategic and operational challenges, and the page lists **Daniel Chan** and **Rachel Taylor** as contacts. That establishes a dedicated charity/non-profit service page and a named charity-facing team contact point. ([pwc.co.uk](https://www.pwc.co.uk/industries/charities.html))\n\n**Category B — people:** Daniel Chan’s profile explicitly says he is **PwC UK’s Charities Leader** and **Government & Health Industries Audit Leader**, based in London, with a “particular specialism in leading audits for large, high profile charities.” The same profile also says he is the partner sponsor for PwC’s Charities Award and is a member of the Charities SORP Committee and the CIPFA Charities and Public Benefit Entities Forum. ([pwc.co.uk](https://www.pwc.co.uk/contacts/d/daniel-chan.html))\n\n**Category B — qualifications:** In the accessible sources reviewed, I did **not** find a verified specialist charity qualification such as **DChA** stated on Daniel Chan’s profile or on the charities page. The profile gives charity responsibilities and committee roles, but not a specialist charity qualification. ([pwc.co.uk](https://www.pwc.co.uk/contacts/d/daniel-chan.html))\n\n**Category C — SORP:** PwC’s 2022 charity-reporting workshop page contains substantive technical discussion of charity reporting: it says the session looked at the current charities **SORP development process**, reviewed the underlying **FRS 102** standard, and discussed reporting areas such as stakeholder engagement, risk, the Charity Governance Code, and environmental disclosures. It is **not** a 2026-specific SORP paper, so I did not find a substantive **Charity SORP 2026** publication in the sources reviewed. ([pwc.co.uk](https://www.pwc.co.uk/who-we-are/pwc-building-trust-awards/insights/bpta-2022-charity-reporting.html?utm_source=openai))\n\n**Category C — 2026 distinction:** PwC’s 2026 Building Trust Awards page shows the firm is reviewing charity reports for the 2026 reporting cycle, using publicly available annual reports up to the year ended **31 March 2026**. That is evidence of 2026 reporting activity, but it is an awards/reporting page rather than a substantive SORP technical publication. ([pwc.co.uk](https://www.pwc.co.uk/who-we-are/building-public-trust-in-corporate-reporting-awards.html))\n\n**Category D — clients/case studies:** PwC’s Living Room case study shows a direct charity engagement: The Living Room worked with PwC to replace and streamline its CRM using Salesforce’s nonprofit program, with the charity’s operations, grants, events, and donations functions reorganised. ([pwc.co.uk](https://www.pwc.co.uk/services/transformation/case-studies-and-insights/living-room-charity.html))\n\n**Category D — broader charity client evidence:** PwC’s charity-sector audit case study says the firm audits five of the UK’s top 20 most famous charities and names several of them, including WaterAid, Great Ormond Street Hospital Children’s Charity, St John Ambulance, the Prince’s Trust, and others. That substantiates a meaningful charity audit client portfolio. ([pwc.co.uk](https://www.pwc.co.uk/who-we-are/annual-report/stories/2023/building-trust-in-the-charity-sector-through-audit.html?utm_source=openai))\n\n**Category E — independent speaking/training/recognition:** An external Charity Times guide says it was **written by Daniel Chan, Senior Manager at PwC**, and also identifies him as a trustee and honorary treasurer for **UK Youth**. That is an independently published technical contribution, separate from PwC’s own marketing. ([charitytimes.com](https://www.charitytimes.com/ct/images/TrusteeGuide2018.pdf?utm_source=openai))\n\n**Category E — external charity-sector appointment:** Charity Times also reported that Daniel Chan was appointed to the **SORP Committee**, which oversees charity financial reporting rules across the UK and Ireland. That is an independently reported sector appointment, not just a self-published claim. ([charitytimes.com](https://www.charitytimes.com/digital_editions_eblasts/FebMarch2020/CT_DigitalEditionFebMarch2020.pdf?utm_source=openai))\n\n**Blocked/missing-source note:** I did not encounter a blocked PwC page in the sources I could access, but I also did **not** find a public source in this search set that established a charity-specific specialist qualification like DChA, or a standalone **Charity SORP 2026** technical publication. ([pwc.co.uk](https://www.pwc.co.uk/contacts/d/daniel-chan.html))",
+              "type": "output_text",
+              "logprobs": [],
+              "annotations": [
+                {
+                  "url": "https://www.pwc.co.uk/who-we-are.html",
+                  "type": "url_citation",
+                  "title": "About us - PwC UK",
+                  "end_index": 356,
+                  "start_index": 304
+                },
+                {
+                  "url": "https://www.pwc.co.uk/industries/charities.html",
+                  "type": "url_citation",
+                  "title": "Charities - PwC UK",
+                  "end_index": 815,
+                  "start_index": 753
+                },
+                {
+                  "url": "https://www.pwc.co.uk/contacts/d/daniel-chan.html",
+                  "type": "url_citation",
+                  "title": "Daniel Chan - PwC UK",
+                  "end_index": 1320,
+                  "start_index": 1256
+                },
+                {
+                  "url": "https://www.pwc.co.uk/contacts/d/daniel-chan.html",
+                  "type": "url_citation",
+                  "title": "Daniel Chan - PwC UK",
+                  "end_index": 1701,
+                  "start_index": 1637
+                },
+                {
+                  "url": "https://www.pwc.co.uk/who-we-are/pwc-building-trust-awards/insights/bpta-2022-charity-reporting.html?utm_source=openai",
+                  "type": "url_citation",
+                  "title": "Charity Reporting - Corporate Reporting workshops - PwC UK",
+                  "end_index": 2355,
+                  "start_index": 2222
+                },
+                {
+                  "url": "https://www.pwc.co.uk/who-we-are/building-public-trust-in-corporate-reporting-awards.html",
+                  "type": "url_citation",
+                  "title": "PwC Building Trust Awards - PwC UK",
+                  "end_index": 2822,
+                  "start_index": 2718
+                },
+                {
+                  "url": "https://www.pwc.co.uk/services/transformation/case-studies-and-insights/living-room-charity.html",
+                  "type": "url_citation",
+                  "title": "Client Stories: The Living Room - PwC UK",
+                  "end_index": 3226,
+                  "start_index": 3115
+                },
+                {
+                  "url": "https://www.pwc.co.uk/who-we-are/annual-report/stories/2023/building-trust-in-the-charity-sector-through-audit.html?utm_source=openai",
+                  "type": "url_citation",
+                  "title": "Building trust in the charity sector through audit - PwC UK",
+                  "end_index": 3742,
+                  "start_index": 3594
+                },
+                {
+                  "url": "https://www.charitytimes.com/ct/images/TrusteeGuide2018.pdf?utm_source=openai",
+                  "type": "url_citation",
+                  "title": "Trustee Guide 2018",
+                  "end_index": 4170,
+                  "start_index": 4071
+                },
+                {
+                  "url": "https://www.charitytimes.com/digital_editions_eblasts/FebMarch2020/CT_DigitalEditionFebMarch2020.pdf?utm_source=openai",
+                  "type": "url_citation",
+                  "title": "Charity Appointments",
+                  "end_index": 4615,
+                  "start_index": 4475
+                },
+                {
+                  "url": "https://www.pwc.co.uk/contacts/d/daniel-chan.html",
+                  "type": "url_citation",
+                  "title": "Daniel Chan - PwC UK",
+                  "end_index": 4980,
+                  "start_index": 4916
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "status": "completed"
+    }
+  },
+  {
+    "purpose": "evidence-extraction",
+    "response": {
+      "id": "resp_04ee50b9a3bd03e0016acea4ce8b0487d2a57134cf7dbf77bd",
+      "output": [
+        {
+          "id": "msg_04ee50b9a3bd03e0016acea4d1b52c87d2812d02481c6f9f62",
+          "role": "assistant",
+          "type": "message",
+          "phase": "final_answer",
+          "status": "completed",
+          "content": [
+            {
+              "text": "{\"identity_matches\":true,\"coverage\":[{\"category\":\"services\",\"checked\":true,\"limitation\":\"\"},{\"category\":\"people\",\"checked\":true,\"limitation\":\"\"},{\"category\":\"sorp\",\"checked\":true,\"limitation\":\"\"},{\"category\":\"clients\",\"checked\":true,\"limitation\":\"\"},{\"category\":\"recognition\",\"checked\":true,\"limitation\":\"\"}],\"evidence\":[{\"passage_id\":0,\"category\":\"recognition\"},{\"passage_id\":1,\"category\":\"services\"},{\"passage_id\":2,\"category\":\"people\"},{\"passage_id\":4,\"category\":\"sorp\"},{\"passage_id\":6,\"category\":\"clients\"},{\"passage_id\":7,\"category\":\"clients\"},{\"passage_id\":8,\"category\":\"recognition\"},{\"passage_id\":9,\"category\":\"recognition\"}],\"people\":[{\"passage_id\":1,\"name\":\"Daniel Chan\",\"role\":\"contact\",\"qualifications\":[]},{\"passage_id\":1,\"name\":\"Rachel Taylor\",\"role\":\"contact\",\"qualifications\":[]},{\"passage_id\":2,\"name\":\"Daniel Chan\",\"role\":\"PwC UK’s Charities Leader and Government & Health Industries Audit Leader\",\"qualifications\":[]},{\"passage_id\":8,\"name\":\"Daniel Chan\",\"role\":\"Senior Manager at PwC\",\"qualifications\":[]},{\"passage_id\":8,\"name\":\"Daniel Chan\",\"role\":\"trustee and honorary treasurer for UK Youth\",\"qualifications\":[]},{\"passage_id\":9,\"name\":\"Daniel Chan\",\"role\":\"appointed to the SORP Committee\",\"qualifications\":[]}]}",
+              "type": "output_text",
+              "logprobs": [],
+              "annotations": []
+            }
+          ]
+        }
+      ],
+      "status": "completed"
+    }
+  }
+]

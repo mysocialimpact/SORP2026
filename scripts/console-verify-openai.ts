@@ -71,8 +71,8 @@ async function main() {
       reuseEvidence || reuseSearch
         ? (
             await query<{ id: string }>(
-              "SELECT r.id FROM research_console.runs r WHERE r.firm_id=$1 AND r.status='collected' AND EXISTS(SELECT 1 FROM research_console.ai_usage u WHERE u.run_id=r.id AND u.purpose='firm-research' AND u.status='completed') ORDER BY r.completed_at DESC LIMIT 1",
-              [firm.id],
+              "SELECT r.id FROM research_console.runs r WHERE r.firm_id=$1 AND (r.status='collected' OR ($2::boolean AND r.status='failed')) AND EXISTS(SELECT 1 FROM research_console.ai_usage u WHERE u.run_id=r.id AND u.purpose='firm-research' AND u.status='completed') ORDER BY r.started_at DESC LIMIT 1",
+              [firm.id, reuseSearch],
             )
           )[0]
         : null;
