@@ -3,8 +3,8 @@ import AxeBuilder from "@axe-core/playwright";
 
 test("homepage presents the social enterprise mission and agreed vision", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText("A social enterprise initiative", { exact: false })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Imagine a world where nothing stood in the way of our potential to make a difference." })).toBeVisible();
+  await expect(page.getByText("A UK-based social enterprise initiative", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Imagine a world where social impact was taken as seriously as financial performance." })).toBeVisible();
   await expect(page.getByText("Already working with an accountant or adviser? Brilliant.")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Help us keep these tools free." })).toBeVisible();
   const footer = page.getByRole("contentinfo");

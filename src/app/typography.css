@@ -1,0 +1,36 @@
+/*
+ * Shared platform typography. Legacy product styles load per route, so these
+ * two explicit overrides keep the type policy stable across client navigation.
+ * The shared footer is deliberately excluded; genuine image/SVG logos are not
+ * modified. Scale, colour and layout remain owned by each product.
+ */
+:is(main, .gateway-header, [role="dialog"]),
+:is(main, .gateway-header, [role="dialog"]) :where(*) {
+  font-family: var(--sans), Arial, sans-serif !important;
+  font-style: normal !important;
+}
+
+/* Keep semantic emphasis visible without decorative italic letterforms. */
+main em { font-weight: 600; }
+
+.gateway-header .gateway-tagline {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -.025em;
+}
+
+@media (max-width: 700px) {
+  .gateway-header .gateway-brand-lockup { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .gateway-header .gateway-tagline {
+    display: block;
+    max-width: none;
+    padding-left: 0;
+    border-left: 0;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+}
+
+.gateway-header .gateway-account-control svg,
+.gateway-header .gateway-directory-nav svg { width: 14px; height: 14px; vertical-align: middle; }
