@@ -25,6 +25,7 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   const hello = page.locator(".homepage-hello");
   await expect(hello.getByRole("heading", { name: "Say hello!" })).toBeVisible();
   await expect(hello.getByPlaceholder("We’d love to hear from you. A question, an idea, some feedback — or just hello.")).toBeVisible();
+  await expect(hello.getByRole("button", { name: "Copy marcus@mysocialimpact.org" })).toBeVisible();
   await expect(hello.locator(".homepage-hello-invitation p")).toHaveCount(0);
   await expect(hello).not.toContainText("Just looking around?");
   await expect(hello).not.toContainText("occasional updates");
@@ -34,6 +35,7 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: info.outputPath("homepage.png"), fullPage: true });
   await page.locator(".gateway-footer").screenshot({ path: info.outputPath("footer.png") });
+  await expect(page.locator(".gateway-footer-msi")).toHaveCSS("background-color", "rgb(38, 59, 53)");
   const results = await new AxeBuilder({ page }).include(".platform-sticky-navigation").include(".homepage-hello").include(".gateway-footer").analyze();
   expect(results.violations).toEqual([]);
 });

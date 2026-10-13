@@ -41,6 +41,11 @@
 .homepage-story .homepage-hello-form textarea { min-height: 62px; }
 .homepage-story .homepage-hello-form > label { margin-top: 8px; }
 .homepage-story .homepage-hello-form .gateway-action { margin-top: 8px; }
+.homepage-story .homepage-hello-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; margin-top: 8px; }
+.homepage-story .homepage-hello-actions .gateway-action { margin-top: 0; }
+.homepage-story .homepage-copy-email { min-height: 44px; padding: 9px 15px; border: 1px solid #242329; border-radius: 3px; background: transparent; color: #242329; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.homepage-story .homepage-copy-email:hover { background: #ffffff55; }
+.homepage-story .homepage-copy-email:focus-visible { outline: 3px solid #6148bc; outline-offset: 3px; }
 .homepage-story .homepage-hello-invitation > p:not(.gateway-kicker), .homepage-story .homepage-hello-form > label > span,
 .homepage-story .homepage-hello-privacy, .homepage-story .homepage-hello-account { color: #49434e; }
 .homepage-story .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 0; }

@@ -105,3 +105,15 @@ test("contact form recognises accounts and confirms only an accepted server resp
   expect(writes).toHaveLength(1);
   expect(writes[0]).toMatchObject({ email: "preview@example.org", newsletter: false });
 });
+
+test("Say hello provides Marcus’s email as a working copy action", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/");
+  const hello = page.locator(".homepage-hello");
+  const copy = hello.locator(".homepage-copy-email");
+  await expect(copy).toBeVisible();
+  await expect(copy).toHaveAccessibleName("Copy marcus@mysocialimpact.org");
+  await copy.click();
+  await expect(copy).toHaveText("Email copied ✓");
+  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe("marcus@mysocialimpact.org");
+});

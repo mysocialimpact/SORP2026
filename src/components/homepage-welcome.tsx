@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { Arrow } from "@/components/ui";
 
 const audienceKey = "sorp2026.homepage-audience";
+const contactEmail = "marcus@mysocialimpact.org";
 type Audience = "charity" | "adviser";
 let memoryAudience: Audience | null = null;
 function readAudience(): Audience | null {
@@ -66,6 +67,7 @@ export function HomepageHello() {
   const [recognised, setRecognised] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [feedback, setFeedback] = useState("");
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
@@ -120,6 +122,16 @@ export function HomepageHello() {
     }
   }
 
+  async function copyEmail() {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(contactEmail);
+      setCopyStatus("copied");
+    } catch {
+      setCopyStatus("error");
+    }
+  }
+
   return (
     <section className="homepage-hello" id="say-hello" aria-labelledby="hello-title">
       <div className="gateway-width homepage-hello-layout">
@@ -133,7 +145,11 @@ export function HomepageHello() {
           <label htmlFor="hello-message">Anything you’d like to share? <span>Optional</span></label>
           <textarea id="hello-message" name="message" rows={3} maxLength={3000} placeholder="We’d love to hear from you. A question, an idea, some feedback — or just hello." />
           <label className="homepage-hello-honeypot" htmlFor="hello-website" aria-hidden="true">Website<input id="hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
-          <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Hello sent ✓" : "Say hello"} <Arrow /></button>
+          <div className="homepage-hello-actions">
+            <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Hello sent ✓" : "Say hello"} <Arrow /></button>
+            <button className="homepage-copy-email" type="button" onClick={() => void copyEmail()}>{copyStatus === "copied" ? "Email copied ✓" : `Copy ${contactEmail}`}</button>
+          </div>
+          {copyStatus === "error" && <p className="homepage-hello-small" role="status">Copy unavailable. Email <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>}
           {feedback && <p className={`homepage-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
           {status === "error" && <p className="homepage-hello-small">You can also <a href="mailto:marcus@mysocialimpact.org">email Marcus directly</a>.</p>}
         </form>
