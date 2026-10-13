@@ -5,7 +5,8 @@ test("homepage presents the social enterprise mission and agreed vision", async 
   await page.goto("/");
   await expect(page.getByText("A UK-based social enterprise initiative", { exact: false })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Imagine a world where social impact was taken as seriously as financial performance." })).toBeVisible();
-  await expect(page.getByText("Already working with an accountant or adviser? Brilliant.")).toBeVisible();
+  await expect(page.getByText("Built for charities and the accountants and advisers who support them.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Greater impact. Accessible to everyone." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Help us keep these tools free." })).toBeVisible();
   const footer = page.getByRole("contentinfo");
   await expect(footer.getByText("Imagine a world where curiosity and creativity were valued as highly as certainty.")).toBeVisible();
