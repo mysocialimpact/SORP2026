@@ -14,3 +14,16 @@ test('one SORP training event cannot earn repeated training/speaking awards',()=
 test('awards always trace to exact evidence and source, invalidated evidence excluded',()=>{const e=evidence('Our dedicated charity team provides charity audit services.');const r=score([e]);assert.ok(r.total>0);assert.ok(r.awards.every(a=>a.evidence_id===e.id&&a.source_url===e.url&&a.quote===e.summary));assert.equal(score([{...e,state:'Incorrect'}]).total,0);});
 test('category caps and criterion identities are validated',()=>{assert.throws(()=>validateRubric(provisionalRubric.map(r=>r.id==='A1'?{...r,points:99}:r)));assert.throws(()=>validateRubric(provisionalRubric.map(r=>r.id==='A1'?{...r,id:'A2'}:r)));assert.throws(()=>validateRubric(provisionalRubric.map(r=>r.id==='A1'?{...r,label:'Different meaning'}:r)));});
 test('encrypted backup round-trips and rejects tampering and wrong keys',()=>{const key=randomBytes(32).toString('base64'),body=Buffer.from(JSON.stringify({tables:{evidence:[{summary:'private evidence'}]}}));const sealed=encryptBackup(body,key);assert.equal(sealed.includes('private evidence'),false);assert.deepEqual(decryptBackup(sealed,key),body);assert.throws(()=>decryptBackup(sealed,randomBytes(32).toString('base64')));const altered=JSON.parse(sealed.toString());altered.tag=Buffer.alloc(16).toString('base64');assert.throws(()=>decryptBackup(Buffer.from(JSON.stringify(altered)),key));});
+
+test('not-for-profit is a sector description, never a negative finding',()=>{
+ const r=score([evidence('Our dedicated not-for-profit service page describes audit and accounting services for charities.',{url:'https://firm.example/our-services/'})]);
+ assert.ok(r.awards.some(a=>a.criterion_id==='A1'));
+});
+test('a separate missing-client sentence does not suppress documented external speaking',()=>{
+ const e=evidence('No named charity clients were found. The ICAEW charity conference lists Jane Smith as a speaker on charity reporting.',{source_type:'External',url:'https://icaew.com/events/charity-conference'});
+ const r=score([e]);assert.ok(r.awards.some(a=>a.criterion_id==='E1'));assert.equal(r.scores.clients,0);
+});
+test('a separate missing qualification never becomes an affirmative qualification award',()=>{
+ const r=score([evidence('Jane Smith FCA is the senior partner responsible for charity audit. No DChA qualification was verified.')]);
+ assert.ok(r.awards.some(a=>a.criterion_id==='B1'));assert.equal(r.awards.some(a=>a.criterion_id==='B2'),false);
+});

@@ -305,9 +305,18 @@ export function scoreEvidence(
         continue;
       // Imported notes are paraphrases, not quotations. Live extracts are verbatim page passages.
       const text = e.summary.replace(/\s+/g, " ").trim();
+      // A missing qualification/client finding must not erase a separate,
+      // affirmative service or speaking finding. Keep mixed/negated sentences
+      // conservative; 'not-for-profit' itself is never a negation.
+      const affirmative = text
+        .split(/(?<=[.!?])\s+(?=[A-Z*])/)
+        .filter((sentence) =>
+          !negative.test(sentence.replace(/\bnot[ -]for[ -]profit\b/gi, "nonprofit")),
+        )
+        .join(" ");
       if (
-        negative.test(text) ||
-        !qualifies(criterion.id, e, text, options.firmName)
+        !affirmative ||
+        !qualifies(criterion.id, e, affirmative, options.firmName)
       )
         continue;
       const group = ["C3", "E1", "E3"].includes(criterion.id)
