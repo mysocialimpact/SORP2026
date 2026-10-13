@@ -7,9 +7,13 @@ test("homepage presents the social enterprise mission and agreed vision", async 
   await expect(page.getByRole("heading", { name: "Imagine a world where social impact was taken as seriously as financial performance." })).toBeVisible();
   await expect(page.getByText("We’ve built this for")).toBeVisible();
   await expect(page.locator("#ambition-title")).toBeVisible();
-  await expect(page.locator("#contribution-title")).toContainText("Greater impact.");
+  await expect(page.locator("#contribution-title")).toContainText("Found this useful?");
+  await expect(page.locator(".gateway-contribution-copy")).toContainText("helps us keep them free and reach more charities — especially smaller ones");
   const footer = page.getByRole("contentinfo");
   await expect(footer.getByRole("link", { name: "See what else is in the Shed", exact: false })).toHaveAttribute("href", "https://www.theideasshed.com/");
+  await expect(footer.getByRole("heading", { name: "Strategy for Social Impact Excellence." })).toBeVisible();
+  await expect(footer.getByRole("link", { name: "See what else we do", exact: false })).toHaveAttribute("href", "https://mysocialimpact.org");
+  await expect(footer.getByRole("img", { name: /Cowminator/ })).toBeVisible();
   await expect(footer).not.toContainText("Independent tools");
   await expect(page.getByRole("banner").getByRole("link", { name: "Our Mission" })).toHaveAttribute("href", "/our-mission/");
   await expect(footer.getByRole("link", { name: "Privacy & accessibility", exact: true })).toHaveAttribute("href", "/privacy/");
@@ -25,7 +29,7 @@ test("mission page is concise, partner-friendly and accessible", async ({ page }
   await expect(page.getByRole("main").getByAltText("My Social Impact")).toHaveCount(0);
   await expect(page.getByRole("main").getByAltText("The Ideas Shed")).toHaveCount(0);
   await expect(page.getByRole("contentinfo").getByAltText("My Social Impact")).toBeVisible();
-  await expect(page.getByRole("contentinfo").getByAltText("The Ideas Shed")).toBeVisible();
+  await expect(page.getByRole("contentinfo").getByAltText("The Ideas Shed", { exact: true })).toBeVisible();
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
 });

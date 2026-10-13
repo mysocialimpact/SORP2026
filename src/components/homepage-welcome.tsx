@@ -46,8 +46,8 @@ export function HomepageAudience() {
       </p>
       <div className="homepage-audience-options">
         {([
-          ["charity", "CHARITIES", "Understand SORP. Strengthen your reporting. Improve your impact."],
-          ["adviser", "ACCOUNTANTS & ADVISERS", "Practical tools to help your charity clients prepare, comply and achieve more."],
+          ["charity", "CHARITIES", "Trustees · CEOs · Finance teams · Staff · Volunteers"],
+          ["adviser", "ACCOUNTANTS & ADVISERS", "Accountants · Auditors · Lawyers · Consultants · Funders"],
         ] as const).map(([value, title, description]) => (
           <button key={value} type="button" aria-pressed={audience === value} onClick={() => select(value)}>
             <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>

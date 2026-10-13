@@ -2,6 +2,7 @@ import { site } from "@/lib/site";
 import { IdeasBrand, MsiBrand } from "./brand";
 import { Arrow } from "./ui";
 import Link from "next/link";
+import Image from "next/image";
 export function Footer() {
   const builtAt = process.env.NEXT_PUBLIC_SITE_BUILT_AT!;
   const buildDate = new Intl.DateTimeFormat("en-GB", {
@@ -20,23 +21,28 @@ export function Footer() {
     <footer className="footer gateway-footer">
       <div className="gateway-width">
         <div className="gateway-footer-partnership">
-          <div className="gateway-footer-msi">
+          <section className="gateway-footer-msi" aria-labelledby="footer-msi-title">
             <MsiBrand attribution="Developed by" />
-          </div>
-          <div className="gateway-footer-shed">
-            <IdeasBrand />
-            <a className="gateway-footer-shed-link" href={site.studio!}>
-              See what else is in the Shed <Arrow />
+            <h2 id="footer-msi-title">Strategy for Social Impact Excellence.</h2>
+            <a className="gateway-footer-partner-link" href={site.msi}>
+              See what else we do <Arrow />
             </a>
-            <p className="gateway-company-details">
-              <a href={site.studio!}>The Ideas Shed Limited</a>
-              <span>Registered in England and Wales · Company number 17380053</span>
-            </p>
-          </div>
+          </section>
+          <section className="gateway-footer-shed" aria-labelledby="footer-shed-title">
+            <div className="gateway-footer-shed-copy">
+              <IdeasBrand eager />
+              <h2 id="footer-shed-title">Ideas, technology and a little mischief.</h2>
+              <a className="gateway-footer-shed-link" href={site.studio!}>
+                See what else is in the Shed <Arrow />
+              </a>
+            </div>
+            <Image className="gateway-footer-cow" src="/images/impact-director-cow.webp" alt="Cowminator, The Ideas Shed’s pink cyborg cow" width={900} height={1350} sizes="(max-width: 600px) 150px, 220px" loading="eager" />
+          </section>
         </div>
         <div className="gateway-footer-record">
           <p>© {new Date().getFullYear()} My Social Impact</p>
           <Link href="/privacy/">Privacy &amp; accessibility</Link>
+          <p>The Ideas Shed Limited · Company 17380053</p>
           <p className="gateway-build" aria-label="Website build information">
             <strong>Build {process.env.NEXT_PUBLIC_SITE_BUILD_NUMBER}</strong>
             {" · "}
