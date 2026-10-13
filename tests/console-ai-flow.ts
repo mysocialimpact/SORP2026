@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { query } from "../src/lib/console/db";
 import { discoverFirm } from "../src/lib/console/discovery";
-import { createFirm, report } from "../src/lib/console/repository";
+import { createFirm, report, listFirms } from "../src/lib/console/repository";
 import { startResearch, runResearch } from "../src/lib/console/research";
 import { response, aiUsageSummary } from "../src/lib/console/openai-response";
 const db = new URL(process.env.CONSOLE_DATABASE_URL ?? "");
@@ -14,7 +14,7 @@ process.env.OPENAI_API_KEY = "local-contract-test-not-a-real-key";
 const id = randomUUID();
 const paragraphs = [
   "Our dedicated charity team provides charity accounts, audit, VAT, governance and payroll services. [1]",
-  "Jane Wilson **FCA** is the **senior charity audit partner** responsible for charity accounting services. [2]",
+  "Jane Wilson **FCA** is the **senior charity audit partner** responsible for charity accounting services. She is a trustee for Helping Hands. [2]",
   "Our article explains Charity SORP 2026 and the three-tier reporting framework for charities. [3]",
 ];
 const text = paragraphs.join("\n\n");
@@ -116,6 +116,7 @@ globalThis.fetch = async (input, init) => {
         role: "senior charity audit partner",
         qualifications: ["FCA"],
       },
+      { passage_id: 1, name: "Helping Hands", role: "trustee", qualifications: [] },
     ],
   };
   return Response.json({
@@ -153,6 +154,11 @@ async function main() {
   assert.equal(saved.runs[0].status, "collected");
   assert.equal(saved.evidence.length, 3);
   assert.equal(saved.people.length, 1);
+  assert.ok((saved.runs[0].limitations as string[]).some((note: string) => note.includes("findings were withheld")));
+  const archivedName = "Archived Organisation " + id;
+  await query("INSERT INTO research_console.people(firm_id,name,role,archived_at) VALUES($1,$2,'Rejected entity fixture',now())", [firm.id, archivedName]);
+  assert.equal((await report(firm.id)).people.length, 1, "Archived findings are retained but excluded from the report");
+  assert.equal((await listFirms(new URLSearchParams({ q: archivedName }))).rows.length, 0, "Archived findings do not create search matches");
   assert.ok(saved.assessments[0].total > 0);
   assert.equal(Object.keys(saved.assessments[0].scores).length, 5);
   const [assessment] = await query<{

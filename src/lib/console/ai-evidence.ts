@@ -131,6 +131,7 @@ const evidenceText = (value: string) =>
 export function validateExtraction(
   data: ResearchExtraction,
   passages: CitedPassage[],
+  options: { withholdUnsupportedPeople?: boolean } = {},
 ) {
   if (data.identity_matches !== true)
     throw new Error(
@@ -160,10 +161,26 @@ export function validateExtraction(
     );
   if (!Array.isArray(data.people) || data.people.length > 50)
     throw new Error("Invalid people extraction.");
+  const supportedPeople: ResearchExtraction["people"] = [];
   for (const p of data.people) {
     const source = evidenceText(
       passages.find((s) => s.id === p.passage_id)?.summary ?? "",
     );
+    // The organisation after "trustee for UK Youth" is not the trustee.
+    const escaped = (s: string) =>
+      evidenceText(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const objectSuffix =
+      "\\s+(?:for|at|of|to)\\s+(?:the\\s+)?" + escaped(p.name);
+    const personalRole = evidenceText(p.role).replace(
+      new RegExp(objectSuffix + "$"),
+      "",
+    );
+    const roleBelongsToSomeoneElse =
+      p.role &&
+      p.name &&
+      new RegExp(escaped(personalRole) + objectSuffix + "(?:\\b|$)").test(
+        source,
+      );
     if (
       !p.name ||
       !evidenceText(p.name) ||
@@ -172,15 +189,37 @@ export function validateExtraction(
       !p.role ||
       !evidenceText(p.role) ||
       !source.includes(evidenceText(p.role)) ||
+      roleBelongsToSomeoneElse ||
       !Array.isArray(p.qualifications) ||
       p.qualifications.some(
         (q) => !q || !evidenceText(q) || !source.includes(evidenceText(q)),
       )
-    )
+    ) {
+      if (options.withholdUnsupportedPeople) continue;
       throw new Error(
         "A person or qualification was not supported by its cited passage.",
       );
+    }
+    supportedPeople.push(p);
   }
+  if (supportedPeople.length !== data.people.length)
+    return {
+      ...data,
+      people: supportedPeople,
+      coverage: data.coverage.map((c) =>
+        c.category === "people"
+          ? {
+              ...c,
+              limitation: [
+                c.limitation,
+                `${data.people.length - supportedPeople.length} proposed people findings were withheld because the cited text did not establish their personal role or qualification. No points rely on those findings.`,
+              ]
+                .filter(Boolean)
+                .join(" "),
+            }
+          : c,
+      ),
+    };
   return data;
 }
 

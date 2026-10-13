@@ -49,6 +49,31 @@ test("actual PwC research accepts supported roles across bold formatting, never 
   const wrongRole = structuredClone(data);
   wrongRole.people[2].role = "Chief Executive";
   assert.throws(() => validateExtraction(wrongRole, passages), /not supported/);
+  const mistakenOrganisation = structuredClone(data);
+  mistakenOrganisation.people.push({
+    passage_id: 8,
+    name: "UK Youth",
+    role: "trustee and honorary treasurer",
+    qualifications: [],
+  });
+  assert.throws(
+    () => validateExtraction(mistakenOrganisation, passages),
+    /not supported/,
+  );
+  const filtered = validateExtraction(mistakenOrganisation, passages, {
+    withholdUnsupportedPeople: true,
+  });
+  assert.equal(filtered.people.length, 6);
+  assert.ok(filtered.people.every((p) => p.name !== "UK Youth"));
+  assert.match(
+    filtered.coverage.find((c) => c.category === "people").limitation,
+    /1 proposed people findings were withheld/,
+  );
+  assert.deepEqual(
+    filtered.evidence,
+    data.evidence,
+    "Supported research survives an invalid person finding",
+  );
 });
 test("actual failed PwC search supports the UK identity through consulted official sources", () => {
   assert.ok(citedPassages(pwc).every((p) => !p.url.includes("www.pwc.co.uk")));
