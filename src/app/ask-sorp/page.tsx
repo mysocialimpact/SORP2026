@@ -58,11 +58,6 @@ export default function AskSorp() {
           </ol>
         </section>
       </main>
-
-      <aside className="ask-fixed-action" aria-label="Ask a question about SORP 2026">
-        <span>Questions about SORP 2026?</span>
-        <a href="#ask-sorp-live">Ask SORP <span aria-hidden="true">→</span></a>
-      </aside>
     </>
   );
 }

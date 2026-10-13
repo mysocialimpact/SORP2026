@@ -7,7 +7,7 @@ import { Arrow } from "@/components/ui";
 import { ExperienceCloud } from "@/components/experience-cloud";
 import { HomepageContribution } from "@/components/voluntary-contribution";
 import { site } from "@/lib/site";
-import { HomepageAudience, HomepageHello } from "@/components/homepage-welcome";
+import { HomepageAudience } from "@/components/homepage-welcome";
 import { HomepagePricing } from "@/components/homepage-pricing";
 import "./homepage.css";
 export const metadata: Metadata = {
@@ -149,7 +149,6 @@ export default function Home() {
       </div>
       <HomepageContribution />
       <HomepagePricing />
-      <HomepageHello />
     </main>
   );
 }

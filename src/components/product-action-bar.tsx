@@ -2,36 +2,73 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLayoutEffect, useRef } from "react";
-import { site } from "@/lib/site";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { folderForPath } from "@/lib/products";
+import { isReadinessComplete, isReadinessStarted, type ReadinessProgress } from "@/lib/readiness-status";
 
-const actions: Record<string, { label: string; href: string; secondary?: { label: string; href: string } }> = {
-  "/": { label: "Start your free SORP review", href: site.readiness!, secondary: { label: "Ask SORP", href: "/ask-sorp/#ask-sorp-live" } },
-  "/charity-impact-reports/": { label: "Review your impact report", href: "/charity-impact-reports/review/" },
-  "/social-impact-excellence/": { label: "See your next step", href: "#excellence-start" },
-  "/my-impact-director/": { label: "Start your free assessment", href: "#assessment", secondary: { label: "Talk to us", href: "#director-conversation" } },
-};
+type Action = { label: string; href: string };
+type AccountResponse = { signedIn?: boolean; progress?: ReadinessProgress };
+
+function defaultAction(path: string): Action {
+  if (path.startsWith("/ask-sorp/")) return { label: "Ask a question", href: "/ask-sorp/#ask-sorp-live" };
+  if (path.startsWith("/charity-impact-reports/")) return { label: "Get your report reviewed", href: "/charity-impact-reports/review/" };
+  if (path.startsWith("/social-impact-excellence/")) return { label: "Explore Social Impact Excellence", href: "/social-impact-excellence/#excellence-start" };
+  if (path.startsWith("/my-impact-director/")) return { label: "Start your free assessment", href: "/my-impact-director/#assessment" };
+  return { label: "Start your free SORP review", href: "/are-you-sorp-ready/review/?entry=intro" };
+}
+
+function readinessAction(progress?: ReadinessProgress): Action {
+  if (isReadinessComplete(progress)) return { label: "View your SORP report", href: "/are-you-sorp-ready/review/" };
+  if (isReadinessStarted(progress)) return { label: "Continue your SORP review", href: "/are-you-sorp-ready/review/" };
+  return { label: "Start your free SORP review", href: "/are-you-sorp-ready/review/?entry=intro" };
+}
 
 export function ProductActionBar() {
   const pathname = usePathname();
   const path = `${pathname.replace(/\/$/, "")}/`;
-  const action = actions[path];
+  const folder = folderForPath(path);
+  const [account, setAccount] = useState<AccountResponse | null>(null);
+  const [director, setDirector] = useState<{ completed?: boolean; started?: boolean } | null>(null);
   const bar = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
+      .then(async response => response.ok ? setAccount(await response.json()) : setAccount({ signedIn: false }))
+      .catch(() => { if (!controller.signal.aborted) setAccount({ signedIn: false }); });
+    if (path.startsWith("/my-impact-director/")) {
+      void fetch("/api/impact-director/", { cache: "no-store", signal: controller.signal })
+        .then(async response => {
+          if (!response.ok) return;
+          const value = await response.json();
+          const progress = value.progress?.data;
+          setDirector({ completed: progress?.completed === true, started: Array.isArray(progress?.ratings) && progress.ratings.some(Boolean) });
+        }).catch(() => undefined);
+    }
+    return () => controller.abort();
+  }, [path]);
+
+  const action = useMemo(() => {
+    if (path === "/" || path.startsWith("/are-you-sorp-ready/") || path === "/dashboard/") return readinessAction(account?.signedIn ? account.progress : undefined);
+    if (path.startsWith("/my-impact-director/") && director) {
+      if (director.completed) return { label: "View your Impact Director report", href: "/my-impact-director/#assessment" };
+      if (director.started) return { label: "Continue your free assessment", href: "/my-impact-director/#assessment" };
+    }
+    return defaultAction(path);
+  }, [account, director, path]);
+
   useLayoutEffect(() => {
-    if (!action || !bar.current) return;
+    if (!bar.current) return;
     const element = bar.current;
     const measure = () => document.documentElement.style.setProperty("--folder-action-height", `${element.getBoundingClientRect().height}px`);
-    const observer = new ResizeObserver(measure);
-    measure(); observer.observe(element);
+    const observer = new ResizeObserver(measure); measure(); observer.observe(element);
     return () => { observer.disconnect(); document.documentElement.style.removeProperty("--folder-action-height"); };
-  }, [action]);
-  // Ready and Ask retain their own working CTAs (including presentation/chat
-  // behaviour). Internal assessments keep their existing task controls only.
-  if (!action) return null;
+  }, []);
+
   return <>
-    <aside ref={bar} className="folder-action-bar" data-action-page={path} aria-label="Page actions">
+    <aside ref={bar} className="folder-action-bar" data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
       <Link className="folder-action-primary" href={action.href}>{action.label} <span aria-hidden="true">→</span></Link>
-      {action.secondary && <Link className="folder-action-secondary" href={action.secondary.href}>{action.secondary.label} <span aria-hidden="true">→</span></Link>}
+      <a className="folder-action-secondary" href="#say-hello">Talk to us <span aria-hidden="true">→</span></a>
     </aside>
     <div className="folder-action-clearance" aria-hidden="true" />
   </>;

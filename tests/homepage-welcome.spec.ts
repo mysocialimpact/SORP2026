@@ -97,14 +97,14 @@ test("contact form recognises accounts and confirms only an accepted server resp
     await route.fulfill({ json: { accepted: true, emailSent: true } });
   });
   await page.goto("/");
-  const form = page.locator(".homepage-hello-form");
+  const form = page.locator(".shared-hello-form");
   await expect(form.getByLabel("Email address")).toHaveValue("preview@example.org");
   await expect(form.getByLabel("Email address")).toHaveAttribute("required", "");
-  await expect(form.getByLabel("Message")).toHaveAttribute("required", "");
-  await expect(form.getByRole("checkbox")).toHaveCount(0);
-  await form.getByLabel("Message").fill("Please show us a demo.");
-  await form.getByRole("button", { name: "Send message" }).click();
-  await expect(form).toContainText("message has been emailed to My Social Impact");
+  await expect(form.getByLabel(/Message/)).not.toHaveAttribute("required", "");
+  await expect(form.getByRole("checkbox")).toHaveCount(1);
+  await form.getByLabel(/Message/).fill("Please show us a demo.");
+  await form.getByRole("button", { name: "Say hello" }).click();
+  await expect(form).toContainText("hello is on its way");
   expect(writes).toHaveLength(1);
   expect(writes[0]).toMatchObject({ email: "preview@example.org", message: "Please show us a demo.", newsletter: false });
 });
@@ -132,16 +132,16 @@ test("pricing is free-first, honest about planned plans and leads directly into 
   await expect.poll(() => track.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
   await expect(pricing.getByRole("link", { name: /£50/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/booking/?session=30");
   await expect(pricing.getByRole("link", { name: /Find Accountants & Advisers/ })).toHaveAttribute("href", "/accountants-advisers/");
-  expect(await pricing.evaluate(element => element.nextElementSibling?.id)).toBe("lets-talk");
+  expect(await pricing.evaluate(element => element.closest("main")?.nextElementSibling?.id)).toBe("say-hello");
 });
 
-test("Let’s talk has exactly two visible fields and keeps the prompt inside the message box", async ({ page }) => {
+test("shared Say hello has two text fields, optional message and newsletter consent", async ({ page }) => {
   await page.goto("/");
-  const talk = page.locator(".homepage-hello");
-  await expect(talk.getByRole("heading", { name: "Let’s talk." })).toBeVisible();
-  await expect(talk.getByPlaceholder("Request a demo, ask a question, share an idea, give feedback, or just say hello…")).toBeVisible();
-  await expect(talk.getByText("Request a demo, ask a question, share an idea, give feedback, or just say hello…", { exact: true })).toHaveCount(0);
-  await expect(talk.locator(".homepage-hello-form > input, .homepage-hello-form > textarea")).toHaveCount(2);
-  await expect(talk.getByRole("button", { name: "Send message" })).toBeVisible();
+  const talk = page.locator(".shared-hello");
+  await expect(talk.getByRole("heading", { name: /Just looking around.*Say hello/ })).toBeVisible();
+  await expect(talk.getByPlaceholder("A question, an idea, some feedback — or just hello…")).toBeVisible();
+  await expect(talk.locator(".shared-hello-form > input, .shared-hello-form > textarea")).toHaveCount(2);
+  await expect(talk.getByRole("checkbox")).toBeVisible();
+  await expect(talk.getByRole("button", { name: "Say hello" })).toBeVisible();
   await expect(talk.getByRole("button", { name: /Copy/ })).toHaveCount(0);
 });

@@ -12,11 +12,13 @@ import "./platform.css";
 import "./typography.css";
 import "./refinement.css";
 import "./folder-continuity.css";
+import "./shared-contact.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProductFolderTabs } from "@/components/product-folder-tabs";
 import { PlatformNavigation } from "@/components/platform-navigation";
 import { ProductActionBar } from "@/components/product-action-bar";
+import { SayHello } from "@/components/say-hello";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
@@ -57,6 +59,7 @@ export default function RootLayout({
         </a>
         <PlatformNavigation><Header /><ProductFolderTabs /></PlatformNavigation>
         {children}
+        <SayHello />
         <Footer />
         <ProductActionBar />
       </body>
