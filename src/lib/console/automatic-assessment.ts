@@ -51,7 +51,7 @@ export async function automaticAssessment(
       (
         await c.query(
           "SELECT 1 FROM research_console.runs WHERE firm_id=$1 AND status IN ('running','assessing') AND id IS DISTINCT FROM $2::uuid",
-          [firmId,options.runId??null],
+          [firmId, options.runId ?? null],
         )
       ).rowCount
     )
@@ -62,7 +62,12 @@ export async function automaticAssessment(
       )
     ).rows[0];
     if (options.calibration) {
-      const existing = (await c.query("SELECT * FROM research_console.assessments WHERE firm_id=$1 AND methodology_id=$2 AND origin='Automated pilot calibration' LIMIT 1", [firmId, method.id])).rows[0];
+      const existing = (
+        await c.query(
+          "SELECT * FROM research_console.assessments WHERE firm_id=$1 AND methodology_id=$2 AND origin='Automated pilot calibration' LIMIT 1",
+          [firmId, method.id],
+        )
+      ).rows[0];
       if (existing) return existing;
     }
     const run = options.runId
@@ -95,7 +100,7 @@ export async function automaticAssessment(
     const sources = run
       ? (
           await c.query(
-            "SELECT url FROM research_console.sources WHERE run_id=$1 AND status='Examined'",
+            "SELECT url FROM research_console.sources WHERE run_id=$1 AND status IN ('Examined','Search evidence')",
             [run.id],
           )
         ).rows
@@ -107,10 +112,14 @@ export async function automaticAssessment(
     );
     const sufficient =
       Boolean(pilot && historical) ||
-      (sources.length >= 3 && relevant.length >= 2);
+      (new Set(sources.map((s) => s.url)).size >= 3 &&
+        (evidence.some((e) => e.provenance?.kind === "openai-search")
+          ? evidence.some((e) => e.provenance?.coverageComplete === true)
+          : new Set(relevant.map((s) => s.url)).size >= 2));
     const result = scoreEvidence(evidence, {
       sufficient,
       rubric: method.rubric,
+      firmName: firm.name,
     });
     if (result.total === null) return result;
     for (const award of result.awards)

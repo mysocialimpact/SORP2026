@@ -79,6 +79,7 @@ test("directory shows ten, loads more, filters, and preserves three-firm shortli
   await page.getByLabel('Find a charity accountant',{exact:true}).fill('zz-no-such-firm');
   await expect(page.getByRole('heading',{name:'A little further afield?'})).toBeVisible();
   await page.getByRole('button',{name:'Reset to nationwide'}).click();
+  await expect(page.getByLabel('Find a charity accountant',{exact:true})).toHaveValue('');
   await page.locator('.directory-filters summary').click();
   await page.getByLabel('Independent examinations',{exact:true}).check();
   await expect(page.locator('.directory-result')).toHaveCount(1);
@@ -93,7 +94,8 @@ test("real map pins, selection, map-area search and mobile toggle work", async (
   // Select from list, then ensure the corresponding real Leaflet marker becomes selected.
   if(info.project.name==='mobile') await page.getByRole('button',{name:'List',exact:true}).click();
   await page.getByLabel('Find a charity accountant',{exact:true}).fill('Burton Sweet');
-  await page.locator('.directory-firm-focus').first().click();
+  await expect(page.locator('.directory-result')).toHaveCount(1);
+  await page.locator('.directory-firm-focus').filter({hasText:'Burton Sweet'}).click();
   await expect(page.locator('.directory-map-preview')).toContainText('Burton Sweet');
   await expect(page.locator('.directory-pin.is-selected')).toBeVisible();
   await page.getByRole('button',{name:'Close firm preview'}).click();

@@ -33,7 +33,7 @@ test("Ask SORP is a native, evidence-led product experience", async ({ page }) =
   expect(requestBody?.round).toBe(1);
   expect(requestBody?.sessionId).toMatch(/^[a-f0-9-]{36}$/i);
 
-  const sticky = page.getByRole("complementary", { name: "Ask a question about SORP 2026" });
+  const sticky = page.getByRole("complementary", { name: "Page actions" });
   await expect(sticky).toBeVisible();
   expect(await sticky.evaluate(element => getComputedStyle(element).position)).toBe("fixed");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();

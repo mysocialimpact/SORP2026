@@ -87,16 +87,19 @@ export function Report({ id }: { id: string }) {
   const { data, error, reload } = useData<ReportData>("firms/" + id);
   const [runUpdate, setActiveRun] = useState<Run | null>(null);
   const activeRun =
-    runUpdate || data?.runs.find((r) => ['running','assessing'].includes(r.status)) || null;
+    runUpdate ||
+    data?.runs.find((r) => ["running", "assessing"].includes(r.status)) ||
+    null;
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
   useEffect(() => {
-    if (!activeRun || !['running','assessing'].includes(activeRun.status)) return;
+    if (!activeRun || !["running", "assessing"].includes(activeRun.status))
+      return;
     const timer = setInterval(() => {
       api<Run>("runs/" + activeRun.id)
         .then((r) => {
           setActiveRun(r);
-          if (!['running','assessing'].includes(r.status)) reload();
+          if (!["running", "assessing"].includes(r.status)) reload();
         })
         .catch((e) => setActionError(e.message));
     }, 2200);
@@ -107,12 +110,17 @@ export function Report({ id }: { id: string }) {
   const a = data.assessments[0];
   const m = data.methods[0];
   const level = evidenceLevel(f.total, m.boundaries);
-  const running = Boolean(activeRun&&['running','assessing'].includes(activeRun.status));
+  const running = Boolean(
+    activeRun && ["running", "assessing"].includes(activeRun.status),
+  );
   async function research() {
     setBusy(true);
     setActionError("");
     try {
-      const run = await api<{ id: string }>("firms/" + id + "/research", {});
+      if (!f.website) await api("firms/" + id + "/website-discovery", {});
+      const run = await api<{ id: string }>("firms/" + id + "/research", {
+        refresh: true,
+      });
       setActiveRun({
         id: run.id,
         status: "running",
@@ -193,14 +201,14 @@ export function Report({ id }: { id: string }) {
         <button
           className="rc-button"
           onClick={research}
-          disabled={busy || running || !f.website || Boolean(f.merged_into)}
+          disabled={busy || running || Boolean(f.merged_into)}
         >
           {busy
             ? "Starting…"
             : running
               ? "Research underway…"
               : data.runs.length
-                ? "Refresh website research"
+                ? "Refresh research"
                 : "Research this accountant"}{" "}
           <span>→</span>
         </button>
@@ -234,7 +242,9 @@ export function Report({ id }: { id: string }) {
           Apply provisional scoring →
         </button>
         {!f.website && (
-          <small>Confirm the official website below to enable research.</small>
+          <small>
+            Research will first search for this firm’s official website.
+          </small>
         )}
       </div>
       {actionError && (
@@ -246,12 +256,25 @@ export function Report({ id }: { id: string }) {
         <div className="rc-run" role="status">
           {running && <span className="rc-spinner" />}
           <div>
-            <strong>{activeRun.stage}</strong>
+            <strong>
+              {["failed", "interrupted"].includes(activeRun.status)
+                ? "Research incomplete — action needed"
+                : activeRun.stage}
+            </strong>
             <p>
               {running
                 ? "Live stage from the saved research run. Collected sources will appear below."
-                : "Sources are saved. Inspect the findings before assessing the firm."}
+                : ["failed", "interrupted"].includes(activeRun.status)
+                  ? "The run did not complete. Any earlier evidence and assessments are retained."
+                  : "Evidence is saved. Review the findings, provisional scores and source links below."}
             </p>
+            {!running && activeRun.limitations?.length > 0 && (
+              <ul>
+                {activeRun.limitations.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            )}
             {running && (
               <button onClick={research}>
                 Run interrupted? Retry research

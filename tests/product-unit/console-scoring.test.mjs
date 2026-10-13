@@ -14,3 +14,62 @@ test('one SORP training event cannot earn repeated training/speaking awards',()=
 test('awards always trace to exact evidence and source, invalidated evidence excluded',()=>{const e=evidence('Our dedicated charity team provides charity audit services.');const r=score([e]);assert.ok(r.total>0);assert.ok(r.awards.every(a=>a.evidence_id===e.id&&a.source_url===e.url&&a.quote===e.summary));assert.equal(score([{...e,state:'Incorrect'}]).total,0);});
 test('category caps and criterion identities are validated',()=>{assert.throws(()=>validateRubric(provisionalRubric.map(r=>r.id==='A1'?{...r,points:99}:r)));assert.throws(()=>validateRubric(provisionalRubric.map(r=>r.id==='A1'?{...r,id:'A2'}:r)));assert.throws(()=>validateRubric(provisionalRubric.map(r=>r.id==='A1'?{...r,label:'Different meaning'}:r)));});
 test('encrypted backup round-trips and rejects tampering and wrong keys',()=>{const key=randomBytes(32).toString('base64'),body=Buffer.from(JSON.stringify({tables:{evidence:[{summary:'private evidence'}]}}));const sealed=encryptBackup(body,key);assert.equal(sealed.includes('private evidence'),false);assert.deepEqual(decryptBackup(sealed,key),body);assert.throws(()=>decryptBackup(sealed,randomBytes(32).toString('base64')));const altered=JSON.parse(sealed.toString());altered.tag=Buffer.alloc(16).toString('base64');assert.throws(()=>decryptBackup(Buffer.from(JSON.stringify(altered)),key));});
+
+test('not-for-profit is a sector description, never a negative finding',()=>{
+ const r=score([evidence('Our dedicated not-for-profit service page describes audit and accounting services for charities.',{url:'https://firm.example/our-services/'})]);
+ assert.ok(r.awards.some(a=>a.criterion_id==='A1'));
+});
+test('a separate missing-client sentence does not suppress documented external speaking',()=>{
+ const e=evidence('No named charity clients were found. The ICAEW charity conference lists Jane Smith as a speaker on charity reporting.',{source_type:'External',url:'https://icaew.com/events/charity-conference'});
+ const r=score([e]);assert.ok(r.awards.some(a=>a.criterion_id==='E1'));assert.equal(r.scores.clients,0);
+});
+test('a separate missing qualification never becomes an affirmative qualification award',()=>{
+ const r=score([evidence('Jane Smith FCA is the senior partner responsible for charity audit. No DChA qualification was verified.')]);
+ assert.ok(r.awards.some(a=>a.criterion_id==='B1'));assert.equal(r.awards.some(a=>a.criterion_id==='B2'),false);
+});
+
+test('markdown and longer negative charity findings cannot turn generic directors into specialists',()=>{
+ const r=score([evidence('The team page names **Jane Smith FCA – Director** and says she is the main contact for corporate clients. I did **not** see any charity-specific responsibility or specialist charity qualification such as **DChA** on that page.',{category:'people',url:'https://firm.example/about-us/meet-the-team'})]);
+ assert.equal(r.scores.people,0);
+});
+test('charity audit requirements in factsheets are not an offer of charity audit services',()=>{
+ const r=score([evidence('The closest page only says the charity factsheet covers trustees responsibilities with emphasis on accounting and audit requirements.',{category:'sorp',url:'https://firm.example/factsheets/specialist-areas'})]);
+ assert.equal(r.scores.services,0);
+});
+
+test('historic charity employment does not establish a current senior charity responsibility',()=>{
+ const r=score([evidence('The people page names Jonathan Coyle as Partner. In his profile, he says he first worked at a youth charity, was responsible for getting the books in order, and joined the firm as a trainee accountant.',{category:'people',url:'https://firm.example/people/'})]);
+ assert.equal(r.awards.some(a=>a.criterion_id==='B1'),false);
+});
+
+test('a firm name and a factsheet heading never identify a senior professional',()=>{
+ const r=scoreEvidence([evidence('On the official Specialist areas page, Fraser Powell publishes charity-related material headed Charities trustees responsibilities, focusing on accounting and audit requirements.',{url:'https://www.fraserpowell.co.uk/factsheets/specialist-areas'})],{sufficient:true,firmName:'fraser powel'});
+ assert.equal(r.scores.people,0);
+});
+test('AI people awards require an extracted named person linked to the passage',()=>{
+ const e=evidence('Jane Smith FCA is the senior partner responsible for charity audit.',{provenance:{kind:'openai-search'}});
+ assert.equal(score([e]).scores.people,0);
+ assert.ok(score([{...e,people:['Jane Smith']}]).awards.some(a=>a.criterion_id==='B1'));
+});
+
+test('named charity clients do not require an extracted staff member',()=>{
+ const r=score([evidence('Our firm was appointed by River Trust as the charity auditor.',{provenance:{kind:'openai-search'},people:[],category:'clients'})]);
+ assert.ok(r.awards.some(a=>a.criterion_id==='D1'));
+});
+
+test('generic technical libraries cannot earn any service-category points',()=>{
+ const r=score([evidence('The site contains a dedicated charity-related service area, but it is framed as general guidance rather than a specialist charity team. It covers charity VAT, governance and audit requirements.',{url:'https://firm.example/factsheets/specialist-areas'})]);
+ assert.equal(r.scores.services,0);
+});
+
+test('AI SORP training claims cannot earn points against an unrelated event citation',()=>{
+ const e=evidence('The firm delivered a charity governance webinar. It also presented SORP 2026 training at another conference.',{title:'Charity Governance Code refreshed',url:'https://firm.example/events/governance-code/',provenance:{kind:'openai-search'}});
+ assert.equal(score([e]).scores.sorp,0);
+ const sourced={...e,title:'SORP 2026 webinar',url:'https://firm.example/events/sorp-2026/'};
+ assert.ok(score([sourced]).awards.some(a=>a.criterion_id==='C3'));
+});
+
+test('AI category headings are not themselves affirmative evidence',()=>{
+ const r=score([evidence('**Dedicated charity team.** The site explains general accounting requirements.',{provenance:{kind:'openai-search'},url:'https://firm.example/news/'})]);
+ assert.equal(r.total,0);
+});

@@ -18,7 +18,7 @@ test("forgot-password link is present on direct sign-in, request acknowledgement
   await page.goto("/are-you-sorp-ready/review/?entry=login");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("WELCOME BACK.");
   await page.getByRole("link", { name: "Forgot password?" }).click();
-  await expect(page.getByLabel("Email address")).toHaveValue(saved.email);
+  await expect(page.getByRole("main").getByLabel("Email address")).toHaveValue(saved.email);
   await page.getByRole("button", { name: "Send reset link" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Request received.");
   await expect(page.getByRole("status")).toContainText("If this address has an account");
@@ -80,7 +80,7 @@ test("fresh-device sign-in can restore saved work after a reset without repeatin
     return route.fulfill({ json: { signedIn: false } });
   });
   await page.goto("/are-you-sorp-ready/review/?entry=login");
-  await page.getByLabel("Email address", { exact: true }).fill(saved.email);
+  await page.getByRole("main").getByLabel("Email address", { exact: true }).fill(saved.email);
   await page.getByLabel("Password", { exact: true }).fill("New secure password");
   await page.getByRole("button", { name: "SIGN IN AND CONTINUE" }).click();
   await expect(page).toHaveURL(/\/dashboard\/$/);

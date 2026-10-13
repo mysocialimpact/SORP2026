@@ -11,7 +11,15 @@ async function call(path:string, init?:RequestInit) { const response = await fet
 export function FounderCentre() {
   const [data,setData] = useState<Dashboard|null>(null); const [error,setError] = useState(""); const [selected,setSelected] = useState<Org|null>(null); const [q,setQ] = useState(""); const [busy,setBusy] = useState(false); const [notice,setNotice] = useState("");
   const load = async () => { try { setData(await call("dashboard")); setError(""); } catch(e) { setError(e instanceof Error?e.message:"Unable to open control centre."); } };
-  useEffect(()=>{void call("dashboard").then(value=>{setData(value);setError("");}).catch(e=>setError(e instanceof Error?e.message:"Unable to open control centre."));},[]);
+  useEffect(()=>{
+    let active = true;
+    void call("dashboard").then(result => {
+      if (active) { setData(result); setError(""); }
+    }).catch(e => {
+      if (active) setError(e instanceof Error ? e.message : "Unable to open control centre.");
+    });
+    return () => { active = false; };
+  },[]);
   const createOrg = async () => { const name = window.prompt("Organisation name"); if (!name) return; const type = window.prompt("Type: Charity, Adviser or Other", "Charity") || "Charity"; try { setBusy(true); await call("organisations",{method:"POST",body:JSON.stringify({name,type})}); setNotice("Organisation created."); await load(); } catch(e) { setError(e instanceof Error?e.message:"Unable to create organisation."); } finally { setBusy(false); } };
   const updatePlan = async (event:React.FormEvent<HTMLFormElement>) => { event.preventDefault(); if (!selected) return; const form = new FormData(event.currentTarget); try { setBusy(true); await call(`organisation/${selected.id}/plan`,{method:"POST",body:JSON.stringify({plan:form.get("plan"),complimentary:form.get("complimentary")==="on",duration:form.get("duration"),expiry:form.get("expiry"),reason:form.get("reason")})}); setNotice("Entitlement updated and recorded in the audit trail."); await load(); setSelected(null); } catch(e) { setError(e instanceof Error?e.message:"Unable to update entitlement."); } finally { setBusy(false); } };
   const invite = async (event:React.FormEvent<HTMLFormElement>) => { event.preventDefault(); if (!selected) return; const formElement=event.currentTarget; const form = new FormData(formElement); try { setBusy(true); setError(""); await call(`organisation/${selected.id}/invite`,{method:"POST",body:JSON.stringify({email:form.get("email"),role:form.get("role")})}); setNotice(`Invitation email sent to ${String(form.get("email"))}.`); formElement.reset(); await load(); } catch(e) { setError(e instanceof Error?e.message:"The invitation was not sent."); } finally { setBusy(false); } };

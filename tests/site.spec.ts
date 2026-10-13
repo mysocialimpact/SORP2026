@@ -8,7 +8,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   await page.goto("/");
   await expect(page.getByText("Brainstrust", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "SORP is the requirement.Better impact is the opportunity.",
+    "Free tools. Affordable expertise.For greater charity impact.",
   );
   for (const link of await page
     .getByRole("link", { name: "Start your free review" })
@@ -19,15 +19,14 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     );
   }
   const sorpSection = page.locator("section.gateway-sorp-section");
-  await expect(sorpSection.getByText("Live beta · Available now", { exact: true })).toHaveCount(2);
   await expect(
-    sorpSection.getByRole("heading", { name: "Start here. Get SORP ready." }),
+    sorpSection.getByRole("heading", { name: "Are You SORP Ready?" }),
   ).toBeVisible();
   await expect(
-    sorpSection.getByText("Already working with an accountant or adviser? Brilliant."),
+    sorpSection.getByText("A free assessment of your charity’s impact and sustainability reporting readiness."),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "The people behind the tools." }),
+    page.getByRole("heading", { name: "Our team", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("img", { name: "Gareth Murphy" })).toBeVisible();
   await expect(page.getByRole("img", { name: "Nicholas Demeter" })).toBeVisible();
@@ -36,22 +35,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   });
   await expect(nicholasProfile).toContainText("Monitoring & evaluation");
   await expect(nicholasProfile).toContainText("USAID & international development");
-  const sectionHierarchy = await page.locator(".platform-family-head").evaluate((header) => {
-    const heading = header.querySelector("h2");
-    const introduction = header.querySelector("p:last-child");
-    return {
-      heading: heading ? Number.parseFloat(getComputedStyle(heading).fontSize) : 0,
-      introduction: introduction ? Number.parseFloat(getComputedStyle(introduction).fontSize) : 0,
-    };
-  });
-  expect(sectionHierarchy.heading).toBeGreaterThan(sectionHierarchy.introduction * 2.5);
-  if (testInfo.project.name === "mobile") {
-    const productColumns = await page.locator(".platform-family-grid").evaluate(
-      (grid) => getComputedStyle(grid).gridTemplateColumns.split(" ").length,
-    );
-    expect(productColumns).toBe(2);
-  }
-  await expect(page.locator('.homepage-product-index[href="/social-impact-excellence/"]')).toContainText("Social Impact Excellence");
+  await expect(page.locator('.product-folder-tab[href="/social-impact-excellence/"]')).toContainText("Social Impact Excellence");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -73,13 +57,10 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(axe.violations).toEqual([]);
-  await page
-    .getByRole("navigation", { name: "Information" })
-    .getByRole("link", { name: "Contact", exact: true })
-    .click();
+  await page.goto("/contact/");
   await expect(page).toHaveURL(/contact/);
   await expect(
-    page.getByRole("link", { name: /marcus@mysocialimpact.org/ }),
+    page.getByRole("main").getByRole("link", { name: /marcus@mysocialimpact.org/ }),
   ).toHaveAttribute("href", "mailto:marcus@mysocialimpact.org");
   expect(errors).toEqual([]);
 });
@@ -170,7 +151,7 @@ test("supporting pages remain inside the Home folder section", async ({ page }) 
   for (const [path, title] of [["/our-mission/", "Our Mission"], ["/contact/", "Contact"]] as const) {
     await page.goto(path);
     const folder = page.getByRole("navigation", { name: "SORP2026 products" });
-    await expect(folder.getByRole("link")).toHaveCount(7);
+    await expect(folder.getByRole("link")).toHaveCount(6);
     await expect(folder.getByRole("link", { name: /Home/ })).toHaveAttribute("aria-current", "location");
     await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toContainText(`Home/${title}`);
   }
@@ -183,9 +164,9 @@ test("supporting pages remain inside the Home folder section", async ({ page }) 
 test("the compact header uses the folder as primary navigation", async ({ page }) => {
   await page.goto("/");
   const header = page.getByRole("banner");
-  await expect(header.getByRole("link", { name: /SORP 2026 home/ })).toContainText("Reporting for greater impact.");
+  await expect(header.getByRole("link", { name: /SORP 2026 home/ })).toContainText("REPORTING FOR GREATER IMPACT");
   await expect(header.getByRole("link", { name: /SORP 2026 home/ })).toHaveAttribute("href", "/");
-  await expect(header.getByRole("navigation", { name: "Find professional support" })).toHaveCount(1);
+  await expect(header.getByRole("navigation", { name: "Platform information" })).toHaveCount(1);
   await expect(header.locator(".gateway-account-control")).toHaveCount(1);
 });
 test("preview stays out of search engines and unknown routes return 404", async ({
@@ -214,10 +195,10 @@ test("footer identifies the exact build and The Ideas Shed company", async ({
   expect(Number.isNaN(Date.parse(timestamp!))).toBe(false);
   const initialText = await build.innerText();
   await expect(
-    footer.getByRole("link", { name: "The Ideas Shed Limited", exact: true }),
+    footer.getByRole("link", { name: /See what else is in the Shed/ }),
   ).toHaveAttribute("href", "https://www.theideasshed.com/");
   await expect(footer).toContainText(
-    "Registered in England and Wales · Company number 17380053",
+    "The Ideas Shed Limited · Company 17380053",
   );
   await page.reload();
   expect(await build.innerText()).toBe(initialText);

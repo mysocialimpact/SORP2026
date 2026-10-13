@@ -28,6 +28,8 @@ try {
     "visits",
     "benchmarks",
     "backup_runs",
+    "ai_usage",
+    "discovery_cache",
   ])
     tables[name] = (
       await client.query(`SELECT * FROM research_console.${name}`)

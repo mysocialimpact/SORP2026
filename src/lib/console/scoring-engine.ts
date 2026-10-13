@@ -20,14 +20,15 @@ export type Award = {
 const charity =
   /charit(?:y|ies|able)|not[ -]for[ -]profit|non[ -]profit|third sector/i;
 const service =
-  /account(?:ing|s)|audit|independent examin|financial reporting/i;
+  /account(?:ing|s)|audit|independent examin|financial (?:reporting|statements)/i;
 const technical =
   /tier(?:ed|s)?|leases?|revenue recognition|income recognition|cash.flow|disclosures?|restricted funds|reporting requirements|thresholds?|FRS\s*102|trustees.? (?:annual )?report/i;
 // A topic label or promise of advice is not technical analysis. Require an
 // identifiable rule, accounting treatment or reporting implication.
-const substantive = /(?:three|3)[ -]tier|tiers?.{0,80}(?:£|\d)|leases?.{0,100}(?:balance sheet|right.of.use|liabilit|recogn)|(?:recognis|recogniz).{0,100}(?:leases?|revenue|income)|reserves.{0,60}(?:disclos|required)|(?:eligible|exempt|threshold).{0,100}(?:accrual|receipts|£|\d)|(?:income|revenue).{0,100}(?:recognition|contract|performance)|disclosures?.{0,80}(?:must|required|threshold)/i;
+const substantive =
+  /(?:three|3)[ -]tier|tiers?.{0,80}(?:£|\d)|leases?.{0,100}(?:balance sheet|right.of.use|liabilit|recogn)|(?:recognis|recogniz).{0,100}(?:leases?|revenue|income)|reserves.{0,60}(?:disclos|required)|(?:eligible|exempt|threshold).{0,100}(?:accrual|receipts|£|\d)|(?:income|revenue).{0,100}(?:recognition|contract|performance)|disclosures?.{0,80}(?:must|required|threshold)/i;
 const negative =
-  /\b(?:no|not|without|lacks?|unverified|unconfirmed)\b.{0,45}(?:evidence|website|named|specialist|DChA|qualification|SORP|client|publication|service|case stud|speaking)|\bnot necessarily\b|\bnetwork.wide\b/i;
+  /\b(?:no|not|without|lacks?|unverified|unconfirmed)\b.{0,80}(?:evidence|website|named|specialist|DChA|qualification|SORP|client|publication|service|case stud|speaking|charit|responsib)|\bnot necessarily\b|\bnetwork.wide\b/i;
 const names = (text: string) => [
   ...new Set(
     (
@@ -42,26 +43,77 @@ const names = (text: string) => [
     ),
   ),
 ];
-function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
+function qualifies(
+  id: string,
+  e: ScoringEvidence,
+  text: string,
+  firmName = "",
+): boolean {
   const url = e.url ?? "",
     official = e.source_type === "Firm website",
     external =
       e.source_type === "External" ||
       (e.source_type === "ICAEW" && !/find\.icaew\.com/i.test(url));
+  const firmWords = new Set(
+    firmName
+      .toLowerCase()
+      .replace(/[^a-z ]/g, " ")
+      .split(/\s+/)
+      .filter(Boolean),
+  );
+  const entityNames = names(text).filter(
+    (n) =>
+      n.toLowerCase().replace(/[^a-z]/g, "") !==
+        new URL(url).hostname.replace(/^www\./, "").split(".")[0].replace(/[^a-z]/g, "") &&
+      !n
+        .toLowerCase()
+        .split(/\s+/)
+        .every((word) => firmWords.has(word)),
+  );
+  const personNames = e.provenance?.kind === "openai-search"
+    ? (e.people ?? []).filter((name) => text.includes(name))
+    : entityNames;
+  const namedEntity = entityNames.length > 0;
   const c = charity.test(text),
-    named = names(text).length > 0;
+    named = personNames.length > 0;
+  // Generic technical libraries describe readers' obligations, not a firm's
+  // service offering, team or advisory capability.
+  if (/^A[1-4]$/.test(id) && /factsheets?|\/resources?\//i.test(url))
+    return false;
+  // An AI paragraph can accidentally combine a SORP event with a different
+  // event on the same site. For technical/training points require the cited
+  // source itself to be identified as SORP material, not just the paraphrase.
+  if (
+    e.provenance?.kind === "openai-search" &&
+    /^C[1-3]$/.test(id) &&
+    !/sorp/i.test(`${e.title} ${url}`)
+  ) return false;
+  if (
+    /^B[1-4]$/.test(id) &&
+    /recommend|testimonial|as (?:a|our) client|in a previous role/i.test(text)
+  )
+    return false;
   const namedInContext =
     named ||
-    /\/(?:team|people|meet-the-speakers)\/[a-z]+-[a-z]+\/?$/i.test(
+    (e.provenance?.kind !== "openai-search" && /\/(?:team|people|meet-the-speakers)\/[a-z]+-[a-z]+\/?$/i.test(
       new URL(url).pathname,
-    ); // A person-profile URL only corroborates identity; responsibility is still required.
+    )); // A person-profile URL only corroborates identity; responsibility is still required.
   switch (id) {
     case "A1":
       return (
         official &&
         c &&
         service.test(text) &&
-        (/\/(?:[^/]*charit[^/]*|[^/]*not-for-profit[^/]*)(?:\/|$)/i.test(url) ||
+        !/factsheets?|\/resources?\//i.test(url) &&
+        /(?:we|our).{0,80}(?:provid|offer|assist|servic|audit|team)|(?:dedicated|specialist).{0,45}(?:page|servic|team)/i.test(
+          text,
+        ) &&
+        (/\/(?:services?|(?:business-)?sectors?|expertise)\/[^?#]*(?:charit|not-for-profit)/i.test(
+          url,
+        ) ||
+          /\/(?:charit(?:y|ies)|not-for-profit)(?:-(?:accountants|accounting|services|audit))?\/?$/i.test(
+            new URL(url).pathname,
+          ) ||
           /dedicated.{0,35}(?:charit|not.for.profit).{0,35}(?:page|service)/i.test(
             text,
           ))
@@ -69,9 +121,10 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
     case "A2":
       return (
         official &&
+        !/factsheets?|\/resources?\//i.test(url) &&
         c &&
         service.test(text) &&
-        /we (?:provide|offer|prepare|audit|help)|our (?:services|audit|charity)|(?:page|service).{0,60}(?:covers|lists|describes|prepar|audit)|audits charities|independent examination of charity/i.test(
+        /we (?:provide|offer|prepare|audit|help|can assist)|our (?:services|audit|charity)|(?:page|service).{0,60}(?:covers|lists|describes|prepar|audit)|audits charities|independent examination of charity/i.test(
           text,
         )
       );
@@ -99,10 +152,10 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
       return (
         c &&
         namedInContext &&
-        /partner|director|head|lead|senior|principal|consultant|presenter/i.test(
+        /\b(?:partners?|directors?|head|lead|senior|principal|consultant|presenter)\b/i.test(
           text,
         ) &&
-        /specialis|responsib|charity.{0,30}(?:audit|account|work|team)|third sector|charit(?:y|ies).{0,35}(?:course|training)/i.test(
+        /(?:specialis|responsib|head|lead).{0,55}(?:charit|not[ -]for[ -]profit)|charit(?:y|ies).{0,30}(?:audit|account|work|team)|third sector|charit(?:y|ies).{0,35}(?:course|training)/i.test(
           text,
         )
       );
@@ -118,7 +171,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
     case "B3":
       return (
         c &&
-        names(text).length >= 2 &&
+        personNames.length >= 2 &&
         /charity.{0,30}specialists|specialists.{0,30}charity|charity.{0,30}(?:partners|team)/i.test(
           text,
         )
@@ -166,7 +219,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
     case "D1":
       return (
         c &&
-        named &&
+        namedEntity &&
         /(?:accounts for|appointed by|client is|client,?)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/.test(
           text,
         ) &&
@@ -175,7 +228,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
     case "D2":
       return (
         c &&
-        named &&
+        namedEntity &&
         /case study|engagement/i.test(text) &&
         /delivered|result|implemented|supported|achieved|saved/i.test(text) &&
         text.length >= 220
@@ -183,7 +236,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
     case "D3":
       return (
         c &&
-        named &&
+        namedEntity &&
         external &&
         /testimonial|review.{0,40}(?:records|says)|trustees.{0,30}thank|chairman.{0,30}thank/i.test(
           text,
@@ -241,7 +294,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
 }
 export function scoreEvidence(
   evidence: ScoringEvidence[],
-  options: { sufficient: boolean; rubric?: Criterion[] },
+  options: { sufficient: boolean; rubric?: Criterion[]; firmName?: string },
 ) {
   const rubric = validateRubric(options.rubric ?? provisionalRubric);
   if (!options.sufficient)
@@ -271,7 +324,23 @@ export function scoreEvidence(
         continue;
       // Imported notes are paraphrases, not quotations. Live extracts are verbatim page passages.
       const text = e.summary.replace(/\s+/g, " ").trim();
-      if (negative.test(text) || !qualifies(criterion.id, e, text)) continue;
+      // A missing qualification/client finding must not erase a separate,
+      // affirmative service or speaking finding. Keep mixed/negated sentences
+      // conservative; 'not-for-profit' itself is never a negation.
+      const factualText = e.provenance?.kind === "openai-search"
+        ? text.replace(/^\*\*[^*]*[:.]\*\*\s*/, "")
+        : text;
+      const affirmative = factualText.replace(/[*_`]/g, "")
+        .split(/(?<=[.!?])\s+(?=[A-Z*])/)
+        .filter((sentence) =>
+          !negative.test(sentence.replace(/\bnot[ -]for[ -]profit\b/gi, "nonprofit")),
+        )
+        .join(" ");
+      if (
+        !affirmative ||
+        !qualifies(criterion.id, e, affirmative, options.firmName)
+      )
+        continue;
       const group = ["C3", "E1", "E3"].includes(criterion.id)
         ? "training-event"
         : ["C1", "C2", "E2"].includes(criterion.id)
@@ -292,7 +361,7 @@ export function scoreEvidence(
         points: criterion.points,
         evidence_id: e.id,
         source_url: e.url,
-        justification: `${criterion.label}. Supported by ${e.provenance?.kind === "pilot" ? "the imported pilot research note (source not freshly rechecked)" : "the retrieved source passage"}.`,
+        justification: `${criterion.label}. Supported by ${e.provenance?.kind === "pilot" ? "the imported pilot research note (source not freshly rechecked)" : e.provenance?.kind === "openai-search" ? "the cited OpenAI web-search paraphrase (not a verbatim quotation)" : "the retrieved source passage"}.`,
         quote: text,
         confidence:
           e.provenance?.kind === "pilot"

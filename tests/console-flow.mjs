@@ -15,7 +15,7 @@ await client.query("DROP SCHEMA IF EXISTS research_console CASCADE");
 await client.query(
   fs.readFileSync("migrations/001_research_console.sql", "utf8"),
 );
-for(const migration of ['002_console_completion.sql','003_icaew_benchmark.sql'])await client.query(fs.readFileSync('migrations/'+migration,'utf8'));
+for(const migration of ['002_console_completion.sql','003_icaew_benchmark.sql','004_console_openai.sql'])await client.query(fs.readFileSync('migrations/'+migration,'utf8'));
 await client.query(
   execFileSync(process.execPath, ["scripts/console-seed.mjs"], {
     encoding: "utf8",
@@ -341,10 +341,10 @@ ok(calibration.data[0].historical_total===15&&calibration.data[0].awards.every(a
 await call('calibration/',{});
 ok((await client.query("SELECT count(*)::int n FROM research_console.assessments WHERE origin='Automated pilot calibration'")).rows[0].n===1,'Calibration is idempotent for a rubric version');
 ok(JSON.stringify((await call('firms/'+f.id+'/')).data.assessments[0])===JSON.stringify(beforePilot.assessments[0]),'Calibration does not replace current human assessment');
-const direct=(await call('discover/?q=known-accountant.example'));
+const direct=(await call('discover/',{input:'known-accountant.example'}));
 ok(direct.status===200&&direct.data.website==='https://known-accountant.example/','Direct website fallback works without search credentials');
-const unknown=(await call('discover/?q=Unfamiliar%20QA%20Accountants'));
-ok(unknown.status===200&&!unknown.data.configured&&unknown.data.message.includes('Brave'),'Missing search provider is reported without fake results');
+const unknown=(await call('discover/',{input:'Unfamiliar QA Accountants'}));
+ok(unknown.status===200&&!unknown.data.configured&&unknown.data.message.includes('OPENAI_API_KEY'),'Missing search provider is reported without fake results');
 ok((await call('dashboard/')).data.benchmark.label.includes('12,000'),'Authoritative benchmark is separate from pending baseline');
 const portable=(await call('export/?format=backup')).data;
 ok(portable.tables.evidence.length>0&&portable.tables.assessments.length>0&&portable.tables.history.length>0&&portable.tables.imports.length>0,'Complete private backup contains evidence, assessments, archives and audit history');
@@ -393,13 +393,9 @@ for (const width of [1440, 390]) {
     .getByLabel("Accountancy firm name or website")
     .fill("Burton Sweet");
   await page.getByRole("button", { name: "Check this accountant" }).click();
-  await page.getByText("Possible existing records").waitFor();
-  ok(
-    (await page
-      .getByRole("link", { name: "View existing research / refresh" })
-      .count()) === 1,
-    "Check-accountant entry point finds existing research at " + width,
-  );
+  await page.waitForURL(/\/console\/firm\/[^/]+\//);
+  await page.getByRole('heading',{name:'Burton Sweet',exact:true}).waitFor();
+  ok(await page.getByRole('heading',{name:'Burton Sweet',exact:true}).isVisible(),"Single existing firm opens its research automatically at "+width);
   await page.goto(base + "/console/firm/" + f.id + "/");
   await page
     .getByRole("heading", { name: "QA Evidence Practice", exact: true })

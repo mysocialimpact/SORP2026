@@ -50,7 +50,7 @@ test("global login uses the existing account service and keeps Google hidden", a
   await expect(page.getByRole("link", { name: /Google/i })).toHaveCount(0);
   await page.getByLabel("Your name").fill("QA Person");
   await page.getByLabel("Your role").selectOption("TRUSTEE / CHAIR");
-  await page.getByLabel("Email address").fill("qa@example.invalid");
+  await page.getByRole("main").getByLabel("Email address").fill("qa@example.invalid");
   await page.getByLabel("Password", { exact: true }).fill("Safe password 123");
   await page.getByLabel("Confirm password").fill("Safe password 123");
   await page.getByRole("button", { name: "Create my SORP2026 account →" }).click();

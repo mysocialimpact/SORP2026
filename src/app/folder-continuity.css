@@ -63,7 +63,9 @@
 /* Task controls take precedence while completing the inline assessment or typing. */
 body:has(#assessment [data-mode]) .folder-action-bar[data-action-page="/my-impact-director/"],
 body:has(#assessment .account-portal) .folder-action-bar[data-action-page="/my-impact-director/"],
-body:has(form:focus-within) .folder-action-bar { visibility: hidden; pointer-events: none; }
+/* Keep the bar hidden when focus moves from directory search to a directory control.
+   Reappearing between pointerdown and click can cover and cancel that control. */
+body:has(form:focus-within, .directory-app :focus) .folder-action-bar { visibility: hidden; pointer-events: none; }
 
 @media (max-width: 900px) {
   .folder-hero.product-hero.gateway-width { padding-inline: 24px; }

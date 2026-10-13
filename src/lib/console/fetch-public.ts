@@ -89,22 +89,56 @@ export async function fetchPublic(
   }
   return { ...result, url: url.href };
 }
-export async function checkRobots(url: string) {
+export type PublicPage = Awaited<ReturnType<typeof fetchPublic>>;
+export function inspectRobots(url: string, robots: PublicPage) {
   const parsed = safeResearchUrl(url);
-  const robots = await fetchPublic(new URL("/robots.txt", parsed).href);
-  if (robots.status === 404) return;
+  // RFC 9309 §2.3.1.3: an unavailable robots resource is not a Disallow.
+  // A security challenge, authentication requirement or rate limit is a block.
+  if (
+    /sorry, you have been blocked|cf-chl-|cf-challenge|captcha|attention required.*cloudflare/i.test(
+      robots.body,
+    )
+  )
+    throw new Error(
+      "Website security blocks automated access. No challenge bypass was attempted.",
+    );
+  if (robots.status === 401 || robots.status === 429)
+    throw new Error(
+      `Website access restricted (HTTP ${robots.status}); research stopped.`,
+    );
+  if (robots.status >= 400 && robots.status < 500)
+    return {
+      notice: `Robots file unavailable (HTTP ${robots.status}); public pages checked under RFC 9309.`,
+      delay: 2000,
+    };
   if (robots.status !== 200)
     throw new Error(
-      `Robots policy could not be checked (HTTP ${robots.status}); inspect this source manually.`,
+      `Robots policy unreachable (HTTP ${robots.status}); research stopped.`,
     );
   if (robots.type.includes("html"))
-    throw new Error("Robots policy returned a web page; manual check needed.");
+    throw new Error(
+      "Robots policy returned HTML rather than rules; research stopped.",
+    );
   const rules = robotsParser(new URL("/robots.txt", parsed).href, robots.body);
   if (rules.isAllowed(parsed.href, agent) === false)
     throw new Error("Research is disallowed by robots.txt.");
-  const delay = rules.getCrawlDelay(agent);
-  if (delay && delay > 2)
+  const delay = Math.max(2000, (rules.getCrawlDelay(agent) || 0) * 1000);
+  if (delay > 10000)
     throw new Error(
-      "Site requests a longer crawl delay; use manual research for this source.",
+      "Site requests a crawl delay longer than this research session can support.",
     );
+  return { notice: null, delay };
+}
+export async function checkRobots(
+  url: string,
+  cache?: Map<string, Promise<PublicPage>>,
+) {
+  const parsed = safeResearchUrl(url);
+  const key = new URL("/robots.txt", parsed).href;
+  let request = cache?.get(key);
+  if (!request) {
+    request = fetchPublic(key);
+    cache?.set(key, request);
+  }
+  return inspectRobots(url, await request);
 }

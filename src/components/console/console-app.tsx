@@ -53,7 +53,12 @@ type Dashboard = {
   } | null;
   reviewed: number;
   discovered: number;
-  backup:{status:string;started_at:string;completed_at:string|null;needs_attention:boolean}|null;
+  backup: {
+    status: string;
+    started_at: string;
+    completed_at: string | null;
+    needs_attention: boolean;
+  } | null;
 };
 export function ConsoleApp() {
   const path = usePathname();
@@ -192,18 +197,23 @@ function Mission() {
         ) : (
           <>
             <div className="rc-mission-grid">
-              {data.backup?.needs_attention&&<div className="rc-notice" role="alert">Your latest backup needs attention. <Link href="/console/status/">Inspect recovery status and retry →</Link></div>}
+              {data.backup?.needs_attention && (
+                <div className="rc-notice" role="alert">
+                  Your latest backup needs attention.{" "}
+                  <Link href="/console/status/">
+                    Inspect recovery status and retry →
+                  </Link>
+                </div>
+              )}
               <div className="rc-population">
                 <Badge>THE STARTING POPULATION</Badge>
                 <h3>The published ICAEW benchmark</h3>
                 {data.benchmark && (
                   <>
-                    <strong className="rc-baseline-number">
-                      12,000+
-                    </strong>
+                    <strong className="rc-baseline-number">12,000+</strong>
                     <p>
-                      ICAEW firms: published directory figure — UK-only unique total
-                      not yet verified.
+                      ICAEW firms: published directory figure — UK-only unique
+                      total not yet verified.
                     </p>
                     <Source
                       url={data.benchmark.source_url}
@@ -496,6 +506,21 @@ function CheckAccountant() {
     candidates: { name: string; website: string; description: string }[];
   } | null>(null);
   const [selectedWebsite, setSelectedWebsite] = useState("");
+  async function begin(candidate: { name: string; website: string }) {
+    const result = await api<{ firm?: Firm; matches?: Firm[] }>(
+      "firms",
+      candidate,
+    );
+    const firm =
+      result.firm ?? (result.matches?.length === 1 ? result.matches[0] : null);
+    if (!firm) {
+      setMatches(result.matches ?? []);
+      throw new Error("Please select the matching existing firm.");
+    }
+    if (!firm.website) await api("firms/" + firm.id + "/website-discovery", {});
+    await api("firms/" + firm.id + "/research", {});
+    router.push("/console/firm/" + firm.id + "/");
+  }
   async function find(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -506,7 +531,18 @@ function CheckAccountant() {
         message: string;
         website: string | null;
         candidates: { name: string; website: string; description: string }[];
-      }>("discover?q=" + encodeURIComponent(input.trim()));
+      }>("discover", { input: input.trim() });
+      if (result.matches.length === 1) {
+        if (!result.matches[0].website)
+          await api("firms/" + result.matches[0].id + "/website-discovery", {});
+        await api("firms/" + result.matches[0].id + "/research", {});
+        router.push("/console/firm/" + result.matches[0].id + "/");
+        return;
+      }
+      if (!result.matches.length && result.candidates.length === 1) {
+        await begin(result.candidates[0]);
+        return;
+      }
       setMatches(result.matches);
       setDiscovery(result);
       setSelectedWebsite(result.website || "");
@@ -543,7 +579,8 @@ function CheckAccountant() {
           placeholder="Enter an accountancy firm name or website…"
         />
         <button disabled={busy} className="rc-button">
-          {busy ? "Checking records…" : "Check this accountant"} <span>→</span>
+          {busy ? "Finding this accountant…" : "Check this accountant"}{" "}
+          <span>→</span>
         </button>
       </form>
       <div className="rc-check-foot">
@@ -587,9 +624,20 @@ function CheckAccountant() {
               <Source url={candidate.website} />
               <button
                 className="rc-text-button"
-                onClick={() => setSelectedWebsite(candidate.website)}
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  setError("");
+                  try {
+                    await begin(candidate);
+                  } catch (e) {
+                    setError((e as Error).message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
-                Use this website and confirm identity →
+                Research this firm →
               </button>
             </div>
           ))}
@@ -1121,9 +1169,10 @@ function ImportPage() {
             </label>
           </Form>
           <p className="rc-muted">
-            All sheets and values are archived. Recognised pilot workbooks retain
-            their original scores, dates and evidence. Directory imports add
-            missing information without replacing existing research or reviews.
+            All sheets and values are archived. Recognised pilot workbooks
+            retain their original scores, dates and evidence. Directory imports
+            add missing information without replacing existing research or
+            reviews.
           </p>
         </section>
         <section className="rc-panel">
@@ -1209,6 +1258,14 @@ function FeatureStatus() {
       last: { status: string; completed_at: string } | null;
     };
   }>("status");
+  const usage = useData<{
+    model: string;
+    day_usd: string;
+    month_usd: string;
+    requests: number;
+    daily_limit_usd: number;
+    monthly_limit_usd: number;
+  }>("ai-usage");
   const rows = [
     [
       "Private access",
@@ -1233,8 +1290,8 @@ function FeatureStatus() {
       "Find any firm by name",
       data?.nameDiscovery ? "Working" : "Needs configuration",
       data?.nameDiscovery
-        ? "Live search suggests possible identities; confirm the right firm before research."
-        : "Existing firm-name search works. Unknown names need BRAVE_SEARCH_API_KEY in the server settings. A confirmed official website works immediately.",
+        ? "OpenAI web search finds official websites. A single match starts research; ambiguous identities need your selection."
+        : "Existing firm-name search works. Unknown names need OPENAI_API_KEY in the SORP2026 server settings. A confirmed official website works immediately.",
     ],
     [
       "Provisional automatic scoring",
@@ -1303,6 +1360,34 @@ function FeatureStatus() {
         occur.
       </p>
       <section className="rc-panel rc-section">
+        <h2>OpenAI research usage</h2>
+        {usage.error ? (
+          <p role="alert">{usage.error}</p>
+        ) : usage.data ? (
+          <>
+            <p>
+              Estimated spend including pending reservations: $
+              {Number(usage.data.day_usd).toFixed(2)} today / $
+              {usage.data.daily_limit_usd} limit; $
+              {Number(usage.data.month_usd).toFixed(2)} this month / $
+              {usage.data.monthly_limit_usd} limit.
+            </p>
+            <p>
+              {usage.data.requests} requests this month. Billing periods use
+              UTC. Token and web-search usage is saved with each request. OpenAI
+              billing is authoritative; estimates use published rates.
+            </p>
+            <p>
+              Saved reports are reused for 30 days; discovery results for 7
+              days. Explicit refresh runs new research. At most two API calls
+              may be active, with 20 requests per hour.
+            </p>
+          </>
+        ) : (
+          <p>Checking usage…</p>
+        )}
+      </section>
+      <section className="rc-panel rc-section">
         <h2>Your recovery tools</h2>
         <p>
           Daily backup schedule: 06:00 UTC. Target retention: 30 days. Neon’s
@@ -1311,7 +1396,8 @@ function FeatureStatus() {
         </p>
         <a
           className="rc-button rc-secondary"
-          href="/api/console/export/?format=backup" download
+          href="/api/console/export/?format=backup"
+          download
         >
           Download complete private backup →
         </a>
