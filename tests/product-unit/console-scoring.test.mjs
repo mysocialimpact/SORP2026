@@ -4,6 +4,12 @@ import {provisionalRubric,validateRubric} from '../../src/lib/console/rubric.ts'
 import {encryptBackup,decryptBackup} from '../../src/lib/console/backup-crypto.ts';
 const evidence=(summary,extra={})=>({id:'e1',firm_id:'f',run_id:'r',source_type:'Firm website',category:'services',title:'Charity services',summary,url:'https://firm.example/charities/',accessed_at:'2026-10-12',published_at:null,people:[],sorp:'Not assessed',confidence:'Needs review',state:'Current',notes:'',...extra});
 const score=(rows,sufficient=true)=>scoreEvidence(rows,{sufficient});
+test('a named person who completed the full charity diploma earns B2 without inventing an abbreviation',()=>{
+ const options={category:'people',people:['Mark Burrage'],provenance:{kind:'openai-search'},url:'https://firm.example/team/mark-burrage/'};
+ const r=score([evidence('Mark Burrage completed a Diploma in Charity Accounting and worked as Audit Manager.',options)]);
+ assert.equal(r.awards.find(a=>a.criterion_id==='B2')?.points,5);
+ assert.equal(score([evidence('Mark Burrage has not completed a Diploma in Charity Accounting.',options)]).awards.some(a=>a.criterion_id==='B2'),false);
+});
 test('unassessed and assessed zero remain distinct',()=>{assert.equal(score([],false).total,null);assert.equal(score([],true).total,0);assert.equal(score([],true).state,'Assessed with no qualifying evidence');});
 test('directory membership and generic seniority/ACA never earn points',()=>{const r=score([evidence('ICAEW member John Smith FCA is an audit partner. Charities & Not For Profit listed.',{source_type:'ICAEW',url:'https://find.icaew.com/firms/example'})]);assert.equal(r.total,0);assert.equal(score([evidence('John Smith FCA is a partner with an excellent professional track record.')]).total,0);});
 test('dedicated page is distinct from a specialist team; never award either twice',()=>{const e=evidence('Our dedicated charity team provides charity accounts, audit, VAT, governance and payroll services.');const r=score([e,{...e,id:'e2'}]);assert.equal(new Set(r.awards.map(a=>a.criterion_id)).size,r.awards.length);assert.ok(r.awards.some(a=>a.criterion_id==='A3'));assert.ok(r.scores.services<=25);const basic=score([evidence('Dedicated page explains independent examination of charity accounts, thresholds and statutory reporting.')]);assert.equal(basic.awards.some(a=>a.criterion_id==='A3'),false);});

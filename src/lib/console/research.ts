@@ -57,7 +57,7 @@ export async function startResearch(
     return { ...run, created: true };
   });
 }
-export async function runResearch(runId: string) {
+export async function runResearch(runId: string, options: { reuseSearchRunId?: string } = {}) {
   const started = Date.now();
   const run = (
     await query<{ id: string; firm_id: string; status: string }>(
@@ -201,7 +201,7 @@ export async function runResearch(runId: string) {
   };
   try {
     if (openaiConfigured()) {
-      await runAIResearch(runId, firm);
+      await runAIResearch(runId, firm, options);
       return;
     }
     limitations.push(
