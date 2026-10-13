@@ -28,6 +28,8 @@ const names = [
   "visits",
   "benchmarks",
   "backup_runs",
+    "ai_usage",
+    "discovery_cache",
 ];
 if (
   backup.schema !== "research_console" ||
@@ -51,6 +53,8 @@ try {
   for (const migration of [
     "001_research_console.sql",
     "002_console_completion.sql",
+    "003_icaew_benchmark.sql",
+    "004_console_openai.sql",
   ]) {
     const sql = (
       await readFile(
@@ -84,6 +88,8 @@ try {
     "visits",
     "benchmarks",
     "backup_runs",
+    "ai_usage",
+    "discovery_cache",
   ];
   for (const table of order) {
     const pending = [...(backup.tables[table] ?? [])];

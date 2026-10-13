@@ -1,20 +1,16 @@
 import "server-only";
-import { load } from "cheerio";
 import { query, transaction } from "./db";
 import { checkRobots, fetchPublic, safeResearchUrl } from "./fetch-public";
-import { type Category } from "./model";
+import { extractResearchPage, linkKind } from "./extract-page";
+import type { PublicPage } from "./fetch-public";
+import { openaiConfigured } from "./openai-response";
+import { runAIResearch } from "./ai-research";
 import { automaticAssessment } from "./automatic-assessment";
-const terms: Record<Category, RegExp> = {
-  services: /charit|not.for.profit|independent examination/i,
-  people:
-    /DChA|diploma in charity|charity (partner|specialist|team)|head of charit/i,
-  sorp: /\bSORP\b/i,
-  clients:
-    /charit.{0,90}(client|case study|testimonial)|(client|case study|testimonial).{0,90}charit/i,
-  recognition:
-    /charit.{0,90}(speaker|webinar|award|conference)|(speaker|webinar|award|conference).{0,90}charit/i,
-};
-export async function startResearch(firmId: string, actor: string) {
+export async function startResearch(
+  firmId: string,
+  actor: string,
+  options: { refresh?: boolean } = {},
+) {
   return transaction(async (c) => {
     const firm = (
       await c.query(
@@ -39,6 +35,15 @@ export async function startResearch(firmId: string, actor: string) {
       )
     ).rows[0];
     if (current) return { ...current, created: false };
+    if (!options.refresh) {
+      const saved = (
+        await c.query(
+          "SELECT r.id FROM research_console.runs r JOIN research_console.assessments a ON a.run_id=r.id WHERE r.firm_id=$1 AND r.status='collected' AND r.completed_at>now()-interval '30 days' AND (a.methodology_id=(SELECT id FROM research_console.methodologies WHERE jsonb_array_length(rubric)>0 ORDER BY created_at DESC LIMIT 1)) AND NOT EXISTS(SELECT 1 FROM research_console.evidence e WHERE e.run_id=r.id AND e.state<>'Current') ORDER BY r.completed_at DESC LIMIT 1",
+          [firmId],
+        )
+      ).rows[0];
+      if (saved) return { ...saved, created: false, cached: true };
+    }
     const run = (
       await c.query(
         "INSERT INTO research_console.runs(firm_id,actor) VALUES($1,$2) RETURNING id",
@@ -62,8 +67,13 @@ export async function runResearch(runId: string) {
   )[0];
   if (!run || run.status !== "running") return;
   const firm = (
-    await query<{ website: string; icaew_url: string }>(
-      "SELECT website,icaew_url FROM research_console.firms WHERE id=$1",
+    await query<{
+      id: string;
+      name: string;
+      website: string;
+      icaew_url: string;
+    }>(
+      "SELECT id,name,website,icaew_url FROM research_console.firms WHERE id=$1",
       [run.firm_id],
     )
   )[0];
@@ -72,94 +82,131 @@ export async function runResearch(runId: string) {
     "External talks, qualifications, clients and office details need human verification; a missing match is not absence of expertise.",
   ];
   let examined = 0;
+  const robotsCache = new Map<string, Promise<PublicPage>>();
+  const lastRequest = new Map<string, number>();
   const stage = async (s: string) =>
     query("UPDATE research_console.runs SET stage=$2 WHERE id=$1", [runId, s]);
   const examine = async (url: string, type: string) => {
+    let httpStatus: number | null = null;
     try {
-      await checkRobots(url);
+      const policy = await checkRobots(url, robotsCache);
+      if (policy.notice && !limitations.includes(policy.notice))
+        limitations.push(policy.notice);
+      const origin = new URL(url).origin;
+      const pause =
+        policy.delay - (Date.now() - (lastRequest.get(origin) || 0));
+      if (pause > 0) await new Promise((resolve) => setTimeout(resolve, pause));
+      lastRequest.set(origin, Date.now());
       const page = await fetchPublic(url);
-      if (page.status !== 200) throw new Error(`HTTP ${page.status}`);
+      httpStatus = page.status;
+      if (page.status !== 200)
+        throw new Error(`Page retrieval failed (HTTP ${page.status}).`);
       if (!page.type.includes("text/html"))
         throw new Error("This source is not an HTML page; inspect manually.");
-      const $ = load(page.body);
-      const links = $("a[href]")
-        .map((_, a) => $(a).attr("href") || "")
-        .get();
-      const title = $("title").first().text().trim().slice(0, 500) || url;
-      // Retain explicitly marked-up office addresses, including footer addresses.
-      // They remain unverified leads and never replace an existing office.
-      const addresses = type==='Firm website' ? [...new Set($('address').map((_,a)=>$(a).text().replace(/\s+/g,' ').trim()).get())].filter(a=>a.length>15&&a.length<500).slice(0,8) : [];
-      for (const address of addresses) {
-        const postcode=address.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i)?.[0].toUpperCase();
-        if (!postcode) continue;
-        await transaction(async c=>{
-          await c.query('SELECT id FROM research_console.firms WHERE id=$1 FOR UPDATE',[run.firm_id]);
-          const added=(await c.query("INSERT INTO research_console.offices(firm_id,address,postcode,source_url,verification) SELECT $1,$2,$3,$4,'Unverified — retrieved from official website' WHERE NOT EXISTS(SELECT 1 FROM research_console.offices WHERE firm_id=$1 AND (lower(address)=lower($2) OR regexp_replace(upper(postcode),'\\s','','g')=regexp_replace($3,'\\s','','g'))) RETURNING *",[run.firm_id,address,postcode,page.url])).rows[0];
-          if(added)await c.query("INSERT INTO research_console.history(firm_id,entity,entity_id,next,reason,actor) VALUES($1,'office',$2,$3,$4,'Website research')",[run.firm_id,added.id,JSON.stringify(added),'Explicit HTML address retained as an unverified office lead; research run '+runId]);
-        });
-      }
-      $("script,style,nav,footer,header,noscript,svg").remove();
-      const text = $("main").length ? $("main").text() : $("body").text();
-      const clean = text.replace(/\s+/g, " ").trim();
-      if (clean.length < 150)
+      const extracted = extractResearchPage(page.body, page.url);
+      if (extracted.text.length < 150)
         throw new Error(
-          "Too little readable text; JavaScript or manual research may be needed.",
+          "Too little readable content; no meaningful assessment is possible.",
         );
-      await query(
-        "INSERT INTO research_console.sources(run_id,url,title,status,http_status) VALUES($1,$2,$3,$4,$5)",
-        [runId, page.url, title, "Examined", 200],
-      );
-      examined++;
-      const passages = [
-        ...new Set(
-          $("main p,main li,article p,article li,p")
-            .map((_, p) => $(p).text().replace(/\s+/g, " ").trim())
-            .get()
-            .filter((p) => p.length >= 60 && p.length <= 2400),
-        ),
-      ];
-      if (!passages.length)
-        passages.push(
-          ...(clean.match(/.{1,1600}(?:[.!?]\s|$)/g) || [clean.slice(0, 1600)]),
+      // A page and all its extracts commit together. Database errors cannot leave
+      // a source marked examined while silently discarding its evidence.
+      await transaction(async (c) => {
+        await c.query(
+          "SELECT id FROM research_console.firms WHERE id=$1 FOR UPDATE",
+          [run.firm_id],
         );
-      for (const [category, regex] of Object.entries(terms)) {
-        for (const extract of passages
-          .map((p,i) => category==='sorp'&&regex.test(p) ? passages.slice(Math.max(0,i-1),i+3).join(' ').slice(0,6000) : p)
-          .filter((p) => regex.test(p))
-          .slice(0, 4)) {
-          await query(
-            "INSERT INTO research_console.evidence(firm_id,run_id,source_type,category,title,summary,url,accessed_at,sorp,confidence,notes) VALUES($1,$2,$3,$4,$5,$6,$7,now(),$8,$9,$10)",
+        await c.query(
+          "INSERT INTO research_console.sources(run_id,url,title,status,http_status) VALUES($1,$2,$3,'Examined',200)",
+          [runId, page.url, extracted.title],
+        );
+        for (const e of extracted.evidence)
+          await c.query(
+            "INSERT INTO research_console.evidence(firm_id,run_id,source_type,category,title,summary,url,accessed_at,confidence,notes,provenance) VALUES($1,$2,$3,$4,$5,$6,$7,now(),'Needs review',$8,$9)",
             [
               run.firm_id,
               runId,
               type,
-              category,
-              title,
-              extract,
+              e.category,
+              extracted.title,
+              e.summary,
               page.url,
-              "Not assessed",
-              "Needs review",
-              "Automatically retrieved verbatim passage. Provisional scoring requires explicit criterion support; human confirmation remains necessary.",
+              "Retrieved source passage; automated finding awaiting review.",
+              JSON.stringify({ kind: "website", extractor: "2", runId }),
             ],
           );
+        if (type === "Firm website") {
+          for (const person of extracted.people) {
+            const added = (
+              await c.query(
+                "INSERT INTO research_console.people(firm_id,name,role,qualifications,responsibilities,profile_url,notes) SELECT $1,$2,$3,$4,$5,$6,$7 WHERE NOT EXISTS(SELECT 1 FROM research_console.people WHERE firm_id=$1 AND lower(name)=lower($2)) RETURNING *",
+                [
+                  run.firm_id,
+                  person.name,
+                  person.role,
+                  person.qualifications,
+                  person.summary,
+                  page.url,
+                  "Automated website extraction — identity, qualifications and responsibilities await review. Run " +
+                    runId,
+                ],
+              )
+            ).rows[0];
+            if (added)
+              await c.query(
+                "INSERT INTO research_console.history(firm_id,entity,entity_id,next,reason,actor) VALUES($1,'person',$2,$3,'Named staff profile extracted without replacing existing people','Website research')",
+                [run.firm_id, added.id, JSON.stringify(added)],
+              );
+          }
+          for (const office of extracted.offices) {
+            const added = (
+              await c.query(
+                "INSERT INTO research_console.offices(firm_id,address,postcode,source_url,verification) SELECT $1,$2,$3,$4,'Unverified — retrieved from official website' WHERE NOT EXISTS(SELECT 1 FROM research_console.offices WHERE firm_id=$1 AND (lower(address)=lower($2) OR replace(upper(postcode),' ','')=replace($3,' ',''))) RETURNING *",
+                [run.firm_id, office.address, office.postcode, page.url],
+              )
+            ).rows[0];
+            if (added)
+              await c.query(
+                "INSERT INTO research_console.history(firm_id,entity,entity_id,next,reason,actor) VALUES($1,'office',$2,$3,'Office source retained without replacing existing offices','Website research')",
+                [run.firm_id, added.id, JSON.stringify(added)],
+              );
+          }
         }
-      }
-      return {
-        url: page.url,
-        links,
-      };
+      });
+      examined++;
+      console.info(
+        "Console research page",
+        JSON.stringify({
+          runId,
+          url: page.url,
+          status: "examined",
+          evidence: extracted.evidence.length,
+          people: extracted.people.length,
+        }),
+      );
+      return { url: page.url, links: extracted.links };
     } catch (error) {
       const reason =
         error instanceof Error ? error.message : "Source unavailable";
       await query(
-        "INSERT INTO research_console.sources(run_id,url,status,error) VALUES($1,$2,$3,$4)",
-        [runId, url, "Unavailable", reason],
+        "INSERT INTO research_console.sources(run_id,url,status,error,http_status) VALUES($1,$2,$3,$4,$5)",
+        [runId, url, "Unavailable", reason, httpStatus],
       );
       limitations.push(`${url}: ${reason}`);
+      console.warn(
+        "Console research source unavailable",
+        JSON.stringify({ runId, url, reason, httpStatus }),
+      );
       return null;
     }
   };
   try {
+    if (openaiConfigured()) {
+      await runAIResearch(runId, firm);
+      return;
+    }
+    limitations.push(
+      "OpenAI is not configured; only direct website research is available. Set OPENAI_API_KEY in SORP2026 Vercel to enable wider web research.",
+    );
     await stage("Checking ICAEW information");
     if (firm.icaew_url) await examine(firm.icaew_url, "ICAEW");
     else
@@ -172,44 +219,39 @@ export async function runResearch(runId: string) {
       const host = new URL(home.url).hostname.replace(/^www\./, "");
       const seen = new Set([home.url]);
       const discover = (links: string[], base: string) =>
-        [
-          ...new Set(
-            links.flatMap((href) => {
-              try {
-                const u = new URL(href, base);
-                u.hash = "";
-                if (
-                  u.hostname.replace(/^www\./, "") !== host ||
-                  u.protocol !== "https:" ||
-                  u.search ||
-                  !/(charit|not-for-profit|sorp|team|people|sector|about|office|service|insight|publication|contact)/i.test(
-                    u.pathname,
-                  )
-                )
-                  return [];
-                return [u.href];
-              } catch {
-                return [];
-              }
-            }),
-          ),
-        ]
-          .filter((u) => !seen.has(u))
-          .sort(
-            (a, b) =>
-              Number(/charit|sorp/.test(b)) - Number(/charit|sorp/.test(a)),
+        [...new Set(links.map((href) => new URL(href, base).href))]
+          .filter(
+            (url) =>
+              new URL(url).hostname.replace(/^www\./, "") === host &&
+              !seen.has(url),
           )
-          .slice(0, 25);
+          .slice(0, 80);
+      const kindsVisited = new Map<string, number>();
+      const priority = (url: string) =>
+        (({
+          charity: 60,
+          sorp: 55,
+          people: 50,
+          offices: 40,
+          services: 30,
+          publications: 20,
+        })[linkKind(url)] || 0) -
+        100 * (kindsVisited.get(linkKind(url)) || 0);
       const urls = discover(home.links, home.url).map((url) => ({
         url,
         depth: 1,
       }));
       for (
         let pageCount = 0;
-        urls.length && pageCount < 11 && Date.now() - started < 105000;
+        urls.length && pageCount < 18 && Date.now() - started < 105000;
         pageCount++
       ) {
+        urls.sort((a, b) => priority(b.url) - priority(a.url));
         const { url, depth } = urls.shift()!;
+        kindsVisited.set(
+          linkKind(url),
+          (kindsVisited.get(linkKind(url)) || 0) + 1,
+        );
         if (seen.has(url)) continue;
         seen.add(url);
         await stage(
@@ -219,13 +261,12 @@ export async function runResearch(runId: string) {
               ? "Looking for specialist people"
               : "Looking for charity expertise",
         );
-        await new Promise((resolve) => setTimeout(resolve, 2000));
         const found = await examine(url, "Firm website");
-        if (found && depth < 2)
+        if (found && depth < 3)
           urls.push(
             ...discover(found.links, found.url)
               .filter((u) => !urls.some((p) => p.url === u))
-              .map((url) => ({ url, depth: 2 })),
+              .map((url) => ({ url, depth: depth + 1 })),
           );
         urls.sort(
           (a, b) =>
@@ -237,12 +278,12 @@ export async function runResearch(runId: string) {
     await stage("Preparing the evidence dossier");
     await transaction(async (c) => {
       await c.query(
-        "UPDATE research_console.runs SET status=$2,stage='Collection finished — human assessment needed',completed_at=now(),limitations=$3 WHERE id=$1",
+        "UPDATE research_console.runs SET status=$2,stage=CASE WHEN $2='assessing' THEN 'Applying provisional evidence criteria' ELSE 'Research blocked — no readable sources collected' END,completed_at=now(),limitations=$3 WHERE id=$1",
         [runId, examined ? "assessing" : "failed", limitations],
       );
       await c.query(
         "UPDATE research_console.firms SET status=$2,approved_at=NULL,updated_at=now() WHERE id=$1",
-        [run.firm_id,examined?'Researching':'Needs more evidence'],
+        [run.firm_id, examined ? "Researching" : "Needs more evidence"],
       );
     });
     if (examined) {
@@ -257,13 +298,32 @@ export async function runResearch(runId: string) {
           ? "Research saved — more evidence needed before scoring"
           : "Report ready — provisional score awaits your review",
       );
-      if(assessment.total===null)await query("UPDATE research_console.firms SET status='Needs more evidence' WHERE id=$1",[run.firm_id]);
-      await query("UPDATE research_console.runs SET status='collected',completed_at=now() WHERE id=$1",[runId]);
+      if (assessment.total === null)
+        await query(
+          "UPDATE research_console.firms SET status='Needs more evidence' WHERE id=$1",
+          [run.firm_id],
+        );
+      await query(
+        "UPDATE research_console.runs SET status='collected',completed_at=now() WHERE id=$1",
+        [runId],
+      );
     }
-  } catch {
+  } catch (error) {
+    console.error(
+      "Console research failed",
+      JSON.stringify({
+        runId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }),
+    );
     await query(
-      "UPDATE research_console.runs SET status='failed',stage='Research interrupted',completed_at=now(),limitations=array_append(limitations,'Research could not finish. Retry is available; collected sources are retained.') WHERE id=$1",
-      [runId],
+      "UPDATE research_console.runs SET status='failed',stage='Research interrupted',completed_at=now(),limitations=array_append(limitations,$2) WHERE id=$1",
+      [
+        runId,
+        error instanceof Error
+          ? error.message.slice(0, 1500)
+          : "Research could not finish. Collected sources are retained.",
+      ],
     );
     await query(
       "UPDATE research_console.firms SET status='Needs more evidence' WHERE id=$1",

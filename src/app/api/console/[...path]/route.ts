@@ -8,7 +8,12 @@ import {
   calibrationReport,
   pilotCalibration,
 } from "@/lib/console/automatic-assessment";
-import { discoverFirm, discoveryConfigured } from "@/lib/console/discovery";
+import { aiUsageSummary } from "@/lib/console/openai-response";
+import {
+  discoverFirm,
+  discoveryConfigured,
+  discoverMissingWebsite,
+} from "@/lib/console/discovery";
 import {
   backupConfiguration,
   completeBackup,
@@ -43,8 +48,7 @@ async function handle(
     if (get && resource === "access") return json({ authorised: true });
     if (get && resource === "dashboard")
       return json(await repository.dashboard(actor));
-    if (get && resource === "discover")
-      return json(await discoverFirm(url.searchParams.get("q") || ""));
+    if (get && resource === "ai-usage") return json(await aiUsageSummary());
     if (get && resource === "calibration")
       return json(await calibrationReport());
     if (get && resource === "status") {
@@ -52,7 +56,9 @@ async function handle(
       return json({
         database: true,
         auth: true,
-        research: "Website collection available; access varies by source.",
+        research: discoveryConfigured()
+          ? "OpenAI web search and cited evidence research configured."
+          : "OpenAI key missing; direct website collection only.",
         automaticScoring: true,
         nameDiscovery: discoveryConfigured(),
         pilot: Number(
@@ -147,6 +153,8 @@ async function handle(
     const text = await request.text();
     if (text.length > 100000) throw new Error("Request is too large.");
     const body = JSON.parse(text);
+    if (resource === "discover")
+      return json(await discoverFirm(String(body.input ?? "")));
     if (resource === "backup") return json(await runBackup());
     if (resource === "calibration") return json(await pilotCalibration());
     if (resource === "firms" && action === "auto-score")
@@ -160,8 +168,12 @@ async function handle(
     }
     if (resource === "firms" && !id)
       return json(await repository.createFirm(body, actor));
+    if (resource === "firms" && action === "website-discovery")
+      return json(await discoverMissingWebsite(id, actor));
     if (resource === "firms" && action === "research") {
-      const run = await startResearch(id, actor);
+      const run = await startResearch(id, actor, {
+        refresh: body.refresh === true,
+      });
       if (run.created) after(() => runResearch(run.id));
       return json(run, 202);
     }

@@ -25,7 +25,8 @@ const technical =
   /tier(?:ed|s)?|leases?|revenue recognition|income recognition|cash.flow|disclosures?|restricted funds|reporting requirements|thresholds?|FRS\s*102|trustees.? (?:annual )?report/i;
 // A topic label or promise of advice is not technical analysis. Require an
 // identifiable rule, accounting treatment or reporting implication.
-const substantive = /(?:three|3)[ -]tier|tiers?.{0,80}(?:£|\d)|leases?.{0,100}(?:balance sheet|right.of.use|liabilit|recogn)|(?:recognis|recogniz).{0,100}(?:leases?|revenue|income)|reserves.{0,60}(?:disclos|required)|(?:eligible|exempt|threshold).{0,100}(?:accrual|receipts|£|\d)|(?:income|revenue).{0,100}(?:recognition|contract|performance)|disclosures?.{0,80}(?:must|required|threshold)/i;
+const substantive =
+  /(?:three|3)[ -]tier|tiers?.{0,80}(?:£|\d)|leases?.{0,100}(?:balance sheet|right.of.use|liabilit|recogn)|(?:recognis|recogniz).{0,100}(?:leases?|revenue|income)|reserves.{0,60}(?:disclos|required)|(?:eligible|exempt|threshold).{0,100}(?:accrual|receipts|£|\d)|(?:income|revenue).{0,100}(?:recognition|contract|performance)|disclosures?.{0,80}(?:must|required|threshold)/i;
 const negative =
   /\b(?:no|not|without|lacks?|unverified|unconfirmed)\b.{0,45}(?:evidence|website|named|specialist|DChA|qualification|SORP|client|publication|service|case stud|speaking)|\bnot necessarily\b|\bnetwork.wide\b/i;
 const names = (text: string) => [
@@ -61,6 +62,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
         official &&
         c &&
         service.test(text) &&
+        !/factsheets?|\/resources?\//i.test(url) &&
         (/\/(?:[^/]*charit[^/]*|[^/]*not-for-profit[^/]*)(?:\/|$)/i.test(url) ||
           /dedicated.{0,35}(?:charit|not.for.profit).{0,35}(?:page|service)/i.test(
             text,
@@ -292,7 +294,7 @@ export function scoreEvidence(
         points: criterion.points,
         evidence_id: e.id,
         source_url: e.url,
-        justification: `${criterion.label}. Supported by ${e.provenance?.kind === "pilot" ? "the imported pilot research note (source not freshly rechecked)" : "the retrieved source passage"}.`,
+        justification: `${criterion.label}. Supported by ${e.provenance?.kind === "pilot" ? "the imported pilot research note (source not freshly rechecked)" : e.provenance?.kind === "openai-search" ? "the cited OpenAI web-search paraphrase (not a verbatim quotation)" : "the retrieved source passage"}.`,
         quote: text,
         confidence:
           e.provenance?.kind === "pilot"
