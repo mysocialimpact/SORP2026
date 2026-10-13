@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import Link from "next/link";
 import { Arrow } from "@/components/ui";
 
 const audienceKey = "sorp2026.homepage-audience";
@@ -125,7 +124,7 @@ export function HomepageHello() {
     <section className="homepage-hello" id="say-hello" aria-labelledby="hello-title">
       <div className="gateway-width homepage-hello-layout">
         <div className="homepage-hello-invitation">
-          <h2 id="hello-title">Just looking around?<br /><em>Say hello.</em></h2>
+          <h2 id="hello-title">Say hello!</h2>
           <p>We’d love to hear from you. A question, an idea, some feedback — or just hello.</p>
         </div>
         <form className="homepage-hello-form" onSubmit={submit}>
@@ -135,11 +134,6 @@ export function HomepageHello() {
           <label htmlFor="hello-message">Anything you’d like to share? <span>Optional</span></label>
           <textarea id="hello-message" name="message" rows={3} maxLength={3000} placeholder="A question, an idea, some feedback — or just hello!" />
           <label className="homepage-hello-honeypot" htmlFor="hello-website" aria-hidden="true">Website<input id="hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
-          <label className="homepage-hello-consent" htmlFor="hello-newsletter">
-            <input id="hello-newsletter" type="checkbox" name="newsletter" />
-            <span>I’d also like occasional updates about SORP 2026 and our free tools.</span>
-          </label>
-          <p className="homepage-hello-privacy">Saying hello doesn’t create an account or sign you up for updates. <Link href="/privacy/">Privacy notice</Link>.</p>
           <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Hello sent ✓" : "Say hello"} <Arrow /></button>
           {feedback && <p className={`homepage-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
           {status === "error" && <p className="homepage-hello-small">You can also <a href="mailto:marcus@mysocialimpact.org">email Marcus directly</a>.</p>}

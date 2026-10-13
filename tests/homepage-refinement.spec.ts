@@ -22,6 +22,13 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   await expect(page.locator(".experience-explore li").filter({ hasText: "Starbucks" })).toBeVisible();
   await page.locator(".experience-explore summary").click();
   await expect(page.locator(".gateway-contribution-amounts").getByRole("button", { name: "£5", exact: true })).toHaveAttribute("aria-pressed", "true");
+  const hello = page.locator(".homepage-hello");
+  await expect(hello.getByRole("heading", { name: "Say hello!" })).toBeVisible();
+  await expect(hello).toContainText("We’d love to hear from you. A question, an idea, some feedback — or just hello.");
+  await expect(hello).not.toContainText("Just looking around?");
+  await expect(hello).not.toContainText("occasional updates");
+  expect((await hello.boundingBox())!.height).toBeLessThan(info.project.name === "mobile" ? 680 : 560);
+  await hello.screenshot({ path: info.outputPath("say-hello.png") });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: info.outputPath("homepage.png"), fullPage: true });
