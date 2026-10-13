@@ -104,10 +104,6 @@ export function SorpReadyPage() {
         </section>
       </main>
 
-      <aside className="sr-fixed-action" aria-label="Start the free SORP readiness review">
-        <span>Free readiness review</span>
-        <StartReview compact />
-      </aside>
     </>
   );
 }

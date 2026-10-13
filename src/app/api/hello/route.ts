@@ -5,6 +5,7 @@ type HelloInput = {
   message?: unknown;
   audience?: unknown;
   newsletter?: unknown;
+  source?: unknown;
   submissionId?: unknown;
   website?: unknown;
 };
@@ -27,13 +28,12 @@ export async function POST(request: Request) {
     const message = typeof input.message === "string" ? input.message.trim() : "";
     const audience = input.audience === "charity" || input.audience === "adviser" ? input.audience : "not selected";
     const newsletter = input.newsletter === true;
+    const source = typeof input.source === "string" && /^\/[a-zA-Z0-9/_-]*$/.test(input.source) ? input.source : "/";
     const submissionId = typeof input.submissionId === "string" && /^[a-zA-Z0-9:-]{8,160}$/.test(input.submissionId)
       ? input.submissionId
       : crypto.randomUUID();
     if (!emailPattern.test(email) || email.length > 254)
       return Response.json({ error: "Please enter a valid email address." }, { status: 400 });
-    if (!message)
-      return Response.json({ error: "Please enter a message." }, { status: 400 });
     if (message.length > 3_000)
       return Response.json({ error: "Please keep your message under 3,000 characters." }, { status: 400 });
 
@@ -43,13 +43,13 @@ export async function POST(request: Request) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         sessionId: submissionId,
-        incidentId: "homepage-lets-talk",
-        organisationName: "SORP2026 homepage visitor",
+        incidentId: "website-say-hello",
+        organisationName: "SORP2026 website visitor",
         organisationId: "",
         email,
-        message,
+        message: message || "Hello — no additional message supplied.",
         diagnostic: [
-          "Source: SORP2026 homepage",
+          `Source: SORP2026 ${source}`,
           `Audience: ${audience}`,
           `Newsletter consent: ${newsletter ? "YES — explicitly selected" : "NO"}`,
           newsletter ? `Consent timestamp: ${new Date().toISOString()}` : "",

@@ -39,6 +39,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
   const [error, setError] = useState("");
   const [fields, setFields] = useState({ name: "", role: "", roleOther: "", email: "", password: "", confirm: "" });
   const destination = useMemo(() => safeReturn(returnTo ?? params.get("return")), [params, returnTo]);
+  const hasExplicitDestination = Boolean(returnTo || params.get("return"));
 
   useEffect(() => {
     const controller = new AbortController();
@@ -47,13 +48,13 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
         const data = await response.json().catch(() => ({}));
         if (response.ok && data.signedIn === true) {
           if (embedded) returnToEmbeddedProduct(destination);
-          else router.replace(destination);
+          else router.replace(data.platformAccess?.founder === true && !hasExplicitDestination ? "/founder/" : destination);
         }
       })
       .catch(() => undefined)
       .finally(() => setChecking(false));
     return () => controller.abort();
-  }, [destination, router, embedded]);
+  }, [destination, router, embedded, hasExplicitDestination]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,7 +83,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
         // Refresh the existing shared session and all account controls together.
         returnToEmbeddedProduct(destination);
       } else {
-        router.replace(signedInDestination(destination));
+        router.replace(data.platformAccess?.founder === true && !hasExplicitDestination ? "/founder/" : signedInDestination(destination));
         router.refresh();
       }
     } catch (caught) {

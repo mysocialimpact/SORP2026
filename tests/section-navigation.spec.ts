@@ -50,7 +50,7 @@ for (const path of routes) test(`folder continuity and actions: ${path}`, async 
   expect((await sticky.boundingBox())!.y).toBe(0);
   expect((await sticky.boundingBox())!.height).toBeLessThan(190);
   await expect(sticky.getByRole("link", { name: "Our Mission" })).toBeVisible();
-  const bar = page.locator(".folder-action-bar, .sr-fixed-action, .ask-fixed-action");
+  const bar = page.locator(".folder-action-bar");
   await expect(bar).toHaveCount(1);
   await expect(bar).toBeVisible();
   const box = (await bar.boundingBox())!;
@@ -68,16 +68,28 @@ test("Home actions, keyboard access, reduced motion and non-product pages", asyn
   await page.goto("/");
   const bar = page.getByRole("complementary", { name: "Page actions" });
   await expect(bar.getByRole("link", { name: /Start your free SORP review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
-  const ask = bar.getByRole("link", { name: /Ask SORP/ });
-  await ask.focus();
-  await expect(ask).toBeFocused();
+  const talk = bar.getByRole("link", { name: /Talk to us/ });
+  await talk.focus();
+  await expect(talk).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/ask-sorp\/#ask-sorp-live/);
-  const scan = await new AxeBuilder({ page }).include(".platform-sticky-navigation").include(".ask-fixed-action").analyze();
+  await expect(page).toHaveURL(/#say-hello/);
+  await expect(page.locator("#say-hello")).toBeInViewport();
+  const scan = await new AxeBuilder({ page }).include(".platform-sticky-navigation").include(".folder-action-bar").include(".shared-hello").analyze();
   expect(scan.violations).toEqual([]);
   await page.goto("/our-mission/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.locator(".folder-action-bar, .product-section-navigation")).toHaveCount(0);
+  await expect(page.locator(".folder-action-bar")).toHaveCount(1);
   await page.goto("/are-you-sorp-ready/review/?entry=intro");
-  await expect(page.locator(".folder-action-bar, .product-section-navigation")).toHaveCount(0);
+  await expect(page.locator(".folder-action-bar")).toBeHidden();
+});
+
+test("the universal action follows real readiness progress and Say hello is shared once", async ({ page }) => {
+  await page.route("**/api/readiness-account/**", route => route.fulfill({ json: { signedIn: true, account: { email: "qa@example.invalid" }, progress: { sessionId: "qa", step: "criterion" } } }));
+  await page.goto("/");
+  await expect(page.locator(".folder-action-bar").getByRole("link", { name: /Continue your SORP review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/");
+  await expect(page.locator(".shared-hello")).toHaveCount(1);
+  await page.unroute("**/api/readiness-account/**");
+  await page.route("**/api/readiness-account/**", route => route.fulfill({ json: { signedIn: true, account: { email: "qa@example.invalid" }, progress: { sessionId: "qa", step: "report" } } }));
+  await page.reload();
+  await expect(page.locator(".folder-action-bar").getByRole("link", { name: /View your SORP report/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/");
 });
