@@ -28,3 +28,6 @@ CREATE TABLE IF NOT EXISTS research_console.founder_audit_log (
 );
 CREATE INDEX IF NOT EXISTS founder_org_name_idx ON research_console.founder_organisations(name);
 CREATE INDEX IF NOT EXISTS founder_membership_email_idx ON research_console.founder_memberships(lower(email));
+INSERT INTO research_console.founder_organisations(name,type,plan,published_price,payable_price,complimentary,complimentary_start,complimentary_reason)
+SELECT 'FLUID','Adviser','Adviser',99,0,true,now(),'Complimentary Partner'
+WHERE NOT EXISTS (SELECT 1 FROM research_console.founder_organisations WHERE lower(name)=lower('FLUID'));
