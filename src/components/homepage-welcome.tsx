@@ -125,14 +125,13 @@ export function HomepageHello() {
       <div className="gateway-width homepage-hello-layout">
         <div className="homepage-hello-invitation">
           <h2 id="hello-title">Say hello!</h2>
-          <p>We’d love to hear from you. A question, an idea, some feedback — or just hello.</p>
         </div>
         <form className="homepage-hello-form" onSubmit={submit}>
           {recognised && <p className="homepage-hello-account">We’ve filled in the email from your existing account.</p>}
           <label htmlFor="hello-email">Email address <span>Required</span></label>
           <input id="hello-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} />
           <label htmlFor="hello-message">Anything you’d like to share? <span>Optional</span></label>
-          <textarea id="hello-message" name="message" rows={3} maxLength={3000} placeholder="A question, an idea, some feedback — or just hello!" />
+          <textarea id="hello-message" name="message" rows={3} maxLength={3000} placeholder="We’d love to hear from you. A question, an idea, some feedback — or just hello." />
           <label className="homepage-hello-honeypot" htmlFor="hello-website" aria-hidden="true">Website<input id="hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
           <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Hello sent ✓" : "Say hello"} <Arrow /></button>
           {feedback && <p className={`homepage-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
