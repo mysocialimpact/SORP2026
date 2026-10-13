@@ -30,6 +30,23 @@ body:has(.sie-team-response) > .header,
 body:has(.sie-team-response) > .footer {
   display: none;
 }
+body:has(.scr-page) > .shared-hello,
+body:has(.scr-page) > .folder-action-bar,
+body:has(.scr-page) > .folder-action-clearance,
+body:has(.sorp-conversation-page) > .shared-hello,
+body:has(.sorp-conversation-page) > .folder-action-bar,
+body:has(.sorp-conversation-page) > .folder-action-clearance,
+body:has(.sorp-workspace) > .shared-hello,
+body:has(.sorp-workspace) > .folder-action-bar,
+body:has(.sorp-workspace) > .folder-action-clearance,
+body:has(.sie-assessment) > .shared-hello,
+body:has(.sie-assessment) > .folder-action-bar,
+body:has(.sie-assessment) > .folder-action-clearance,
+body:has(.sie-team-response) > .shared-hello,
+body:has(.sie-team-response) > .folder-action-bar,
+body:has(.sie-team-response) > .folder-action-clearance {
+  display: none;
+}
 * {
   box-sizing: border-box;
 }

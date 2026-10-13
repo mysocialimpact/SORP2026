@@ -47,10 +47,9 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
   await expect(page.locator(".sr-more > details")).not.toHaveAttribute("open", "");
   await page.locator(".sr-more summary").click();
   await expect(page.getByRole("heading", { name: "How your score works" })).toBeVisible();
-  const fixedAction = page.locator(".sr-fixed-action");
+  const fixedAction = page.locator(".folder-action-bar");
   await expect(fixedAction).toBeVisible();
-  await expect(fixedAction.getByRole("link", { name: /Start Free Review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
-  await expect(fixedAction.getByRole("link", { name: /Start Free Review/ })).toHaveCSS("background-color", "rgb(36, 35, 41)");
+  await expect(fixedAction.getByRole("link", { name: /Start your free SORP review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
   await expect(fixedAction).toHaveCSS("position", "fixed");
   const fixedBox = (await fixedAction.boundingBox())!;
   expect(fixedBox.height).toBeLessThanOrEqual(90);

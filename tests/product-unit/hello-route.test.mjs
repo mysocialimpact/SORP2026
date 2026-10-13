@@ -32,15 +32,17 @@ test("hello rejects invalid addresses before making a backend request", async t 
   assert.equal(backend.mock.callCount(), 0);
 });
 
-test("hello requires a non-empty message before making a backend request", async t => {
-  const backend = t.mock.method(globalThis, "fetch", async () => Response.json({ accepted: true }));
+test("hello allows an optional message and sends an explicit hello downstream", async t => {
+  const backend = t.mock.method(globalThis, "fetch", async (_url, options) => {
+    assert.equal(JSON.parse(options.body).message, "Hello — no additional message supplied.");
+    return Response.json({ accepted: true });
+  });
   const response = await POST(new Request("https://sorp2026.org/api/hello", {
     method: "POST",
     body: JSON.stringify({ email: "person@example.org", message: "   " }),
   }));
-  assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: "Please enter a message." });
-  assert.equal(backend.mock.callCount(), 0);
+  assert.equal(response.status, 200);
+  assert.equal(backend.mock.callCount(), 1);
 });
 
 test("hello never invents success when the message service refuses a submission", async t => {

@@ -22,13 +22,11 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   await expect(page.locator(".experience-explore li").filter({ hasText: "Starbucks" })).toBeVisible();
   await page.locator(".experience-explore summary").click();
   await expect(page.locator(".gateway-contribution-amounts").getByRole("button", { name: "£5", exact: true })).toHaveAttribute("aria-pressed", "true");
-  const hello = page.locator(".homepage-hello");
-  await expect(hello.getByRole("heading", { name: "Let’s talk." })).toBeVisible();
-  await expect(hello.getByPlaceholder("Request a demo, ask a question, share an idea, give feedback, or just say hello…")).toBeVisible();
-  await expect(hello.getByRole("button", { name: "Send message" })).toBeVisible();
-  await expect(hello.locator(".homepage-hello-invitation p")).toHaveCount(0);
-  await expect(hello).not.toContainText("Just looking around?");
-  await expect(hello).not.toContainText("occasional updates");
+  const hello = page.locator(".shared-hello");
+  await expect(hello.getByRole("heading", { name: /Just looking around.*Say hello/ })).toBeVisible();
+  await expect(hello.getByPlaceholder("A question, an idea, some feedback — or just hello…")).toBeVisible();
+  await expect(hello.getByRole("button", { name: "Say hello" })).toBeVisible();
+  await expect(hello).toContainText("occasional updates");
   expect((await hello.boundingBox())!.height).toBeLessThan(info.project.name === "mobile" ? 760 : 680);
   await hello.screenshot({ path: info.outputPath("lets-talk.png") });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -36,7 +34,7 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   await page.screenshot({ path: info.outputPath("homepage.png"), fullPage: true });
   await page.locator(".gateway-footer").screenshot({ path: info.outputPath("footer.png") });
   await expect(page.locator(".gateway-footer-msi")).toHaveCSS("background-color", "rgb(38, 59, 53)");
-  const results = await new AxeBuilder({ page }).include(".platform-sticky-navigation").include(".homepage-pricing").include(".homepage-hello").include(".gateway-footer").analyze();
+  const results = await new AxeBuilder({ page }).include(".platform-sticky-navigation").include(".homepage-pricing").include(".shared-hello").include(".gateway-footer").analyze();
   expect(results.violations).toEqual([]);
 });
 
