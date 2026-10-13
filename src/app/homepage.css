@@ -1,4 +1,18 @@
 /* Homepage refinements only — no assessment or product theme overrides. */
+.homepage-tool-summaries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.homepage-tool-summary { padding: 28px 30px; border-radius: 5px; }
+.homepage-tool-summary-ready { background: var(--g-orange); }
+.homepage-tool-summary-ask { background: #e7e2f1; }
+.homepage-tool-summary h3 { margin: 0 0 14px; font-size: clamp(28px, 2.8vw, 40px); font-weight: 600; line-height: 1.08; letter-spacing: -.045em; }
+.homepage-tool-summary p { max-width: 440px; margin: 0; font-size: 17px; line-height: 1.5; }
+.homepage-tools-beyond { margin: 22px 0 0; max-width: 850px; color: #625f65; font-size: 16px; line-height: 1.6; }
+@media (max-width: 700px) {
+  .homepage-tool-summaries { grid-template-columns: 1fr; gap: 12px; }
+  .homepage-tool-summary { padding: 24px; }
+  .homepage-tool-summary h3 { font-size: 30px; margin-bottom: 12px; }
+  .homepage-tool-summary p { font-size: 16px; }
+  .homepage-tools-beyond { margin-top: 20px; font-size: 15px; }
+}
 .homepage-source { margin-top: 24px; font-size: 14px; color: #625f65; }
 .homepage-source a { display: inline-flex; align-items: center; gap: 6px; color: #355747; text-decoration: underline; text-underline-offset: 4px; }
 .homepage-story .homepage-impact { padding: 105px 0 75px; }

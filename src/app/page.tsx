@@ -6,7 +6,6 @@ import { Arrow } from "@/components/ui";
 import { ExperienceCloud } from "@/components/experience-cloud";
 import { HomepageContribution } from "@/components/voluntary-contribution";
 import { site } from "@/lib/site";
-import { excellenceProducts } from "@/lib/products";
 import { HomepageAudience, HomepageHello } from "@/components/homepage-welcome";
 import "./homepage.css";
 export const metadata: Metadata = {
@@ -52,75 +51,17 @@ export default function Home() {
               Understand the requirements. Find your starting point.
             </p>
           </header>
-          <div className="gateway-products">
-            <article className="gateway-ready">
-            <div className="gateway-product-top">
-              <span className="gateway-status">
-                <i />
-                Live beta · Available now
-              </span>
-              <span className="gateway-product-number" aria-hidden="true">
-                01
-              </span>
-            </div>
-            <h2>
-              Are You
-              <br />
-              SORP Ready<span>?</span>
-            </h2>
-            <p>
-              Discover how ready your charity is for
-              <br className="gateway-desktop-break" /> impact and sustainability
-              reporting.
-            </p>
-            <div className="gateway-product-actions">
-              <Link className="gateway-action" href={site.readiness!}>
-                Start your free review <Arrow />
-              </Link>
-              <Link className="gateway-quiet-link" href="/are-you-sorp-ready/">
-                Meet the tool <Arrow diagonal />
-              </Link>
-            </div>
-            <span className="gateway-product-scope">
-              Impact, sustainability & narrative reporting.
-              <br />
-              Not a full financial accounting compliance assessment.
-            </span>
+          <div className="homepage-tool-summaries">
+            <article className="homepage-tool-summary homepage-tool-summary-ready">
+              <h3>Are You SORP Ready?</h3>
+              <p>Discover how ready your charity is for SORP 2026 impact and sustainability reporting.</p>
             </article>
-            <article className="gateway-ask">
-            <div className="gateway-product-top">
-              <span className="gateway-status">
-                <i />
-                Live beta · Available now
-              </span>
-              <span className="gateway-product-number" aria-hidden="true">
-                02
-              </span>
-            </div>
-            <div className="gateway-ask-heading">
-              <h2>
-                Ask
-                <br />
-                SORP<span>.</span>
-              </h2>
-              <span className="gateway-question" aria-hidden="true">
-                ?
-              </span>
-            </div>
-            <p>
-              SORP questions? Just ask. Get evidence-led answers grounded in
-              the official SORP.
-            </p>
-            <Link className="gateway-line-link" href="/ask-sorp/">
-              Ask SORP now <Arrow />
-            </Link>
-            <span className="gateway-product-scope">
-              AI-supported guidance across the whole SORP.
-              <br />
-              Accounting, reporting, disclosures and impact.
-            </span>
+            <article className="homepage-tool-summary homepage-tool-summary-ask">
+              <h3>Ask SORP</h3>
+              <p>Get clear, evidence-led answers to your SORP questions.</p>
             </article>
           </div>
+          <p className="homepage-tools-beyond">Beyond compliance, our tools help charities report their impact, manage it, communicate it and continually improve it.</p>
           <aside className="gateway-adviser-note" aria-labelledby="adviser-note-title">
             <p className="gateway-kicker">For accountants and advisers</p>
             <div>
@@ -147,20 +88,6 @@ export default function Home() {
             <li><span className="homepage-sheet-tab" aria-hidden="true">02</span><span className="homepage-decision" aria-hidden="true"><svg viewBox="0 0 72 62" fill="none"><path d="M8 54 56 6M20 6h36v36" stroke="currentColor" strokeWidth="3" /></svg></span><h3>Better decisions.</h3><p>Put that knowledge to work.<br />Choose where to focus next.</p></li>
             <li><span className="homepage-sheet-tab" aria-hidden="true">03</span><span className="homepage-impact-bars" aria-hidden="true"><i /><i /><i /></span><h3>Greater impact.</h3><p>Learn, improve and show the difference<br />to funders and supporters.</p></li>
           </ol>
-        </section>
-        <section className="platform-family homepage-family" aria-labelledby="platform-family-title">
-          <header className="platform-family-head">
-            <h2 id="platform-family-title">From Compliance<br /><em>to Excellence.</em></h2>
-            <p>Take the next step with our wider family of tools and human expertise.</p>
-          </header>
-          <div className="platform-family-grid">
-            {excellenceProducts.map(product => (
-              <Link href={product.href} className={`homepage-product-index ${product.className}`} key={product.slug}>
-                <span className="homepage-product-index-number" aria-hidden="true">{product.number}</span>
-                <span><strong>{product.name}</strong><small>{product.status}</small></span><Arrow diagonal />
-              </Link>
-            ))}
-          </div>
         </section>
         <section className="homepage-access" aria-labelledby="access-title">
           <div className="homepage-access-copy">
