@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AccountControl } from "./account-control";
+import { Arrow } from "./ui";
 export function Header() {
   return (
     <header className="header gateway-header">
@@ -11,7 +12,7 @@ export function Header() {
           </span>
           <span className="gateway-tagline">Reporting for greater impact.</span>
         </Link>
-        <nav className="gateway-directory-nav" aria-label="Find professional support"><Link href="/accountants-advisers/">Accountants & Advisers <span aria-hidden="true">↗</span></Link></nav>
+        <nav className="gateway-directory-nav" aria-label="Find professional support"><Link href="/accountants-advisers/">Accountants & Advisers <Arrow diagonal /></Link></nav>
         <AccountControl />
       </div>
     </header>

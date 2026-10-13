@@ -21,21 +21,26 @@ export default function Home() {
       <div className="gateway-width">
         <section className="gateway-opening" aria-labelledby="gateway-title">
           <div className="gateway-intro">
-            <p className="gateway-kicker">SORP 2026 · A new chapter in charity reporting</p>
+            <p className="gateway-kicker">SORP 2026 · An independent online platform</p>
             <h1 id="gateway-title">
               <span className="gateway-hero-context">SORP is the requirement.</span>
               <span className="gateway-hero-opportunity">Better impact is the opportunity.</span>
             </h1>
+            <p className="homepage-hero-definition">
+              Practical tools, guidance and expert support for <strong>charities,
+              accountants and advisers.</strong> Navigate SORP 2026. Improve your social impact.
+            </p>
           </div>
           <div className="gateway-intro-aside">
-            <span className="gateway-enterprise-label">A social enterprise initiative</span>
+            <span className="gateway-enterprise-label">A UK-based social enterprise initiative</span>
             <p>
               We’re excited about SORP 2026 and better charity reporting. Even more so about
               what charities can achieve with the insight it brings.
             </p>
             <MsiBrand attribution="Developed by" />
             <p className="gateway-enterprise-note">
-              Specialist knowledge. Useful technology. Within reach of smaller charities.
+              Using technology to put valuable tools within reach of smaller
+              charities. <strong>Free wherever possible.</strong>
             </p>
           </div>
         </section>
@@ -99,8 +104,7 @@ export default function Home() {
         <div className="gateway-opening-vision gateway-home-vision" aria-labelledby="home-vision-title">
           <p className="gateway-kicker">Our social enterprise vision</p>
           <h2 id="home-vision-title">
-            Imagine a world where nothing stood in the way of our potential
-            to make a difference.
+            Imagine a world where social impact was taken as seriously as financial performance.
           </h2>
         </div>
         </section>

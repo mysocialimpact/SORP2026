@@ -9,6 +9,7 @@ import "@fontsource/lora/400.css";
 import "./globals.css";
 import "./gateway.css";
 import "./platform.css";
+import "./typography.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProductFolderTabs } from "@/components/product-folder-tabs";

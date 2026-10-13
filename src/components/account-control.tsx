@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Arrow } from "./ui";
 
 export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
@@ -18,7 +19,7 @@ export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Link className="gateway-account-control" href={signedIn ? "/dashboard/" : "/login/"} onClick={onNavigate}>
       {signedIn === null ? "Account" : signedIn ? "My Dashboard" : "Log in"}
-      <span aria-hidden="true">↗</span>
+      <Arrow diagonal />
     </Link>
   );
 }
