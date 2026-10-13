@@ -192,19 +192,19 @@ export function DirectorAssessment() {
   useEffect(() => {
     saveRef.current = save;
   });
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!ready || locked || draft.step < 0) return;
     if (!owner) {
-      const timer = setTimeout(() => {
-        try {
-          sessionStorage.setItem(GUEST, JSON.stringify(draft));
-        } catch {
+      try {
+        sessionStorage.setItem(GUEST, JSON.stringify(draft));
+      } catch {
+        queueMicrotask(() =>
           setError(
             "This browser cannot keep your draft. Keep this page open and download your answers before leaving.",
-          );
-        }
-      }, 0);
-      return () => clearTimeout(timer);
+          ),
+        );
+      }
+      return;
     }
     try {
       sessionStorage.setItem(

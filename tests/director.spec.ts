@@ -68,7 +68,7 @@ test("reduced motion and keyboard stars work; unavailable progress is not a fals
     }),
   );
   await page.reload();
-  await expect(page.getByRole("alert")).toContainText(
+  await expect(page.locator("#assessment").getByRole("alert")).toContainText(
     "Saved progress temporarily unavailable",
   );
   await expect(
@@ -242,6 +242,11 @@ test("guest handoff is explicit and signed-in saving survives reopening", async 
   await page.getByRole("button", { name: "Let’s find out" }).click();
   await page.getByRole("radio", { name: "3 stars: Partly true" }).check();
   await page.getByRole("button", { name: "Next →", exact: true }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Colleagues can get practical help when a digital task is difficult.",
+    }),
+  ).toBeVisible();
   await page
     .context()
     .addCookies([
