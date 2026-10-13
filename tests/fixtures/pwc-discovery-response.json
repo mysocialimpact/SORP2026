@@ -1,0 +1,180 @@
+{
+  "id": "resp_051727d1ccfc54dd016ace9f1e810887d28ea2b739d29d9d00",
+  "output": [
+    {
+      "id": "ws_051727d1ccfc54dd016ace9f1f6b8887d29989e24ae22b96ed",
+      "type": "web_search_call",
+      "action": {
+        "type": "search",
+        "query": "PwC UK official website accountancy firm UK PricewaterhouseCoopers official site",
+        "queries": [
+          "PwC UK official website accountancy firm UK PricewaterhouseCoopers official site",
+          "\"Pwc\" UK accountancy firm official website",
+          "site:pwc.com UK PricewaterhouseCoopers LLP official"
+        ],
+        "sources": [
+          {
+            "url": "https://www.business.gov.uk/invest-in-uk/investment-support-directory/find-a-specialist/specialist/OC303525/",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.co.uk/who-we-are.html",
+            "type": "url"
+          },
+          {
+            "url": "https://find-and-update.company-information.service.gov.uk/company/07443606",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.co.uk/who-we-are/contact-pwc.html",
+            "type": "url"
+          },
+          {
+            "url": "https://store.pwc.co.uk/en/general-terms-and-conditions",
+            "type": "url"
+          },
+          {
+            "url": "https://discovery.pwc.co.uk/login.html",
+            "type": "url"
+          },
+          {
+            "url": "https://find.icaew.com/firms/london/pricewaterhousecoopers-uk-advisory-services-ku-limited/Z1wqCA2",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.com/gx/en/about/assets/pwc-uk-transparency-report-19.pdf",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.co.uk/annualreport/assets/2025/pwc-uk-financial-statements-2025.pdf",
+            "type": "url"
+          },
+          {
+            "url": "https://store.pwc.co.uk/en",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.com/gx/en/about/assets/pwc-master-document-active-client-facing-entities-in-the-pwc-network-1-july-21.pdf",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.com/gx/en/about/corporate-governance/legal-entities.html",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.com/gx/en/legal-notices/pwc-privacy-statement.html",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.co.uk/?trk=public_post_main-feed-card_reshare-text",
+            "type": "url"
+          },
+          {
+            "url": "https://www.pwc.com/gx/en/about/office-locations.html",
+            "type": "url"
+          },
+          {
+            "url": "https://en.wikipedia.org/wiki/PwC",
+            "type": "url"
+          },
+          {
+            "url": "https://zh.wikipedia.org/wiki/%E6%99%AE%E5%8D%8E%E6%B0%B8%E9%81%93",
+            "type": "url"
+          },
+          {
+            "url": "https://fr.wikipedia.org/wiki/PricewaterhouseCoopers",
+            "type": "url"
+          },
+          {
+            "url": "https://it.wikipedia.org/wiki/PricewaterhouseCoopers",
+            "type": "url"
+          },
+          {
+            "url": "https://de.wikipedia.org/wiki/PricewaterhouseCoopers_International",
+            "type": "url"
+          },
+          {
+            "url": "https://en.wikipedia.org/wiki/A._F._Ferguson_%26_Co.",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/Accounting/comments/1gknhkc",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/PwC/comments/1o99nyg",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/PwC/comments/11elm78",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/PwC/comments/1d5pbcy",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/news/comments/1fekph3/pwc_laying_off_1800_employees_in_first_formal/",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/PwC/comments/1kb9o3o/pwc_flying_start_accounting_uk/",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/Accounting/comments/bxi8qu",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/ICAEW/comments/1mr267y",
+            "type": "url"
+          },
+          {
+            "url": "https://www.reddit.com/r/PwC/comments/1hy0kxo",
+            "type": "url"
+          },
+          {
+            "url": "https://www.business.gov.uk/invest-in-uk/investment-support-directory/find-a-specialist/specialist/OC303525/?utm_source=openai",
+            "type": "url"
+          },
+          {
+            "url": "https://find-and-update.company-information.service.gov.uk/company/07443606?utm_source=openai",
+            "type": "url"
+          }
+        ]
+      },
+      "status": "completed"
+    },
+    {
+      "id": "msg_051727d1ccfc54dd016ace9f2441cc87d29e4e58dcb019cf0b",
+      "role": "assistant",
+      "type": "message",
+      "phase": "final_answer",
+      "status": "completed",
+      "content": [
+        {
+          "text": "**PricewaterhouseCoopers LLP (PwC UK)** — this is the UK accountancy firm commonly referred to as **PwC**. Public UK business and firm listings identify the firm as **PricewaterhouseCoopers LLP** with registered office at **1 Embankment Place, London, WC2N 6RH**, and its official UK website as **pwc.co.uk**. PwC’s own “About us” and contact pages confirm the UK firm identity and direct users to the UK site and UK office locations. ([business.gov.uk](https://www.business.gov.uk/invest-in-uk/investment-support-directory/find-a-specialist/specialist/OC303525/?utm_source=openai))\n\nI do **not** see a second plausible UK accountancy firm that should be treated as the same entity. A similarly named Companies House record, **PWC (UK) LIMITED**, is a different legal company and should not be confused with the accountancy firm PwC UK. ([find-and-update.company-information.service.gov.uk](https://find-and-update.company-information.service.gov.uk/company/07443606?utm_source=openai))",
+          "type": "output_text",
+          "logprobs": [],
+          "annotations": [
+            {
+              "url": "https://www.business.gov.uk/invest-in-uk/investment-support-directory/find-a-specialist/specialist/OC303525/?utm_source=openai",
+              "type": "url_citation",
+              "title": "Buy from the UK find a specialist profile business.gov.uk international",
+              "end_index": 582,
+              "start_index": 435
+            },
+            {
+              "url": "https://find-and-update.company-information.service.gov.uk/company/07443606?utm_source=openai",
+              "type": "url_citation",
+              "title": "PWC (UK) LIMITED overview - Find and update company information - GOV.UK",
+              "end_index": 986,
+              "start_index": 837
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "status": "completed"
+}

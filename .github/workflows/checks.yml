@@ -72,3 +72,4 @@ jobs:
             sleep 1
           done
           node tests/console-flow.mjs
+      - run: NODE_OPTIONS=--conditions=react-server npx tsx tests/console-discovery-flow.ts

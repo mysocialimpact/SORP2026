@@ -61,6 +61,7 @@ export async function response(
     purpose: string;
     runId?: string;
     search?: boolean;
+    timeoutMs?: number;
     schema?: Record<string, unknown>;
   },
 ) {
@@ -110,7 +111,9 @@ export async function response(
       },
       cache: "no-store",
       redirect: "error",
-      signal: AbortSignal.timeout(options.search ? 95000 : 55000),
+      signal: AbortSignal.timeout(
+        Math.min(options.timeoutMs ?? Infinity, options.search ? 95000 : 55000),
+      ),
       body: JSON.stringify({
         model: researchModel,
         store: false,
