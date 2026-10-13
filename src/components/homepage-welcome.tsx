@@ -4,7 +4,6 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { Arrow } from "@/components/ui";
 
 const audienceKey = "sorp2026.homepage-audience";
-const contactEmail = "marcus@mysocialimpact.org";
 type Audience = "charity" | "adviser";
 let memoryAudience: Audience | null = null;
 function readAudience(): Audience | null {
@@ -58,16 +57,11 @@ export function HomepageAudience() {
   );
 }
 
-/** Design preview only: Growth's existing events API deliberately excludes contacts.
- * Keep sending disabled until a durable contact + explicit-consent endpoint exists.
- * Never post personal information to the assessment analytics endpoint.
- */
 export function HomepageHello() {
   const [email, setEmail] = useState("");
   const [recognised, setRecognised] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [feedback, setFeedback] = useState("");
-  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
@@ -103,7 +97,7 @@ export function HomepageHello() {
           email,
           message: String(form.get("message") || ""),
           audience,
-          newsletter: form.get("newsletter") === "on",
+          newsletter: false,
           website: String(form.get("website") || ""),
           submissionId,
         }),
@@ -112,44 +106,32 @@ export function HomepageHello() {
       if (!response.ok || !result.accepted) throw new Error(result.error || "Your message was not accepted.");
       setStatus("sent");
       setFeedback(result.emailSent
-        ? "Thank you — your hello has been emailed to My Social Impact."
+        ? "Thank you — your message has been emailed to My Social Impact."
         : result.queued
-          ? "Thank you — your hello is saved and queued for delivery to My Social Impact."
-          : "Thank you — your hello has been securely logged for My Social Impact.");
+          ? "Thank you — your message is saved and queued for delivery to My Social Impact."
+          : "Thank you — your message has been securely logged for My Social Impact.");
     } catch (cause) {
       setStatus("error");
       setFeedback(cause instanceof Error ? cause.message : "We could not send your message. Please try again.");
     }
   }
 
-  async function copyEmail() {
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
-      await navigator.clipboard.writeText(contactEmail);
-      setCopyStatus("copied");
-    } catch {
-      setCopyStatus("error");
-    }
-  }
-
   return (
-    <section className="homepage-hello" id="say-hello" aria-labelledby="hello-title">
+    <section className="homepage-hello" id="lets-talk" aria-labelledby="hello-title">
       <div className="gateway-width homepage-hello-layout">
         <div className="homepage-hello-invitation">
-          <h2 id="hello-title">Say hello!</h2>
+          <h2 id="hello-title">Let’s talk.</h2>
         </div>
         <form className="homepage-hello-form" onSubmit={submit}>
           {recognised && <p className="homepage-hello-account">We’ve filled in the email from your existing account.</p>}
-          <label htmlFor="hello-email">Email address <span>Required</span></label>
+          <label htmlFor="hello-email">Email address</label>
           <input id="hello-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} />
-          <label htmlFor="hello-message">Anything you’d like to share? <span>Optional</span></label>
-          <textarea id="hello-message" name="message" rows={3} maxLength={3000} placeholder="We’d love to hear from you. A question, an idea, some feedback — or just hello." />
+          <label htmlFor="hello-message">Message</label>
+          <textarea id="hello-message" name="message" rows={5} required maxLength={3000} placeholder="Request a demo, ask a question, share an idea, give feedback, or just say hello…" />
           <label className="homepage-hello-honeypot" htmlFor="hello-website" aria-hidden="true">Website<input id="hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
           <div className="homepage-hello-actions">
-            <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Hello sent ✓" : "Say hello"} <Arrow /></button>
-            <button className="homepage-copy-email" type="button" onClick={() => void copyEmail()}>{copyStatus === "copied" ? "Email copied ✓" : `Copy ${contactEmail}`}</button>
+            <button className="gateway-action" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Message sent ✓" : "Send message"} <Arrow /></button>
           </div>
-          {copyStatus === "error" && <p className="homepage-hello-small" role="status">Copy unavailable. Email <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.</p>}
           {feedback && <p className={`homepage-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
           {status === "error" && <p className="homepage-hello-small">You can also <a href="mailto:marcus@mysocialimpact.org">email Marcus directly</a>.</p>}
         </form>

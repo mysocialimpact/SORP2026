@@ -32,6 +32,8 @@ export async function POST(request: Request) {
       : crypto.randomUUID();
     if (!emailPattern.test(email) || email.length > 254)
       return Response.json({ error: "Please enter a valid email address." }, { status: 400 });
+    if (!message)
+      return Response.json({ error: "Please enter a message." }, { status: 400 });
     if (message.length > 3_000)
       return Response.json({ error: "Please keep your message under 3,000 characters." }, { status: 400 });
 
@@ -41,11 +43,11 @@ export async function POST(request: Request) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         sessionId: submissionId,
-        incidentId: "homepage-say-hello",
+        incidentId: "homepage-lets-talk",
         organisationName: "SORP2026 homepage visitor",
         organisationId: "",
         email,
-        message: message || "Hello from the SORP2026 homepage.",
+        message,
         diagnostic: [
           "Source: SORP2026 homepage",
           `Audience: ${audience}`,

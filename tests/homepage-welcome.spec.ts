@@ -100,22 +100,48 @@ test("contact form recognises accounts and confirms only an accepted server resp
   const form = page.locator(".homepage-hello-form");
   await expect(form.getByLabel("Email address")).toHaveValue("preview@example.org");
   await expect(form.getByLabel("Email address")).toHaveAttribute("required", "");
-  await expect(form.getByLabel("Anything you’d like to share?")).not.toHaveAttribute("required");
+  await expect(form.getByLabel("Message")).toHaveAttribute("required", "");
   await expect(form.getByRole("checkbox")).toHaveCount(0);
-  await form.getByRole("button", { name: "Say hello" }).click();
-  await expect(form).toContainText("has been emailed to My Social Impact");
+  await form.getByLabel("Message").fill("Please show us a demo.");
+  await form.getByRole("button", { name: "Send message" }).click();
+  await expect(form).toContainText("message has been emailed to My Social Impact");
   expect(writes).toHaveLength(1);
-  expect(writes[0]).toMatchObject({ email: "preview@example.org", newsletter: false });
+  expect(writes[0]).toMatchObject({ email: "preview@example.org", message: "Please show us a demo.", newsletter: false });
 });
 
-test("Say hello provides Marcus’s email as a working copy action", async ({ page, context }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+test("pricing is free-first, honest about planned plans and leads directly into Let’s talk", async ({ page }) => {
   await page.goto("/");
-  const hello = page.locator(".homepage-hello");
-  const copy = hello.locator(".homepage-copy-email");
-  await expect(copy).toBeVisible();
-  await expect(copy).toHaveAccessibleName("Copy marcus@mysocialimpact.org");
-  await copy.click();
-  await expect(copy).toHaveText("Email copied ✓");
-  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe("marcus@mysocialimpact.org");
+  const pricing = page.locator(".homepage-pricing");
+  await expect(pricing.getByRole("heading", { name: /Powerful tools/ })).toBeVisible();
+  const plans = pricing.locator(".homepage-plan");
+  await expect(plans).toHaveCount(4);
+  await expect(plans.first()).toContainText("FREE");
+  await expect(plans.first()).toContainText("£0");
+  await expect(plans.first()).toContainText("Available now");
+  await expect(plans.nth(1)).toContainText("Planned");
+  await expect(plans.nth(2)).toContainText("Planned");
+  await expect(pricing).toContainText("exclude VAT where applicable");
+  await expect(plans.getByRole("link")).toHaveCount(0);
+  const track = pricing.locator(".homepage-plan-track");
+  const geometry = await track.evaluate(element => ({ left: element.scrollLeft, width: element.clientWidth, scroll: element.scrollWidth }));
+  expect(geometry.left).toBe(0);
+  expect(geometry.scroll).toBeGreaterThan(geometry.width);
+  await plans.first().getByText("See everything included").click();
+  await expect(plans.first()).toContainText("No numeric allowance is currently published");
+  await pricing.getByRole("button", { name: "Next plan" }).click();
+  await expect.poll(() => track.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  await expect(pricing.getByRole("link", { name: /£50/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/booking/?session=30");
+  await expect(pricing.getByRole("link", { name: /Find Accountants & Advisers/ })).toHaveAttribute("href", "/accountants-advisers/");
+  expect(await pricing.evaluate(element => element.nextElementSibling?.id)).toBe("lets-talk");
+});
+
+test("Let’s talk has exactly two visible fields and keeps the prompt inside the message box", async ({ page }) => {
+  await page.goto("/");
+  const talk = page.locator(".homepage-hello");
+  await expect(talk.getByRole("heading", { name: "Let’s talk." })).toBeVisible();
+  await expect(talk.getByPlaceholder("Request a demo, ask a question, share an idea, give feedback, or just say hello…")).toBeVisible();
+  await expect(talk.getByText("Request a demo, ask a question, share an idea, give feedback, or just say hello…", { exact: true })).toHaveCount(0);
+  await expect(talk.locator(".homepage-hello-form > input, .homepage-hello-form > textarea")).toHaveCount(2);
+  await expect(talk.getByRole("button", { name: "Send message" })).toBeVisible();
+  await expect(talk.getByRole("button", { name: /Copy/ })).toHaveCount(0);
 });
