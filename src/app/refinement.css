@@ -1,0 +1,41 @@
+/* Shared navigation and footer refinements. Product content is unchanged. */
+.platform-sticky-navigation { position: sticky; top: 0; z-index: 45; background: #faf9f6; }
+.platform-sticky-navigation .gateway-header { position: static; }
+.platform-sticky-navigation .gateway-header-inner { min-height: 76px; padding-block: 12px; }
+.platform-sticky-navigation .gateway-tagline { font-family: var(--sans); font-style: normal; font-size: 11px; letter-spacing: .08em; }
+.platform-sticky-navigation .gateway-directory-nav { display: flex; gap: 24px; font-size: 12px; }
+.platform-sticky-navigation .product-folder { position: static; }
+.platform-sticky-navigation .product-folder-tabs { padding-top: 12px; }
+.platform-sticky-navigation .product-folder-tab { min-height: 66px; padding-top: 10px; padding-bottom: 10px; }
+.platform-sticky-navigation .product-folder-tab small { display: none; }
+html { scroll-padding-top: calc(var(--platform-navigation-height, 170px) + 16px); }
+/* Existing assessment controls sit below the persistent platform navigation. */
+body .scr-page .sorp-workspace-brand, body .sorp-workspace-page .sorp-tool-header,
+body .sorp-ready-nav, body .sorp-journey-progress { top: var(--platform-navigation-height, 170px); }
+body .scr-page .scr-top { top: calc(var(--platform-navigation-height, 170px) + 64px); }
+body .scr-page .scr-guide { top: calc(var(--platform-navigation-height, 170px) + 156px); }
+body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigation-height, 170px) + 76px); }
+.gateway-footer { padding: 34px 0 20px; }
+.gateway-footer .gateway-footer-partnership { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 0; margin: 0; border: 0; align-items: center; }
+.gateway-footer .gateway-footer-shed { padding: 22px 28px; border-radius: 4px; background: repeating-linear-gradient(115deg, #ffffff04 0 1px, transparent 1px 7px), #302f34; }
+.gateway-footer .gateway-footer-shed-link { margin-top: 14px; font-size: 17px; }
+.gateway-footer .gateway-company-details { margin-top: 16px; font-size: 10px; }
+.gateway-footer .gateway-footer-record { margin-top: 26px; padding-top: 16px; font-size: 11px; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 900px) {
+  .platform-sticky-navigation .gateway-header-inner { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; min-height: 0; padding-block: 10px; }
+  .platform-sticky-navigation .gateway-brand-lockup { display: block; }
+  .platform-sticky-navigation .gateway-wordmark { font-size: 25px; }
+  .platform-sticky-navigation .gateway-tagline { display: block; border: 0; margin: 3px 0 0; padding: 0; font-size: 8px; letter-spacing: .06em; }
+  .platform-sticky-navigation .gateway-account-control { grid-column: 2; grid-row: 1; padding: 8px 12px; font-size: 12px; }
+  .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; font-size: 10px; }
+  .platform-sticky-navigation .product-folder-tabs { padding-top: 6px; }
+  .platform-sticky-navigation .product-folder-tab { min-height: 52px; width: 155px; flex-basis: 155px; padding: 8px 12px; }
+  .platform-sticky-navigation .product-folder-tab strong { font-size: 13px; }
+  .platform-sticky-navigation .product-folder-tab > span { display: none; }
+  .platform-sticky-navigation .product-folder-sheet-edge { height: 4px; }
+}
+@media (max-width: 600px) {
+  .gateway-footer .gateway-footer-partnership { grid-template-columns: 1fr; gap: 24px; }
+  .gateway-footer .gateway-footer-msi .gateway-msi { margin: 0; }
+  .gateway-footer .gateway-footer-shed { padding: 20px; }
+}

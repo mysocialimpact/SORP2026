@@ -10,9 +10,9 @@ export function Header() {
             SORP<span>2026</span>
             <i aria-hidden="true" />
           </span>
-          <span className="gateway-tagline">Reporting for greater impact.</span>
+          <span className="gateway-tagline">REPORTING FOR GREATER IMPACT</span>
         </Link>
-        <nav className="gateway-directory-nav" aria-label="Find professional support"><Link href="/accountants-advisers/">Accountants & Advisers <Arrow diagonal /></Link></nav>
+        <nav className="gateway-directory-nav" aria-label="Platform information"><Link href="/our-mission/">Our Mission</Link><Link href="/accountants-advisers/">Accountants & Advisers <Arrow diagonal /></Link></nav>
         <AccountControl />
       </div>
     </header>
