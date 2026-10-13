@@ -31,13 +31,35 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
       cover: getComputedStyle(cover).backgroundColor,
       edgeBorder: getComputedStyle(edge).borderTopWidth,
       gap: cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
-      sequence: [".gateway-opening", ".homepage-audience", ".gateway-sorp-section", ".platform-family", ".gateway-home-vision"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
+      sequence: [".gateway-opening", ".homepage-audience", ".gateway-sorp-section", ".homepage-impact", ".gateway-home-vision"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
     };
   });
   expect(surfaces.edge).toBe(surfaces.cover);
   expect(surfaces.edgeBorder).toBe("0px");
   expect(surfaces.gap).toBe(0);
   expect(surfaces.sequence).toEqual([...surfaces.sequence].sort((a, b) => a - b));
+});
+
+test("flagship summaries are compact, informational and responsive", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const cards = page.locator(".homepage-tool-summary");
+  await expect(cards).toHaveCount(2);
+  await expect(cards.nth(0).getByRole("heading")).toHaveText("Are You SORP Ready?");
+  await expect(cards.nth(1).getByRole("heading")).toHaveText("Ask SORP");
+  await expect(cards.locator("a, button, [tabindex], [role=button], svg, img")).toHaveCount(0);
+  await expect(page.locator(".homepage-tools-beyond")).toHaveText("Beyond compliance, our tools help charities report their impact, manage it, communicate it and continually improve it.");
+  await expect(page.locator(".homepage-product-index")).toHaveCount(0);
+  const first = (await cards.nth(0).boundingBox())!;
+  const second = (await cards.nth(1).boundingBox())!;
+  expect(first.height).toBeLessThan(230);
+  expect(second.height).toBeLessThan(230);
+  if (testInfo.project.name === "mobile") expect(second.y).toBeGreaterThan(first.y + first.height);
+  else {
+    expect(second.y).toBe(first.y);
+    expect(second.width).toBeCloseTo(first.width, 0);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.locator(".homepage-tool-summaries").screenshot({ path: testInfo.outputPath("compact-products.png") });
 });
 
 test("hero frames SORP as the requirement and better impact as the opportunity", async ({ page }) => {
