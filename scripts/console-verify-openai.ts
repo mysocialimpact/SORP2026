@@ -8,6 +8,8 @@ import { startResearch, runResearch } from "../src/lib/console/research";
 import { openaiConfigured } from "../src/lib/console/openai-response";
 import { automaticAssessment } from "../src/lib/console/automatic-assessment";
 async function main() {
+  const discoveryOnly = process.argv.includes("--discovery-only");
+  const namesArg = process.argv.find((arg) => arg.startsWith("--names="));
   const production = process.argv.includes("--production");
   const reuseEvidence = process.argv.includes("--reuse-evidence");
   const reuseSearch = process.argv.includes("--reuse-search");
@@ -22,17 +24,41 @@ async function main() {
   const before = await query<{ id: string; fingerprint: string }>(
     "SELECT id,md5(row_to_json(a)::text) fingerprint FROM research_console.assessments a",
   );
-  for (const name of [
-    "Fraser Powell accountants Shepton Mallet",
-    "Sayer Vincent charity accountants London",
-  ]) {
+  for (const name of namesArg
+    ? namesArg.slice("--names=".length).split(",")
+    : [
+        "Fraser Powell accountants Shepton Mallet",
+        "Sayer Vincent charity accountants London",
+      ]) {
     const discovery = await discoverFirm(name);
     assert.equal(
-      discovery.candidates.length,
+      discovery.candidates.length + discovery.matches.length,
       1,
       "Name discovery must establish one official firm",
     );
-    const candidate = discovery.candidates[0];
+    const candidate = discovery.candidates[0] ?? discovery.matches[0];
+    assert.ok(candidate.website, "Identity needs an official website");
+    if (name.toLowerCase() === "pwc")
+      assert.equal(
+        new URL(candidate.website).hostname.replace(/^www\./, ""),
+        "pwc.co.uk",
+      );
+    if (name.toLowerCase() === "bdo")
+      assert.equal(
+        new URL(candidate.website).hostname.replace(/^www\./, ""),
+        "bdo.co.uk",
+      );
+    if (discoveryOnly) {
+      console.log(
+        JSON.stringify({
+          liveDiscovery: "passed",
+          query: name,
+          name: candidate.name,
+          website: candidate.website,
+        }),
+      );
+      continue;
+    }
     const created = await createFirm(
       candidate,
       "Live OpenAI workflow validation",
@@ -41,27 +67,49 @@ async function main() {
       created.firm ??
       (created.matches?.length === 1 ? created.matches[0] : null);
     assert.ok(firm, "Discovered identity must resolve to one saved firm");
-    const savedRun = reuseEvidence || reuseSearch ? (await query<{ id: string }>(
-      "SELECT r.id FROM research_console.runs r WHERE r.firm_id=$1 AND r.status='collected' AND EXISTS(SELECT 1 FROM research_console.ai_usage u WHERE u.run_id=r.id AND u.purpose='firm-research' AND u.status='completed') ORDER BY r.completed_at DESC LIMIT 1",
-      [firm.id],
-    ))[0] : null;
-    if (reuseEvidence || reuseSearch) assert.ok(savedRun, "Reprocessing requires a completed real OpenAI research run");
-    const run = reuseEvidence && savedRun ? { ...savedRun, created: false } : await startResearch(
-      firm.id,
-      "Live OpenAI workflow validation",
-      { refresh: true },
-    );
-    if (reuseEvidence) await automaticAssessment(firm.id, "Validate corrected scoring against saved live OpenAI evidence", { runId: run.id });
+    const savedRun =
+      reuseEvidence || reuseSearch
+        ? (
+            await query<{ id: string }>(
+              "SELECT r.id FROM research_console.runs r WHERE r.firm_id=$1 AND r.status='collected' AND EXISTS(SELECT 1 FROM research_console.ai_usage u WHERE u.run_id=r.id AND u.purpose='firm-research' AND u.status='completed') ORDER BY r.completed_at DESC LIMIT 1",
+              [firm.id],
+            )
+          )[0]
+        : null;
+    if (reuseEvidence || reuseSearch)
+      assert.ok(
+        savedRun,
+        "Reprocessing requires a completed real OpenAI research run",
+      );
+    const run =
+      reuseEvidence && savedRun
+        ? { ...savedRun, created: false }
+        : await startResearch(firm.id, "Live OpenAI workflow validation", {
+            refresh: true,
+          });
+    if (reuseEvidence)
+      await automaticAssessment(
+        firm.id,
+        "Validate corrected scoring against saved live OpenAI evidence",
+        { runId: run.id },
+      );
     else {
       assert.ok(run.created, "Validation needs a new real research run");
-      await runResearch(run.id, reuseSearch ? { reuseSearchRunId: savedRun!.id } : {});
+      await runResearch(
+        run.id,
+        reuseSearch ? { reuseSearchRunId: savedRun!.id } : {},
+      );
     }
     const saved = await report(firm.id);
     const assessment = saved.assessments.find((a) => a.run_id === run.id);
     assert.ok(assessment, "Live run must save a complete assessment");
     const rows = saved.evidence.filter((e) => e.run_id === run.id);
     assert.ok(rows.length >= 3, "Live run must save source-backed evidence");
-    assert.ok(saved.people.length > 0, "Live research must identify people from the cited staff profiles");
+    if (!namesArg)
+      assert.ok(
+        saved.people.length > 0,
+        "Live research must identify people from the cited staff profiles",
+      );
     assert.equal(Object.keys(assessment.scores).length, 5);
     assert.equal(
       Object.values(assessment.scores).reduce((sum, n) => sum + n, 0),

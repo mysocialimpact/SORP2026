@@ -86,6 +86,7 @@ globalThis.fetch = async (input, init) => {
                     name: "QA AI " + id,
                     website: "https://qa-ai.example/",
                     description: "Cited official-domain identity.",
+                    source_url: urls[0],
                   },
                 ],
               }),
