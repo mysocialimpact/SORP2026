@@ -1,5 +1,5 @@
 import "server-only";
-import { listFirms } from "./repository";
+import { findFirmIdentities } from "./repository";
 import { safeResearchUrl } from "./fetch-public";
 import { query, transaction } from "./db";
 import { canonicalName } from "./model";
@@ -181,14 +181,10 @@ export async function discoverFirm(input: string) {
     website = safeResearchUrl(
       /^https?:/i.test(term) ? term : "https://" + term,
     ).href;
-  const result = await listFirms(
-    new URLSearchParams({
-      q: website ? new URL(website).hostname.replace(/^www\./, "") : term,
-    }),
-  );
-  if (result.rows.length || website)
+  const matches = await findFirmIdentities(term, website);
+  if (matches.length || website)
     return {
-      matches: result.rows,
+      matches,
       candidates: [],
       website,
       configured: discoveryConfigured(),

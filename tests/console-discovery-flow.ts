@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { discoverFirm } from "../src/lib/console/discovery";
-import { database } from "../src/lib/console/db";
+import { database, query } from "../src/lib/console/db";
 const db = new URL(process.env.CONSOLE_DATABASE_URL ?? "");
 assert.equal(db.hostname, "127.0.0.1");
 assert.equal(db.port, "5433");
@@ -103,6 +103,27 @@ async function main() {
     "https://www.pwc.com/uk/",
     "UK-specific paths survive extraction",
   );
+  await query(
+    "INSERT INTO research_console.firms(name,name_key) VALUES($1,$2)",
+    ["Godfrey Wilson " + randomUUID(), "godfrey wilson"],
+  );
+  mode = "consulted-source";
+  calls = 0;
+  assert.equal(
+    (await discoverFirm("EY")).matches.length,
+    0,
+    "EY does not match Godfrey",
+  );
+  assert.equal(calls, 2, "Unrelated saved names do not suppress discovery");
+  const [ey] = await query<{ id: string }>(
+    "INSERT INTO research_console.firms(name,name_key,website,domain) VALUES('EY LLP','ey llp','https://www.ey.com/en_uk/','ey.com') RETURNING id",
+  );
+  assert.equal(
+    (await discoverFirm("ey")).matches[0].id,
+    ey.id,
+    "Exact UK identity reuses the saved record",
+  );
+  assert.equal(calls, 2);
   console.log(
     "PASS discovery replay, cache, follow-up, unsupported source rejection and ambiguity",
   );

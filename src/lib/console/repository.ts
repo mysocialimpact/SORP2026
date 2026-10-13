@@ -78,6 +78,28 @@ export async function dashboard(actor?: string) {
     backup:(await query("SELECT status,started_at,completed_at,(status='failed' OR coalesce(completed_at,started_at)<now()-interval '36 hours') needs_attention FROM research_console.backup_runs ORDER BY started_at DESC LIMIT 1"))[0]??null,
   };
 }
+// Name discovery needs an identity match, not directory matches on a town,
+// employee or arbitrary substring (e.g. EY inside Godfrey).
+export async function findFirmIdentities(term: string, website: string | null) {
+  if (website)
+    return query<Firm>(
+      firmSelect + " WHERE f.merged_into IS NULL AND f.domain=$1 ORDER BY f.name,f.id",
+      [websiteDomain(website)],
+    );
+  const name = canonicalName(term);
+  const base = name.replace(/ (?:limited|ltd|llp|plc)$/, "");
+  const names = [...new Set([
+    name, base,
+    ...["limited", "ltd", "llp", "plc"].map(suffix => base + " " + suffix),
+  ])];
+  return query<Firm>(
+    firmSelect + ` WHERE f.merged_into IS NULL AND (
+    f.name_key=ANY($1::text[]) OR split_part(f.domain,'.',1)=$2 OR
+    EXISTS(SELECT 1 FROM unnest(f.aliases) alias WHERE trim(regexp_replace(lower(alias),'[^[:alnum:]]+',' ','g'))=ANY($1::text[]))
+  ) ORDER BY f.name,f.id`,
+    [names, name.replaceAll(" ", "")],
+  );
+}
 export async function listFirms(params: URLSearchParams) {
   const values: unknown[] = [];
   const where = ["f.merged_into IS NULL"];
