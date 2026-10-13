@@ -8,6 +8,7 @@ import { ExperienceCloud } from "@/components/experience-cloud";
 import { HomepageContribution } from "@/components/voluntary-contribution";
 import { site } from "@/lib/site";
 import { HomepageAudience, HomepageHello } from "@/components/homepage-welcome";
+import { HomepagePricing } from "@/components/homepage-pricing";
 import "./homepage.css";
 export const metadata: Metadata = {
   title: "SORP 2026 — Reporting for greater impact",
@@ -147,6 +148,7 @@ export default function Home() {
         </section>
       </div>
       <HomepageContribution />
+      <HomepagePricing />
       <HomepageHello />
     </main>
   );
