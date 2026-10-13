@@ -61,3 +61,10 @@ test('generic technical libraries cannot earn any service-category points',()=>{
  const r=score([evidence('The site contains a dedicated charity-related service area, but it is framed as general guidance rather than a specialist charity team. It covers charity VAT, governance and audit requirements.',{url:'https://firm.example/factsheets/specialist-areas'})]);
  assert.equal(r.scores.services,0);
 });
+
+test('AI SORP training claims cannot earn points against an unrelated event citation',()=>{
+ const e=evidence('The firm delivered a charity governance webinar. It also presented SORP 2026 training at another conference.',{title:'Charity Governance Code refreshed',url:'https://firm.example/events/governance-code/',provenance:{kind:'openai-search'}});
+ assert.equal(score([e]).scores.sorp,0);
+ const sourced={...e,title:'SORP 2026 webinar',url:'https://firm.example/events/sorp-2026/'};
+ assert.ok(score([sourced]).awards.some(a=>a.criterion_id==='C3'));
+});

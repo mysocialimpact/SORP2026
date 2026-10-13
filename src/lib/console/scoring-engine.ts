@@ -80,6 +80,14 @@ function qualifies(
   // service offering, team or advisory capability.
   if (/^A[1-4]$/.test(id) && /factsheets?|\/resources?\//i.test(url))
     return false;
+  // An AI paragraph can accidentally combine a SORP event with a different
+  // event on the same site. For technical/training points require the cited
+  // source itself to be identified as SORP material, not just the paraphrase.
+  if (
+    e.provenance?.kind === "openai-search" &&
+    /^C[1-3]$/.test(id) &&
+    !/sorp/i.test(`${e.title} ${url}`)
+  ) return false;
   if (
     /^B[1-4]$/.test(id) &&
     /recommend|testimonial|as (?:a|our) client|in a previous role/i.test(text)
