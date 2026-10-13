@@ -51,3 +51,13 @@ test('AI people awards require an extracted named person linked to the passage',
  assert.equal(score([e]).scores.people,0);
  assert.ok(score([{...e,people:['Jane Smith']}]).awards.some(a=>a.criterion_id==='B1'));
 });
+
+test('named charity clients do not require an extracted staff member',()=>{
+ const r=score([evidence('Our firm was appointed by River Trust as the charity auditor.',{provenance:{kind:'openai-search'},people:[],category:'clients'})]);
+ assert.ok(r.awards.some(a=>a.criterion_id==='D1'));
+});
+
+test('generic technical libraries cannot earn any service-category points',()=>{
+ const r=score([evidence('The site contains a dedicated charity-related service area, but it is framed as general guidance rather than a specialist charity team. It covers charity VAT, governance and audit requirements.',{url:'https://firm.example/factsheets/specialist-areas'})]);
+ assert.equal(r.scores.services,0);
+});

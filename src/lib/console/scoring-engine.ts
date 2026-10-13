@@ -61,9 +61,7 @@ function qualifies(
       .split(/\s+/)
       .filter(Boolean),
   );
-  const personNames = (e.provenance?.kind === "openai-search"
-    ? (e.people ?? []).filter((name) => text.includes(name))
-    : names(text)).filter(
+  const entityNames = names(text).filter(
     (n) =>
       n.toLowerCase().replace(/[^a-z]/g, "") !==
         new URL(url).hostname.replace(/^www\./, "").split(".")[0].replace(/[^a-z]/g, "") &&
@@ -72,8 +70,16 @@ function qualifies(
         .split(/\s+/)
         .every((word) => firmWords.has(word)),
   );
+  const personNames = e.provenance?.kind === "openai-search"
+    ? (e.people ?? []).filter((name) => text.includes(name))
+    : entityNames;
+  const namedEntity = entityNames.length > 0;
   const c = charity.test(text),
     named = personNames.length > 0;
+  // Generic technical libraries describe readers' obligations, not a firm's
+  // service offering, team or advisory capability.
+  if (/^A[1-4]$/.test(id) && /factsheets?|\/resources?\//i.test(url))
+    return false;
   if (
     /^B[1-4]$/.test(id) &&
     /recommend|testimonial|as (?:a|our) client|in a previous role/i.test(text)
@@ -205,7 +211,7 @@ function qualifies(
     case "D1":
       return (
         c &&
-        named &&
+        namedEntity &&
         /(?:accounts for|appointed by|client is|client,?)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/.test(
           text,
         ) &&
@@ -214,7 +220,7 @@ function qualifies(
     case "D2":
       return (
         c &&
-        named &&
+        namedEntity &&
         /case study|engagement/i.test(text) &&
         /delivered|result|implemented|supported|achieved|saved/i.test(text) &&
         text.length >= 220
@@ -222,7 +228,7 @@ function qualifies(
     case "D3":
       return (
         c &&
-        named &&
+        namedEntity &&
         external &&
         /testimonial|review.{0,40}(?:records|says)|trustees.{0,30}thank|chairman.{0,30}thank/i.test(
           text,
