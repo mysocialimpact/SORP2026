@@ -14,7 +14,7 @@ process.env.OPENAI_API_KEY = "local-contract-test-not-a-real-key";
 const id = randomUUID();
 const paragraphs = [
   "Our dedicated charity team provides charity accounts, audit, VAT, governance and payroll services. [1]",
-  "Jane Wilson FCA is the senior charity audit partner responsible for charity accounting services. [2]",
+  "Jane Wilson **FCA** is the **senior charity audit partner** responsible for charity accounting services. [2]",
   "Our article explains Charity SORP 2026 and the three-tier reporting framework for charities. [3]",
 ];
 const text = paragraphs.join("\n\n");

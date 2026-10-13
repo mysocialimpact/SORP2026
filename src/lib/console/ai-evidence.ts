@@ -116,6 +116,18 @@ export type ResearchExtraction = {
     qualifications: string[];
   }>;
 };
+// Formatting marks may separate otherwise identical words in a cited passage.
+// Normalise presentation only; do not paraphrase or infer missing information.
+const evidenceText = (value: string) =>
+  value
+    .normalize("NFKC")
+    .replace(/[*_`]/g, "")
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[–—]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 export function validateExtraction(
   data: ResearchExtraction,
   passages: CitedPassage[],
@@ -149,19 +161,53 @@ export function validateExtraction(
   if (!Array.isArray(data.people) || data.people.length > 50)
     throw new Error("Invalid people extraction.");
   for (const p of data.people) {
-    const source = passages.find((s) => s.id === p.passage_id)?.summary ?? "";
+    const source = evidenceText(
+      passages.find((s) => s.id === p.passage_id)?.summary ?? "",
+    );
     if (
       !p.name ||
+      !evidenceText(p.name) ||
       p.name.length > 150 ||
-      !source.includes(p.name) ||
+      !source.includes(evidenceText(p.name)) ||
       !p.role ||
-      !source.includes(p.role) ||
+      !evidenceText(p.role) ||
+      !source.includes(evidenceText(p.role)) ||
       !Array.isArray(p.qualifications) ||
-      p.qualifications.some((q) => !q || !source.includes(q))
+      p.qualifications.some(
+        (q) => !q || !evidenceText(q) || !source.includes(evidenceText(q)),
+      )
     )
       throw new Error(
         "A person or qualification was not supported by its cited passage.",
       );
   }
   return data;
+}
+
+// Prefer the supported official profile over a generic contact listing or an
+// older external article when one person occurs in several cited passages.
+export function preferredPeople(
+  data: ResearchExtraction,
+  passages: CitedPassage[],
+  officialHost: string,
+) {
+  const rank = (person: ResearchExtraction["people"][number]) => {
+    const source = passages.find((p) => p.id === person.passage_id);
+    if (!source) return -1;
+    const url = new URL(source.url);
+    return (
+      (url.hostname.replace(/^www\./, "") === officialHost ? 2 : 0) +
+      (/\/(?:contacts?|team|people|profiles?)\//i.test(url.pathname) ? 2 : 0) +
+      (/^(?:contacts?|team member|staff)$/i.test(person.role) ? 0 : 2)
+    );
+  };
+  const seen = new Set<string>();
+  return [...data.people]
+    .sort((a, b) => rank(b) - rank(a))
+    .filter((person) => {
+      const name = evidenceText(person.name).toLowerCase();
+      if (seen.has(name)) return false;
+      seen.add(name);
+      return true;
+    });
 }

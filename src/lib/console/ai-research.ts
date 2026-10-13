@@ -5,6 +5,7 @@ import {
   citedPassages,
   extractionSchema,
   validateExtraction,
+  preferredPeople,
   type ResearchExtraction,
 } from "./ai-evidence";
 import {
@@ -129,7 +130,7 @@ export async function runAIResearch(
         ],
       );
     }
-    for (const p of data.people) {
+    for (const p of preferredPeople(data, selected, host)) {
       const source = passages.find((s) => s.id === p.passage_id)!;
       if (!selected.some((s) => s.id === p.passage_id)) continue;
       const added = (
