@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FolderHero } from "@/components/folder-hero";
 import Link from "next/link";
 import Image from "next/image";
 import { MsiBrand } from "@/components/brand";
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main id="main" className="gateway homepage-story">
-      <div className="gateway-home-cover">
+      <FolderHero product="home" as="div" className="gateway-home-cover">
       <div className="gateway-width">
         <section className="gateway-opening" id="home-overview" aria-labelledby="gateway-title">
           <div className="gateway-intro">
@@ -36,7 +37,7 @@ export default function Home() {
           </div>
         </section>
       </div>
-      </div>
+      </FolderHero>
       <div className="gateway-width">
         <p className="homepage-sorp-enthusiasm">
           We’re excited about SORP 2026 and better charity reporting. <strong>Even more so about what charities can achieve with the insight it brings.</strong>

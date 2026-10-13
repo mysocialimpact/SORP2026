@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FolderHero } from "@/components/folder-hero";
 import SorpFilm from "./sorp-film/sorp-film";
 import { sorpSource } from "./sorp-methodology-v1";
 
@@ -16,7 +17,7 @@ export function SorpReadyPage() {
   return (
     <>
       <main id="main" className="sr-story">
-        <header className="sr-hero" id="top">
+        <FolderHero product="sorp-ready" as="header" paper="#fbfaf7" className="sr-hero" id="top">
           <div className="sr-hero-copy">
             <p className="sr-eyebrow">A completely free SORP 2026 readiness review</p>
             <h1>Are You<br /><span>SORP Ready?</span></h1>
@@ -30,7 +31,7 @@ export function SorpReadyPage() {
               <a className="sr-play" href="#presentation">Play Presentation <span aria-hidden="true">▶</span></a>
             </div>
           </div>
-        </header>
+        </FolderHero>
 
         <section id="sr-audiences" className="sr-audiences" aria-labelledby="sr-audiences-title">
           <div className="sr-section-heading">

@@ -1,45 +1,91 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { FolderHero } from "@/components/folder-hero";
 import { Arrow } from "@/components/ui";
-import { ProductAdviserNote } from "@/components/product-adviser-note";
-import { pillars, site } from "@/lib/site";
 import { ExcellenceHome } from "@/features/excellence/excellence-home";
+import { pillars, site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Social Impact Excellence",
-  description: "Assess and systematically improve how your charity understands, manages and delivers social impact.",
+  title: "Social Impact Excellence | My Social Impact",
+  description:
+    "My Social Impact’s flagship five-pillar methodology for embedding social impact as a management discipline.",
   ...(site.live ? { alternates: { canonical: "/social-impact-excellence/" } } : {}),
 };
 
-export default function ExcellencePage() {
-  const publicPage = <main id="main" className="gateway product-page product-excellence">
-    <section id="excellence-overview" className="product-hero gateway-width">
-      <div className="product-hero-copy">
-        <p className="gateway-kicker">04 · My Social Impact’s flagship approach</p>
-        <h1>Make social impact part of <em>how your charity is run.</em></h1>
-        <p className="product-lead">Embed impact as a management discipline across your organisation—not merely something measured when an annual report is due.</p>
-        <Link className="gateway-action" href="/social-impact-excellence/assessment/">Explore Social Impact Excellence <Arrow /></Link>
-        <p className="product-hero-note">Start with the established five-pillar Social Impact Maturity Assessment.</p>
-      </div>
-      <div className="product-brand-panel is-excellence"><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority /></div>
-    </section>
-    <section className="product-statement gateway-width"><p className="gateway-kicker">Five connected pillars</p><h2>One honest baseline.<br/>A better way forward.</h2><p>The established Social Impact Maturity Assessment, private results and the complete existing Purpose pathway now sit inside SORP2026. Other deeper pillar pathways remain clearly marked until the original product releases them.</p></section>
-    <section id="excellence-start" className="excellence-programmes gateway-width" aria-labelledby="excellence-programmes-title">
-      <div><p className="gateway-kicker">Choose how deeply to explore</p><h2 id="excellence-programmes-title">Three programmes.<br/>One Excellence journey.</h2><p>These are Social Impact Excellence programmes—not extra SORP2026 memberships. Your platform account remains free.</p></div>
-      <article><span>01 · Free</span><h3>Snapshot</h3><p>One person completes the 25-question maturity assessment and receives a private five-pillar baseline.</p><strong>1 person · 10–15 minutes</strong><Link href="/social-impact-excellence/assessment/">Start your free Snapshot <Arrow /></Link></article>
-      <article className="is-team"><span>02 · Fixed-price programme</span><h3>Team Perspective</h3><p>Invite colleagues, track completion and reveal a protected organisation-wide view once at least three people respond.</p><strong>Up to 15 people · self-service</strong><Link href="/social-impact-excellence/team/">Open Team Perspective <Arrow /></Link></article>
-      <article><span>03 · Human-led programme</span><h3>Excellence Programme</h3><p>Turn the evidence into structured improvement with expert challenge, deeper pillar work and review checkpoints.</p><strong>Tailored scope · MSI support</strong><a href="mailto:marcus@mysocialimpact.org?subject=Social%20Impact%20Excellence%20Programme">Discuss the Excellence Programme <Arrow diagonal /></a></article>
-    </section>
-    <section id="excellence-pillars" className="excellence-pillars gateway-width" aria-label="The five pillars of Social Impact Excellence">
-      {pillars.map(pillar => <article key={pillar.title}><span>{pillar.number}</span><h3>{pillar.title}</h3><p>{pillar.text}</p></article>)}
-    </section>
-    <section id="excellence-account" className="integration-note gateway-width">
-      <div><p className="gateway-kicker">One platform account</p><h2>Start here.<br/>Continue the full journey.</h2></div>
-      <div><p>Your SORP2026 account saves the maturity assessment, Purpose diagnostic and supporting evidence independently from your readiness review. The original Social Impact Excellence platform remains unchanged.</p><Link href="/social-impact-excellence/assessment/">Start or continue the assessment <Arrow /></Link><Link href="/social-impact-excellence/journey/">Open your Excellence journey <Arrow /></Link><a href={site.platform!}>Visit the original platform <Arrow diagonal /></a></div>
-    </section>
-    <ProductAdviserNote title="Help clients move from reporting to better management.">Use the five pillars to support charity clients beyond accounts preparation—into stronger purpose, leadership, evidence, delivery and communication. The approach complements existing professional relationships.</ProductAdviserNote>
-  </main>;
-  return <ExcellenceHome publicPage={publicPage}/>;
-}
+const journey = [
+  { number: "01", title: "Maturity Assessment", text: "Understand where your organisation stands." },
+  { number: "02", title: "Diagnostic", text: "Identify strengths, gaps and opportunities." },
+  { number: "03", title: "Blueprint", text: "Establish what excellence should look like." },
+  { number: "04", title: "Roadmap", text: "Prioritise practical actions and continuous improvement." },
+];
 
+export default function ExcellencePage() {
+  const publicPage = (
+    <main id="main" className="gateway product-page product-excellence excellence-public">
+      <FolderHero product="social-impact-excellence" id="excellence-overview" className="excellence-public-hero">
+        <div className="gateway-width excellence-public-hero-grid">
+          <div className="excellence-public-hero-copy">
+            <a className="excellence-msi-brand" href={site.msi} aria-label="Visit My Social Impact">
+              <Image src="/brand/my-social-impact.png" alt="My Social Impact" width={1088} height={124} priority sizes="(max-width: 700px) 250px, 360px" />
+            </a>
+            <p className="excellence-flagship">Our flagship methodology</p>
+            <h1>Social Impact{" "}<br />Excellence</h1>
+            <p className="excellence-public-principle">We believe social impact should be embedded as a management discipline.</p>
+            <p className="excellence-public-lead">A practical framework helping charities understand, manage and continuously improve their social impact.</p>
+          </div>
+          <div className="excellence-public-mark" aria-label="Social Impact Excellence">
+            <Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority sizes="(max-width: 700px) 62vw, 390px" />
+            <p>Five pillars.<br /><strong>One management framework.</strong></p>
+          </div>
+        </div>
+      </FolderHero>
+
+      <section className="excellence-public-pillars gateway-width" aria-labelledby="excellence-pillars-title">
+        <header>
+          <p className="gateway-kicker">The five pillars</p>
+          <h2 id="excellence-pillars-title">Excellence is connected.</h2>
+          <p>Each pillar strengthens the others. Together, they turn impact into a discipline the whole organisation can use.</p>
+        </header>
+        <ol tabIndex={0} aria-label="The five pillars of Social Impact Excellence; swipe or use arrow keys to explore">
+          {pillars.map((pillar) => <li key={pillar.title}><span>{pillar.number}</span><h3>{pillar.title}</h3><p>{pillar.text}</p></li>)}
+        </ol>
+        <p className="excellence-pillar-swipe">Swipe to explore all five pillars →</p>
+      </section>
+
+      <section className="excellence-public-journey" aria-labelledby="excellence-journey-title">
+        <div className="gateway-width">
+          <header>
+            <p className="gateway-kicker">The Social Impact Excellence journey</p>
+            <h2 id="excellence-journey-title">From an honest baseline{" "}<br />to continuous improvement.</h2>
+          </header>
+          <ol>{journey.map((stage) => <li key={stage.title}><span>{stage.number}</span><div><h3>{stage.title}</h3><p>{stage.text}</p></div></li>)}</ol>
+        </div>
+      </section>
+
+      <section className="excellence-public-bridge" aria-labelledby="excellence-bridge-title">
+        <div className="gateway-width">
+          <p className="gateway-kicker">The wider journey</p>
+          <h2 id="excellence-bridge-title">Compliance first.{" "}<br /><span>Excellence next.</span></h2>
+          <p>SORP 2026 establishes important reporting requirements. Social Impact Excellence helps organisations go further, embedding impact into how they are led, managed and improved.</p>
+        </div>
+      </section>
+
+      <section id="excellence-start" className="excellence-public-access gateway-width" aria-labelledby="excellence-access-title">
+        <div><p className="gateway-kicker">Your starting point on SORP2026.org</p><h2 id="excellence-access-title">Start with<br />SORP readiness.</h2></div>
+        <div>
+          <p>Begin with SORP readiness, create your account and discover the next steps towards Social Impact Excellence.</p>
+          <Link className="gateway-action" href={site.readiness!}>Start with Are You SORP Ready? <Arrow /></Link>
+          <p className="excellence-access-note">The Social Impact Maturity Assessment is available inside your registered SORP2026 account.</p>
+          <Link className="excellence-login-link" href="/login/?return=/social-impact-excellence/">Already registered? Log in <Arrow /></Link>
+        </div>
+      </section>
+
+      <section className="excellence-public-credit gateway-width" aria-label="About My Social Impact">
+        <p>Social Impact Excellence is the flagship methodology developed by My Social Impact.</p>
+        <a href={site.msi}>Explore My Social Impact <Arrow diagonal /></a>
+      </section>
+    </main>
+  );
+  return <ExcellenceHome publicPage={publicPage} />;
+}

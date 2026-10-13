@@ -3,24 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { allProducts } from "@/lib/products";
+import { folderTabs, folderForPath } from "@/lib/products";
 import { isReadinessComplete } from "@/lib/readiness-status";
-
-const homeTab = {
-  number: "Index",
-  slug: "home",
-  tabLabel: "Home",
-  status: "Platform index",
-  href: "/",
-  className: "is-home",
-  tabColour: "#cfddcf",
-  tabInk: "#1b3931",
-};
-const folderTabs = [homeTab, ...allProducts];
-function activeFolderPath(pathname: string) {
-  const product = allProducts.find((tab) => pathname === tab.href || pathname.startsWith(tab.href));
-  return product?.href || "/";
-}
 
 export function ProductFolderTabs() {
   const pathname = usePathname();
@@ -28,7 +12,8 @@ export function ProductFolderTabs() {
   const tabStrip = useRef<HTMLElement>(null);
   const selectedTab = useRef<HTMLAnchorElement>(null);
   const normalisedPath = pathname.endsWith("/") ? pathname : `${pathname}/`;
-  const activePath = activeFolderPath(normalisedPath);
+  const activeFolder = folderForPath(normalisedPath);
+  const activePath = activeFolder.href;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -52,7 +37,7 @@ export function ProductFolderTabs() {
   }, [activePath]);
 
   return (
-    <div className="product-folder" data-active-product={activePath}>
+    <div className="product-folder" data-active-product={activePath} style={{ "--folder-paper": activeFolder.tabColour } as CSSProperties}>
       <nav ref={tabStrip} className="product-folder-tabs" aria-label="SORP2026 products">
         <div className="product-folder-tabs-track">
           {folderTabs.map((tab, index) => {

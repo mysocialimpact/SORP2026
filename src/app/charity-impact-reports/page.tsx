@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
@@ -29,7 +30,7 @@ function ReportArtwork() {
 
 export default function CharityImpactReportsPage() {
   return <main id="main" className="gateway reports-page">
-    <section id="reports-overview" className="reports-hero">
+    <FolderHero product="charity-impact-reports" id="reports-overview" className="reports-hero">
       <div className="gateway-width reports-hero-grid">
         <div className="reports-hero-copy">
           <p className="gateway-kicker">Charity Impact Reports</p>
@@ -42,7 +43,7 @@ export default function CharityImpactReportsPage() {
         </div>
         <ReportArtwork />
       </div>
-    </section>
+    </FolderHero>
 
     <section id="reports-connection" className="reports-connection gateway-width">
       <div><p className="gateway-kicker">The SORP connection</p><h2>SORP establishes the reporting framework. <span>Your impact report brings the fuller story to life.</span></h2></div>

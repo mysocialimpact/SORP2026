@@ -313,9 +313,9 @@
   margin-bottom: 15px;
 }
 .frame {
-  /* The document already offsets the fixed platform header. Add only the
-     product subnavigation here, never the platform height a second time. */
-  scroll-margin-top: 58px;
+  /* The document already offsets the fixed platform header. Leave only a
+     little breathing room, never the platform height a second time. */
+  scroll-margin-top: 12px;
   border: 1.5px solid var(--ink);
   border-top: 0;
   background: #fffdf8;
@@ -327,7 +327,7 @@
   height: max(360px, min(760px, calc(100svh - var(--platform-navigation-height, 0px) - 90px)));
 }
 .authPanel {
-  scroll-margin-top: 58px;
+  scroll-margin-top: 12px;
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   gap: 45px;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
 import { DirectorAssessment } from "@/features/director/assessment";
 import { DirectorBooking } from "@/features/director/booking";
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function MyImpactDirectorPage() {
   return (
     <main id="main" className={s.page}>
-      <section id="director-overview" className={s.hero}>
+      <FolderHero product="my-impact-director" paper="#fbf7ef" id="director-overview" className={s.hero}>
         <div className={s.heroCopy}>
           <p className={s.kicker}>
             My Impact Director
@@ -66,7 +67,7 @@ export default function MyImpactDirectorPage() {
             <strong>The humans are still in charge.</strong>
           </p>
         </div>
-      </section>
+      </FolderHero>
       <DirectorAssessment />
       <section id="director-support" className={s.service}>
         <div className={s.serviceIntro}>

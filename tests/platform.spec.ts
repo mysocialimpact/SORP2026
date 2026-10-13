@@ -3,9 +3,25 @@ import AxeBuilder from "@axe-core/playwright";
 
 const productPages = [
   ["/my-impact-director/", "Your Impact Director.Without thefull-time salary."],
-  ["/social-impact-excellence/", "Make social impact part of how your charity is run."],
+  ["/social-impact-excellence/", "Social Impact Excellence"],
   ["/charity-impact-reports/", "Go beyond SORP.Tell the full story of your impact."],
 ] as const;
+
+test("public Social Impact Excellence is transparent, concise and starts with SORP readiness", async ({ page }) => {
+  await page.route("**/api/readiness-account/**", route => route.fulfill({ status: 401, json: { signedIn: false } }));
+  await page.goto("/social-impact-excellence/");
+  const publicPage = page.locator(".excellence-public");
+  await expect(publicPage.getByRole("img", { name: "My Social Impact" })).toBeVisible();
+  await expect(publicPage.getByRole("heading", { level: 1 })).toHaveText("Social Impact Excellence");
+  await expect(publicPage).toContainText("embedded as a management discipline");
+  await expect(publicPage.locator(".excellence-public-pillars li h3")).toHaveText(["Purpose", "Leadership", "Data", "Delivery", "Communications"]);
+  await expect(publicPage.locator(".excellence-public-journey li h3")).toHaveText(["Maturity Assessment", "Diagnostic", "Blueprint", "Roadmap"]);
+  await expect(publicPage.getByRole("heading", { name: "Compliance first. Excellence next." })).toBeVisible();
+  await expect(publicPage.getByRole("link", { name: /Start with Are You SORP Ready/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
+  await expect(publicPage.getByRole("link", { name: /Already registered/ })).toHaveAttribute("href", "/login/?return=/social-impact-excellence/");
+  await expect(publicPage.locator('a[href="/social-impact-excellence/assessment/"]')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
 
 test("all five products have distinct working destinations", async ({ page }) => {
   await page.route("**/api/readiness-account/**", route => route.fulfill({ json: { signedIn: false } }));

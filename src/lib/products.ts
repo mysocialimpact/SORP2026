@@ -82,3 +82,15 @@ export const excellenceProducts: PlatformProduct[] = [
 
 export const allProducts = [...primaryProducts, ...excellenceProducts];
 
+export const homeFolder = {
+  number: "Index", slug: "home", tabLabel: "Home", status: "Platform index",
+  href: "/", className: "is-home", tabColour: "#cfddcf", tabInk: "#1b3931",
+};
+
+export const folderTabs = [homeFolder, ...allProducts];
+
+export function folderForPath(pathname: string) {
+  const path = `${pathname.replace(/\/$/, "")}/`;
+  return allProducts.find(product => path.startsWith(product.href)) || homeFolder;
+}
+
