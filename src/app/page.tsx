@@ -38,6 +38,9 @@ export default function Home() {
       </div>
       </div>
       <div className="gateway-width">
+        <p className="homepage-sorp-enthusiasm">
+          We’re excited about SORP 2026 and better charity reporting. <strong>Even more so about what charities can achieve with the insight it brings.</strong>
+        </p>
         <HomepageAudience />
         <section className="homepage-ambition" aria-labelledby="ambition-title">
           <p className="gateway-kicker">Our ambition</p>
