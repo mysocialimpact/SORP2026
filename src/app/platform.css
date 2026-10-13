@@ -11,6 +11,7 @@
 .gateway-account-control::after { display: none; }
 .gateway-account-control span { font-size: 12px; transition: transform .2s ease; }
 .gateway-account-control:hover span { transform: translate(2px, -2px); }
+.gateway-account-group{display:flex;align-items:center;gap:8px}.gateway-founder-control{display:inline-flex;align-items:center;gap:7px;background:#202027;color:#fff!important;border-radius:999px;padding:10px 14px!important;min-height:40px;font-weight:700}.gateway-founder-control::after{display:none}.gateway-founder-control svg{color:#caff3d}
 
 /* The shared product shell: stationery dividers in one SORP2026 folder. */
 .product-folder {
@@ -475,6 +476,8 @@
 .dashboard-card > a { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid currentColor; padding-top: 15px; margin-top: auto; font-size: 13px; font-weight: 600; }
 .dashboard-state { min-height: 450px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 20px; }
 .dashboard-state h2 { font-size: clamp(40px, 5vw, 70px); max-width: 780px; }
+.dashboard-private-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 38px}.dashboard-private-tools>.dashboard-state{min-height:0;padding:34px;background:#e5ede4}.dashboard-private-tools>.dashboard-state--founder{background:#202027;color:#fff}.dashboard-private-tools>.dashboard-state--founder .gateway-kicker{color:#caff3d}.dashboard-private-tools>.dashboard-state h2{font-size:clamp(32px,4vw,56px);margin:0}.dashboard-consent-actions{display:flex;gap:10px}.dashboard-consent-actions button{border:1px solid #202027;background:#202027;color:#fff;padding:12px 16px;font:inherit;font-weight:700}.dashboard-consent-actions button+button{background:transparent;color:#202027}.dashboard-consent-notice{grid-column:1/-1;padding:12px 16px;background:#dcebdc}
+@media(max-width:720px){.dashboard-private-tools{grid-template-columns:1fr}.dashboard-private-tools>.dashboard-state{padding:24px}.dashboard-consent-actions{display:grid;width:100%}}
 
 .review-intake-page { min-height: 75vh; padding: 28px 0 100px; }
 .review-back { margin-bottom: 55px; font-size: 13px; }

@@ -7,8 +7,7 @@ type FounderIdentity = { id?: string; email: string; name?: string };
 
 export async function founderIdentity(cookie?: string): Promise<FounderIdentity> {
   const origin = process.env.SORP_BACKEND_ORIGIN;
-  const founderEmail = (process.env.FOUNDER_EMAIL || process.env.ADMIN_EMAIL || "").trim().toLowerCase();
-  if (!origin || !founderEmail) throw new AccessError(503, "Founder access needs configuration.");
+  if (!origin) throw new AccessError(503, "Founder access needs configuration.");
   if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
   let response: Response;
   try {
@@ -18,8 +17,8 @@ export async function founderIdentity(cookie?: string): Promise<FounderIdentity>
   const data = await response.json();
   const account = data.account;
   if (data.signedIn !== true || !account || typeof account.email !== "string") throw new AccessError(401, "Please log in again.");
-  if (account.email.trim().toLowerCase() !== founderEmail) throw new AccessError(403, "This control centre is private to the founder.");
-  return { id: typeof account.id === "string" ? account.id : undefined, email: account.email.trim().toLowerCase(), name: typeof account.name === "string" ? account.name : undefined };
+  if (typeof account.id !== "string" || data.platformAccess?.founder !== true) throw new AccessError(403, "This control centre is private to authorised platform administrators.");
+  return { id: account.id, email: account.email.trim().toLowerCase(), name: typeof account.name === "string" ? account.name : undefined };
 }
 
 export async function protectFounderPage() {

@@ -2,6 +2,7 @@
 -- This is an entitlement and relationship ledger; no users or assessments are copied here.
 CREATE TABLE IF NOT EXISTS research_console.founder_organisations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text NOT NULL, type text NOT NULL CHECK (type IN ('Charity','Adviser','Other')),
+  platform_organisation_id text,
   plan text NOT NULL DEFAULT 'Free' CHECK (plan IN ('Free','Plus','Adviser','Enterprise')),
   published_price numeric(10,2) NOT NULL DEFAULT 0, payable_price numeric(10,2) NOT NULL DEFAULT 0,
   complimentary boolean NOT NULL DEFAULT false, complimentary_start timestamptz, complimentary_end timestamptz,
@@ -28,6 +29,12 @@ CREATE TABLE IF NOT EXISTS research_console.founder_audit_log (
 );
 CREATE INDEX IF NOT EXISTS founder_org_name_idx ON research_console.founder_organisations(name);
 CREATE INDEX IF NOT EXISTS founder_membership_email_idx ON research_console.founder_memberships(lower(email));
+ALTER TABLE research_console.founder_organisations ADD COLUMN IF NOT EXISTS platform_organisation_id text;
+CREATE UNIQUE INDEX IF NOT EXISTS founder_org_platform_id_idx ON research_console.founder_organisations(platform_organisation_id) WHERE platform_organisation_id IS NOT NULL;
 INSERT INTO research_console.founder_organisations(name,type,plan,published_price,payable_price,complimentary,complimentary_start,complimentary_reason)
 SELECT 'FLUID','Adviser','Adviser',99,0,true,now(),'Complimentary Partner'
 WHERE NOT EXISTS (SELECT 1 FROM research_console.founder_organisations WHERE lower(name)=lower('FLUID'));
+UPDATE research_console.founder_organisations SET platform_organisation_id='fluid-adviser' WHERE lower(name)=lower('FLUID') AND platform_organisation_id IS NULL;
+INSERT INTO research_console.founder_organisations(name,type,platform_organisation_id,plan,published_price,payable_price,complimentary,complimentary_reason)
+SELECT 'Brainstrust','Charity','brainstrust','Free',0,0,false,NULL
+WHERE NOT EXISTS (SELECT 1 FROM research_console.founder_organisations WHERE lower(name)=lower('Brainstrust'));

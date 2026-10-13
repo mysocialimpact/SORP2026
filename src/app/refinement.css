@@ -40,6 +40,7 @@ body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigat
   .platform-sticky-navigation .gateway-wordmark { font-size: 25px; }
   .platform-sticky-navigation .gateway-tagline { display: block; border: 0; margin: 3px 0 0; padding: 0; font-size: 8px; letter-spacing: .06em; }
   .platform-sticky-navigation .gateway-account-control { grid-column: 2; grid-row: 1; padding: 8px 12px; font-size: 12px; }
+  .platform-sticky-navigation .gateway-account-group{grid-column:2;grid-row:1;justify-self:end;gap:3px}.platform-sticky-navigation .gateway-founder-control{padding:8px 9px!important;min-height:34px;font-size:11px}.platform-sticky-navigation .gateway-account-group .gateway-account-control{grid-column:auto;grid-row:auto}
   .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; font-size: 10px; }
   .platform-sticky-navigation .product-folder-tabs { padding-top: 6px; }
   .platform-sticky-navigation .product-folder-tab { min-height: 60px; width: 168px; flex-basis: 168px; padding: 8px 12px; }
