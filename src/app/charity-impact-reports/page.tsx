@@ -2,39 +2,72 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
-import { ProductAdviserNote } from "@/components/product-adviser-note";
 import { site } from "@/lib/site";
+import "./reports.css";
 
 export const metadata: Metadata = {
-  title: "Charity Impact Reports",
-  description: "Professional review of your charity's existing impact report, or help developing a complete Charity Impact Report.",
+  title: "Charity Impact Reports | Go beyond SORP 2026",
+  description: "Bring together powerful stories, stronger evidence and clear methodology in a Charity Impact Report that goes beyond the statutory minimum.",
   ...(site.live ? { alternates: { canonical: "/charity-impact-reports/" } } : {}),
 };
 
+function ReportArtwork() {
+  return <div className="reports-artwork" aria-hidden="true">
+    <div className="reports-artwork-sheet reports-artwork-story">
+      <span>THE HUMAN STORY</span><strong>People.<br/>Change.<br/>Possibility.</strong><i />
+    </div>
+    <div className="reports-artwork-sheet reports-artwork-evidence">
+      <span>EVIDENCE</span><div className="reports-artwork-chart"><i/><i/><i/><i/></div><small>OUTCOMES · LEARNING · CONTEXT</small>
+    </div>
+    <div className="reports-artwork-sheet reports-artwork-cover">
+      <small>YOUR FULLER IMPACT STORY</small>
+      <Image src="/product/charity-impact-reports.png" alt="" width={1787} height={887} priority />
+      <span>Stories / evidence / methodology</span>
+    </div>
+  </div>;
+}
+
 export default function CharityImpactReportsPage() {
-  return <main id="main" className="gateway product-page product-reports">
-    <section id="reports-overview" className="product-hero gateway-width">
-      <div className="product-hero-copy">
-        <p className="gateway-kicker">03 · Human-led service · Available now</p>
-        <h1>Is your impact report telling the <em>whole story?</em></h1>
-        <p className="product-lead">Upload your existing impact report for a professional written review and a one-hour discussion about how to make it stronger.</p>
-        <Link className="gateway-action" href="/charity-impact-reports/review/">Get your report reviewed · £100 <Arrow /></Link>
-        <p className="product-hero-note">Written review and expert meeting. No automated AI analysis.</p>
+  return <main id="main" className="gateway reports-page">
+    <section id="reports-overview" className="reports-hero">
+      <div className="gateway-width reports-hero-grid">
+        <div className="reports-hero-copy">
+          <p className="gateway-kicker">Charity Impact Reports</p>
+          <h1>Go beyond SORP.<br/><span>Tell the full story of your impact.</span></h1>
+          <p className="reports-hero-lead">SORP 2026 asks charities to explain the difference they make. Your impact report gives you room to go further — with powerful stories, compelling pictures, stronger evidence and the methodology behind your results.</p>
+          <div className="reports-hero-actions">
+            <Link className="gateway-action" href="/are-you-sorp-ready/review/?entry=intro">Start with Are You SORP Ready? <Arrow /></Link>
+            <Link className="reports-login-link" href="/login/?return=/charity-impact-reports/review/">Already registered? Log in</Link>
+          </div>
+        </div>
+        <ReportArtwork />
       </div>
-      <div className="product-brand-panel is-reports"><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887} priority /></div>
     </section>
-    <section id="reports-why" className="product-statement gateway-width"><p className="gateway-kicker">Reporting beyond the statutory minimum</p><h2>A richer account of the difference you make.</h2><p>A separate impact report can bring evidence, beneficiary stories, outcomes, photographs and learning to life. It can complement and, where permitted, be signposted from the Trustees’ Annual Report—but it does not replace mandatory disclosures.</p></section>
-    <section id="reports-review" className="report-offer gateway-width">
-      <header><p className="gateway-kicker">A deliberately simple service</p><h2>Written review + 60-minute meeting</h2><strong>£100</strong></header>
-      <ol>{[
-        "Sign in with your SORP2026 account.", "Upload your most recent impact report securely.", "Pay £100 through secure checkout.",
-        "My Social Impact reviews strengths, weaknesses, evidence and clarity.", "Receive practical written feedback.", "Book a 60-minute meeting to discuss it.",
-      ].map((step, index) => <li key={step}><span>{String(index + 1).padStart(2, "0")}</span>{step}</li>)}</ol>
-      <p className="report-caveat">A professional review of an existing document—not a regulatory audit, formal assurance engagement or AI-generated analysis.</p>
+
+    <section id="reports-connection" className="reports-connection gateway-width">
+      <div><p className="gateway-kicker">The SORP connection</p><h2>SORP establishes the reporting framework. <span>Your impact report brings the fuller story to life.</span></h2></div>
+      <div className="reports-connection-note">
+        <p>The published Charities SORP 2026 allows relevant additional material—including an impact assessment—to sit within or accompany the accounts. It also makes clear that information outside the statutory framework is not a substitute for good statutory reporting.</p>
+        <a href="https://www.charitysorp.org/download-a-full-sorp" target="_blank" rel="noreferrer">Read the official SORP · Module 1, paragraphs 1.5 and 1.33 <Arrow diagonal /></a>
+      </div>
     </section>
-    <section id="reports-full" className="product-split product-dark is-reports"><div className="gateway-width"><div><p className="gateway-kicker">A more substantial project</p><h2>Need the full report?</h2><strong className="product-price">From £1,000</strong></div><div><p>My Social Impact can help develop your Charity Impact Report: shaping the evidence, structure, analysis, writing and story around the difference your charity makes.</p><p>This is separate from the £100 review of an existing document.</p><a href="mailto:marcus@mysocialimpact.org?subject=Full%20Charity%20Impact%20Report%20from%20%C2%A31%2C000">Enquire about full report development <Arrow diagonal /></a></div></div></section>
-    <ProductAdviserNote title="Strengthen the story alongside the accounts.">Accountants and advisers can recommend the £100 review to charity clients who want clearer impact communication alongside strong financial reporting. We work alongside the existing adviser, not instead of them.</ProductAdviserNote>
+
+    <section id="reports-value" className="reports-value">
+      <div className="gateway-width">
+        <header><p className="gateway-kicker">More than a report</p><h2>Evidence of real change.</h2></header>
+        <div className="reports-value-grid">
+          <article><span>01</span><h3>Stories</h3><p>Bring your impact to life.</p></article>
+          <article><span>02</span><h3>Evidence</h3><p>Show what has changed.</p></article>
+          <article><span>03</span><h3>Credibility</h3><p>Explain how you know.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="reports-review" className="reports-review gateway-width">
+      <div><p className="gateway-kicker">Expert human support</p><h2>Make a good report stronger.</h2></div>
+      <div><p>My Social Impact can review your existing charity impact report and help you make it stronger.</p><p className="reports-review-gate">Complete your free SORP readiness review first. Once it is saved to your account, the report-review service unlocks as your next step.</p><Link className="gateway-action" href="/charity-impact-reports/review/">Open report review <Arrow /></Link></div>
+    </section>
+
     <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow /></Link></nav>
   </main>;
 }
-
