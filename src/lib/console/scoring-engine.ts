@@ -164,7 +164,7 @@ function qualifies(
         c &&
         namedInContext &&
         /\bDChA\b|Diploma in Charity Accounting/i.test(text) &&
-        /FCA.{0,10}DChA|DChA.{0,80}(?:credentials|qualif)|holds.{0,40}DChA|awarded.{0,40}DChA/i.test(
+        /FCA.{0,10}DChA|DChA.{0,80}(?:credentials|qualif)|(?:completed|holds|awarded).{0,40}(?:DChA|Diploma in Charity Accounting)/i.test(
           text,
         )
       );

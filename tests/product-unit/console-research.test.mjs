@@ -81,6 +81,8 @@ test("extraction rejects unsupported people, qualifications, identity and refere
     ],
   };
   assert.equal(validateExtraction(data, p), data);
+  const withoutQualifications = { ...data, people: [{ ...data.people[0], qualifications: [] }] };
+  assert.equal(validateExtraction(withoutQualifications, p), withoutQualifications);
   assert.throws(() =>
     validateExtraction({ ...data, identity_matches: false }, p),
   );

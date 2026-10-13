@@ -216,6 +216,24 @@ async function main() {
     [retry.id],
   );
   assert.equal(Number(rejected[0].estimated_usd), 0);
+  mode = "success";
+  const deniedReuse = await startResearch(firm.id, "Do not reuse flagged evidence", { refresh: true });
+  const beforeDenied = calls;
+  await runResearch(deniedReuse.id, { reuseSearchRunId: run.id });
+  assert.equal(calls, beforeDenied);
+  assert.equal((await report(firm.id)).runs[0].status, "failed");
+  const fresh = await startResearch(firm.id, "New source search", { refresh: true });
+  await runResearch(fresh.id);
+  const oldAssessments = await query("SELECT id,md5(row_to_json(a)::text) fingerprint FROM research_console.assessments a WHERE firm_id=$1 ORDER BY id", [firm.id]);
+  const reprocessed = await startResearch(firm.id, "Reprocess saved search", { refresh: true });
+  const beforeReuse = calls;
+  await runResearch(reprocessed.id, { reuseSearchRunId: fresh.id });
+  assert.equal(calls, beforeReuse + 1, "Reprocessing pays only for extraction, not another web search");
+  const reprocessedReport = await report(firm.id);
+  assert.equal(reprocessedReport.runs[0].status, "collected");
+  assert.equal(reprocessedReport.people.length, 1, "Reprocessing does not duplicate people");
+  assert.ok(reprocessedReport.evidence.filter(e=>e.run_id===reprocessed.id).every(e=>e.provenance?.reusedSearchRunId===fresh.id));
+  assert.deepEqual(await query("SELECT id,md5(row_to_json(a)::text) fingerprint FROM research_console.assessments a WHERE id=ANY($1::uuid[]) ORDER BY id", [oldAssessments.map(a=>a.id)]), oldAssessments);
   mode = "transport-error";
   await assert.rejects(
     response("Transport failure test", {

@@ -10,6 +10,7 @@ import { automaticAssessment } from "../src/lib/console/automatic-assessment";
 async function main() {
   const production = process.argv.includes("--production");
   const reuseEvidence = process.argv.includes("--reuse-evidence");
+  const reuseSearch = process.argv.includes("--reuse-search");
   if (process.env.VERCEL_ENV !== (production ? "production" : "preview"))
     throw new Error(
       "Live validation requires the isolated Vercel preview environment.",
@@ -40,12 +41,12 @@ async function main() {
       created.firm ??
       (created.matches?.length === 1 ? created.matches[0] : null);
     assert.ok(firm, "Discovered identity must resolve to one saved firm");
-    const savedRun = reuseEvidence ? (await query<{ id: string }>(
+    const savedRun = reuseEvidence || reuseSearch ? (await query<{ id: string }>(
       "SELECT r.id FROM research_console.runs r WHERE r.firm_id=$1 AND r.status='collected' AND EXISTS(SELECT 1 FROM research_console.ai_usage u WHERE u.run_id=r.id AND u.purpose='firm-research' AND u.status='completed') ORDER BY r.completed_at DESC LIMIT 1",
       [firm.id],
     ))[0] : null;
-    if (reuseEvidence) assert.ok(savedRun, "Rescoring requires a completed real OpenAI research run");
-    const run = savedRun ? { ...savedRun, created: false } : await startResearch(
+    if (reuseEvidence || reuseSearch) assert.ok(savedRun, "Reprocessing requires a completed real OpenAI research run");
+    const run = reuseEvidence && savedRun ? { ...savedRun, created: false } : await startResearch(
       firm.id,
       "Live OpenAI workflow validation",
       { refresh: true },
@@ -53,13 +54,14 @@ async function main() {
     if (reuseEvidence) await automaticAssessment(firm.id, "Validate corrected scoring against saved live OpenAI evidence", { runId: run.id });
     else {
       assert.ok(run.created, "Validation needs a new real research run");
-      await runResearch(run.id);
+      await runResearch(run.id, reuseSearch ? { reuseSearchRunId: savedRun!.id } : {});
     }
     const saved = await report(firm.id);
     const assessment = saved.assessments.find((a) => a.run_id === run.id);
     assert.ok(assessment, "Live run must save a complete assessment");
     const rows = saved.evidence.filter((e) => e.run_id === run.id);
     assert.ok(rows.length >= 3, "Live run must save source-backed evidence");
+    assert.ok(saved.people.length > 0, "Live research must identify people from the cited staff profiles");
     assert.equal(Object.keys(assessment.scores).length, 5);
     assert.equal(
       Object.values(assessment.scores).reduce((sum, n) => sum + n, 0),
@@ -115,6 +117,7 @@ async function main() {
         awards: awards.length,
         cacheReused: true,
         researchReused: reuseEvidence,
+        searchReused: reuseSearch,
       }),
     );
   }
