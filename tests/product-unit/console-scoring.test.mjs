@@ -27,3 +27,17 @@ test('a separate missing qualification never becomes an affirmative qualificatio
  const r=score([evidence('Jane Smith FCA is the senior partner responsible for charity audit. No DChA qualification was verified.')]);
  assert.ok(r.awards.some(a=>a.criterion_id==='B1'));assert.equal(r.awards.some(a=>a.criterion_id==='B2'),false);
 });
+
+test('markdown and longer negative charity findings cannot turn generic directors into specialists',()=>{
+ const r=score([evidence('The team page names **Jane Smith FCA – Director** and says she is the main contact for corporate clients. I did **not** see any charity-specific responsibility or specialist charity qualification such as **DChA** on that page.',{category:'people',url:'https://firm.example/about-us/meet-the-team'})]);
+ assert.equal(r.scores.people,0);
+});
+test('charity audit requirements in factsheets are not an offer of charity audit services',()=>{
+ const r=score([evidence('The closest page only says the charity factsheet covers trustees responsibilities with emphasis on accounting and audit requirements.',{category:'sorp',url:'https://firm.example/factsheets/specialist-areas'})]);
+ assert.equal(r.scores.services,0);
+});
+
+test('historic charity employment does not establish a current senior charity responsibility',()=>{
+ const r=score([evidence('The people page names Jonathan Coyle as Partner. In his profile, he says he first worked at a youth charity, was responsible for getting the books in order, and joined the firm as a trainee accountant.',{category:'people',url:'https://firm.example/people/'})]);
+ assert.equal(r.awards.some(a=>a.criterion_id==='B1'),false);
+});

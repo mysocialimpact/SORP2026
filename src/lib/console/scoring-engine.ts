@@ -28,7 +28,7 @@ const technical =
 const substantive =
   /(?:three|3)[ -]tier|tiers?.{0,80}(?:£|\d)|leases?.{0,100}(?:balance sheet|right.of.use|liabilit|recogn)|(?:recognis|recogniz).{0,100}(?:leases?|revenue|income)|reserves.{0,60}(?:disclos|required)|(?:eligible|exempt|threshold).{0,100}(?:accrual|receipts|£|\d)|(?:income|revenue).{0,100}(?:recognition|contract|performance)|disclosures?.{0,80}(?:must|required|threshold)/i;
 const negative =
-  /\b(?:no|not|without|lacks?|unverified|unconfirmed)\b.{0,45}(?:evidence|website|named|specialist|DChA|qualification|SORP|client|publication|service|case stud|speaking)|\bnot necessarily\b|\bnetwork.wide\b/i;
+  /\b(?:no|not|without|lacks?|unverified|unconfirmed)\b.{0,80}(?:evidence|website|named|specialist|DChA|qualification|SORP|client|publication|service|case stud|speaking|charit|responsib)|\bnot necessarily\b|\bnetwork.wide\b/i;
 const names = (text: string) => [
   ...new Set(
     (
@@ -103,6 +103,7 @@ function qualifies(
     case "A2":
       return (
         official &&
+        !/factsheets?|\/resources?\//i.test(url) &&
         c &&
         service.test(text) &&
         /we (?:provide|offer|prepare|audit|help|can assist)|our (?:services|audit|charity)|(?:page|service).{0,60}(?:covers|lists|describes|prepar|audit)|audits charities|independent examination of charity/i.test(
@@ -136,7 +137,7 @@ function qualifies(
         /partner|director|head|lead|senior|principal|consultant|presenter/i.test(
           text,
         ) &&
-        /specialis|responsib|charity.{0,30}(?:audit|account|work|team)|third sector|charit(?:y|ies).{0,35}(?:course|training)/i.test(
+        /(?:specialis|responsib|head|lead).{0,55}(?:charit|not[ -]for[ -]profit)|charit(?:y|ies).{0,30}(?:audit|account|work|team)|third sector|charit(?:y|ies).{0,35}(?:course|training)/i.test(
           text,
         )
       );
@@ -308,7 +309,7 @@ export function scoreEvidence(
       // A missing qualification/client finding must not erase a separate,
       // affirmative service or speaking finding. Keep mixed/negated sentences
       // conservative; 'not-for-profit' itself is never a negation.
-      const affirmative = text
+      const affirmative = text.replace(/[*_`]/g, "")
         .split(/(?<=[.!?])\s+(?=[A-Z*])/)
         .filter((sentence) =>
           !negative.test(sentence.replace(/\bnot[ -]for[ -]profit\b/gi, "nonprofit")),
