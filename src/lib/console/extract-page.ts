@@ -13,7 +13,9 @@ const categories: Record<Category, RegExp> = {
 };
 export function linkKind(url: string) {
   const path = new URL(url).pathname;
-  return /team|people|partner|staff|leadership|our-experts/i.test(path)
+  return /team|people|partners?(?:\/|$)|staff|leadership|our-experts/i.test(
+    path,
+  )
     ? "people"
     : /contact|office|location/i.test(path)
       ? "offices"

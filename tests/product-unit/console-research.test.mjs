@@ -164,3 +164,58 @@ test("mixed-source paragraphs cannot attribute every claim to either source", ()
   ];
   assert.deepEqual(citedPassages(response(text, annotations)), []);
 });
+
+test("technical charity articles do not masquerade as dedicated service pages", () => {
+  const e = {
+    id: "article",
+    state: "Current",
+    source_type: "Firm website",
+    url: "https://practice.example/lease-accounting-rules-charity/",
+    summary:
+      "If your organisation is an unincorporated charity and has income below £500,000, it is possible to avoid these lease changes by adopting receipts and payments accounts instead.",
+  };
+  assert.ok(
+    !scoreEvidence([e], {
+      sufficient: true,
+      firmName: "Example Practice",
+    }).awards.some((a) => a.criterion_id === "A1"),
+  );
+});
+test("testimonials and firm names cannot masquerade as named charity specialists", () => {
+  const e = {
+    id: "review",
+    state: "Current",
+    source_type: "Firm website",
+    url: "https://practice.example/charities/",
+    summary:
+      "As quality assurance partner in a previous role, I can highly recommend Example Practice. Their major strength is specialist accounting and legal expertise in their not-for-profit department.",
+  };
+  assert.equal(
+    scoreEvidence([e], { sufficient: true, firmName: "Example Practice" })
+      .scores.people,
+    0,
+  );
+  const company = {
+    ...e,
+    summary:
+      "Example Practice is a specialist charity audit partner responsible for charity accounting services.",
+  };
+  assert.equal(
+    scoreEvidence([company], { sufficient: true, firmName: "Example Practice" })
+      .scores.people,
+    0,
+  );
+});
+test("explicit charity financial-statement services earn supported service criteria", () => {
+  const e = {
+    id: "service",
+    state: "Current",
+    source_type: "Firm website",
+    url: "https://practice.example/business-sectors/charities/",
+    summary:
+      "Publishing high quality annual financial statements is a cornerstone of excellence in charity accountability; we can assist you with this.",
+  };
+  const result = scoreEvidence([e], { sufficient: true });
+  assert.ok(result.awards.some((a) => a.criterion_id === "A1"));
+  assert.ok(result.awards.some((a) => a.criterion_id === "A2"));
+});

@@ -20,7 +20,7 @@ export type Award = {
 const charity =
   /charit(?:y|ies|able)|not[ -]for[ -]profit|non[ -]profit|third sector/i;
 const service =
-  /account(?:ing|s)|audit|independent examin|financial reporting/i;
+  /account(?:ing|s)|audit|independent examin|financial (?:reporting|statements)/i;
 const technical =
   /tier(?:ed|s)?|leases?|revenue recognition|income recognition|cash.flow|disclosures?|restricted funds|reporting requirements|thresholds?|FRS\s*102|trustees.? (?:annual )?report/i;
 // A topic label or promise of advice is not technical analysis. Require an
@@ -43,14 +43,38 @@ const names = (text: string) => [
     ),
   ),
 ];
-function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
+function qualifies(
+  id: string,
+  e: ScoringEvidence,
+  text: string,
+  firmName = "",
+): boolean {
   const url = e.url ?? "",
     official = e.source_type === "Firm website",
     external =
       e.source_type === "External" ||
       (e.source_type === "ICAEW" && !/find\.icaew\.com/i.test(url));
+  const firmWords = new Set(
+    firmName
+      .toLowerCase()
+      .replace(/[^a-z ]/g, " ")
+      .split(/\s+/)
+      .filter(Boolean),
+  );
+  const personNames = names(text).filter(
+    (n) =>
+      !n
+        .toLowerCase()
+        .split(/\s+/)
+        .every((word) => firmWords.has(word)),
+  );
   const c = charity.test(text),
-    named = names(text).length > 0;
+    named = personNames.length > 0;
+  if (
+    /^B[1-4]$/.test(id) &&
+    /recommend|testimonial|as (?:a|our) client|in a previous role/i.test(text)
+  )
+    return false;
   const namedInContext =
     named ||
     /\/(?:team|people|meet-the-speakers)\/[a-z]+-[a-z]+\/?$/i.test(
@@ -63,7 +87,15 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
         c &&
         service.test(text) &&
         !/factsheets?|\/resources?\//i.test(url) &&
-        (/\/(?:[^/]*charit[^/]*|[^/]*not-for-profit[^/]*)(?:\/|$)/i.test(url) ||
+        /(?:we|our).{0,80}(?:provid|offer|assist|servic|audit|team)|(?:dedicated|specialist).{0,45}(?:page|servic|team)/i.test(
+          text,
+        ) &&
+        (/\/(?:services?|(?:business-)?sectors?|expertise)\/[^?#]*(?:charit|not-for-profit)/i.test(
+          url,
+        ) ||
+          /\/(?:charit(?:y|ies)|not-for-profit)(?:-(?:accountants|accounting|services|audit))?\/?$/i.test(
+            new URL(url).pathname,
+          ) ||
           /dedicated.{0,35}(?:charit|not.for.profit).{0,35}(?:page|service)/i.test(
             text,
           ))
@@ -73,7 +105,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
         official &&
         c &&
         service.test(text) &&
-        /we (?:provide|offer|prepare|audit|help)|our (?:services|audit|charity)|(?:page|service).{0,60}(?:covers|lists|describes|prepar|audit)|audits charities|independent examination of charity/i.test(
+        /we (?:provide|offer|prepare|audit|help|can assist)|our (?:services|audit|charity)|(?:page|service).{0,60}(?:covers|lists|describes|prepar|audit)|audits charities|independent examination of charity/i.test(
           text,
         )
       );
@@ -120,7 +152,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
     case "B3":
       return (
         c &&
-        names(text).length >= 2 &&
+        personNames.length >= 2 &&
         /charity.{0,30}specialists|specialists.{0,30}charity|charity.{0,30}(?:partners|team)/i.test(
           text,
         )
@@ -243,7 +275,7 @@ function qualifies(id: string, e: ScoringEvidence, text: string): boolean {
 }
 export function scoreEvidence(
   evidence: ScoringEvidence[],
-  options: { sufficient: boolean; rubric?: Criterion[] },
+  options: { sufficient: boolean; rubric?: Criterion[]; firmName?: string },
 ) {
   const rubric = validateRubric(options.rubric ?? provisionalRubric);
   if (!options.sufficient)
@@ -273,7 +305,11 @@ export function scoreEvidence(
         continue;
       // Imported notes are paraphrases, not quotations. Live extracts are verbatim page passages.
       const text = e.summary.replace(/\s+/g, " ").trim();
-      if (negative.test(text) || !qualifies(criterion.id, e, text)) continue;
+      if (
+        negative.test(text) ||
+        !qualifies(criterion.id, e, text, options.firmName)
+      )
+        continue;
       const group = ["C3", "E1", "E3"].includes(criterion.id)
         ? "training-event"
         : ["C1", "C2", "E2"].includes(criterion.id)

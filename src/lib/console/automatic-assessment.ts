@@ -112,13 +112,14 @@ export async function automaticAssessment(
     );
     const sufficient =
       Boolean(pilot && historical) ||
-      (sources.length >= 3 &&
+      (new Set(sources.map((s) => s.url)).size >= 3 &&
         (evidence.some((e) => e.provenance?.kind === "openai-search")
           ? evidence.some((e) => e.provenance?.coverageComplete === true)
-          : relevant.length >= 2));
+          : new Set(relevant.map((s) => s.url)).size >= 2));
     const result = scoreEvidence(evidence, {
       sufficient,
       rubric: method.rubric,
+      firmName: firm.name,
     });
     if (result.total === null) return result;
     for (const award of result.awards)
