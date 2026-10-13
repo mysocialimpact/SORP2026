@@ -9,7 +9,15 @@ async function call(path:string, init?:RequestInit) { const response = await fet
 export function FounderCentre() {
   const [data,setData] = useState<Dashboard|null>(null); const [error,setError] = useState(""); const [selected,setSelected] = useState<Org|null>(null); const [q,setQ] = useState(""); const [busy,setBusy] = useState(false); const [notice,setNotice] = useState("");
   const load = async () => { try { setData(await call("dashboard")); setError(""); } catch(e) { setError(e instanceof Error?e.message:"Unable to open control centre."); } };
-  useEffect(()=>{void load();},[]);
+  useEffect(()=>{
+    let active = true;
+    void call("dashboard").then(result => {
+      if (active) { setData(result); setError(""); }
+    }).catch(e => {
+      if (active) setError(e instanceof Error ? e.message : "Unable to open control centre.");
+    });
+    return () => { active = false; };
+  },[]);
   const createOrg = async () => { const name = window.prompt("Organisation name"); if (!name) return; const type = window.prompt("Type: Charity, Adviser or Other", "Charity") || "Charity"; try { setBusy(true); await call("organisations",{method:"POST",body:JSON.stringify({name,type})}); setNotice("Organisation created."); await load(); } catch(e) { setError(e instanceof Error?e.message:"Unable to create organisation."); } finally { setBusy(false); } };
   const updatePlan = async (event:React.FormEvent<HTMLFormElement>) => { event.preventDefault(); if (!selected) return; const form = new FormData(event.currentTarget); try { setBusy(true); await call(`organisation/${selected.id}/plan`,{method:"POST",body:JSON.stringify({plan:form.get("plan"),complimentary:form.get("complimentary")==="on",duration:form.get("duration"),expiry:form.get("expiry"),reason:form.get("reason")})}); setNotice("Entitlement updated and recorded in the audit trail."); await load(); setSelected(null); } catch(e) { setError(e instanceof Error?e.message:"Unable to update entitlement."); } finally { setBusy(false); } };
   if (error && !data) return <div className="founder-shell"><p className="founder-kicker">Founder Control Centre</p><h1>We couldn’t open the control centre.</h1><p role="alert">{error}</p></div>;
