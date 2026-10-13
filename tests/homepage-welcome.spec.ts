@@ -95,12 +95,9 @@ test("contact form recognises accounts and confirms only an accepted server resp
   await expect(form.getByLabel("Email address")).toHaveValue("preview@example.org");
   await expect(form.getByLabel("Email address")).toHaveAttribute("required", "");
   await expect(form.getByLabel("Anything you’d like to share?")).not.toHaveAttribute("required");
-  const consent = form.getByRole("checkbox");
-  await expect(consent).not.toBeChecked();
-  await consent.check();
-  await expect(consent).toBeChecked();
+  await expect(form.getByRole("checkbox")).toHaveCount(0);
   await form.getByRole("button", { name: "Say hello" }).click();
   await expect(form).toContainText("has been emailed to My Social Impact");
   expect(writes).toHaveLength(1);
-  expect(writes[0]).toMatchObject({ email: "preview@example.org", newsletter: true });
+  expect(writes[0]).toMatchObject({ email: "preview@example.org", newsletter: false });
 });
