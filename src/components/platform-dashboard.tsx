@@ -73,6 +73,8 @@ export function PlatformDashboard({ signedInCelebration = false }: { signedInCel
   const [excellence, setExcellence] = useState<ExcellenceProgress | null>(null);
   const [reportReviews, setReportReviews] = useState<ReportReview[]>([]);
   const [teamWorkspace, setTeamWorkspace] = useState<TeamWorkspaceSummary | null>(null);
+  const [director, setDirector] = useState<{ data: { ratings: number[]; completed: boolean } } | null>(null);
+  const [directorUnavailable, setDirectorUnavailable] = useState(false);
   const [showSignedIn, setShowSignedIn] = useState(signedInCelebration);
   useEffect(() => {
     if (!signedInCelebration) return;
@@ -106,6 +108,15 @@ export function PlatformDashboard({ signedInCelebration = false }: { signedInCel
       if (reviewResult.response.ok) setReportReviews(reviewResult.payload.reviews || []);
       if (teamResult.response.ok) setTeamWorkspace(teamResult.payload);
     }).catch(() => undefined);
+    return () => controller.abort();
+  }, [data?.signedIn]);
+  useEffect(() => {
+    if (!data?.signedIn) return;
+    const controller = new AbortController();
+    void fetch("/api/impact-director/", { cache: "no-store", signal: controller.signal }).then(async response => {
+      if (!response.ok) throw new Error("Unavailable");
+      const payload = await response.json(); setDirector(payload.progress); setDirectorUnavailable(false);
+    }).catch(() => { if (!controller.signal.aborted) setDirectorUnavailable(true); });
     return () => controller.abort();
   }, [data?.signedIn]);
   async function signOut() {
@@ -146,7 +157,7 @@ export function PlatformDashboard({ signedInCelebration = false }: { signedInCel
     { number: "03", name: "Charity Impact Reports", status: reportPercent === 100 ? "Complete" : reportPercent > 0 ? "In progress" : "Not started", percentage: reportPercent },
     { number: "04", name: "Social Impact Excellence", status: excellencePercent === 100 ? "Complete" : excellencePercent > 0 ? "In progress" : "Not started", percentage: excellencePercent },
     { number: "05", name: "Purpose Works", status: "Not started", percentage: 0 },
-    { number: "06", name: "My Impact Director", status: "Not started", percentage: 0 },
+    { number: "06", name: "My Impact Director", status: directorUnavailable ? "Progress unavailable" : director?.data.completed ? "Started · snapshot complete" : director ? "Snapshot in progress" : "Not started", percentage: director?.data.completed ? 100 : Math.round((director?.data.ratings.filter(Boolean).length || 0) / 21 * 100), unavailable: directorUnavailable },
   ];
   return <>
     <FounderConsoleLink />
@@ -178,7 +189,7 @@ export function PlatformDashboard({ signedInCelebration = false }: { signedInCel
         <article className="dashboard-card is-reports"><div className="dashboard-card-top"><span>03</span><b>{latestReportReview ? latestReportReview.feedbackReady ? "Feedback ready" : latestReportReview.status === "awaiting_payment" ? "Report uploaded" : latestReportReview.status.replaceAll("_", " ") : "Available"}</b></div><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887}/><p>{latestReportReview ? latestReportReview.filename : "£100 written review and a 60-minute expert discussion."}</p><Link href="/charity-impact-reports/review/">{latestReportReview ? "View review status" : "Start report review"} <Arrow /></Link></article>
         <article className="dashboard-card is-excellence"><div className="dashboard-card-top"><span>04</span><b>{teamActive ? `Team · ${teamCompleted} complete` : excellenceLabel}</b></div><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200}/>{excellence?.data?.migration?.source === "legacy-social-impact-excellence" ? <p className="dashboard-context">Your previous assessment has been brought into this account.</p> : null}<p>{teamActive ? `${teamWorkspace?.organisation?.name || "Your organisation"} has a shared Team Perspective. Invite colleagues and see the protected combined result here.` : excellenceComplete ? purposeStarted ? "Your completed baseline is safe here. Continue with the Purpose pathway when you are ready." : "Your five-pillar baseline and deeper Purpose pathway are connected to this account." : "Assess your charity across Purpose, Leadership, Data, Delivery and Communication."}</p><Link href={teamActive ? "/social-impact-excellence/team/" : excellenceComplete ? "/social-impact-excellence/journey/" : "/social-impact-excellence/assessment/"}>{teamActive ? "Open Team Perspective" : excellenceComplete ? "Continue your journey" : excellenceAnswered ? "Continue assessment" : "Start assessment"} <Arrow /></Link></article>
         <article className="dashboard-card is-purpose"><div className="dashboard-card-top"><span>05</span><b>Explore</b></div><Image src="/product/purpose-works-wordmark.png" alt="Purpose Works" width={1942} height={809}/><p>Turn purpose into meaningful action and credible communication.</p><Link href="/purpose-works/">Explore Purpose Works <Arrow /></Link></article>
-        <article className="dashboard-card is-director"><div className="dashboard-card-top"><span>06</span><b>Explore</b></div><h2>My <em>Impact</em><br/>Director</h2><p>Ongoing senior impact expertise for charities.</p><Link href="/my-impact-director/">Explore support <Arrow /></Link></article>
+        <article className="dashboard-card is-director"><div className="dashboard-card-top"><span>06</span><b>{director?.data.completed ? "Started" : director ? "In progress" : "Explore"}</b></div><h2>My <em>Impact</em><br/>Director</h2><p>{directorUnavailable ? "Your saved progress could not be loaded. Open the product to try again." : director?.data.completed ? "Your readiness snapshot is complete. Open your report, practical actions and conversation agenda. The progress bar tracks this free snapshot, not completion of ongoing support." : director ? `${director.data.ratings.filter(Boolean).length} of 21 questions answered. Pick up where you left off.` : "Meet your Impact Director with a free readiness snapshot."}</p><Link href="/my-impact-director/#assessment">{director?.data.completed ? "Open my report & next steps" : director ? "Continue my snapshot" : "Meet Your Impact Director"} <Arrow /></Link></article>
       </div>
     </section>
   </>;
