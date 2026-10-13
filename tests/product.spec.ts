@@ -1,4 +1,5 @@
 import { test, expect, type Locator } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 async function contrastRatio(locator: Locator) {
   return locator.evaluate((element) => {
@@ -31,12 +32,36 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/are-you-sorp-ready/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("How ready is your charity for SORP 2026?");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Are You\s*SORP Ready\?/);
+  await expect(page.getByText("Find out how prepared your charity is for SORP 2026.")).toBeVisible();
+  await expect(page.getByText("100% free. No obligation.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Charities", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Accountants & Advisers", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your readiness score" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your gaps and priorities" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your next steps" })).toBeVisible();
   const deck = page.locator(".sorp-film");
   await expect(deck).toHaveAttribute("data-ready", "true");
   await expect(deck.locator(".sf-chapters button")).toHaveCount(9);
-  await expect(page.locator(".sr-details > details")).toHaveCount(8);
+  await expect(page.locator(".sr-more > details")).toHaveCount(1);
+  await expect(page.locator(".sr-more > details")).not.toHaveAttribute("open", "");
+  await page.locator(".sr-more summary").click();
+  await expect(page.getByRole("heading", { name: "How your score works" })).toBeVisible();
+  const fixedAction = page.locator(".sr-fixed-action");
+  await expect(fixedAction).toBeVisible();
+  await expect(fixedAction.getByRole("link", { name: /Start Free Review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
+  await expect(fixedAction.getByRole("link", { name: /Start Free Review/ })).toHaveCSS("background-color", "rgb(36, 35, 41)");
+  await expect(fixedAction).toHaveCSS("position", "fixed");
+  const fixedBox = (await fixedAction.boundingBox())!;
+  expect(fixedBox.height).toBeLessThanOrEqual(90);
+  expect(Math.abs(fixedBox.y + fixedBox.height - page.viewportSize()!.height)).toBeLessThanOrEqual(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+  expect(accessibility.violations).toEqual([]);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: testInfo.outputPath("sorp-ready-top.png") });
+  await fixedAction.screenshot({ path: testInfo.outputPath("sorp-ready-action.png") });
+  await page.screenshot({ path: testInfo.outputPath("sorp-ready-page.png"), fullPage: true });
 
   await deck.locator(".sf-chapters button").nth(8).click();
   const start = deck.getByRole("link", { name: "START THE FREE REVIEW" });
