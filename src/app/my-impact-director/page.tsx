@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function MyImpactDirectorPage() {
   return (
     <main id="main" className={s.page}>
-      <section className={s.hero}>
+      <section id="director-overview" className={s.hero}>
         <div className={s.heroCopy}>
           <p className={s.kicker}>
             My Impact Director · Human-led. AI-enabled.
@@ -75,7 +75,7 @@ export default function MyImpactDirectorPage() {
         <span>Intelligent tools.</span>
         <span>Greater impact.</span>
       </div>
-      <section className={s.manifesto}>
+      <section id="director-ambition" className={s.manifesto}>
         <p className={s.kicker}>
           A serious ambition. A different way of getting there.
         </p>
@@ -152,7 +152,7 @@ export default function MyImpactDirectorPage() {
           ))}
         </ol>
       </section>
-      <section className={s.measurement}>
+      <section id="director-measurement" className={s.measurement}>
         <p className={s.kicker}>A small question with very big consequences</p>
         <p className={s.saying}>
           “What gets measured
@@ -174,7 +174,7 @@ export default function MyImpactDirectorPage() {
           decide and improve—not simply give us more numbers to report.
         </p>
       </section>
-      <section className={s.future}>
+      <section id="director-future" className={s.future}>
         <div>
           <p className={s.kicker}>
             The next chapter · possibilities, not promises

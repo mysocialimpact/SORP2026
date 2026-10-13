@@ -74,7 +74,7 @@ function ExperienceRow({ names, index, paused }: { names: string[]; index: numbe
 export function ExperienceCloud() {
   const [paused, setPaused] = useState(false);
   return (
-    <section className="experience-cloud experience-landscape" data-paused={paused} aria-labelledby="experience-title">
+    <section className="experience-cloud experience-landscape" id="home-experience" data-paused={paused} aria-labelledby="experience-title">
       <div className="gateway-width experience-cloud-head">
         <h2 id="experience-title">Experience across our team</h2>
       </div>

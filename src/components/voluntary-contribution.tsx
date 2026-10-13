@@ -126,7 +126,7 @@ export function HomepageContribution({ mission = false }: { mission?: boolean })
   });
   const [paid, setPaid] = useState(false);
   const contribution = useVoluntaryContribution({ sessionId, onPaid: () => setPaid(true) });
-  return <section className="gateway-contribution" aria-labelledby="contribution-title">
+  return <section className="gateway-contribution" id="home-support" aria-labelledby="contribution-title">
     <div className="gateway-width gateway-contribution-inner">
       <div className="gateway-contribution-copy">
         <p className="gateway-kicker">Help the next charity</p>

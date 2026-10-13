@@ -19,7 +19,7 @@ export default function Home() {
     <main id="main" className="gateway homepage-story">
       <div className="gateway-home-cover">
       <div className="gateway-width">
-        <section className="gateway-opening" aria-labelledby="gateway-title">
+        <section className="gateway-opening" id="home-overview" aria-labelledby="gateway-title">
           <div className="gateway-intro">
             <p className="gateway-kicker">SORP 2026 · An independent online platform</p>
             <h1 id="gateway-title">
@@ -63,7 +63,7 @@ export default function Home() {
       </div>
       <ExperienceCloud />
       <div className="gateway-width">
-        <section className="gateway-people" aria-labelledby="people-title">
+        <section className="gateway-people" id="home-team" aria-labelledby="people-title">
           <div className="gateway-people-intro">
             <h2 id="people-title">Our team</h2>
             <p>

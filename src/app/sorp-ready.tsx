@@ -32,7 +32,7 @@ export function SorpReadyPage() {
           </div>
         </header>
 
-        <section className="sr-audiences" aria-labelledby="sr-audiences-title">
+        <section id="sr-audiences" className="sr-audiences" aria-labelledby="sr-audiences-title">
           <div className="sr-section-heading">
             <p className="sr-eyebrow">Who is it for?</p>
             <h2 id="sr-audiences-title">For charities—and the people who help them.</h2>
@@ -49,7 +49,7 @@ export function SorpReadyPage() {
           </div>
         </section>
 
-        <section className="sr-benefits" aria-labelledby="sr-benefits-title">
+        <section id="sr-benefits" className="sr-benefits" aria-labelledby="sr-benefits-title">
           <div className="sr-section-heading">
             <p className="sr-eyebrow">What you’ll get</p>
             <h2 id="sr-benefits-title">A clear picture.<br />A practical way forward.</h2>
@@ -77,7 +77,7 @@ export function SorpReadyPage() {
           </div>
         </section>
 
-        <section className="sr-more" aria-label="More information about the review">
+        <section id="sr-more" className="sr-more" aria-label="More information about the review">
           <details>
             <summary>More about the review <span aria-hidden="true">↓</span></summary>
             <div className="sr-more-content">

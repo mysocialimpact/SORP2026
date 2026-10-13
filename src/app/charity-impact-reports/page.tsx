@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function CharityImpactReportsPage() {
   return <main id="main" className="gateway product-page product-reports">
-    <section className="product-hero gateway-width">
+    <section id="reports-overview" className="product-hero gateway-width">
       <div className="product-hero-copy">
         <p className="gateway-kicker">03 · Human-led service · Available now</p>
         <h1>Is your impact report telling the <em>whole story?</em></h1>
@@ -23,8 +23,8 @@ export default function CharityImpactReportsPage() {
       </div>
       <div className="product-brand-panel is-reports"><Image src="/product/charity-impact-reports.png" alt="Charity Impact Reports" width={1787} height={887} priority /></div>
     </section>
-    <section className="product-statement gateway-width"><p className="gateway-kicker">Reporting beyond the statutory minimum</p><h2>A richer account of the difference you make.</h2><p>A separate impact report can bring evidence, beneficiary stories, outcomes, photographs and learning to life. It can complement and, where permitted, be signposted from the Trustees’ Annual Report—but it does not replace mandatory disclosures.</p></section>
-    <section className="report-offer gateway-width">
+    <section id="reports-why" className="product-statement gateway-width"><p className="gateway-kicker">Reporting beyond the statutory minimum</p><h2>A richer account of the difference you make.</h2><p>A separate impact report can bring evidence, beneficiary stories, outcomes, photographs and learning to life. It can complement and, where permitted, be signposted from the Trustees’ Annual Report—but it does not replace mandatory disclosures.</p></section>
+    <section id="reports-review" className="report-offer gateway-width">
       <header><p className="gateway-kicker">A deliberately simple service</p><h2>Written review + 60-minute meeting</h2><strong>£100</strong></header>
       <ol>{[
         "Sign in with your SORP2026 account.", "Upload your most recent impact report securely.", "Pay £100 through secure checkout.",
@@ -32,7 +32,7 @@ export default function CharityImpactReportsPage() {
       ].map((step, index) => <li key={step}><span>{String(index + 1).padStart(2, "0")}</span>{step}</li>)}</ol>
       <p className="report-caveat">A professional review of an existing document—not a regulatory audit, formal assurance engagement or AI-generated analysis.</p>
     </section>
-    <section className="product-split product-dark is-reports"><div className="gateway-width"><div><p className="gateway-kicker">A more substantial project</p><h2>Need the full report?</h2><strong className="product-price">From £1,000</strong></div><div><p>My Social Impact can help develop your Charity Impact Report: shaping the evidence, structure, analysis, writing and story around the difference your charity makes.</p><p>This is separate from the £100 review of an existing document.</p><a href="mailto:marcus@mysocialimpact.org?subject=Full%20Charity%20Impact%20Report%20from%20%C2%A31%2C000">Enquire about full report development <Arrow diagonal /></a></div></div></section>
+    <section id="reports-full" className="product-split product-dark is-reports"><div className="gateway-width"><div><p className="gateway-kicker">A more substantial project</p><h2>Need the full report?</h2><strong className="product-price">From £1,000</strong></div><div><p>My Social Impact can help develop your Charity Impact Report: shaping the evidence, structure, analysis, writing and story around the difference your charity makes.</p><p>This is separate from the £100 review of an existing document.</p><a href="mailto:marcus@mysocialimpact.org?subject=Full%20Charity%20Impact%20Report%20from%20%C2%A31%2C000">Enquire about full report development <Arrow diagonal /></a></div></div></section>
     <ProductAdviserNote title="Strengthen the story alongside the accounts.">Accountants and advisers can recommend the £100 review to charity clients who want clearer impact communication alongside strong financial reporting. We work alongside the existing adviser, not instead of them.</ProductAdviserNote>
     <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow /></Link></nav>
   </main>;
