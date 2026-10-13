@@ -55,6 +55,7 @@ try {
     "002_console_completion.sql",
     "003_icaew_benchmark.sql",
     "004_console_openai.sql",
+    "005_people_archive.sql",
   ]) {
     const sql = (
       await readFile(

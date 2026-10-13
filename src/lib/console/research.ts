@@ -138,7 +138,7 @@ export async function runResearch(runId: string, options: { reuseSearchRunId?: s
           for (const person of extracted.people) {
             const added = (
               await c.query(
-                "INSERT INTO research_console.people(firm_id,name,role,qualifications,responsibilities,profile_url,notes) SELECT $1,$2,$3,$4,$5,$6,$7 WHERE NOT EXISTS(SELECT 1 FROM research_console.people WHERE firm_id=$1 AND lower(name)=lower($2)) RETURNING *",
+                "INSERT INTO research_console.people(firm_id,name,role,qualifications,responsibilities,profile_url,notes) SELECT $1,$2,$3,$4,$5,$6,$7 WHERE NOT EXISTS(SELECT 1 FROM research_console.people WHERE firm_id=$1 AND archived_at IS NULL AND lower(name)=lower($2)) RETURNING *",
                 [
                   run.firm_id,
                   person.name,

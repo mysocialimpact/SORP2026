@@ -15,7 +15,7 @@ await client.query("DROP SCHEMA IF EXISTS research_console CASCADE");
 await client.query(
   fs.readFileSync("migrations/001_research_console.sql", "utf8"),
 );
-for(const migration of ['002_console_completion.sql','003_icaew_benchmark.sql','004_console_openai.sql'])await client.query(fs.readFileSync('migrations/'+migration,'utf8'));
+for(const migration of ['002_console_completion.sql','003_icaew_benchmark.sql','004_console_openai.sql','005_people_archive.sql'])await client.query(fs.readFileSync('migrations/'+migration,'utf8'));
 await client.query(
   execFileSync(process.execPath, ["scripts/console-seed.mjs"], {
     encoding: "utf8",

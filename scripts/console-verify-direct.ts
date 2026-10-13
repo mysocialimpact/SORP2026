@@ -26,7 +26,7 @@ async function main() {
       [run.id],
     );
     const [counts] = await query(
-      "SELECT (SELECT count(*)::int FROM research_console.sources WHERE run_id=$1 AND status='Examined') sources,(SELECT count(*)::int FROM research_console.evidence WHERE run_id=$1) evidence,(SELECT count(*)::int FROM research_console.people WHERE firm_id=$2) people",
+      "SELECT (SELECT count(*)::int FROM research_console.sources WHERE run_id=$1 AND status='Examined') sources,(SELECT count(*)::int FROM research_console.evidence WHERE run_id=$1) evidence,(SELECT count(*)::int FROM research_console.people WHERE firm_id=$2 AND archived_at IS NULL) people",
       [run.id, firm.id],
     );
     const [assessment] = await query(

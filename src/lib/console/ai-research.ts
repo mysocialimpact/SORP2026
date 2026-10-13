@@ -54,6 +54,7 @@ export async function runAIResearch(
   const data = validateExtraction(
     JSON.parse(responseText(extracted)) as ResearchExtraction,
     passages,
+    { withholdUnsupportedPeople: true },
   );
   const host = new URL(firm.website).hostname.replace(/^www\./, "");
   const selected = [...new Set(data.evidence.map((e) => e.passage_id))].map(
@@ -135,7 +136,7 @@ export async function runAIResearch(
       if (!selected.some((s) => s.id === p.passage_id)) continue;
       const added = (
         await c.query(
-          "INSERT INTO research_console.people(firm_id,name,role,qualifications,responsibilities,profile_url,notes) SELECT $1,$2,$3,$4,$5,$6,$7 WHERE NOT EXISTS(SELECT 1 FROM research_console.people WHERE firm_id=$1 AND lower(name)=lower($2)) RETURNING *",
+          "INSERT INTO research_console.people(firm_id,name,role,qualifications,responsibilities,profile_url,notes) SELECT $1,$2,$3,$4,$5,$6,$7 WHERE NOT EXISTS(SELECT 1 FROM research_console.people WHERE firm_id=$1 AND archived_at IS NULL AND lower(name)=lower($2)) RETURNING *",
           [
             firm.id,
             p.name,

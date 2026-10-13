@@ -110,7 +110,7 @@ export async function listFirms(params: URLSearchParams) {
   const q = params.get("q")?.trim();
   if (q)
     add(
-      `(f.name ILIKE ? OR f.website ILIKE ? OR array_to_string(f.aliases,' ') ILIKE ? OR EXISTS(SELECT 1 FROM research_console.people p WHERE p.firm_id=f.id AND p.name ILIKE ?) OR EXISTS(SELECT 1 FROM research_console.offices o WHERE o.firm_id=f.id AND concat_ws(' ',o.town,o.postcode,o.address) ILIKE ?))`,
+      `(f.name ILIKE ? OR f.website ILIKE ? OR array_to_string(f.aliases,' ') ILIKE ? OR EXISTS(SELECT 1 FROM research_console.people p WHERE p.firm_id=f.id AND p.archived_at IS NULL AND p.name ILIKE ?) OR EXISTS(SELECT 1 FROM research_console.offices o WHERE o.firm_id=f.id AND concat_ws(' ',o.town,o.postcode,o.address) ILIKE ?))`,
       "%" + q + "%",
     );
   for (const field of ["status", "review_status"])
@@ -126,11 +126,11 @@ export async function listFirms(params: URLSearchParams) {
     add("array_to_string(a.gaps,' ') ILIKE ?", "%" + params.get("gap") + "%");
   if (params.get("specialist") === "true")
     where.push(
-      "EXISTS(SELECT 1 FROM research_console.people p WHERE p.firm_id=f.id)",
+      "EXISTS(SELECT 1 FROM research_console.people p WHERE p.firm_id=f.id AND p.archived_at IS NULL)",
     );
   if (params.get("dcha") === "true")
     where.push(
-      "EXISTS(SELECT 1 FROM research_console.people p WHERE p.firm_id=f.id AND p.dcha=true)",
+      "EXISTS(SELECT 1 FROM research_console.people p WHERE p.firm_id=f.id AND p.archived_at IS NULL AND p.dcha=true)",
     );
   if (params.get("services") === "true")
     where.push(
@@ -191,7 +191,7 @@ export async function report(id: string) {
       [id],
     ),
     query("SELECT * FROM research_console.offices WHERE firm_id=$1", [id]),
-    query("SELECT * FROM research_console.people WHERE firm_id=$1", [id]),
+    query("SELECT * FROM research_console.people WHERE firm_id=$1 AND archived_at IS NULL", [id]),
     query(
       "SELECT * FROM research_console.reviews WHERE firm_id=$1 ORDER BY created_at DESC",
       [id],
