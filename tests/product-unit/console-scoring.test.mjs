@@ -68,3 +68,8 @@ test('AI SORP training claims cannot earn points against an unrelated event cita
  const sourced={...e,title:'SORP 2026 webinar',url:'https://firm.example/events/sorp-2026/'};
  assert.ok(score([sourced]).awards.some(a=>a.criterion_id==='C3'));
 });
+
+test('AI category headings are not themselves affirmative evidence',()=>{
+ const r=score([evidence('**Dedicated charity team.** The site explains general accounting requirements.',{provenance:{kind:'openai-search'},url:'https://firm.example/news/'})]);
+ assert.equal(r.total,0);
+});

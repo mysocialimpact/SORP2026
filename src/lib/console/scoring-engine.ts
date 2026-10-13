@@ -327,7 +327,10 @@ export function scoreEvidence(
       // A missing qualification/client finding must not erase a separate,
       // affirmative service or speaking finding. Keep mixed/negated sentences
       // conservative; 'not-for-profit' itself is never a negation.
-      const affirmative = text.replace(/[*_`]/g, "")
+      const factualText = e.provenance?.kind === "openai-search"
+        ? text.replace(/^\*\*[^*]*[:.]\*\*\s*/, "")
+        : text;
+      const affirmative = factualText.replace(/[*_`]/g, "")
         .split(/(?<=[.!?])\s+(?=[A-Z*])/)
         .filter((sentence) =>
           !negative.test(sentence.replace(/\bnot[ -]for[ -]profit\b/gi, "nonprofit")),

@@ -77,7 +77,7 @@ export default function Home() {
               experience and creative thinking.
             </p>
           </div>
-          <div className="gateway-portraits">
+          <div className="gateway-portraits" role="region" aria-label="Our team portraits" tabIndex={0}>
             <figure>
               <Image
                 src="/images/marcus-warry.webp"

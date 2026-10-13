@@ -26,7 +26,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     sorpSection.getByText("A free assessment of your charity’s impact and sustainability reporting readiness."),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Our team" }),
+    page.getByRole("heading", { name: "Our team", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("img", { name: "Gareth Murphy" })).toBeVisible();
   await expect(page.getByRole("img", { name: "Nicholas Demeter" })).toBeVisible();
