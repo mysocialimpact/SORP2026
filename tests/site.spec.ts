@@ -60,7 +60,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
   await page.goto("/contact/");
   await expect(page).toHaveURL(/contact/);
   await expect(
-    page.getByRole("link", { name: /marcus@mysocialimpact.org/ }),
+    page.getByRole("main").getByRole("link", { name: /marcus@mysocialimpact.org/ }),
   ).toHaveAttribute("href", "mailto:marcus@mysocialimpact.org");
   expect(errors).toEqual([]);
 });
