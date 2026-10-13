@@ -24,6 +24,10 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   await expect(page.locator(".gateway-contribution-amounts").getByRole("button", { name: "£5", exact: true })).toHaveAttribute("aria-pressed", "true");
   const hello = page.locator(".shared-hello");
   await expect(hello.getByRole("heading", { name: /Just looking around.*Say hello/ })).toBeVisible();
+  await expect(hello.getByRole("link", { name: "marcus@mysocialimpact.org" })).toHaveAttribute("href", "mailto:marcus@mysocialimpact.org");
+  await expect(hello).toContainText("10 Market Place, Shepton Mallet");
+  await expect(hello).toContainText("POPHub, Whitcomb Street, London");
+  await expect(page.locator(".homepage-talk-cue")).toHaveCount(0);
   await expect(hello.getByPlaceholder("A question, an idea, some feedback — or just hello…")).toBeVisible();
   await expect(hello.getByRole("button", { name: "Say hello" })).toBeVisible();
   await expect(hello).toContainText("occasional updates");

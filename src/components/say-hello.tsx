@@ -55,6 +55,11 @@ export function SayHello() {
         <p className="shared-hello-kicker">A human is always welcome here</p>
         <h2 id="say-hello-title">Just looking around?<br/><span>Say hello.</span></h2>
         <p>A question, an idea, some feedback — or just hello. We’d love to hear from you.</p>
+        <div className="shared-hello-details" aria-label="My Social Impact contact details">
+          <a href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org</a>
+          <address><span>Somerset</span>10 Market Place, Shepton Mallet</address>
+          <address><span>London</span>POPHub, Whitcomb Street, London</address>
+        </div>
       </div>
       <form className="shared-hello-form" onSubmit={submit}>
         {recognised && <p className="shared-hello-account">We’ve used the email from your account.</p>}

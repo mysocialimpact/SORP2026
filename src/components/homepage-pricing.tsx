@@ -158,7 +158,6 @@ export function HomepagePricing() {
             <Link className="homepage-directory-link" href="/accountants-advisers/">Need specialist SORP or accounting advice? Find Accountants &amp; Advisers ↗</Link>
           </div>
         </div>
-        <a className="homepage-talk-cue" href="#lets-talk" aria-label="Continue to Let’s talk">↓</a>
       </div>
     </section>
   );
