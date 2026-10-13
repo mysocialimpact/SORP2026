@@ -36,7 +36,9 @@ export async function platformIdentity(cookie: string): Promise<PlatformIdentity
 export async function protectAdviserPage() {
   try {
     const identity = await platformIdentity((await cookies()).toString());
-    const advisers = identity.memberships.filter(membership => membership.type === "Adviser");
+    const advisers = identity.memberships.filter(membership =>
+      membership.type === "Adviser" && ["Adviser", "Enterprise"].includes(membership.entitlement?.plan || "")
+    );
     if (!advisers.length) redirect("/dashboard/?adviser=unavailable");
     return { ...identity, advisers };
   } catch (error) {
