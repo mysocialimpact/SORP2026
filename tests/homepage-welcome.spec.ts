@@ -85,6 +85,10 @@ test("hero frames SORP as the requirement and better impact as the opportunity",
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Free tools. Affordable expertise.");
   await expect(page.locator(".homepage-editorial")).toContainText("SORP is the requirement.");
   await expect(page.locator(".homepage-editorial")).toContainText("Better impact is the opportunity.");
+  const enthusiasm = page.locator(".homepage-sorp-enthusiasm");
+  await expect(enthusiasm).toHaveText("We’re excited about SORP 2026 and better charity reporting. Even more so about what charities can achieve with the insight it brings.");
+  const positions = await page.locator(".gateway-home-cover, .homepage-sorp-enthusiasm, .homepage-audience").evaluateAll(elements => elements.map(element => element.getBoundingClientRect().top));
+  expect(positions).toEqual([...positions].sort((a, b) => a - b));
 });
 
 test("contact form recognises accounts and confirms only an accepted server response", async ({ page }) => {
