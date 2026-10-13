@@ -18,7 +18,7 @@ export function MsiBrand({
     </a>
   );
 }
-export function IdeasBrand() {
+export function IdeasBrand({ eager = false }: { eager?: boolean }) {
   return (
     <a className="gateway-studio" href={site.studio!}>
       <Image
@@ -27,6 +27,7 @@ export function IdeasBrand() {
         width={1254}
         height={1254}
         sizes="72px"
+        loading={eager ? "eager" : "lazy"}
       />
       <span>
         Built by

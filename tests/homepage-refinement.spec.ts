@@ -9,6 +9,8 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   expect((await nav.boundingBox())!.height).toBeLessThan(190);
   await expect(nav.getByRole("link", { name: "Our Mission" })).toBeVisible();
   await expect(nav.locator(".product-folder-tab")).toHaveCount(7);
+  await expect(page.locator(".homepage-audience-options button").first()).toContainText("Trustees · CEOs · Finance teams · Staff · Volunteers");
+  await expect(page.locator(".homepage-audience-options button").nth(1)).toContainText("Accountants · Auditors · Lawyers · Consultants · Funders");
   await expect(page.locator(".gateway-portraits h3")).toHaveText(["Marcus Warry ACA", "Dr Chris Arnold", "Gareth Murphy", "Nicholas Demeter"]);
   const portraits = page.locator(".gateway-portraits");
   const sizes = await portraits.evaluate(el => ({ width: el.clientWidth, scroll: el.scrollWidth, ys: [...el.children].map(child => child.getBoundingClientRect().y) }));
@@ -23,6 +25,7 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: info.outputPath("homepage.png"), fullPage: true });
+  await page.locator(".gateway-footer").screenshot({ path: info.outputPath("footer.png") });
   const results = await new AxeBuilder({ page }).include(".platform-sticky-navigation").include(".homepage-hello").include(".gateway-footer").analyze();
   expect(results.violations).toEqual([]);
 });
