@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 const productPages = [
-  ["/my-impact-director/", "Your charity’s Impact Director. Without the full-time salary."],
+  ["/my-impact-director/", "What if everyorganisation hadan Impact Director?"],
   ["/social-impact-excellence/", "Make social impact part of how your charity is run."],
   ["/charity-impact-reports/", "Is your impact report telling the whole story?"],
   ["/purpose-works/", "Creative campaigns that make a difference."],
@@ -46,6 +46,7 @@ test("global login uses the existing account service and keeps Google hidden", a
 });
 
 test("dashboard shows genuine readiness and native Social Impact Excellence state", async ({ page }) => {
+  await page.route("**/api/impact-director/**", route => route.fulfill({ json: { signedIn: true, progress: null } }));
   await page.route("**/api/readiness-account/**", route => route.fulfill({ json: {
     signedIn: true,
     account: { name: "QA Person", email: "qa@example.invalid", position: "TRUSTEE / CHAIR", organisation: "QA Charity" },
