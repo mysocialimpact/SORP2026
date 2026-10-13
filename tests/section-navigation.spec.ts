@@ -54,7 +54,7 @@ for (const path of routes) test(`folder continuity and actions: ${path}`, async 
   await expect(bar).toHaveCount(1);
   await expect(bar).toBeVisible();
   const box = (await bar.boundingBox())!;
-  expect(box.y + box.height).toBeCloseTo(page.viewportSize()!.height, 0);
+  expect(box.y + box.height).toBeCloseTo(await page.evaluate(() => innerHeight), 0);
   await page.screenshot({ path: info.outputPath("scrolled.png") });
   if (info.project.name === "mobile") {
     const current = (await tabs.locator('[aria-current="page"]').boundingBox())!;

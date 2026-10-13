@@ -8,7 +8,7 @@ import { site } from "@/lib/site";
 const actions: Record<string, { label: string; href: string; secondary?: { label: string; href: string } }> = {
   "/": { label: "Start your free SORP review", href: site.readiness!, secondary: { label: "Ask SORP", href: "/ask-sorp/#ask-sorp-live" } },
   "/charity-impact-reports/": { label: "Review your impact report", href: "/charity-impact-reports/review/" },
-  "/social-impact-excellence/": { label: "Start or continue", href: "#excellence-start" },
+  "/social-impact-excellence/": { label: "See your next step", href: "#excellence-start" },
   "/my-impact-director/": { label: "Start your free assessment", href: "#assessment", secondary: { label: "Talk to us", href: "#director-conversation" } },
 };
 
