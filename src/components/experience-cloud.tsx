@@ -22,12 +22,13 @@ const organisations = [
 ];
 
 const featured = [
-  ["ActionAid", "Hackney Council", "Starbucks", "Great Ormond Street Hospital", "RSPB", "Comic Relief"],
-  ["Greenpeace", "Diageo", "CARE International", "Westminster Council", "RSPCA", "Blue Cross"],
-  ["Médecins Sans Frontières", "Sainsbury’s", "STOP THE TRAFFIK", "Docklands Light Railway", "Haringey Council"],
+  ["ActionAid", "Hackney Council", "Great Ormond Street Hospital", "RSPB", "Comic Relief"],
+  ["Greenpeace", "CARE International", "Westminster Council", "RSPCA", "Blue Cross"],
+  ["Médecins Sans Frontières", "Crouch End Festival", "STOP THE TRAFFIK", "Docklands Light Railway", "Haringey Council"],
 ];
 const featuredNames = new Set(featured.flat());
-const remaining = organisations.filter(name => !featuredNames.has(name));
+const collectionOnly = new Set(["Diageo", "Starbucks", "Sainsbury’s", "Brewers Decorating Centres", "AgriEvolve", "Ashima"]);
+const remaining = organisations.filter(name => !featuredNames.has(name) && !collectionOnly.has(name));
 const rows = featured.map((names, row) => [...names, ...remaining.filter((_, i) => i % 3 === row)]);
 const logos: Record<string, string> = { Greenpeace: "/experience/greenpeace.svg", Starbucks: "/experience/starbucks.svg" };
 
@@ -75,12 +76,9 @@ export function ExperienceCloud() {
   return (
     <section className="experience-cloud experience-landscape" data-paused={paused} aria-labelledby="experience-title">
       <div className="gateway-width experience-cloud-head">
-        <p className="gateway-kicker">Collective experience · charities · communities · campaigns</p>
         <h2 id="experience-title">Experience across our team</h2>
-        <p>Organisation names reflect work and experience across our team; they are not presented as endorsements of this platform.</p>
       </div>
       <div className="gateway-width experience-controls">
-        <p>Charities. Councils. Communities. Global brands.</p>
         <button type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>{paused ? "Resume movement" : "Pause movement"}</button>
       </div>
       <div className="experience-landscape-stage">
@@ -90,6 +88,7 @@ export function ExperienceCloud() {
         <span className="experience-swipe">Swipe or scroll to explore ↔</span>
         <details onToggle={event => { if (event.currentTarget.open) setPaused(true); }}>
           <summary>Explore all organisations <span>{organisations.length} names +</span></summary>
+          <p className="experience-collection-note">Historical experience across our team; no endorsement of SORP2026 is implied.</p>
           <ul>{organisations.map(name => <li key={name}>{name}</li>)}</ul>
         </details>
       </div>

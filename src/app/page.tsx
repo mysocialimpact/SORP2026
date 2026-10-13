@@ -23,36 +23,36 @@ export default function Home() {
           <div className="gateway-intro">
             <p className="gateway-kicker">SORP 2026 · An independent online platform</p>
             <h1 id="gateway-title">
-              <span className="gateway-hero-context">SORP is the requirement.</span>
-              <span className="gateway-hero-opportunity">Better impact is the opportunity.</span>
+              Free tools. Affordable expertise.<br /><span>For greater charity impact.</span>
             </h1>
             <p className="homepage-hero-definition">
-              Practical tools, guidance and expert support for <strong>charities,
-              accountants and advisers.</strong> Navigate SORP 2026. Improve your social impact.
+              We’re a UK-based social enterprise initiative helping charities and their advisers
+              navigate SORP 2026 — and achieve greater impact.
             </p>
           </div>
           <div className="gateway-intro-aside">
-            <span className="gateway-enterprise-label">A UK-based social enterprise initiative</span>
-            <p>
-              We’re excited about SORP 2026 and better charity reporting. Even more so about
-              what charities can achieve with the insight it brings.
-            </p>
+            <p className="homepage-editorial">SORP is the requirement.<br /><strong>Better impact is the opportunity.</strong></p>
             <MsiBrand attribution="Developed by" />
-            <p className="gateway-enterprise-note">
-              Using technology to put valuable tools within reach of smaller
-              charities. <strong>Free wherever possible.</strong>
-            </p>
           </div>
         </section>
       </div>
       </div>
       <div className="gateway-width">
         <HomepageAudience />
+        <section className="homepage-ambition" aria-labelledby="ambition-title">
+          <p className="gateway-kicker">Our ambition</p>
+          <h2 id="ambition-title">Greater impact.<span>Accessible to everyone.</span></h2>
+        </section>
+        <section className="gateway-opening-vision gateway-home-vision homepage-vision" aria-labelledby="home-vision-title">
+          <p className="gateway-kicker">Our vision</p>
+          <h2 id="home-vision-title">Imagine a world where social impact was taken as seriously as financial performance.</h2>
+        </section>
         <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
+          <p className="gateway-kicker">This is where most people start.</p>
           <div className="homepage-start">
             <h2 id="sorp-tools-title">Are You SORP Ready?</h2>
             <div className="homepage-start-action">
-              <p>Discover how prepared your charity is for impact and sustainability reporting under SORP 2026.</p>
+              <p>A free assessment of your charity’s impact and sustainability reporting readiness.</p>
               <Link className="gateway-action" href={site.readiness!}>
                 Start your free review <Arrow />
               </Link>
@@ -60,35 +60,17 @@ export default function Home() {
           </div>
           <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/">Read the official Charities SORP <Arrow diagonal /></a></p>
         </section>
-        <section className="homepage-ambition" aria-labelledby="ambition-title">
-          <p className="gateway-kicker">Our ambition</p>
-          <h2 id="ambition-title">
-            Greater impact.
-            <span>Accessible to everyone.</span>
-          </h2>
-          <p>Useful tools, free wherever possible. Expert support when you need it.</p>
-        </section>
-        <section className="gateway-opening-vision gateway-home-vision homepage-vision" aria-labelledby="home-vision-title">
-          <p className="gateway-kicker">Our social enterprise vision</p>
-          <h2 id="home-vision-title">
-            Imagine a world where social impact was taken as seriously as financial performance.
-          </h2>
-        </section>
       </div>
       <ExperienceCloud />
       <div className="gateway-width">
         <section className="gateway-people" aria-labelledby="people-title">
           <div className="gateway-people-intro">
-            <p className="gateway-kicker">Charity reporting meets social impact</p>
-            <h2 id="people-title">The people behind the tools.</h2>
+            <h2 id="people-title">Our team</h2>
             <p>
               Developed by My Social Impact—combining financial rigour,
               monitoring and evaluation, technology, practical charity
               experience and creative thinking.
             </p>
-            <Link className="gateway-quiet-link" href="#say-hello">
-              Say hello <Arrow diagonal />
-            </Link>
           </div>
           <div className="gateway-portraits">
             <figure>

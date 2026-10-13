@@ -10,9 +10,11 @@ import "./globals.css";
 import "./gateway.css";
 import "./platform.css";
 import "./typography.css";
+import "./refinement.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProductFolderTabs } from "@/components/product-folder-tabs";
+import { PlatformNavigation } from "@/components/platform-navigation";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
@@ -51,8 +53,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <Header />
-        <ProductFolderTabs />
+        <PlatformNavigation><Header /><ProductFolderTabs /></PlatformNavigation>
         {children}
         <Footer />
       </body>

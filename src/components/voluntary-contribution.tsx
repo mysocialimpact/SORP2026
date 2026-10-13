@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { SorpPublicSupportCheckout } from "@/app/sorp-public-support-checkout";
 import { supportPence, type SupportChoice } from "@/app/sorp-payment-amounts";
 
@@ -129,14 +130,15 @@ export function HomepageContribution({ mission = false }: { mission?: boolean })
     <div className="gateway-width gateway-contribution-inner">
       <div className="gateway-contribution-copy">
         <p className="gateway-kicker">Support our social enterprise</p>
-        <h2 id="contribution-title">{mission ? "Found the tools useful? Help us make more." : "Help us keep these tools free."}</h2>
+        <h2 id="contribution-title">{mission ? "Found the tools useful? Help us make more." : <>Greater impact.<br />Accessible to everyone.</>}</h2>
         {mission ? <>
           <p>You don’t need to use our consultancy services to be part of this. If our free tools give you what you need, that’s a result we’re proud of.</p>
           <p>If you’d like to support our mission, a few pounds helps us keep these tools free, improve them and build more for smaller charities and organisations.</p>
           <p>Use what helps. Give if you can. Every contribution is entirely voluntary.</p>
         </> : <>
-          <p>We’re building practical tools to help charities create greater impact, and we’re determined to make them free wherever possible.</p>
-          <p>If you’ve found them useful, your contribution helps us improve them, maintain them and make more tools available to everyone.</p>
+          <p>Technology and professional expertise, within reach of smaller charities and other organisations.</p>
+          <p>Free wherever possible. Affordable expert support where needed.</p>
+          <Link className="gateway-quiet-link" href="/our-mission/">Our Mission →</Link>
         </>}
       </div>
       <div className="gateway-contribution-panel">

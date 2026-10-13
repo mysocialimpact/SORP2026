@@ -4,7 +4,7 @@ test("audience choice is optional, reversible and retained without tracking", as
   const writes: string[] = [];
   page.on("request", request => { if (request.method() === "POST") writes.push(request.url()); });
   await page.goto("/");
-  await expect(page.getByText("Built for charities and the accountants and advisers who support them.")).toBeVisible();
+  await expect(page.getByText("We’ve built this for")).toBeVisible();
   const charity = page.getByRole("button", { name: /CHARITIES/ });
   const adviser = page.getByRole("button", { name: /ACCOUNTANTS & ADVISERS/ });
   await expect(charity).toHaveAttribute("aria-pressed", "false");
@@ -32,7 +32,7 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
       cover: getComputedStyle(cover).backgroundColor,
       edgeBorder: getComputedStyle(edge).borderTopWidth,
       gap: cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
-      sequence: [".gateway-opening", ".homepage-audience", ".gateway-sorp-section", ".homepage-ambition", ".gateway-home-vision"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
+      sequence: [".gateway-opening", ".homepage-audience", ".homepage-ambition", ".gateway-home-vision", ".gateway-sorp-section"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
     };
   });
   expect(surfaces.edge).toBe(surfaces.cover);
@@ -47,7 +47,6 @@ test("the middle story is one compact ambition and a distinct vision", async ({ 
   const vision = page.locator(".homepage-vision");
   await expect(ambition.getByText("Our ambition", { exact: true })).toBeVisible();
   await expect(ambition.getByRole("heading")).toHaveText("Greater impact.Accessible to everyone.");
-  await expect(ambition).toContainText("Useful tools, free wherever possible. Expert support when you need it.");
   await expect(vision.getByRole("heading")).toHaveText("Imagine a world where social impact was taken as seriously as financial performance.");
   for (const removed of ["Too useful to leave in a filing cabinet.", "Better evidence.", "Better decisions.", "Big possibilities. Smaller barriers."]) {
     await expect(page.getByText(removed, { exact: false })).toHaveCount(0);
@@ -63,7 +62,7 @@ test("one compact starting point links directly to the working review", async ({
   await page.goto("/");
   const start = page.locator(".homepage-start");
   await expect(start.getByRole("heading")).toHaveText("Are You SORP Ready?");
-  await expect(start).toContainText("Discover how prepared your charity is for impact and sustainability reporting under SORP 2026.");
+  await expect(start).toContainText("A free assessment of your charity’s impact and sustainability reporting readiness.");
   const review = start.getByRole("link", { name: "Start your free review" });
   await expect(review).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
   await expect(start.getByText("Ask SORP")).toHaveCount(0);
@@ -79,14 +78,9 @@ test("one compact starting point links directly to the working review", async ({
 
 test("hero frames SORP as the requirement and better impact as the opportunity", async ({ page }) => {
   await page.goto("/");
-  const heading = page.getByRole("heading", { level: 1 });
-  await expect(heading).toContainText("SORP is the requirement.");
-  await expect(heading).toContainText("Better impact is the opportunity.");
-  const sizes = await heading.evaluate(element => ({
-    context: parseFloat(getComputedStyle(element.querySelector(".gateway-hero-context")!).fontSize),
-    opportunity: parseFloat(getComputedStyle(element.querySelector(".gateway-hero-opportunity")!).fontSize),
-  }));
-  expect(sizes.opportunity).toBeGreaterThan(sizes.context);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Free tools. Affordable expertise.");
+  await expect(page.locator(".homepage-editorial")).toContainText("SORP is the requirement.");
+  await expect(page.locator(".homepage-editorial")).toContainText("Better impact is the opportunity.");
 });
 
 test("contact form recognises accounts and confirms only an accepted server response", async ({ page }) => {

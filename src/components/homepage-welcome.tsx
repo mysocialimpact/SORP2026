@@ -42,12 +42,12 @@ export function HomepageAudience() {
   return (
     <section className="homepage-audience" aria-label="Choose your audience">
       <p className="homepage-audience-intro">
-        Built for charities and the accountants and advisers who support them.
+        We’ve built this for
       </p>
       <div className="homepage-audience-options">
         {([
-          ["charity", "CHARITIES", "Staff · Leaders · Trustees · Volunteers"],
-          ["adviser", "ACCOUNTANTS & ADVISERS", "Accountants · Auditors · Consultants · Lawyers"],
+          ["charity", "CHARITIES", "Understand SORP. Strengthen your reporting. Improve your impact."],
+          ["adviser", "ACCOUNTANTS & ADVISERS", "Practical tools to help your charity clients prepare, comply and achieve more."],
         ] as const).map(([value, title, description]) => (
           <button key={value} type="button" aria-pressed={audience === value} onClick={() => select(value)}>
             <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>
@@ -125,10 +125,8 @@ export function HomepageHello() {
     <section className="homepage-hello" id="say-hello" aria-labelledby="hello-title">
       <div className="gateway-width homepage-hello-layout">
         <div className="homepage-hello-invitation">
-          <p className="gateway-kicker">A little conversation can go a long way</p>
           <h2 id="hello-title">Just looking around?<br /><em>Say hello.</em></h2>
-          <p>We’d love to know who’s visiting. Whether you have a question, an idea, some feedback or simply want to introduce yourself, we’d love to hear from you.</p>
-          <p className="homepage-hello-signature">Marcus &amp; Chris<span>My Social Impact</span></p>
+          <p>We’d love to hear from you. A question, an idea, some feedback — or just hello.</p>
         </div>
         <form className="homepage-hello-form" onSubmit={submit}>
           {recognised && <p className="homepage-hello-account">We’ve filled in the email from your existing account.</p>}

@@ -5,15 +5,14 @@ test("hero explains the platform, keeps its identity and preserves the footer", 
   await page.goto("/");
   const hero = page.locator(".gateway-home-cover");
   await expect(hero).toContainText("An independent online platform");
-  await expect(hero).toContainText("Practical tools, guidance and expert support");
-  await expect(hero).toContainText("charities, accountants and advisers.");
-  await expect(hero).toContainText("A UK-based social enterprise initiative");
+  await expect(hero).toContainText("Free tools. Affordable expertise.");
+  await expect(hero).toContainText("charities and their advisers");
+  await expect(hero).toContainText("UK-based social enterprise initiative");
   await expect(hero.getByRole("img", { name: "My Social Impact" })).toBeVisible();
-  await expect(hero).toContainText("Free wherever possible.");
   await expect(page.locator("#home-vision-title")).toHaveText("Imagine a world where social impact was taken as seriously as financial performance.");
-  await expect(page.locator(".gateway-tagline")).toHaveText("Reporting for greater impact.");
+  await expect(page.locator(".gateway-tagline")).toHaveText("REPORTING FOR GREATER IMPACT");
   await expect(page.locator(".gateway-tagline")).toBeVisible();
-  expect(await page.locator(".gateway-footer-intro h2").evaluate(el => getComputedStyle(el).fontFamily)).toContain("Instrument Serif");
+  await expect(page.locator(".gateway-footer-intro")).toHaveCount(0);
   await hero.screenshot({ path: testInfo.outputPath("hero.png") });
   const results = await new AxeBuilder({ page }).include(".gateway-home-cover").withTags(["wcag2a", "wcag2aa"]).analyze();
   expect(results.violations).toEqual([]);
@@ -24,7 +23,7 @@ test("small iPhone keeps the tagline and reduced-motion layout readable", async 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator(".gateway-tagline")).toBeVisible();
-  await expect(page.locator(".gateway-hero-opportunity")).toBeVisible();
+  await expect(page.locator(".homepage-editorial")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 

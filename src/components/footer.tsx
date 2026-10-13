@@ -19,27 +19,14 @@ export function Footer() {
   return (
     <footer className="footer gateway-footer">
       <div className="gateway-width">
-        <nav className="gateway-footer-nav" aria-label="Information">
-          <Link href="/our-mission/">Our Mission</Link>
-          <Link href="/contact/">Contact</Link>
-          <Link href="/privacy/">Privacy &amp; accessibility</Link>
-          <Link href="/">Folder index</Link>
-        </nav>
-        <div className="gateway-footer-intro">
-          <p className="gateway-kicker">Ideas made useful</p>
-          <h2>Greater impact takes expertise, curiosity and creativity.</h2>
-        </div>
         <div className="gateway-footer-partnership">
           <div className="gateway-footer-msi">
             <MsiBrand attribution="Developed by" />
-            <p>Practical tools and human expertise for organisations determined to make a greater difference.</p>
           </div>
-          <span className="gateway-footer-plus" aria-hidden="true">+</span>
           <div className="gateway-footer-shed">
             <IdeasBrand />
-            <blockquote>Imagine a world where curiosity and creativity were valued as highly as certainty.</blockquote>
             <a className="gateway-footer-shed-link" href={site.studio!}>
-              See what else is in the Shed! <Arrow diagonal />
+              See what else is in the Shed <Arrow />
             </a>
             <p className="gateway-company-details">
               <a href={site.studio!}>The Ideas Shed Limited</a>
@@ -49,6 +36,7 @@ export function Footer() {
         </div>
         <div className="gateway-footer-record">
           <p>© {new Date().getFullYear()} My Social Impact</p>
+          <Link href="/privacy/">Privacy &amp; accessibility</Link>
           <p className="gateway-build" aria-label="Website build information">
             <strong>Build {process.env.NEXT_PUBLIC_SITE_BUILD_NUMBER}</strong>
             {" · "}
