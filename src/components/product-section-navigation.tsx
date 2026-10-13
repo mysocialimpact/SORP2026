@@ -61,18 +61,6 @@ const pageIndexes: Record<string, PageIndex> = {
       { id: "excellence-account", label: "Your journey" },
     ],
   },
-  "/purpose-works/": {
-    title: "Purpose Works",
-    colour: "#493b72",
-    ink: "#ffffff",
-    sections: [
-      { id: "purpose-overview", label: "Overview" },
-      { id: "purpose-services", label: "Services" },
-      { id: "purpose-expertise", label: "Expertise" },
-      { id: "purpose-claims", label: "Credible claims" },
-      { id: "purpose-review", label: "Start with a review" },
-    ],
-  },
   "/my-impact-director/": {
     title: "My Impact Director",
     colour: "#d8ff52",

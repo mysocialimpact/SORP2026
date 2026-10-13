@@ -68,18 +68,6 @@ export const excellenceProducts: PlatformProduct[] = [
   },
   {
     number: "05",
-    slug: "purpose-works",
-    name: "Purpose Works",
-    short: "Turn purpose into meaningful action, credible claims and communications.",
-    status: "Explore",
-    href: "/purpose-works/",
-    className: "is-purpose",
-    tabLabel: "Purpose Works",
-    tabColour: "#493b72",
-    tabInk: "#ffffff",
-  },
-  {
-    number: "06",
     slug: "my-impact-director",
     name: "My Impact Director",
     short: "Ongoing senior impact expertise, made more accessible to charities.",

@@ -39,7 +39,6 @@ export default function ExcellencePage() {
       <div><p>Your SORP2026 account saves the maturity assessment, Purpose diagnostic and supporting evidence independently from your readiness review. The original Social Impact Excellence platform remains unchanged.</p><Link href="/social-impact-excellence/assessment/">Start or continue the assessment <Arrow /></Link><Link href="/social-impact-excellence/journey/">Open your Excellence journey <Arrow /></Link><a href={site.platform!}>Visit the original platform <Arrow diagonal /></a></div>
     </section>
     <ProductAdviserNote title="Help clients move from reporting to better management.">Use the five pillars to support charity clients beyond accounts preparation—into stronger purpose, leadership, evidence, delivery and communication. The approach complements existing professional relationships.</ProductAdviserNote>
-    <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/purpose-works/">Purpose Works <Arrow /></Link></nav>
   </main>;
   return <ExcellenceHome publicPage={publicPage}/>;
 }

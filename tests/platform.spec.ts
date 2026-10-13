@@ -5,10 +5,9 @@ const productPages = [
   ["/my-impact-director/", "What if everyorganisation hadan Impact Director?"],
   ["/social-impact-excellence/", "Make social impact part of how your charity is run."],
   ["/charity-impact-reports/", "Is your impact report telling the whole story?"],
-  ["/purpose-works/", "Creative campaigns that make a difference."],
 ] as const;
 
-test("all six products have distinct working destinations", async ({ page }) => {
+test("all five products have distinct working destinations", async ({ page }) => {
   await page.route("**/api/readiness-account/**", route => route.fulfill({ json: { signedIn: false } }));
   await page.goto("/");
   for (const [path] of productPages) await expect(page.locator(`a[href="${path}"]`).first()).toBeVisible();
@@ -61,7 +60,7 @@ test("dashboard shows genuine readiness and native Social Impact Excellence stat
   await expect(readinessProgress).toHaveAttribute("aria-valuenow", "63");
   await expect(readinessProgress.locator("xpath=..")).toContainText("In progress63%");
   await expect(progressOverview.locator("li").filter({ hasText: "Live beta · separate service" })).toHaveCount(1);
-  await expect(progressOverview.locator("li").filter({ hasText: "Not started" })).toHaveCount(4);
+  await expect(progressOverview.locator("li").filter({ hasText: "Not started" })).toHaveCount(3);
   await expect(page.getByRole("heading", { name: "Your SORP tools." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Strengthen your impact." })).toBeVisible();
   await expect(page.getByRole("link", { name: /Continue assessment/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/");
@@ -71,6 +70,15 @@ test("dashboard shows genuine readiness and native Social Impact Excellence stat
     grid => getComputedStyle(grid).gridTemplateColumns.split(" ").length,
   );
   expect(impactColumns).toBe(page.viewportSize()!.width > 700 ? 2 : 1);
+});
+
+test("Purpose Works has no public route or navigation entry", async ({ page }) => {
+  const response = await page.goto("/purpose-works/");
+  expect(response?.status()).toBe(404);
+  await page.goto("/");
+  await expect(page.getByRole("navigation", { name: "SORP2026 products" }).getByRole("link")).toHaveCount(6);
+  await expect(page.locator('a[href="/purpose-works/"]')).toHaveCount(0);
+  await expect(page.getByText("Purpose Works", { exact: true })).toHaveCount(0);
 });
 
 test("Social Impact Excellence uses the SORP account and saves real assessment progress", async ({ page }) => {
