@@ -9,6 +9,8 @@ test("hero explains the platform, keeps its identity and preserves the footer", 
   await expect(hero).toContainText("charities and their advisers");
   await expect(hero).toContainText("UK-based social enterprise initiative");
   await expect(hero.getByRole("img", { name: "My Social Impact" })).toBeVisible();
+  const headlineSize = await hero.locator("#gateway-title").evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize));
+  expect(headlineSize).toBeLessThanOrEqual(testInfo.project.name === "mobile" ? 34 : 48);
   await expect(page.locator("#home-vision-title")).toHaveText("Imagine a world where social impact was taken as seriously as financial performance.");
   await expect(page.locator(".gateway-tagline")).toHaveText("REPORTING FOR GREATER IMPACT");
   await expect(page.locator(".gateway-tagline")).toBeVisible();
