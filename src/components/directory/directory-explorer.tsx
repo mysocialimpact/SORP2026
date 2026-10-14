@@ -138,20 +138,21 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
         {area && <button className="directory-text-button" onClick={() => { setArea(null); changeFilters(); }}>Clear map area ×</button>}
         {!results.length && <div className="directory-empty"><h2>A little further afield?</h2><p>No firms match these filters. Try a different area or fewer services.</p><button onClick={nationwide}>Show all firms</button></div>}
         {results.slice(0,limit).map(({ firm, distance }) => <article id={`firm-${firm.slug}`} key={firm.slug} className={`directory-result${selected === firm.slug ? " is-active" : ""}${firm.featured ? " is-featured" : ""}`}>
-          <div className="directory-result-meta"><span>{firm.featured ? "★ Featured firm" : "ICAEW directory listing"}</span><button aria-label={`${saved.includes(firm.slug) ? "Remove" : "Save"} ${firm.name}${saved.includes(firm.slug) ? " from" : " to"} shortlist`} aria-pressed={saved.includes(firm.slug)} onClick={() => save(firm.slug)}>{saved.includes(firm.slug) ? "Saved ✓" : "Save +"}</button></div>
+          <div className="directory-result-meta"><span>{firm.featured ? `★ ${firm.placementLabel || "Featured firm"}` : firm.humanReviewed ? "✓ Human-reviewed research" : "ICAEW directory listing"}</span><button aria-label={`${saved.includes(firm.slug) ? "Remove" : "Save"} ${firm.name}${saved.includes(firm.slug) ? " from" : " to"} shortlist`} aria-pressed={saved.includes(firm.slug)} onClick={() => save(firm.slug)}>{saved.includes(firm.slug) ? "Saved ✓" : "Save +"}</button></div>
           <h2><button className="directory-firm-focus" onClick={() => { select(firm.slug); setMode("map"); }}>{firm.name}<span aria-hidden="true">↗</span></button></h2>
           <p className="directory-result-location">{firm.location} · {firm.postcode}{distance !== null && <strong> · {distance < 0.1 ? "<0.1" : distance.toFixed(1)} miles</strong>}</p>
           <p className="directory-result-evidence">{firm.classification === "Verified" ? "Charity service evidence recorded" : "Charity specialism listed with ICAEW; further checks pending"}</p>
           {firm.contact && <p className="directory-result-contact">{firm.contact}</p>}
           <div className="directory-result-actions"><Link href={firmPath(firm)}>View profile →</Link>{firm.website ? <a href={firm.website} target="_blank" rel="noopener noreferrer">Website ↗</a> : <a href={firm.icaewUrl} target="_blank" rel="noopener noreferrer">ICAEW details ↗</a>}</div>
-          {firm.featured && <small>Editorial launch feature · not a paid placement</small>}
+          {firm.featured && <small>{firm.placementLabel || "Featured placement"} · placement does not change the independent evidence score</small>}
+          {firm.humanReviewed && <small>Research reviewed by a human · not an endorsement</small>}
           {!firm.coordinates && <small>Map location awaiting verification</small>}
         </article>)}
         {limit < results.length && <button className="directory-load-more" onClick={() => setLimit(current => current + 10)}>Show 10 more <span>{Math.min(limit,results.length)} of {results.length}</span></button>}
       </div>
       <div className="directory-map-panel"><DirectoryMap firms={mapped} selected={active?.firm.slug || null} origin={origin} view={view} onSelect={slug => select(slug,true)} onMove={setMapBounds}/>
         <div className="directory-map-tools">{mapBounds && <button onClick={() => { setArea(mapBounds); changeFilters(); }}>Search this area</button>}<span>Office postcodes · approximate locations</span></div>
-        {active && <div className="directory-map-preview"><button className="directory-preview-close" aria-label="Close firm preview" onClick={() => setSelected(null)}>×</button><small>{active.firm.featured ? "Featured firm · editorial" : "Explore this firm"}</small><h3>{active.firm.name}</h3><p>{active.firm.location} · {active.firm.postcode}</p><div><Link href={firmPath(active.firm)}>Full profile →</Link><button onClick={() => save(active.firm.slug)}>{saved.includes(active.firm.slug) ? "Remove from shortlist" : "Save to shortlist"}</button></div></div>}
+        {active && <div className="directory-map-preview"><button className="directory-preview-close" aria-label="Close firm preview" onClick={() => setSelected(null)}>×</button><small>{active.firm.featured ? active.firm.placementLabel || "Featured firm" : active.firm.humanReviewed ? "Human-reviewed research" : "Explore this firm"}</small><h3>{active.firm.name}</h3><p>{active.firm.location} · {active.firm.postcode}</p><div><Link href={firmPath(active.firm)}>Full profile →</Link><button onClick={() => save(active.firm.slug)}>{saved.includes(active.firm.slug) ? "Remove from shortlist" : "Save to shortlist"}</button></div></div>}
       </div>
     </div>
     <p className="directory-notice" role="status">{notice || "Save up to three firms to compare. Your shortlist stays in this browser tab for this visit."}</p>

@@ -1271,7 +1271,7 @@ function FeatureStatus() {
       "Private access",
       data ? "Working" : "Needs attention",
       data
-        ? "Every console page and API checks the signed-in account against ADMIN_EMAIL."
+        ? "Every console page and API requires the server-issued platform founder role."
         : error || "Checking the connection…",
     ],
     [

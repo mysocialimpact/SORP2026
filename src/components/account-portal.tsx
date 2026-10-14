@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 const roles = [
@@ -32,14 +32,13 @@ function returnToEmbeddedProduct(destination: string) {
 
 export function AccountPortal({ returnTo, embedded = false }: { returnTo?: string; embedded?: boolean } = {}) {
   const params = useSearchParams();
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>(params.get("mode") === "signup" ? "signup" : "login");
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
   const [fields, setFields] = useState({ name: "", role: "", roleOther: "", email: "", password: "", confirm: "" });
-  const destination = useMemo(() => safeReturn(returnTo ?? params.get("return")), [params, returnTo]);
-  const hasExplicitDestination = Boolean(returnTo || params.get("return"));
+  const destination = useMemo(() => safeReturn(returnTo ?? params.get("return") ?? params.get("next")), [params, returnTo]);
+  const hasExplicitDestination = Boolean(returnTo || params.get("return") || params.get("next"));
 
   useEffect(() => {
     const controller = new AbortController();
@@ -48,13 +47,13 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
         const data = await response.json().catch(() => ({}));
         if (response.ok && data.signedIn === true) {
           if (embedded) returnToEmbeddedProduct(destination);
-          else router.replace(data.platformAccess?.founder === true && !hasExplicitDestination ? "/founder/" : destination);
+          else window.location.replace(data.platformAccess?.founder === true && !hasExplicitDestination ? "/founder/" : destination);
         }
       })
       .catch(() => undefined)
       .finally(() => setChecking(false));
     return () => controller.abort();
-  }, [destination, router, embedded, hasExplicitDestination]);
+  }, [destination, embedded, hasExplicitDestination]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -83,8 +82,10 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
         // Refresh the existing shared session and all account controls together.
         returnToEmbeddedProduct(destination);
       } else {
-        router.replace(data.platformAccess?.founder === true && !hasExplicitDestination ? "/founder/" : signedInDestination(destination));
-        router.refresh();
+        // A full navigation ensures the newly issued secure session cookie is
+        // present when server-side founder/adviser guards run. A client-only
+        // transition can race the cookie update and bounce back to sign-in.
+        window.location.assign(data.platformAccess?.founder === true && !hasExplicitDestination ? "/founder/" : signedInDestination(destination));
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "We could not complete that request. Please try again.");

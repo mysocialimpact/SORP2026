@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { AccessError } from "@/lib/console/auth";
+import { AccessError } from "@/lib/access-error";
 
 export type PlatformMembership = {
   organisationId: string;
