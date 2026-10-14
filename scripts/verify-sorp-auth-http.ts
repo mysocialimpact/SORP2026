@@ -4,6 +4,7 @@ import { hashPassword } from "better-auth/crypto";
 import { base32 } from "@better-auth/utils/base32";
 import { createOTP } from "@better-auth/utils/otp";
 import { Pool } from "pg";
+import { chromium, expect } from "@playwright/test";
 
 const url = process.env.SORP_AUTH_DATABASE_URL || "";
 if (!url.includes("127.0.0.1:55432/sorp_test")) throw new Error("Local test DB required.");
@@ -64,6 +65,27 @@ try {
   assert.equal(plan.status, 200, await plan.clone().text());
   assert.equal((await plan.json() as { complimentary_reason: string }).complimentary_reason,
     "Synthetic HTTP plan test");
+  const directory = await fetch(`${origin}/api/founder/dashboard`, { headers: { cookie: founderCookie } });
+  const view = await directory.json() as { users: Array<{ id: string }>; products: { readiness: unknown[] } };
+  assert.ok(view.users.some(user => user.id === id));
+  assert.ok(Array.isArray(view.products.readiness));
+  const userDetail = await fetch(`${origin}/api/founder/user/${id}`, { headers: { cookie: founderCookie } });
+  assert.equal((await userDetail.json() as { user: { id: string } }).user.id, id);
+  assert.equal((await fetch(`${origin}/api/founder/plans`, { headers: { cookie: founderCookie } })).status, 200);
+  const browser = await chromium.launch({ executablePath: "/usr/bin/chromium", args: ["--no-sandbox"] });
+  try {
+    const context = await browser.newContext({ baseURL: origin });
+    const [cookieName, ...cookieValue] = founderCookie.split("=");
+    await context.addCookies([{ name: cookieName, value: cookieValue.join("="),
+      domain: "localhost", path: "/" }]);
+    const page = await context.newPage();
+    page.on("pageerror", error => process.stderr.write(`Founder page error: ${error.message}\n`));
+    page.on("console", entry => { if (entry.type() === "error") process.stderr.write(`Founder console: ${entry.text()}\n`); });
+    await page.goto("/founder/");
+    await expect(page.getByText("Synthetic HTTP charity", { exact: true }).first()).toBeVisible();
+    await page.getByRole("button", { name: "Synthetic HTTP charity" }).first().click();
+    await expect(page.getByRole("dialog")).toContainText("Synthetic HTTP plan test");
+  } finally { await browser.close(); }
   process.stdout.write("HTTP auth, founder MFA, guard, organisation and plan paths passed.\n");
 } finally {
   if (organisationId) {

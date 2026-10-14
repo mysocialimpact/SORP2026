@@ -149,7 +149,8 @@ assessment import and overwrite refusal, confidentiality thresholds,
 revoked/expired team links, founder TOTP and revocation, and adviser access
 before and after charity approval. A local HTTP check covers the actual Next
 route for login, founder denial before grant, TOTP challenge, founder route,
-organisation creation and plan change. Separate tests cover durable login
+organisation creation and plan change; its Chromium continuation opens the
+rebased founder workspace and the changed organisation. Separate tests cover durable login
 limits, expired sessions, report upload ownership and PDF bytes, including an
 exact 15 MB file in five chunks. A Chromium
 browser check passed the real login, two-chunk report upload and persisted
