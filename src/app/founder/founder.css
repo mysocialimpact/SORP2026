@@ -12,3 +12,4 @@
 @media(max-width:920px){.founder-metrics{grid-template-columns:repeat(3,1fr)}.founder-modal-sections{grid-template-columns:1fr}}
 @media(max-width:720px){.founder-live-grid{display:grid;grid-template-columns:1fr;gap:36px;margin-top:55px}.founder-metrics{grid-template-columns:1fr 1fr}}
 .founder-revoke{border:1px solid #9d321f;background:transparent;color:#7a2418;padding:.8rem 1rem;font:inherit;font-weight:750;cursor:pointer}.founder-revoke:hover{background:#fff0ec}.founder-revoke:disabled{opacity:.55;cursor:wait}
+.founder-modal{z-index:200}

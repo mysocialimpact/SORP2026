@@ -123,7 +123,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       await audit(actor.email, "invitation_recorded", "organisation", id, null, invitation);
       return json({ ...invitation, delivery: "sent", platform: delivered.invitation }, 201);
     }
-    if (resource === "clients" && action === "link") {
+    if (resource === "clients" && (id === "link" || action === "link")) {
       const adviser = String(body.adviserOrganisationId || "");
       const charity = String(body.charityOrganisationId || "");
       if (!adviser || !charity || adviser === charity) return json({ error: "Choose two different organisations." }, 400);
