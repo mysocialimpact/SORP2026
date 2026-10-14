@@ -17,41 +17,47 @@ async function login(page: Page, account: { email: string; password: string }) {
 }
 
 async function createOrganisation(page: Page, name: string, type: "Charity" | "Adviser") {
-  const answers = [name, type];
-  page.on("dialog", async dialog => dialog.accept(answers.shift() || ""));
+  await page.getByRole("button", { name: /Organisations & Accounts/ }).click();
   await page.getByRole("button", { name: /New organisation/ }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Organisation name").fill(name);
+  await dialog.getByLabel("Organisation type").selectOption(type);
+  await dialog.getByRole("button", { name: /Create live organisation/ }).click();
   await expect(page.getByRole("status")).toContainText("Organisation created");
   await expect(page.getByRole("row", { name: new RegExp(name) })).toBeVisible();
-  page.removeAllListeners("dialog");
 }
 
 async function manage(page: Page, name: string) {
-  await page.getByPlaceholder("Search organisations").fill(name);
+  const existing = page.getByRole("dialog");
+  if (await existing.isVisible().catch(() => false)) await existing.getByRole("button", { name: "Close" }).click();
+  await page.getByRole("button", { name: /Organisations & Accounts/ }).click();
+  await page.getByPlaceholder("Name, type or email").fill(name);
   const row = page.getByRole("row", { name: new RegExp(name) });
   await expect(row).toBeVisible();
-  await row.getByRole("button", { name: /Manage/ }).click();
+  await row.getByRole("button", { name: /Open/ }).click();
   return page.getByRole("dialog");
 }
 
 async function setPlan(page: Page, name: string, plan: string, duration: string, reason: string) {
   const dialog = await manage(page, name);
-  const form = dialog.getByRole("heading", { name: "Plan and complimentary access" }).locator("..").locator("form");
+  const form = dialog.getByRole("heading", { name: "Plan and access" }).locator("..").locator("form");
   await form.getByLabel("Plan").selectOption(plan);
   await form.getByLabel("Complimentary access").check();
   await form.getByLabel("Duration").selectOption(duration);
-  await form.getByLabel("Reason").fill(reason);
+  await form.getByLabel("Internal reason").fill(reason);
   await form.getByRole("button", { name: /Save entitlement/ }).click();
-  await expect(page.getByRole("status")).toContainText("Entitlement updated");
+  await expect(page.getByRole("status")).toContainText("Plan and entitlement updated");
+  await dialog.getByRole("button", { name: "Close" }).click();
 }
 
 async function inviteFromFounder(page: Page, organisation: string, email: string) {
   const dialog = await manage(page, organisation);
-  const form = dialog.getByRole("heading", { name: "Invite a person" }).locator("..").locator("form");
+  const form = dialog.getByRole("heading", { name: "People" }).locator("..").locator("form");
   await form.getByLabel("Email address").fill(email);
   await form.getByLabel("Role").selectOption("owner");
   await form.getByRole("button", { name: /Send invitation email/ }).click();
-  await expect(page.getByRole("status")).toContainText(`Invitation email sent to ${email}`);
-  const message = await page.request.get("http://127.0.0.1:4181/mail/latest").then(r => r.json());
+  await expect(page.getByRole("status")).toContainText(`Invitation sent to ${email}`);
+  const message = await page.request.get("http://localhost:4181/mail/latest").then(r => r.json());
   expect(message.email).toBe(email);
   expect(message.link).toContain("/invitation/");
   await dialog.getByRole("button", { name: "Close" }).click();
@@ -84,7 +90,7 @@ test("founder can administer plans, invitations and consent-based adviser access
   await login(page, founder);
   await expect(page).toHaveURL(/\/founder\//);
   await expect(page.getByRole("heading", { name: "Control the platform." })).toBeVisible();
-  await page.getByRole("link", { name: /Back to My Dashboard/ }).click();
+  await page.getByRole("link", { name: /View My Dashboard/ }).click();
   await expect(page.getByRole("link", { name: /Open Founder Control Centre/ })).toBeVisible();
   await page.getByRole("link", { name: /Open Founder Control Centre/ }).click();
 
@@ -94,7 +100,7 @@ test("founder can administer plans, invitations and consent-based adviser access
 
   await setPlan(page, "Test Adviser Ltd", "Adviser", "30", "30-day isolated browser test");
   await setPlan(page, "Test Charity Ltd", "Plus", "90", "90-day isolated browser test");
-  await page.getByPlaceholder("Search organisations").fill("");
+  await page.getByPlaceholder("Name, type or email").fill("");
   const adviserRow = page.getByRole("row", { name: /Test Adviser Ltd/ });
   await expect(adviserRow).toContainText("Adviser");
   await expect(adviserRow).toContainText("£99/month");
@@ -120,11 +126,11 @@ test("founder can administer plans, invitations and consent-based adviser access
   await charityPage.request.post("/api/readiness-account/", { data: { action: "save", progress: { state: { charityName: "Test Charity Ltd", currentStage: 3, completedStages: [1, 2] }, answers: { charity_name: "Test Charity Ltd", threshold: "above-500k" } } } });
 
   const relationDialog = await manage(page, "Test Adviser Ltd");
-  const relationForm = relationDialog.getByRole("heading", { name: "Request client access" }).locator("..").locator("form");
+  const relationForm = relationDialog.getByRole("heading", { name: "Authorised clients" }).locator("..").locator("form");
   await relationForm.getByLabel("Charity").selectOption(testCharity.id);
   await relationForm.getByLabel("View individual answers").check();
   await relationForm.getByRole("button", { name: /Request charity approval/ }).click();
-  await expect(page.getByRole("status")).toContainText("charity owner must approve");
+  await expect(page.getByRole("status")).toContainText("charity owner approves");
   await relationDialog.getByRole("button", { name: "Close" }).click();
 
   await charityPage.goto("/dashboard/");
@@ -169,26 +175,59 @@ test("founder can administer plans, invitations and consent-based adviser access
   expect(saved.progress.answers.charity_name).toBe("Test Charity Ltd");
 
   const customDialog = await manage(page, "Test Adviser Ltd");
-  const customForm = customDialog.getByRole("heading", { name: "Plan and complimentary access" }).locator("..").locator("form");
+  const customForm = customDialog.getByRole("heading", { name: "Plan and access" }).locator("..").locator("form");
   await customForm.getByLabel("Plan").selectOption("Adviser");
   await customForm.getByLabel("Complimentary access").check();
   await customForm.getByLabel("Duration").selectOption("custom");
-  await customForm.getByLabel("Custom expiry (optional)").fill("2027-06-30");
-  await customForm.getByLabel("Reason").fill("Custom isolated browser test");
+  await customForm.getByLabel("Custom expiry", { exact: true }).fill("2027-06-30");
+  await customForm.getByLabel("Internal reason").fill("Custom isolated browser test");
   await customForm.getByRole("button", { name: /Save entitlement/ }).click();
-  await expect(page.getByRole("status")).toContainText("Entitlement updated");
+  await expect(page.getByRole("status")).toContainText("Plan and entitlement updated");
+  await customDialog.getByRole("button", { name: "Close" }).click();
   const enterpriseDialog = await manage(page, "Test Adviser Ltd");
-  const enterpriseForm = enterpriseDialog.getByRole("heading", { name: "Plan and complimentary access" }).locator("..").locator("form");
+  const enterpriseForm = enterpriseDialog.getByRole("heading", { name: "Plan and access" }).locator("..").locator("form");
   await enterpriseForm.getByLabel("Plan").selectOption("Enterprise");
   await enterpriseForm.getByLabel("Complimentary access").uncheck();
   await enterpriseForm.getByRole("button", { name: /Save entitlement/ }).click();
-  await expect(page.getByRole("status")).toContainText("Entitlement updated");
-  await page.getByPlaceholder("Search organisations").fill("");
+  await expect(page.getByRole("status")).toContainText("Plan and entitlement updated");
+  await enterpriseDialog.getByRole("button", { name: "Close" }).click();
+  await page.getByPlaceholder("Name, type or email").fill("");
   await expect(page.getByRole("row", { name: /Test Adviser Ltd/ })).toContainText("Enterprise");
 
-  await page.getByPlaceholder("Search organisations").fill("");
+  await page.getByRole("button", { name: /Platform Management/ }).click();
   await expect(page.getByText("complimentary_access_revoked", { exact: true })).toBeVisible();
-  await expect(page.getByText("client_access_changed", { exact: true })).toBeVisible();
+  await expect(page.getByText("client_access_changed", { exact: true }).first()).toBeVisible();
+
+  await page.getByRole("button", { name: /Accountants & Advisers/ }).click();
+  await page.getByPlaceholder("Firm, town or domain").fill("Burton Sweet");
+  const firmRow = page.getByRole("row", { name: /Burton Sweet/ });
+  const scoreBefore = await firmRow.locator("td").nth(2).textContent();
+  await firmRow.getByRole("button", { name: /Manage/ }).click();
+  const firmDialog = page.getByRole("dialog");
+  await firmDialog.getByLabel("Human Reviewed").check();
+  await firmDialog.getByLabel("Review note").fill("Evidence report checked in the isolated founder browser test.");
+  await firmDialog.getByLabel("Visible in public directory").check();
+  await firmDialog.getByLabel("Featured placement").check();
+  await firmDialog.getByLabel("Featured priority").fill("90");
+  await firmDialog.getByLabel("Public placement label").fill("Featured — isolated test");
+  await firmDialog.getByRole("button", { name: /Save directory controls/ }).click();
+  await expect(page.getByRole("status")).toContainText("Independent research scores were not changed");
+  await firmDialog.getByRole("button", { name: "Close" }).click();
+  await expect(firmRow).toContainText("Reviewed");
+  await expect(firmRow).toContainText("Featured 90");
+  expect(await firmRow.locator("td").nth(2).textContent()).toBe(scoreBefore);
+  const directoryHtml = await page.request.get("/accountants-advisers/").then(response => response.text());
+  expect(directoryHtml).toContain("Featured — isolated test");
+  expect(directoryHtml).toContain("Research reviewed by a human");
+
+  await firmRow.getByRole("button", { name: /Manage/ }).click();
+  await firmDialog.getByLabel("Human Reviewed").uncheck();
+  // Restore the curated launch feature after exercising founder placement.
+  await firmDialog.getByLabel("Featured placement").check();
+  await firmDialog.getByLabel("Featured priority").fill("0");
+  await firmDialog.getByLabel("Public placement label").fill("Editorial launch feature");
+  await firmDialog.getByRole("button", { name: /Save directory controls/ }).click();
+  await expect(page.getByRole("status")).toContainText("Directory controls saved");
   await adviserContext.close();
   await charityContext.close();
 });
@@ -199,8 +238,9 @@ test("founder interface remains usable at iPhone width", async ({ page }) => {
   await login(page, founder);
   await expect(page).toHaveURL(/\/founder\//);
   await expect(page.getByRole("heading", { name: "Control the platform." })).toBeVisible();
-  await page.getByPlaceholder("Search organisations").fill("Test Adviser Ltd");
-  await page.getByRole("row", { name: /Test Adviser Ltd/ }).getByRole("button", { name: /Manage/ }).click();
+  await page.getByRole("button", { name: /Organisations & Accounts/ }).click();
+  await page.getByPlaceholder("Name, type or email").fill("Test Adviser Ltd");
+  await page.getByRole("row", { name: /Test Adviser Ltd/ }).getByRole("button", { name: /Open/ }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("button", { name: /Save entitlement/ })).toBeVisible();
 });

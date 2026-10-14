@@ -1,6 +1,8 @@
 import { protectFounderRequest } from "@/lib/founder/auth";
 import { founderQuery } from "@/lib/founder/db";
-import { AccessError } from "@/lib/console/auth";
+import { AccessError } from "@/lib/access-error";
+import { listDirectoryControls, setDirectoryControls, setHumanReviewed } from "@/lib/console/directory-controls";
+import { firms as publicFirms } from "@/lib/accountants";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,6 +10,8 @@ export const dynamic = "force-dynamic";
 const plans: Record<string, number> = { Free: 0, Plus: 29, Adviser: 99, Enterprise: 0 };
 const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow" } });
 const cleanEmail = (email: unknown) => String(email || "").trim().toLowerCase();
+const canonical = (value: unknown) => String(value || "").toLowerCase().replace(/\b(?:limited|ltd|llp|plc)\b/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const hostname = (value: unknown) => { try { return new URL(String(value || "")).hostname.toLowerCase().replace(/^www\./, ""); } catch { return ""; } };
 
 class PlatformActionError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -45,6 +49,41 @@ async function audit(actor: string, action: string, type: string, id: string, be
   await founderQuery("INSERT INTO research_console.founder_audit_log(actor,action,target_type,target_id,before_state,after_state) VALUES($1,$2,$3,$4,$5,$6)", [actor, action, type, id, before ? JSON.stringify(before) : null, after ? JSON.stringify(after) : null]);
 }
 
+async function reconcileLiveOrganisations(rows: unknown) {
+  if (!Array.isArray(rows)) return;
+  for (const candidate of rows) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const row = candidate as Record<string, unknown>;
+    const platformId = String(row.id || "").trim();
+    const name = String(row.name || "").trim();
+    const type = ["Charity", "Adviser", "Other"].includes(String(row.type)) ? String(row.type) : "Other";
+    const plan = String(row.plan || "Free") in plans ? String(row.plan || "Free") : "Free";
+    if (!platformId || name.length < 2) continue;
+    const published = Number(row.published_price || 0) / 100;
+    const payable = Number(row.payable_price || 0) / 100;
+    const complimentary = String(row.entitlement_status || "").startsWith("complimentary");
+    await founderQuery(
+      `INSERT INTO research_console.founder_organisations
+       (name,type,platform_organisation_id,plan,published_price,payable_price,complimentary,complimentary_start,complimentary_end,complimentary_reason)
+       VALUES($1,$2,$3,$4,$5,$6,$7,CASE WHEN $7 THEN now() ELSE NULL END,$8,CASE WHEN $7 THEN 'Complimentary Partner' ELSE NULL END)
+       ON CONFLICT(platform_organisation_id) WHERE platform_organisation_id IS NOT NULL DO UPDATE SET
+       name=excluded.name,type=excluded.type,plan=excluded.plan,published_price=excluded.published_price,
+       payable_price=excluded.payable_price,complimentary=excluded.complimentary,
+       complimentary_end=excluded.complimentary_end,
+       complimentary_reason=CASE WHEN excluded.complimentary THEN COALESCE(research_console.founder_organisations.complimentary_reason,'Complimentary Partner') ELSE NULL END,
+       updated_at=now()`,
+      [name, type, platformId, plan, published, payable, complimentary, row.complimentary_end || null],
+    );
+  }
+}
+
+function publicSlug(row: { name:string; website:string|null; domain:string|null }) {
+  const targetDomain = row.domain || hostname(row.website);
+  return publicFirms.find(firm =>
+    Boolean(targetDomain && hostname(firm.website) === targetDomain) || canonical(firm.name) === canonical(row.name),
+  )?.slug || null;
+}
+
 async function handle(request: Request, context: { params: Promise<{ path: string[] }> }) {
   try {
     const actor = await protectFounderRequest(request);
@@ -53,15 +92,40 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     const url = new URL(request.url);
     if (request.method === "GET") {
       if (resource === "dashboard") {
-        const [orgs, membershipCount, invitations, auditRows, live] = await Promise.all([
-          founderQuery("SELECT * FROM research_console.founder_organisations ORDER BY updated_at DESC"),
+        const [membershipCount, invitations, auditRows, live] = await Promise.all([
           founderQuery<{ count: string }>("SELECT count(*) FROM research_console.founder_memberships WHERE status='active'"),
           founderQuery("SELECT * FROM research_console.founder_invitations ORDER BY created_at DESC LIMIT 20"),
           founderQuery("SELECT * FROM research_console.founder_audit_log ORDER BY created_at DESC LIMIT 30"),
           platformAction(request, { action: "founder-overview" }),
         ]);
+        await reconcileLiveOrganisations(live.organisations);
+        const orgs = await founderQuery(`SELECT o.*,
+          (SELECT email FROM research_console.founder_memberships m WHERE m.organisation_id=o.id ORDER BY (m.role='owner') DESC,m.created_at LIMIT 1) primary_email,
+          (SELECT count(*)::int FROM research_console.founder_memberships m WHERE m.organisation_id=o.id) member_count
+          FROM research_console.founder_organisations o ORDER BY o.updated_at DESC`);
         const liveMetrics = live.metrics && typeof live.metrics === "object" ? live.metrics as Record<string, unknown> : {};
-        return json({ founder: { email: actor.email, name: actor.name || "Founder" }, metrics: { organisations: Number(liveMetrics.organisations || orgs.length), activeUsers: Number(liveMetrics.activeUsers || 0), registeredUsers: Number(liveMetrics.registeredUsers || membershipCount[0]?.count || 0), complimentaryAccounts: Number(liveMetrics.complimentaryAccounts || 0), pendingInvitations: Number(liveMetrics.pendingInvitations || 0), source: "Live platform identities plus Founder commercial records." }, organisations: orgs, invitations: live.invitations || invitations, clientAccess: live.clients || [], recentRegistrations: live.recentRegistrations || [], audit: auditRows, unavailable: ["AI usage and cost", "Ask SORP token cost"] });
+        const planCounts = Object.fromEntries(Object.keys(plans).map(plan => [plan, orgs.filter(row => row.plan === plan).length]));
+        const pendingInvitations = Array.isArray(live.invitations) ? live.invitations.filter((row:Record<string,unknown>) => row.status === "pending") : [];
+        const pendingClients = Array.isArray(live.clients) ? live.clients.filter((row:Record<string,unknown>) => row.status === "pending") : [];
+        const expiring = orgs.filter(row => row.complimentary_end && new Date(String(row.complimentary_end)).getTime() < Date.now() + 30 * 86400000);
+        return json({
+          founder: { email: actor.email, name: actor.name || "Founder" },
+          metrics: {
+            organisations: Number(liveMetrics.organisations || orgs.length), activeUsers: Number(liveMetrics.activeUsers || 0),
+            registeredUsers: Number(liveMetrics.registeredUsers || membershipCount[0]?.count || 0),
+            complimentaryAccounts: Number(liveMetrics.complimentaryAccounts || orgs.filter(row => row.complimentary).length),
+            pendingInvitations: Number(liveMetrics.pendingInvitations || pendingInvitations.length),
+            activeSubscriptions: orgs.filter(row => Number(row.payable_price) > 0).length,
+            planCounts, source: "Live platform identities plus Founder commercial records.",
+          },
+          organisations: orgs, invitations: live.invitations || invitations, clientAccess: live.clients || [], recentRegistrations: live.recentRegistrations || [], audit: auditRows,
+          attention: [
+            ...pendingInvitations.map((row:Record<string,unknown>) => ({ kind:"invitation", id:row.id, title:`Invitation awaiting ${row.email}`, detail:row.organisation_name || "Organisation" })),
+            ...pendingClients.map((row:Record<string,unknown>) => ({ kind:"client", id:row.id, title:`${row.adviser_name} → ${row.charity_name}`, detail:"Awaiting charity approval" })),
+            ...expiring.map(row => ({ kind:"complimentary", id:row.id, title:`${row.name} complimentary access`, detail:`Expires ${new Date(String(row.complimentary_end)).toLocaleDateString("en-GB")}` })),
+          ],
+          unavailable: ["Verified billing revenue", "Billing discounts and promotions", "AI usage and cost", "Ask SORP token cost"],
+        });
       }
       if (resource === "organisations") return json(await founderQuery("SELECT * FROM research_console.founder_organisations ORDER BY name"));
       if (resource === "organisation" && id) {
@@ -74,6 +138,30 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
         const q = `%${(url.searchParams.get("q") || "").trim()}%`;
         return json(await founderQuery("SELECT o.*,count(m.id)::int member_count FROM research_console.founder_organisations o LEFT JOIN research_console.founder_memberships m ON m.organisation_id=o.id WHERE o.name ILIKE $1 OR EXISTS(SELECT 1 FROM research_console.founder_memberships mm WHERE mm.organisation_id=o.id AND mm.email ILIKE $1) GROUP BY o.id ORDER BY o.name LIMIT 50", [q]));
       }
+      if (resource === "accountants") {
+        const rows = await listDirectoryControls(url.searchParams.get("q") || "");
+        const firms = rows.map(row => ({ ...row, overall_score: row.total, public_slug: publicSlug(row) }));
+        return json({
+          firms,
+          metrics: {
+            total: firms.length,
+            researched: firms.filter(row => row.research_completed_at).length,
+            humanReviewed: firms.filter(row => row.approved_at).length,
+            publicListings: firms.filter(row => row.public_visible && row.public_slug).length,
+            featured: firms.filter(row => row.featured).length,
+          },
+        });
+      }
+      if (resource === "plans") return json({
+        plans: [
+          { name:"Free", price:0, description:"Core access and saved progress." },
+          { name:"Plus", price:29, description:"Expanded charity tools and support." },
+          { name:"Adviser", price:99, description:"Adviser workspace and authorised client management." },
+          { name:"Enterprise", price:null, description:"Bespoke access agreed directly." },
+        ],
+        billingConnected:false,
+        discountsConnected:false,
+      });
       return json({ error: "Not found" }, 404);
     }
     if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -139,11 +227,23 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       await audit(actor.email, "client_access_changed", "client_access", String(row.id), null, row);
       return json({ ...row as Record<string, unknown>, platform: live }, 201);
     }
+    if (resource === "accountants" && id && action === "directory") {
+      return json(await setDirectoryControls(id, body, actor.email));
+    }
+    if (resource === "accountants" && id && action === "human-review") {
+      return json(await setHumanReviewed(id, body.reviewed === true, String(body.notes || ""), actor.email));
+    }
+    if (resource === "invitations" && id && action === "revoke") {
+      const live = await platformAction(request, { action: "founder-revoke-invitation", invitationId:id });
+      await audit(actor.email, "invitation_revoked", "invitation", id, null, live);
+      return json(live);
+    }
     return json({ error: "Not found" }, 404);
   } catch (error) {
     if (error instanceof AccessError) return json({ error: error.message }, error.status);
     if (error instanceof PlatformActionError) return json({ error: error.message }, error.status);
     const e = error as Error & { code?: string };
+    console.error("Founder Control Centre request failed", { message: e.message, code: e.code });
     if (e.code || /database|connect|timeout/i.test(e.message)) return json({ error: "The founder database could not complete this request. Existing records are retained; please retry." }, 503);
     return json({ error: e.message || "Unable to complete this request." }, 400);
   }

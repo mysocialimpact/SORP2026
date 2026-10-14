@@ -31,6 +31,10 @@ export type Firm = {
   coordinateSource: string;
   services: { id: Service; source: string; evidence: string }[];
   featured?: boolean;
+  featuredPriority?: number;
+  placementLabel?: string;
+  humanReviewed?: boolean;
+  humanReviewedAt?: string;
   overview?: string;
   people?: { name: string; role: string; source: string }[];
   offices?: { address: string; postcode: string; source: string; phone?: string }[];
@@ -72,5 +76,6 @@ export function selectFirms(all: Firm[], options: { query: string; services: Ser
   }).map(firm => ({ firm, distance: options.origin && firm.coordinates ? milesBetween(options.origin, firm.coordinates) : null }))
     .sort((a, b) => options.origin
       ? (a.distance ?? Infinity) - (b.distance ?? Infinity) || a.firm.name.localeCompare(b.firm.name)
-      : a.firm.name.localeCompare(b.firm.name));
+      : (b.firm.featuredPriority || 0) - (a.firm.featuredPriority || 0) ||
+        a.firm.name.localeCompare(b.firm.name));
 }

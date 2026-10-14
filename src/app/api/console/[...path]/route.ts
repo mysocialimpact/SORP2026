@@ -1,5 +1,6 @@
 import { after } from "next/server";
-import { protectRequest, AccessError } from "@/lib/console/auth";
+import { protectRequest } from "@/lib/console/auth";
+import { AccessError } from "@/lib/access-error";
 import * as repository from "@/lib/console/repository";
 import { query } from "@/lib/console/db";
 import { startResearch, runResearch } from "@/lib/console/research";

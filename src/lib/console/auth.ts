@@ -1,18 +1,11 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-export class AccessError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+import { AccessError } from "@/lib/access-error";
+export { AccessError } from "@/lib/access-error";
 export async function authenticate(cookie: string) {
-  const admin = process.env.ADMIN_EMAIL?.trim().toLowerCase();
   const origin = process.env.SORP_BACKEND_ORIGIN;
-  if (!admin || !origin)
+  if (!origin)
     throw new AccessError(503, "Private access needs configuration.");
   if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
   let response: Response;
@@ -28,11 +21,15 @@ export async function authenticate(cookie: string) {
   }
   if (!response.ok) throw new AccessError(401, "Please log in again.");
   const data = await response.json();
-  if (data.signedIn !== true || typeof data.account?.email !== "string")
+  if (
+    data.signedIn !== true ||
+    typeof data.account?.id !== "string" ||
+    typeof data.account?.email !== "string"
+  )
     throw new AccessError(401, "Please log in again.");
-  if (data.account.email.trim().toLowerCase() !== admin)
-    throw new AccessError(403, "This console is private to its owner.");
-  return admin;
+  if (data.platformAccess?.founder !== true)
+    throw new AccessError(403, "This console is private to authorised platform founders.");
+  return data.account.email.trim().toLowerCase();
 }
 export async function protectPage() {
   try {
