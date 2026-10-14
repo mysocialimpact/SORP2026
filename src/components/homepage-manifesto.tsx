@@ -15,12 +15,12 @@ export function HomepageManifesto() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           root.setAttribute("data-active", "true");
-          root.querySelectorAll("[data-reveal]").forEach((element) => element.setAttribute("data-revealed", "true"));
-          observer.disconnect();
+          entry.target.setAttribute("data-revealed", "true");
+          observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.08, rootMargin: "0px 0px -18% 0px" });
-    observer.observe(root);
+    }, { threshold: 0.3, rootMargin: "-120px 0px -12% 0px" });
+    root.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
     return () => observer.disconnect();
   }, []);
 
@@ -36,8 +36,8 @@ export function HomepageManifesto() {
       </div>
       <figure className={styles.founders} data-reveal>
         <div className={styles.portraits}>
-          <Image className={styles.marcus} src="/images/marcus-warry-cutout.webp" alt="Marcus Warry" width={1205} height={1306} sizes="(max-width: 700px) 40vw, 190px" />
-          <Image className={styles.chris} src="/images/chris-arnold-cutout.webp" alt="Dr Chris Arnold" width={1205} height={1306} sizes="(max-width: 700px) 40vw, 190px" />
+          <Image className={styles.marcus} src="/images/marcus-editorial.webp" alt="Marcus Warry" width={640} height={857} sizes="(max-width: 700px) 40vw, 240px" />
+          <div className={styles.photoPending}><span>Dr Chris Arnold</span><small>Preview: awaiting the original attached photograph file.</small></div>
         </div>
         <figcaption>
           <span className={styles.founderNames}><strong>Marcus Warry &amp; Dr Chris Arnold</strong><span>Co-founders, My Social Impact</span></span>
