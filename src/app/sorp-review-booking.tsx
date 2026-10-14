@@ -52,6 +52,13 @@ export function SorpReviewBooking({ shared = false, onSelect, humanIntroduction,
         if (stored) {
           setDetails({ name: stored.name || "", email: stored.email || "", organisation: stored.candidate?.name || "" });
           setReviewSessionId(stored.sessionId || "");
+        } else {
+          void fetch("/api/readiness-account/", { cache: "no-store" }).then(async response => {
+            if (!response.ok) return;
+            const data = await response.json();
+            if (!data.signedIn || !data.account) return;
+            setDetails({ name: data.account.name || "", email: data.account.email || "", organisation: data.account.organisation || data.platformAccess?.memberships?.[0]?.name || "" });
+          }).catch(() => undefined);
         }
       } catch { /* Shared booking remains usable without saved review details. */ }
       if (shared) {

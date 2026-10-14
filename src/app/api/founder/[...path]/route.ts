@@ -12,6 +12,7 @@ const json = (data: unknown, status = 200) => Response.json(data, { status, head
 const cleanEmail = (email: unknown) => String(email || "").trim().toLowerCase();
 const canonical = (value: unknown) => String(value || "").toLowerCase().replace(/\b(?:limited|ltd|llp|plc)\b/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 const hostname = (value: unknown) => { try { return new URL(String(value || "")).hostname.toLowerCase().replace(/^www\./, ""); } catch { return ""; } };
+const cleanText = (value: unknown, limit: number) => String(value || "").trim().slice(0, limit);
 
 class PlatformActionError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -162,6 +163,51 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
         billingConnected:false,
         discountsConnected:false,
       });
+      if (resource === "feedback") {
+        const status = ["new", "reviewing", "actioning", "resolved"].includes(url.searchParams.get("status") || "") ? url.searchParams.get("status")! : "";
+        const category = ["general", "suggestion", "problem"].includes(url.searchParams.get("category") || "") ? url.searchParams.get("category")! : "";
+        const sourceType = ["user", "automatic"].includes(url.searchParams.get("source") || "") ? url.searchParams.get("source")! : "";
+        const search = cleanText(url.searchParams.get("q"), 160);
+        const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit")) || 50));
+        const offset = Math.max(0, Number(url.searchParams.get("offset")) || 0);
+        const params = [status, category, sourceType, search ? `%${search}%` : "", limit, offset];
+        const where = `($1='' OR status=$1) AND ($2='' OR category=$2) AND ($3='' OR source_type=$3) AND ($4='' OR user_name ILIKE $4 OR email ILIKE $4 OR organisation_name ILIKE $4 OR comment ILIKE $4 OR page_path ILIKE $4 OR theme ILIKE $4)`;
+        const [rows, count] = await Promise.all([
+          founderQuery(`SELECT * FROM research_console.founder_feedback WHERE ${where} ORDER BY created_at DESC LIMIT $5 OFFSET $6`, params),
+          founderQuery<{ count: string }>(`SELECT count(*) FROM research_console.founder_feedback WHERE ${where}`, params.slice(0, 4)),
+        ]);
+        return json({ rows, total: Number(count[0]?.count || 0), limit, offset });
+      }
+      if (resource === "enquiries") {
+        const status = ["new", "actioning", "resolved"].includes(url.searchParams.get("status") || "") ? url.searchParams.get("status")! : "";
+        const search = cleanText(url.searchParams.get("q"), 160);
+        const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit")) || 50));
+        const offset = Math.max(0, Number(url.searchParams.get("offset")) || 0);
+        const params = [status, search ? `%${search}%` : "", limit, offset];
+        const where = `($1='' OR status=$1) AND ($2='' OR user_name ILIKE $2 OR email ILIKE $2 OR organisation_name ILIKE $2 OR message ILIKE $2 OR page_path ILIKE $2)`;
+        const [rows, count] = await Promise.all([
+          founderQuery(`SELECT * FROM research_console.founder_contact_enquiries WHERE ${where} ORDER BY created_at DESC LIMIT $3 OFFSET $4`, params),
+          founderQuery<{ count: string }>(`SELECT count(*) FROM research_console.founder_contact_enquiries WHERE ${where}`, params.slice(0, 2)),
+        ]);
+        return json({ rows, total: Number(count[0]?.count || 0), limit, offset });
+      }
+      if (resource === "feedback-metrics") {
+        const [summary, trends, recurring] = await Promise.all([
+          founderQuery(`SELECT count(*) FILTER (WHERE status='new')::int new_feedback,
+            count(*) FILTER (WHERE category='problem' AND status<>'resolved')::int outstanding_problems,
+            round(avg(rating)::numeric,1) average_rating,
+            count(*) FILTER (WHERE status='resolved')::int resolved,
+            count(*) FILTER (WHERE created_at > now()-interval '30 days')::int last_30_days
+            FROM research_console.founder_feedback`),
+          founderQuery(`SELECT category,count(*)::int submissions,round(avg(rating)::numeric,1) average_rating
+            FROM research_console.founder_feedback WHERE created_at > now()-interval '30 days' GROUP BY category ORDER BY submissions DESC`),
+          founderQuery(`SELECT coalesce(nullif(theme,''),page_path) label,count(*)::int submissions
+            FROM research_console.founder_feedback WHERE category='problem' AND status<>'resolved'
+            GROUP BY coalesce(nullif(theme,''),page_path) HAVING count(*) > 1 ORDER BY submissions DESC,label LIMIT 8`),
+        ]);
+        return json({ summary: summary[0] || {}, trends, recurring });
+      }
+      if (resource === "improvements") return json(await founderQuery("SELECT * FROM research_console.founder_improvements ORDER BY published DESC,published_at DESC NULLS LAST,updated_at DESC"));
       return json({ error: "Not found" }, 404);
     }
     if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -237,6 +283,51 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       const live = await platformAction(request, { action: "founder-revoke-invitation", invitationId:id });
       await audit(actor.email, "invitation_revoked", "invitation", id, null, live);
       return json(live);
+    }
+    if (resource === "feedback" && id && action === "update") {
+      const before = (await founderQuery<Record<string, unknown>>("SELECT * FROM research_console.founder_feedback WHERE id=$1", [id]))[0];
+      if (!before) return json({ error: "Feedback not found." }, 404);
+      const status = ["new", "reviewing", "actioning", "resolved"].includes(body.status) ? body.status : before.status;
+      const notes = cleanText(body.internalNotes, 5_000) || null;
+      const theme = cleanText(body.theme, 160) || null;
+      const row = (await founderQuery("UPDATE research_console.founder_feedback SET status=$1,internal_notes=$2,theme=$3,updated_at=now() WHERE id=$4 RETURNING *", [status, notes, theme, id]))[0];
+      await audit(actor.email, "feedback_updated", "feedback", id, before, row);
+      return json(row);
+    }
+    if (resource === "enquiries" && id && action === "update") {
+      const before = (await founderQuery<Record<string, unknown>>("SELECT * FROM research_console.founder_contact_enquiries WHERE id=$1", [id]))[0];
+      if (!before) return json({ error: "Enquiry not found." }, 404);
+      const status = ["new", "actioning", "resolved"].includes(body.status) ? body.status : before.status;
+      const notes = cleanText(body.internalNotes, 5_000) || null;
+      const row = (await founderQuery("UPDATE research_console.founder_contact_enquiries SET status=$1,internal_notes=$2,updated_at=now() WHERE id=$3 RETURNING *", [status, notes, id]))[0];
+      await audit(actor.email, "contact_enquiry_updated", "contact_enquiry", id, before, row);
+      return json(row);
+    }
+    if (resource === "improvements" && !id) {
+      const said = cleanText(body.said, 1_000);
+      const did = cleanText(body.did, 2_000);
+      const linkUrl = cleanText(body.linkUrl, 500) || null;
+      const feedbackId = cleanText(body.feedbackId, 80) || null;
+      if (!said || !did) return json({ error: "Add both what users said and what changed." }, 400);
+      if (linkUrl && !linkUrl.startsWith("/")) return json({ error: "Use a link within SORP 2026." }, 400);
+      if (feedbackId && !(await founderQuery("SELECT id FROM research_console.founder_feedback WHERE id=$1", [feedbackId]))[0]) return json({ error: "Linked feedback was not found." }, 400);
+      const published = body.published === true;
+      const row = (await founderQuery("INSERT INTO research_console.founder_improvements(feedback_id,said,did,link_url,published,published_at,created_by) VALUES($1,$2,$3,$4,$5,CASE WHEN $5 THEN now() END,$6) RETURNING *", [feedbackId, said, did, linkUrl, published, actor.email]))[0] as Record<string, unknown> & { id: string };
+      await audit(actor.email, published ? "improvement_published" : "improvement_created", "improvement", row.id, null, row);
+      return json(row, 201);
+    }
+    if (resource === "improvements" && id && action === "update") {
+      const before = (await founderQuery<Record<string, unknown>>("SELECT * FROM research_console.founder_improvements WHERE id=$1", [id]))[0];
+      if (!before) return json({ error: "Improvement not found." }, 404);
+      const said = cleanText(body.said, 1_000);
+      const did = cleanText(body.did, 2_000);
+      const linkUrl = cleanText(body.linkUrl, 500) || null;
+      if (!said || !did) return json({ error: "Add both what users said and what changed." }, 400);
+      if (linkUrl && !linkUrl.startsWith("/")) return json({ error: "Use a link within SORP 2026." }, 400);
+      const published = body.published === true;
+      const row = (await founderQuery("UPDATE research_console.founder_improvements SET said=$1,did=$2,link_url=$3,published=$4,published_at=CASE WHEN $4 THEN coalesce(published_at,now()) ELSE NULL END,updated_at=now() WHERE id=$5 RETURNING *", [said, did, linkUrl, published, id]))[0];
+      await audit(actor.email, published ? "improvement_published" : "improvement_updated", "improvement", id, before, row);
+      return json(row);
     }
     return json({ error: "Not found" }, 404);
   } catch (error) {

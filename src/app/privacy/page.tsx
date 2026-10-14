@@ -39,6 +39,17 @@ export default function Privacy() {
           to services with their own privacy policies.
         </p>
         <p>
+          Signed-in users can send a question or advice request to Marcus and
+          can choose to submit beta feedback. We associate those submissions
+          with the user’s account, organisation, account type and the page they
+          came from so My Social Impact can respond and improve the right part
+          of the service. Only authorised platform administrators can review
+          the full records and their internal follow-up notes. If an
+          improvement is later published in “You Said. We Did.”, it contains
+          only founder-written summaries and never the submitting person’s
+          identity or contact details.
+        </p>
+        <p>
           The hosting provider and connected services may process ordinary
           connection data, such as IP addresses, request times and browser
           information, to deliver and secure the service. My Social Impact uses
