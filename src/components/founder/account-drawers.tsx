@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, ReactNode, useEffect } from "react";
+import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   Dashboard,
+  Invitation,
   Organisation,
   OrganisationDetail,
   UserDetail,
@@ -16,15 +17,45 @@ type OrganisationProps = {
   detail: OrganisationDetail | null;
   data: Dashboard;
   busy: boolean;
+  invitationFeedback: string;
   onClose: () => void;
   onPlan: (event: FormEvent<HTMLFormElement>) => void;
   onInvite: (event: FormEvent<HTMLFormElement>) => void;
+  onRevokeInvitation: (id?: string) => void;
+  onResendInvitation: (id?: string) => void;
   onRevokeComplimentary: () => void;
   onClientAccess: (event: FormEvent<HTMLFormElement>) => void;
   onOpenUser: (userId: string) => void;
+  onRefresh: () => Promise<void>;
 };
 
-export function OrganisationDrawer({ organisation, detail, data, busy, onClose, onPlan, onInvite, onRevokeComplimentary, onClientAccess, onOpenUser }: OrganisationProps) {
+export function OrganisationDrawer({ organisation, detail, data, busy, invitationFeedback, onClose, onPlan, onInvite, onRevokeInvitation, onResendInvitation, onRevokeComplimentary, onClientAccess, onOpenUser, onRefresh }: OrganisationProps) {
+  const inviteForm = useRef<HTMLFormElement>(null);
+  const refreshAction = useRef(onRefresh);
+  const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => { refreshAction.current = onRefresh; }, [onRefresh]);
+  useEffect(() => {
+    const interval = window.setInterval(() => { void refreshAction.current().catch(() => undefined); }, 20_000);
+    return () => window.clearInterval(interval);
+  }, [organisation.id]);
+  const invitations = useMemo(() => data.invitations.filter(row => {
+    const invitationOrganisation = row.organisation_id || row.organisationId;
+    return invitationOrganisation ? invitationOrganisation === organisation.platform_organisation_id : (row.organisation_name || row.organisationName) === organisation.name;
+  }), [data.invitations, organisation.name, organisation.platform_organisation_id]);
+  const pending = invitations.filter(row => ["preparing", "pending", "sent", "delivered"].includes(String(row.status))).length;
+  const failed = invitations.filter(row => row.status === "failed").length;
+  const inviteAgain = (invitation: Invitation) => {
+    const form = inviteForm.current;
+    if (!form) return;
+    const email = form.elements.namedItem("email") as HTMLInputElement | null;
+    const confirmation = form.elements.namedItem("confirmEmail") as HTMLInputElement | null;
+    const role = form.elements.namedItem("role") as HTMLSelectElement | null;
+    if (email) email.value = invitation.email || "";
+    if (confirmation) confirmation.value = invitation.email || "";
+    if (role) role.value = invitation.role || "member";
+    email?.focus();
+  };
+  const refresh = async () => { setRefreshing(true); try { await onRefresh(); } catch { /* The existing data remains visible. */ } finally { setRefreshing(false); } };
   return <Drawer title={organisation.name} onClose={onClose}>
     <div className="founder-record-summary">
       <div><span>Account type</span><strong>{organisation.type}</strong></div>
@@ -35,17 +66,35 @@ export function OrganisationDrawer({ organisation, detail, data, busy, onClose, 
     </div>
 
     <DrawerSection title="People">
+      <div className="founder-people-summary">
+        <a href="#registered-people"><strong>{detail?.users.length || 0}</strong><span>Registered</span></a>
+        <a href="#organisation-invitations"><strong>{pending}</strong><span>Awaiting acceptance</span></a>
+        <a href="#organisation-invitations"><strong>{failed}</strong><span>Failed</span></a>
+      </div>
+      <div id="registered-people" className="founder-people-block">
+      <h4>Registered people</h4>
       {detail?.users.length ? <div className="founder-table-wrap"><table className="founder-table">
-        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last activity</th></tr></thead>
-        <tbody>{detail.users.map(user => <tr key={user.id}><td><button className="founder-link" onClick={() => onOpenUser(user.id)}>{user.name}</button></td><td>{user.email}</td><td>{label(user.role)}</td><td>{label(user.status)}</td><td>{displayDate(user.lastActivity, true)}</td></tr>)}</tbody>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last activity</th><th>Action</th></tr></thead>
+        <tbody>{detail.users.map(user => <tr key={user.id}><td><button className="founder-link" onClick={() => onOpenUser(user.id)}>{user.name}</button></td><td>{user.email}</td><td>{label(user.role)}</td><td>{label(user.status)}</td><td>{displayDate(user.lastActivity, true)}</td><td><button className="founder-link" onClick={() => onOpenUser(user.id)}>View user</button></td></tr>)}</tbody>
       </table></div> : <p className="founder-muted">No registered users are associated with this organisation.</p>}
-      <form className="founder-inline-form" onSubmit={onInvite}>
+      </div>
+      <div className="founder-people-block">
+      <h4>Invite someone</h4>
+      <form ref={inviteForm} className="founder-inline-form" onSubmit={onInvite}>
         <label>Email<input name="email" type="email" required /></label>
         <label>Confirm email<input name="confirmEmail" type="email" required /></label>
         <label>Role<select name="role" defaultValue="member"><option value="owner">Owner</option><option value="admin">Administrator</option><option value="member">Member</option></select></label>
         <button disabled={busy}>Send invitation</button>
       </form>
       <p className="founder-note">The invitation is only recorded as sent after the configured email service accepts it.</p>
+      {invitationFeedback && <p className="founder-invitation-feedback" role="status">{invitationFeedback}</p>}
+      </div>
+      <div id="organisation-invitations" className="founder-people-block">
+        <div className="founder-invitation-heading"><div><p className="founder-kicker">Invitations</p><h4>Invitation tracker</h4></div><button className="founder-text-button" type="button" disabled={refreshing} onClick={() => void refresh()}>{refreshing ? "Refreshing…" : "Refresh"}</button></div>
+        <p className="founder-invitation-counts">{invitations.filter(row => row.status === "accepted").length} Accepted <span>·</span> {pending} Awaiting acceptance <span>·</span> {failed} Failed</p>
+        {invitations.length ? <div className="founder-invitation-list">{invitations.map(invitation => <InvitationRecord key={invitation.id || `${invitation.email}-${invitation.created_at}`} invitation={invitation} busy={busy} users={detail?.users || []} onOpenUser={onOpenUser} onResend={onResendInvitation} onRevoke={onRevokeInvitation} onInviteAgain={inviteAgain} />)}</div> : <p className="founder-muted">No invitations have been recorded for this organisation.</p>}
+        <p className="founder-note">Updates refresh automatically while this account view is open. “Delivered” appears only when the provider confirms delivery.</p>
+      </div>
     </DrawerSection>
 
     <DrawerSection title="Product progress">
@@ -88,6 +137,52 @@ export function OrganisationDrawer({ organisation, detail, data, busy, onClose, 
       <p className="founder-note">An Adviser plan never grants automatic access to confidential charity data.</p>
     </DrawerSection>}
   </Drawer>;
+}
+
+function InvitationRecord({ invitation, busy, users, onOpenUser, onResend, onRevoke, onInviteAgain }: {
+  invitation: Invitation;
+  busy: boolean;
+  users: Dashboard["users"];
+  onOpenUser: (userId: string) => void;
+  onResend: (id?: string) => void;
+  onRevoke: (id?: string) => void;
+  onInviteAgain: (invitation: Invitation) => void;
+}) {
+  const status = String(invitation.status || "pending");
+  const accepted = status === "accepted";
+  const failed = status === "failed";
+  const terminal = ["expired", "revoked"].includes(status);
+  const sentAt = invitation.last_sent_at || invitation.lastSentAt;
+  const deliveredAt = invitation.delivered_at || invitation.deliveredAt;
+  const acceptedAt = invitation.accepted_at || invitation.acceptedAt;
+  const deliveryError = invitation.delivery_error || invitation.deliveryError;
+  const member = users.find(user => user.email.toLowerCase() === String(invitation.email || "").toLowerCase());
+  const stages = [
+    { key:"created", label:"Created", complete:true },
+    { key:"sent", label:"Sent", complete:["sent", "delivered", "accepted"].includes(status) },
+    { key:"delivered", label:"Delivered", complete:["delivered", "accepted"].includes(status) && Boolean(deliveredAt) },
+    { key:"accepted", label:"Accepted", complete:accepted },
+  ];
+  const statusNote = status === "pending" && sentAt ? "Submitted — provider confirmation unavailable" : status === "preparing" ? "Preparing email" : label(status);
+  return <article className={`founder-invitation founder-invitation--${status}`}>
+    <header><div><strong>{invitation.email}</strong><span>Role: {label(invitation.role)}</span></div><b className={`founder-invitation-status is-${status}`}>{statusNote}</b></header>
+    {!failed && !terminal && <ol className="founder-invitation-progress" aria-label={`Invitation progress: ${statusNote}`}>
+      {stages.map(stage => <li key={stage.key} className={stage.complete ? "is-complete" : ""}><i aria-hidden="true" /><span>{stage.label}</span></li>)}
+    </ol>}
+    <dl className="founder-invitation-dates">
+      <div><dt>Invited</dt><dd>{displayDate(invitation.created_at || invitation.createdAt, true)}</dd></div>
+      <div><dt>Sent</dt><dd>{displayDate(sentAt, true)}</dd></div>
+      <div><dt>Delivered</dt><dd>{displayDate(deliveredAt, true)}</dd></div>
+      <div><dt>Accepted</dt><dd>{displayDate(acceptedAt, true)}</dd></div>
+    </dl>
+    {deliveryError && <details className="founder-invitation-error"><summary>View failure details</summary><p role="alert">{deliveryError}</p></details>}
+    <div className="founder-invitation-actions">
+      {accepted && member ? <button type="button" className="founder-link" onClick={() => onOpenUser(member.id)}>View user</button> : null}
+      {["preparing", "pending", "sent", "delivered", "failed", "expired"].includes(status) ? <button type="button" className="founder-link" disabled={busy} onClick={() => onResend(invitation.id)}>{failed ? "Retry sending" : status === "expired" ? "Send replacement invitation" : "Resend invitation"}</button> : null}
+      {!["accepted", "revoked"].includes(status) ? <button type="button" className="founder-link founder-link--danger" disabled={busy} onClick={() => onRevoke(invitation.id)}>Revoke</button> : null}
+      {status === "revoked" ? <button type="button" className="founder-link" onClick={() => onInviteAgain(invitation)}>Prepare new invitation</button> : null}
+    </div>
+  </article>;
 }
 
 function ProductSummary({ name, rows = [], note }: { name: string; rows?: Array<Record<string, unknown>>; note?: string }) {

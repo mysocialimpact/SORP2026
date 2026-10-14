@@ -23,6 +23,11 @@ function signedInDestination(destination: string) {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+function invitationTokenFromDestination(destination: string) {
+  const match = new URL(destination, "https://sorp2026.org").pathname.match(/^\/invitation\/([a-f0-9]{64})\/?$/);
+  return match?.[1] || "";
+}
+
 function returnToEmbeddedProduct(destination: string) {
   // A hash-only navigation does not reload account state. Keep the product
   // address and anchor, then refresh so its assessment and shared header agree.
@@ -38,6 +43,10 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
   const [error, setError] = useState("");
   const [fields, setFields] = useState({ name: "", role: "", roleOther: "", email: "", password: "", confirm: "" });
   const destination = useMemo(() => safeReturn(returnTo ?? params.get("return") ?? params.get("next")), [params, returnTo]);
+  const invitationToken = useMemo(() => invitationTokenFromDestination(destination), [destination]);
+  const [invitationChecking, setInvitationChecking] = useState(Boolean(invitationToken));
+  const [invitationName, setInvitationName] = useState("");
+  const [invitationEmail, setInvitationEmail] = useState("");
   const hasExplicitDestination = Boolean(returnTo || params.get("return") || params.get("next"));
 
   useEffect(() => {
@@ -55,6 +64,24 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
     return () => controller.abort();
   }, [destination, embedded, hasExplicitDestination]);
 
+  useEffect(() => {
+    if (!invitationToken) return;
+    const controller = new AbortController();
+    void fetch("/api/readiness-account/", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "invitation-preview", invitationToken }), cache: "no-store", signal: controller.signal,
+    }).then(async response => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "This invitation could not be opened.");
+      const invitedEmail = String(data.invitation?.email || "").toLowerCase();
+      setInvitationName(String(data.invitation?.organisationName || "the organisation"));
+      setInvitationEmail(invitedEmail);
+      setFields(current => ({ ...current, email: invitedEmail }));
+    }).catch(caught => { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "This invitation could not be opened."); })
+      .finally(() => { if (!controller.signal.aborted) setInvitationChecking(false); });
+    return () => controller.abort();
+  }, [invitationToken]);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
@@ -70,7 +97,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
       const body = mode === "login"
         ? { action: "login", email, password: fields.password }
         : {
-            action: "signup", name: fields.name.trim(), position: role, email, password: fields.password,
+            action: "signup", name: fields.name.trim(), position: role, email, password: fields.password, invitationToken: invitationToken || undefined,
             progress: { sessionId: crypto.randomUUID(), step: "scope" },
           };
       const response = await fetch("/api/readiness-account/", {
@@ -98,7 +125,8 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
       <button type="button" role="tab" aria-selected={mode === "login"} onClick={() => { setMode("login"); setError(""); }}>Log in</button>
       <button type="button" role="tab" aria-selected={mode === "signup"} onClick={() => { setMode("signup"); setError(""); }}>Create account</button>
     </div>
-    {checking ? <p className="account-checking" role="status">Checking your account…</p> : <form onSubmit={submit}>
+    {invitationName ? <p className="account-note"><strong>Invitation to join {invitationName}</strong><br/>Use {invitationEmail} to continue.</p> : null}
+    {checking || invitationChecking ? <p className="account-checking" role="status">Checking your account and invitation…</p> : <form onSubmit={submit}>
       {mode === "signup" && <>
         <label>Your name<input required maxLength={120} autoComplete="name" value={fields.name} onChange={event => setFields(current => ({ ...current, name: event.target.value }))} /></label>
         <label>Your role<select required value={fields.role} onChange={event => setFields(current => ({ ...current, role: event.target.value }))}>
@@ -106,7 +134,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
         </select></label>
         {fields.role === "OTHER" && <label>Describe your role<input required maxLength={120} autoComplete="organization-title" value={fields.roleOther} onChange={event => setFields(current => ({ ...current, roleOther: event.target.value }))} /></label>}
       </>}
-      <label>Email address<input required type="email" maxLength={254} autoComplete="email" value={fields.email} onChange={event => setFields(current => ({ ...current, email: event.target.value }))} /></label>
+      <label>Email address<input required readOnly={Boolean(invitationEmail)} type="email" maxLength={254} autoComplete="email" value={fields.email} onChange={event => setFields(current => ({ ...current, email: event.target.value }))} /></label>
       <label>Password<input required type="password" minLength={10} maxLength={200} autoComplete={mode === "signup" ? "new-password" : "current-password"} value={fields.password} onChange={event => setFields(current => ({ ...current, password: event.target.value }))} /></label>
       {mode === "signup" && <label>Confirm password<input required type="password" minLength={10} maxLength={200} autoComplete="new-password" value={fields.confirm} onChange={event => setFields(current => ({ ...current, confirm: event.target.value }))} /></label>}
       {error && <div className="account-error" role="alert"><strong>We couldn’t complete that yet.</strong><span>{error}</span></div>}

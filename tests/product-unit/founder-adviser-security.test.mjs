@@ -13,6 +13,7 @@ const founderRoute = await readFile(new URL("../../src/app/api/founder/[...path]
 const consoleAuth = await readFile(new URL("../../src/lib/console/auth.ts", import.meta.url), "utf8");
 const directoryControls = await readFile(new URL("../../src/lib/console/directory-controls.ts", import.meta.url), "utf8");
 const directoryData = await readFile(new URL("../../src/lib/directory-data.ts", import.meta.url), "utf8");
+const accountDrawers = await readFile(new URL("../../src/components/founder/account-drawers.tsx", import.meta.url), "utf8");
 
 test("the founder page requires the server-issued platform founder role", () => {
   assert.match(founderAuth, /data\.platformAccess\?\.founder !== true/);
@@ -44,10 +45,25 @@ test("charity administrators manage adviser access in Settings with confirmation
   assert.match(accountSettings, /\["owner","admin"\]/);
 });
 
-test("invitation acceptance requires an authenticated account", () => {
+test("invitation signup preserves context and acceptance still requires authentication", () => {
+  assert.match(invitation, /action:"invitation-preview"/);
   assert.match(invitation, /action:"invitation-accept"/);
-  assert.match(invitation, /Sign in to accept/);
+  assert.match(invitation, /Sign up to accept invitation/);
+  assert.match(invitation, /Already have an account\? Log in/);
   assert.match(accountPortal, /params\.get\("next"\)/);
+  assert.match(accountPortal, /invitationToken: invitationToken \|\| undefined/);
+  assert.match(accountPortal, /readOnly=\{Boolean\(invitationEmail\)\}/);
+});
+
+test("the organisation drawer exposes truthful invitation tracking and existing secure actions", () => {
+  assert.match(accountDrawers, /Invitation tracker/);
+  assert.match(accountDrawers, /provider confirmation unavailable/);
+  assert.match(accountDrawers, /deliveredAt/);
+  assert.match(accountDrawers, /acceptedAt/);
+  assert.match(accountDrawers, /onResend\(invitation\.id\)/);
+  assert.match(accountDrawers, /onRevoke\(invitation\.id\)/);
+  assert.match(accountDrawers, /window\.setInterval/);
+  assert.doesNotMatch(accountDrawers, /token_hash|tokenHash/);
 });
 
 test("the founder client-access form reaches its two-segment API route", () => {

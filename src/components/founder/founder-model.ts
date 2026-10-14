@@ -83,6 +83,8 @@ export type AskSorp = {
 
 export type Invitation = {
   id?: string;
+  organisation_id?: string;
+  organisationId?: string;
   email?: string;
   role?: string;
   status?: string;

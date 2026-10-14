@@ -8,7 +8,7 @@ const dashboard = {
   metrics: {
     organisations: 1, activeUsers: 1, registeredUsers: 1, newOrganisationsThisWeek: 0,
     recentlyActiveOrganisations: 1, organisationsAssessing: 1, complimentaryAccounts: 0,
-    pendingInvitations: 0, activeSubscriptions: 0,
+    pendingInvitations: 1, activeSubscriptions: 0,
     planCounts: { Free: 1, Plus: 0, Adviser: 0, Enterprise: 0 }, source: "isolated-shell-fixture",
   },
   organisations: [{
@@ -17,7 +17,11 @@ const dashboard = {
     member_count: 1, progress: 42, last_activity: "2026-10-14T10:00:00Z", products: { readiness: "in_progress" },
   }],
   users: [{ id: "will", name: "Will Jones", email: "will@example.invalid", organisationId: "brainstrust", organisationName: "Brainstrust", role: "owner" }],
-  invitations: [], clientAccess: [], activity: [], audit: [], attention: [], unavailable: [],
+  invitations: [
+    { id:"invite-pending", organisation_id:"brainstrust", email:"gareth@example.invalid", role:"member", status:"sent", created_at:"2026-10-14T09:00:00Z", last_sent_at:"2026-10-14T09:01:00Z", delivery_id:"resend-test" },
+    { id:"invite-failed", organisation_id:"brainstrust", email:"jess@example.invalid", role:"admin", status:"failed", created_at:"2026-10-13T09:00:00Z", last_sent_at:"2026-10-13T09:01:00Z", delivery_error:"Provider rejected recipient" },
+    { id:"invite-accepted", organisation_id:"brainstrust", email:"will@example.invalid", role:"owner", status:"accepted", created_at:"2026-10-12T09:00:00Z", accepted_at:"2026-10-12T10:00:00Z" },
+  ], clientAccess: [], activity: [], audit: [], attention: [], unavailable: [],
   products: {
     readiness: [{ id: "ready-1", accountId: "will", user: "Will Jones", organisationId: "brainstrust", organisation: "Brainstrust", status: "in_progress", percentage: 42, updatedAt: "2026-10-14T10:00:00Z" }],
     askSorp: { metrics: { users: 0, conversations: 0, questions: 0, completed: 0 }, users: [], topics: [], note: "No usage recorded." },
@@ -30,6 +34,7 @@ test.beforeEach(async ({ page }) => {
   await page.route("**/api/founder/**", async route => {
     const path = new URL(route.request().url()).pathname.replace(/\/$/, "");
     if (path.endsWith("/dashboard")) return route.fulfill({ json: dashboard });
+    if (path.endsWith("/organisation/brainstrust")) return route.fulfill({ json: { organisation:dashboard.organisations[0], memberships:[], users:dashboard.users, clients:[], history:[], activity:[], products:dashboard.products } });
     if (path.endsWith("/plans")) return route.fulfill({ json: { plans: [], billingConnected: false, discountsConnected: false } });
     if (path.endsWith("/accountants")) return route.fulfill({ json: { firms: [], metrics: { total: 0, researched: 0, humanReviewed: 0, publicListings: 0, featured: 0 } } });
     if (path.includes("/feedback-metrics")) return route.fulfill({ json: { summary: {}, trends: [], recurring: [] } });
@@ -95,4 +100,21 @@ test("founder administration remains horizontally usable on mobile", async ({ pa
   await track.getByRole("link", { name: "Platform Management" }).click();
   await expect(page.getByRole("heading", { name: "Administration and audit" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test("organisation people shows invitation history, evidence and actions beneath the form", async ({ page }) => {
+  await page.goto("/founder/");
+  await page.getByRole("button", { name:/Brainstrust/ }).first().click();
+  const drawer = page.getByRole("dialog", { name:"Brainstrust" });
+  await expect(drawer.getByRole("heading", { name:"Registered people" })).toBeVisible();
+  await expect(drawer.getByRole("heading", { name:"Invite someone" })).toBeVisible();
+  await expect(drawer.getByRole("heading", { name:"Invitation tracker" })).toBeVisible();
+  await expect(drawer.getByText("1 Accepted · 1 Awaiting acceptance · 1 Failed")).toBeVisible();
+  await expect(drawer.getByText("gareth@example.invalid")).toBeVisible();
+  await expect(drawer.getByText("Provider rejected recipient")).not.toBeVisible();
+  await drawer.getByText("View failure details").click();
+  await expect(drawer.getByText("Provider rejected recipient")).toBeVisible();
+  await expect(drawer.getByRole("button", { name:"Resend invitation" })).toBeVisible();
+  await expect(drawer.getByRole("button", { name:"Retry sending" })).toBeVisible();
+  await expect(drawer.getByRole("button", { name:"View user" })).toBeVisible();
 });

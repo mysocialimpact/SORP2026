@@ -27,6 +27,7 @@ export function FounderControlCentre() {
   const [query, setQuery] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [invitationFeedback, setInvitationFeedback] = useState("");
   const [busy, setBusy] = useState(false);
   const [selectedOrganisation, setSelectedOrganisation] = useState<Organisation | null>(null);
   const [organisationDetail, setOrganisationDetail] = useState<OrganisationDetail | null>(null);
@@ -94,6 +95,7 @@ export function FounderControlCentre() {
       : candidate;
     if (!organisation) { setError("That organisation is not available in the founder directory."); return; }
     setSelectedUser(null);
+    setInvitationFeedback("");
     setSelectedOrganisation(organisation);
     setOrganisationDetail(null);
     try { setOrganisationDetail(await founderCall<OrganisationDetail>(`organisation/${organisation.id}`)); }
@@ -138,15 +140,21 @@ export function FounderControlCentre() {
     const form = new FormData(element);
     const email = String(form.get("email") || "").trim().toLowerCase();
     const confirmedEmail = String(form.get("confirmEmail") || "").trim().toLowerCase();
-    await perform(async () => {
+    setBusy(true); setError(""); setNotice(""); setInvitationFeedback("");
+    try {
       if (email !== confirmedEmail) throw new Error("The email addresses do not match. Check the recipient before sending.");
       const result = await founderCall<{ delivery?:string; platform?:Invitation }>(`organisation/${selectedOrganisation.id}/invite`, { method: "POST", body: JSON.stringify({ email, role: form.get("role") }) });
       element.reset();
       await loadDashboard();
       setOrganisationDetail(await founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`));
       const status = result.platform?.status || result.delivery || "pending";
-      setNotice(status === "delivered" ? `Invitation delivered to ${email}.` : status === "sent" ? `Email provider accepted the invitation to ${email}.` : `Invitation submitted for ${email}. Delivery confirmation is pending.`);
-    }, "The invitation was not sent.");
+      const feedback = status === "delivered" ? `Invitation delivered to ${email}.` : status === "sent" ? `Email provider accepted the invitation to ${email}.` : `Invitation created for ${email}. Email-provider confirmation is pending.`;
+      setInvitationFeedback(feedback); setNotice(feedback);
+    } catch (caught) {
+      const failure = message(caught, "The invitation could not be sent.");
+      setInvitationFeedback(failure); setError(failure);
+      await loadDashboard().catch(() => undefined);
+    } finally { setBusy(false); }
   };
 
   const revokeComplimentary = async () => {
@@ -176,6 +184,8 @@ export function FounderControlCentre() {
     await perform(async () => {
       await founderCall(`invitations/${id}/revoke`, { method:"POST", body:"{}" });
       await loadDashboard();
+      if (selectedOrganisation) setOrganisationDetail(await founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`));
+      setInvitationFeedback("Invitation revoked. Its previous link can no longer be accepted.");
       setNotice("Invitation revoked.");
     }, "The invitation could not be revoked.");
   };
@@ -185,8 +195,10 @@ export function FounderControlCentre() {
     await perform(async () => {
       const result = await founderCall<{ invitation?:Invitation }>(`invitations/${id}/resend`, { method:"POST", body:"{}" });
       await loadDashboard();
+      if (selectedOrganisation) setOrganisationDetail(await founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`));
       const status = result.invitation?.status || "pending";
-      setNotice(status === "delivered" ? "Invitation delivered." : status === "sent" ? "Email provider accepted the resent invitation." : "Invitation resubmitted; provider confirmation is pending.");
+      const feedback = status === "delivered" ? "Invitation delivered." : status === "sent" ? "Email provider accepted the resent invitation." : "Invitation resubmitted; email-provider confirmation is pending.";
+      setInvitationFeedback(feedback); setNotice(feedback);
     }, "The invitation could not be resent.");
   };
 
@@ -221,7 +233,7 @@ export function FounderControlCentre() {
     </div>
 
     {creating && <Drawer title="Create organisation" onClose={() => setCreating(false)}><form className="founder-form-grid" onSubmit={createOrganisation}><label className="founder-span">Organisation name<input name="name" required minLength={2} autoFocus /></label><label>Type<select name="type" defaultValue="Charity"><option>Charity</option><option>Adviser</option><option>Other</option></select></label><button disabled={busy}>Create organisation</button><p className="founder-note founder-span">This creates a real account record; it is not demonstration data.</p></form></Drawer>}
-    {selectedOrganisation && <OrganisationDrawer organisation={selectedOrganisation} detail={organisationDetail} data={data} busy={busy} onClose={() => setSelectedOrganisation(null)} onPlan={updatePlan} onInvite={invite} onRevokeComplimentary={revokeComplimentary} onClientAccess={requestClientAccess} onOpenUser={openUser} />}
+    {selectedOrganisation && <OrganisationDrawer organisation={selectedOrganisation} detail={organisationDetail} data={data} busy={busy} invitationFeedback={invitationFeedback} onClose={() => setSelectedOrganisation(null)} onPlan={updatePlan} onInvite={invite} onRevokeInvitation={revokeInvitation} onResendInvitation={resendInvitation} onRevokeComplimentary={revokeComplimentary} onClientAccess={requestClientAccess} onOpenUser={openUser} onRefresh={async () => { const [dashboard, detail] = await Promise.all([founderCall<Dashboard>("dashboard"), founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`)]); setData(dashboard); setOrganisationDetail(detail); }} />}
     {selectedUser && <UserDrawer detail={selectedUser} onClose={() => setSelectedUser(null)} onOpenOrganisation={openOrganisation} />}
     {selectedFirm && <FirmDrawer firm={selectedFirm} busy={busy} onClose={() => setSelectedFirm(null)} onSaved={refreshed => { setAccountants(refreshed); setSelectedFirm(refreshed.firms.find(row => row.id === selectedFirm.id) || null); }} onError={setError} onNotice={setNotice} />}
   </main>;
