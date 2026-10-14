@@ -10,15 +10,17 @@ export function HomepageManifesto() {
   useEffect(() => {
     const root = section.current;
     if (!root || !window.IntersectionObserver) return;
+    root.setAttribute("data-animated", "true");
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.setAttribute("data-revealed", "true");
-          observer.unobserve(entry.target);
+          root.setAttribute("data-active", "true");
+          root.querySelectorAll("[data-reveal]").forEach((element) => element.setAttribute("data-revealed", "true"));
+          observer.disconnect();
         }
       });
-    }, { threshold: 0.15 });
-    root.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
+    }, { threshold: 0.08, rootMargin: "0px 0px -18% 0px" });
+    observer.observe(root);
     return () => observer.disconnect();
   }, []);
 
@@ -34,10 +36,13 @@ export function HomepageManifesto() {
       </div>
       <figure className={styles.founders} data-reveal>
         <div className={styles.portraits}>
-          <Image className={styles.marcus} src="/images/marcus-vision.webp" alt="Marcus Warry" width={600} height={803} sizes="(max-width: 700px) 42vw, 23vw" />
-          <Image className={styles.chris} src="/images/chris-vision.webp" alt="Dr Chris Arnold" width={600} height={534} sizes="(max-width: 700px) 52vw, 28vw" />
+          <Image className={styles.marcus} src="/images/marcus-warry-cutout.webp" alt="Marcus Warry" width={1205} height={1306} sizes="(max-width: 700px) 40vw, 190px" />
+          <Image className={styles.chris} src="/images/chris-arnold-cutout.webp" alt="Dr Chris Arnold" width={1205} height={1306} sizes="(max-width: 700px) 40vw, 190px" />
         </div>
-        <figcaption><strong>Marcus Warry &amp; Dr Chris Arnold</strong><span>Co-founders, My Social Impact</span></figcaption>
+        <figcaption>
+          <span className={styles.founderNames}><strong>Marcus Warry &amp; Dr Chris Arnold</strong><span>Co-founders, My Social Impact</span></span>
+          <Image className={styles.logo} src="/brand/my-social-impact.png" alt="My Social Impact" width={1088} height={124} sizes="150px" />
+        </figcaption>
       </figure>
     </section>
   );

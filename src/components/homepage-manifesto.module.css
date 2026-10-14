@@ -2,12 +2,12 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
   grid-template-areas: "ambition ambition" "vision founders";
   column-gap: 4%;
-  row-gap: 60px;
+  row-gap: 42px;
   margin: 28px 0 48px;
-  padding: clamp(32px, 4vw, 64px);
+  padding: clamp(30px, 3.3vw, 50px);
   overflow: hidden;
   border-radius: 6px;
   background: #cfddcf;
@@ -22,47 +22,52 @@
   background: radial-gradient(ellipse at 100% 12%, #56726055, transparent 58%),
     linear-gradient(170deg, #242329 0%, #242329 24%, #34443c 35%, #9bad9a 50%, #cfddcf 68%);
 }
+.manifesto::after { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(170deg, transparent 22%, #afbfad55 48%, transparent 70%); opacity: 0; pointer-events: none; }
 
 .label { margin: 0 0 20px; font-size: 11px; font-weight: 700; line-height: 1.4; letter-spacing: .16em; text-transform: uppercase; }
 .ambition { grid-area: ambition; color: #faf9f6; }
 .ambition .label { color: #d8ff52; }
-.ambition h2 { max-width: 1050px; margin: 0; font-size: clamp(48px, 6.3vw, 88px); line-height: .97; letter-spacing: -.065em; font-weight: 500; }
+.ambition h2 { max-width: 1050px; margin: 0; font-size: clamp(48px, 5.7vw, 80px); line-height: .97; letter-spacing: -.065em; font-weight: 500; }
 .ambition h2 span { display: block; color: #d8ff52; }
 .vision { grid-area: vision; align-self: end; max-width: 620px; }
 .vision .label { color: #284537; }
-.vision h2 { margin: 0; font-size: clamp(29px, 3.25vw, 46px); line-height: 1.08; letter-spacing: -.045em; font-weight: 500; text-wrap: pretty; }
-.founders { grid-area: founders; align-self: end; min-width: 0; margin: -140px -2% 0 -6%; }
-.portraits { display: flex; align-items: flex-end; justify-content: center; padding-top: 22px; }
+.vision h2 { margin: 0; font-size: clamp(29px, 3vw, 43px); line-height: 1.08; letter-spacing: -.045em; font-weight: 500; text-wrap: pretty; }
+.founders { grid-area: founders; align-self: end; justify-self: end; width: min(100%, 430px); min-width: 0; margin: -44px 0 0; }
+.portraits { display: flex; align-items: flex-end; justify-content: center; padding: 0 5%; }
 .portraits img { display: block; height: auto; object-fit: contain; filter: drop-shadow(0 12px 20px #182c2420); }
-.marcus { position: relative; z-index: 1; width: 49%; margin-right: -13%; }
-.chris { width: 64%; }
-.founders figcaption { margin: 18px 0 0; text-align: center; line-height: 1.5; }
-.founders figcaption strong { display: block; font-size: 15px; font-weight: 650; }
-.founders figcaption span { display: block; margin-top: 3px; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: #355747; }
+.marcus { position: relative; z-index: 1; width: 52%; margin-right: -12%; }
+.chris { width: 52%; }
+.founders figcaption { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 13px 0 0; line-height: 1.4; }
+.founderNames { min-width: 0; text-align: right; }
+.founderNames strong { display: block; font-size: 14px; font-weight: 650; white-space: nowrap; }
+.founderNames > span { display: block; margin-top: 3px; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: #355747; }
+.logo { width: 132px; height: auto; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .ambition[data-revealed], .vision[data-revealed], .founders[data-revealed] { animation: emerge 900ms cubic-bezier(.2,.65,.3,1) both; }
-  .vision[data-revealed] { animation-delay: 100ms; }
-  .founders[data-revealed] { animation-delay: 220ms; }
-  @supports (animation-timeline: view()) {
-    .manifesto::before { animation: colour-arrives linear both; animation-timeline: view(); animation-range: entry 0% entry 100%; }
-  }
+  .manifesto[data-animated="true"] [data-reveal] { opacity: 0; transform: translateY(18px); }
+  .manifesto[data-animated="true"] .founders { transform: translateY(22px) scale(.98); }
+  .ambition[data-revealed], .vision[data-revealed], .founders[data-revealed] { animation: emerge 760ms cubic-bezier(.2,.65,.3,1) both; }
+  .vision[data-revealed] { animation-delay: 180ms; }
+  .founders[data-revealed] { animation: founders-emerge 820ms cubic-bezier(.2,.65,.3,1) 380ms both; }
+  .manifesto[data-active="true"]::after { animation: colour-arrives 900ms ease-out 90ms both; }
 }
 @keyframes emerge { from { opacity: .45; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes colour-arrives { from { opacity: .9; } to { opacity: 1; } }
+@keyframes founders-emerge { from { opacity: .35; transform: translateY(22px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes colour-arrives { from { opacity: 0; } to { opacity: 1; } }
 
 @media (max-width: 700px) {
-  .manifesto { grid-template-columns: 1fr; grid-template-areas: "ambition" "vision" "founders"; gap: 30px; padding: 30px 24px 26px; margin-bottom: 36px; }
+  .manifesto { grid-template-columns: 1fr; grid-template-areas: "ambition" "vision" "founders"; gap: 26px; padding: 28px 24px 24px; margin-bottom: 36px; }
   .manifesto::before { background: radial-gradient(ellipse at 100% 24%, #56726044, transparent 60%), linear-gradient(175deg, #242329 0%, #242329 23%, #34443c 29%, #829987 35%, #cfddcf 43%); }
   .label { margin-bottom: 14px; font-size: 10px; }
   .ambition h2 { font-size: clamp(38px, 10.7vw, 62px); line-height: 1.01; }
-  .vision { margin-top: 45px; }
+  .vision { margin-top: 38px; }
   .vision h2 { font-size: clamp(27px, 7vw, 38px); line-height: 1.09; }
-  .founders { width: 100%; max-width: 360px; margin: -14px auto 0; }
+  .founders { width: 100%; max-width: 330px; margin: -8px auto 0; }
   .portraits { padding-top: 0; }
-  .marcus { width: 43%; margin-right: -10%; }
-  .chris { width: 56%; }
-  .founders figcaption { margin-top: 12px; }
-  .founders figcaption strong { font-size: 13px; }
-  .founders figcaption span { font-size: 9px; }
+  .marcus, .chris { width: 48%; }
+  .marcus { margin-right: -7%; }
+  .founders figcaption { gap: 12px; margin-top: 10px; }
+  .founderNames strong { font-size: 11px; }
+  .founderNames > span { font-size: 8px; }
+  .logo { width: 88px; }
 }
