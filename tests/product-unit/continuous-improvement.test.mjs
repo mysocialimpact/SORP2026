@@ -7,6 +7,8 @@ const route = await readFile(new URL("../../src/app/api/continuous-improvement/r
 const founderRoute = await readFile(new URL("../../src/app/api/founder/[...path]/route.ts", import.meta.url), "utf8");
 const founderUi = await readFile(new URL("../../src/components/founder/feedback-workspace.tsx", import.meta.url), "utf8");
 const migration = await readFile(new URL("../../migrations/006_founder_feedback.sql", import.meta.url), "utf8");
+const founderRuntimeMigration = await readFile(new URL("../../migrations/007_founder_control_runtime.sql", import.meta.url), "utf8");
+const founderDatabase = await readFile(new URL("../../src/lib/founder/db.ts", import.meta.url), "utf8");
 
 test("authenticated contact and beta feedback share one global component", () => {
   assert.match(component, /Need a hand\?/);
@@ -44,4 +46,13 @@ test("the migration constrains workflow state and grants only the existing runti
   assert.match(migration, /REVOKE ALL .* FROM PUBLIC/);
   assert.match(migration, /GRANT SELECT, INSERT, UPDATE .* TO sorp_console_runtime/);
   assert.doesNotMatch(migration, /GRANT DELETE/);
+});
+
+test("runtime requests never attempt schema mutation and the founder ledger has a unique migration", () => {
+  assert.doesNotMatch(founderDatabase, /CREATE TABLE|ALTER TABLE|CREATE INDEX/);
+  assert.match(founderRuntimeMigration, /007-founder-control-runtime/);
+  assert.match(founderRuntimeMigration, /founder_organisations/);
+  assert.match(founderRuntimeMigration, /founder_client_access/);
+  assert.match(founderRuntimeMigration, /GRANT SELECT, INSERT, UPDATE/);
+  assert.doesNotMatch(founderRuntimeMigration, /GRANT (?:ALL|CREATE|DELETE)/);
 });

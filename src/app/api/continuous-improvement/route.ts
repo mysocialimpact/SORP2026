@@ -116,6 +116,11 @@ export async function POST(request: Request) {
     if (error instanceof SyntaxError) return json({ error: "That submission could not be read." }, 400);
     const failure = error as Error & { code?: string };
     if (failure.code === "23505") return json({ accepted: true, duplicate: true });
+    console.error("continuous-improvement write failed", {
+      name: failure.name,
+      code: failure.code,
+      message: failure.message,
+    });
     return json({ error: "We couldn’t safely store that just now. Your words are still here, so please try again." }, 503);
   }
 }
