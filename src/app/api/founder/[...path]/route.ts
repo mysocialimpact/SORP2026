@@ -78,6 +78,38 @@ async function reconcileLiveOrganisations(rows: unknown) {
   }
 }
 
+async function reconcileLiveMemberships(users: unknown) {
+  if (!Array.isArray(users)) return;
+  for (const candidate of users) {
+    if (!candidate || typeof candidate !== "object") continue;
+    const row = candidate as Record<string, unknown>;
+    const platformOrganisationId = cleanText(row.organisationId, 120);
+    const memberEmail = cleanEmail(row.email);
+    if (!platformOrganisationId || !memberEmail) continue;
+    const organisation = (await founderQuery<{ id:string }>("SELECT id FROM research_console.founder_organisations WHERE platform_organisation_id=$1", [platformOrganisationId]))[0];
+    if (!organisation) continue;
+    const role = ["owner", "admin", "member"].includes(String(row.role)) ? String(row.role) : "member";
+    await founderQuery(
+      `INSERT INTO research_console.founder_memberships(organisation_id,account_id,email,role,status)
+       VALUES($1,$2,$3,$4,'active')
+       ON CONFLICT(organisation_id,email) DO UPDATE SET account_id=excluded.account_id,role=excluded.role,status='active'`,
+      [organisation.id, cleanText(row.id, 120) || null, memberEmail, role],
+    );
+  }
+}
+
+async function optionalFounderQuery<T = Record<string, unknown>>(text: string, values: unknown[] = []) {
+  try { return await founderQuery<T>(text, values); }
+  catch { return [] as T[]; }
+}
+
+function productStatus(rows: Record<string, unknown>[], organisationId: string, fallback = "not_started") {
+  const matches = rows.filter(row => String(row.organisationId || "") === organisationId);
+  if (!matches.length) return fallback;
+  if (matches.some(row => ["completed", "complete", "feedback_ready"].includes(String(row.status)))) return "completed";
+  return "in_progress";
+}
+
 function publicSlug(row: { name:string; website:string|null; domain:string|null }) {
   const targetDomain = row.domain || hostname(row.website);
   return publicFirms.find(firm =>
@@ -93,51 +125,103 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     const url = new URL(request.url);
     if (request.method === "GET") {
       if (resource === "dashboard") {
-        const [membershipCount, invitations, auditRows, live] = await Promise.all([
+        const [membershipCount, invitations, auditRows, live, feedbackAttention, enquiryAttention, directorRows] = await Promise.all([
           founderQuery<{ count: string }>("SELECT count(*) FROM research_console.founder_memberships WHERE status='active'"),
           founderQuery("SELECT * FROM research_console.founder_invitations ORDER BY created_at DESC LIMIT 20"),
           founderQuery("SELECT * FROM research_console.founder_audit_log ORDER BY created_at DESC LIMIT 30"),
           platformAction(request, { action: "founder-overview" }),
+          optionalFounderQuery<{ count:string }>("SELECT count(*) FROM research_console.founder_feedback WHERE status='new'"),
+          optionalFounderQuery<{ count:string }>("SELECT count(*) FROM research_console.founder_contact_enquiries WHERE status='new'"),
+          optionalFounderQuery("SELECT account_id,data,revision,updated_at FROM msi_products.impact_director ORDER BY updated_at DESC"),
         ]);
         await reconcileLiveOrganisations(live.organisations);
-        const orgs = await founderQuery(`SELECT o.*,
+        await reconcileLiveMemberships(live.users);
+        const storedOrganisations = await founderQuery<Record<string, unknown>>(`SELECT o.*,
           (SELECT email FROM research_console.founder_memberships m WHERE m.organisation_id=o.id ORDER BY (m.role='owner') DESC,m.created_at LIMIT 1) primary_email,
           (SELECT count(*)::int FROM research_console.founder_memberships m WHERE m.organisation_id=o.id) member_count
           FROM research_console.founder_organisations o ORDER BY o.updated_at DESC`);
         const liveMetrics = live.metrics && typeof live.metrics === "object" ? live.metrics as Record<string, unknown> : {};
-        const planCounts = Object.fromEntries(Object.keys(plans).map(plan => [plan, orgs.filter(row => row.plan === plan).length]));
+        const liveProducts = live.products && typeof live.products === "object" ? live.products as Record<string, unknown> : {};
+        const readiness = Array.isArray(liveProducts.readiness) ? liveProducts.readiness as Record<string, unknown>[] : [];
+        const impactReports = Array.isArray(liveProducts.impactReports) ? liveProducts.impactReports as Record<string, unknown>[] : [];
+        const excellence = Array.isArray(liveProducts.excellence) ? liveProducts.excellence as Record<string, unknown>[] : [];
+        const users = Array.isArray(live.users) ? live.users as Record<string, unknown>[] : [];
+        const organisations: Record<string, unknown>[] = storedOrganisations.map(row => {
+          const platformId = String(row.platform_organisation_id || "");
+          const liveRow = Array.isArray(live.organisations) ? (live.organisations as Record<string, unknown>[]).find(item => String(item.id) === platformId) : undefined;
+          const readinessRows = readiness.filter(item => String(item.organisationId || "") === platformId);
+          const progress = readinessRows.length ? Math.max(...readinessRows.map(item => Number(item.percentage || 0))) : 0;
+          const reports = impactReports.filter(item => String(item.organisationId || "") === platformId);
+          const director = directorRows.filter(item => users.some(user => String(user.organisationId || "") === platformId && String(user.id) === String(item.account_id)));
+          return { ...row, last_activity: liveRow?.last_activity || liveRow?.lastActivity || row.updated_at, progress, products: {
+            readiness: productStatus(readiness, platformId), askSorp: "not_recorded", impactReports: reports.some(item => item.feedbackReady) ? "completed" : reports.length ? "in_progress" : "not_started",
+            excellence: productStatus(excellence, platformId), impactDirector: director.some(item => (item.data as Record<string,unknown> | undefined)?.completed) ? "completed" : director.length ? "in_progress" : "not_started",
+          } };
+        });
+        const planCounts = Object.fromEntries(Object.keys(plans).map(plan => [plan, organisations.filter(row => row.plan === plan).length]));
         const pendingInvitations = Array.isArray(live.invitations) ? live.invitations.filter((row:Record<string,unknown>) => row.status === "pending") : [];
         const pendingClients = Array.isArray(live.clients) ? live.clients.filter((row:Record<string,unknown>) => row.status === "pending") : [];
-        const expiring = orgs.filter(row => row.complimentary_end && new Date(String(row.complimentary_end)).getTime() < Date.now() + 30 * 86400000);
+        const expiring = organisations.filter(row => row.complimentary_end && new Date(String(row.complimentary_end)).getTime() < Date.now() + 30 * 86400000);
+        const newFeedback = Number(feedbackAttention[0]?.count || 0), newEnquiries = Number(enquiryAttention[0]?.count || 0);
         return json({
           founder: { email: actor.email, name: actor.name || "Founder" },
           metrics: {
-            organisations: Number(liveMetrics.organisations || orgs.length), activeUsers: Number(liveMetrics.activeUsers || 0),
+            organisations: Number(liveMetrics.organisations || organisations.length), activeUsers: Number(liveMetrics.activeUsers || 0),
             registeredUsers: Number(liveMetrics.registeredUsers || membershipCount[0]?.count || 0),
-            complimentaryAccounts: Number(liveMetrics.complimentaryAccounts || orgs.filter(row => row.complimentary).length),
+            newOrganisationsThisWeek: Number(liveMetrics.newOrganisationsThisWeek || 0), recentlyActiveOrganisations: Number(liveMetrics.recentlyActiveOrganisations || 0),
+            organisationsAssessing: Number(liveMetrics.organisationsAssessing || 0),
+            complimentaryAccounts: Number(liveMetrics.complimentaryAccounts || organisations.filter(row => row.complimentary).length),
             pendingInvitations: Number(liveMetrics.pendingInvitations || pendingInvitations.length),
-            activeSubscriptions: orgs.filter(row => Number(row.payable_price) > 0).length,
+            activeSubscriptions: organisations.filter(row => Number(row.payable_price) > 0).length,
             planCounts, source: "Live platform identities plus Founder commercial records.",
           },
-          organisations: orgs, invitations: live.invitations || invitations, clientAccess: live.clients || [], recentRegistrations: live.recentRegistrations || [], audit: auditRows,
+          organisations, users, invitations: live.invitations || invitations, clientAccess: live.clients || [], recentRegistrations: live.recentRegistrations || [], activity: live.activity || [], audit: auditRows,
+          products: { ...liveProducts, impactDirector: directorRows.map(row => {
+            const user = users.find(item => String(item.id) === String(row.account_id));
+            return { ...row, accountId:row.account_id, user:user?.name || user?.email || "Account holder", organisationId:user?.organisationId || null, organisation:user?.organisationName || "" };
+          }) },
           attention: [
             ...pendingInvitations.map((row:Record<string,unknown>) => ({ kind:"invitation", id:row.id, title:`Invitation awaiting ${row.email}`, detail:row.organisation_name || "Organisation" })),
             ...pendingClients.map((row:Record<string,unknown>) => ({ kind:"client", id:row.id, title:`${row.adviser_name} → ${row.charity_name}`, detail:"Awaiting charity approval" })),
             ...expiring.map(row => ({ kind:"complimentary", id:row.id, title:`${row.name} complimentary access`, detail:`Expires ${new Date(String(row.complimentary_end)).toLocaleDateString("en-GB")}` })),
+            ...(newEnquiries ? [{ kind:"enquiry", title:`${newEnquiries} new ${newEnquiries === 1 ? "enquiry" : "enquiries"}`, detail:"Review and follow up", target:"feedback" }] : []),
+            ...(newFeedback ? [{ kind:"feedback", title:`${newFeedback} new feedback ${newFeedback === 1 ? "item" : "items"}`, detail:"Review customer feedback", target:"feedback" }] : []),
           ],
-          unavailable: ["Verified billing revenue", "Billing discounts and promotions", "AI usage and cost", "Ask SORP token cost"],
+          unavailable: ["Verified billing revenue", "Billing discounts and promotions", "Ask SORP topic analytics and token cost"],
         });
       }
       if (resource === "organisations") return json(await founderQuery("SELECT * FROM research_console.founder_organisations ORDER BY name"));
       if (resource === "organisation" && id) {
         const organisation = (await founderQuery("SELECT * FROM research_console.founder_organisations WHERE id=$1", [id]))[0];
         if (!organisation) return json({ error: "Organisation not found." }, 404);
-        const [memberships, clients, history] = await Promise.all([founderQuery("SELECT * FROM research_console.founder_memberships WHERE organisation_id=$1 ORDER BY created_at", [id]), founderQuery("SELECT ca.*,o.name charity_name FROM research_console.founder_client_access ca JOIN research_console.founder_organisations o ON o.id=ca.charity_organisation_id WHERE ca.adviser_organisation_id=$1", [id]), founderQuery("SELECT * FROM research_console.founder_audit_log WHERE target_id=$1 ORDER BY created_at DESC", [id])]);
-        return json({ organisation, memberships, clients, history });
+        const live = await platformAction(request, { action:"founder-overview" });
+        await reconcileLiveMemberships(live.users);
+        const platformId = String(organisation.platform_organisation_id || "");
+        const users = Array.isArray(live.users) ? (live.users as Record<string,unknown>[]).filter(row => String(row.organisationId || "") === platformId) : [];
+        const accountIds = users.map(row => String(row.id));
+        const liveProducts = live.products && typeof live.products === "object" ? live.products as Record<string,unknown> : {};
+        const filterProduct = (value: unknown) => Array.isArray(value) ? value.filter((row:Record<string,unknown>) => String(row.organisationId || "") === platformId) : [];
+        const [memberships, clients, history, directors] = await Promise.all([
+          founderQuery("SELECT * FROM research_console.founder_memberships WHERE organisation_id=$1 ORDER BY created_at", [id]),
+          founderQuery("SELECT ca.*,o.name charity_name FROM research_console.founder_client_access ca JOIN research_console.founder_organisations o ON o.id=ca.charity_organisation_id WHERE ca.adviser_organisation_id=$1", [id]),
+          founderQuery("SELECT * FROM research_console.founder_audit_log WHERE target_id=$1 ORDER BY created_at DESC", [id]),
+          accountIds.length ? optionalFounderQuery(`SELECT account_id,data,revision,updated_at FROM msi_products.impact_director WHERE account_id = ANY($1::text[])`, [accountIds]) : Promise.resolve([]),
+        ]);
+        return json({ organisation, memberships, users, clients, history, products:{ readiness:filterProduct(liveProducts.readiness), impactReports:filterProduct(liveProducts.impactReports), excellence:filterProduct(liveProducts.excellence), impactDirector:directors, askSorp:liveProducts.askSorp || null }, activity:Array.isArray(live.activity)?(live.activity as Record<string,unknown>[]).filter(row=>String(row.organisationId||"")===platformId):[] });
+      }
+      if (resource === "user" && id) {
+        const detail = await platformAction(request, { action:"founder-account-detail", accountId:id });
+        const directors = await optionalFounderQuery("SELECT account_id,data,revision,updated_at FROM msi_products.impact_director WHERE account_id=$1", [id]);
+        return json({ ...detail, impactDirector: directors[0] || null });
       }
       if (resource === "search") {
-        const q = `%${(url.searchParams.get("q") || "").trim()}%`;
-        return json(await founderQuery("SELECT o.*,count(m.id)::int member_count FROM research_console.founder_organisations o LEFT JOIN research_console.founder_memberships m ON m.organisation_id=o.id WHERE o.name ILIKE $1 OR EXISTS(SELECT 1 FROM research_console.founder_memberships mm WHERE mm.organisation_id=o.id AND mm.email ILIKE $1) GROUP BY o.id ORDER BY o.name LIMIT 50", [q]));
+        const q = (url.searchParams.get("q") || "").trim().toLowerCase();
+        const live = await platformAction(request, { action:"founder-overview" });
+        await reconcileLiveOrganisations(live.organisations); await reconcileLiveMemberships(live.users);
+        const organisations = await founderQuery("SELECT * FROM research_console.founder_organisations ORDER BY name");
+        const orgResults = organisations.filter(row=>!q||[row.name,row.primary_email].some(value=>String(value||"").toLowerCase().includes(q))).slice(0,50).map(row=>({kind:"organisation",...row}));
+        const userResults = (Array.isArray(live.users)?live.users:[]).filter((row:Record<string,unknown>)=>!q||[row.name,row.email,row.organisationName].some(value=>String(value||"").toLowerCase().includes(q))).slice(0,50).map((row:Record<string,unknown>)=>({kind:"user",...row}));
+        return json([...orgResults,...userResults].slice(0,50));
       }
       if (resource === "accountants") {
         const rows = await listDirectoryControls(url.searchParams.get("q") || "");
