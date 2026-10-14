@@ -159,7 +159,8 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
           } };
         });
         const planCounts = Object.fromEntries(Object.keys(plans).map(plan => [plan, organisations.filter(row => row.plan === plan).length]));
-        const pendingInvitations = Array.isArray(live.invitations) ? live.invitations.filter((row:Record<string,unknown>) => row.status === "pending") : [];
+        const pendingInvitations = Array.isArray(live.invitations) ? live.invitations.filter((row:Record<string,unknown>) => ["pending", "preparing"].includes(String(row.status))) : [];
+        const failedInvitations = Array.isArray(live.invitations) ? live.invitations.filter((row:Record<string,unknown>) => row.status === "failed") : [];
         const pendingClients = Array.isArray(live.clients) ? live.clients.filter((row:Record<string,unknown>) => row.status === "pending") : [];
         const expiring = organisations.filter(row => row.complimentary_end && new Date(String(row.complimentary_end)).getTime() < Date.now() + 30 * 86400000);
         const newFeedback = Number(feedbackAttention[0]?.count || 0), newEnquiries = Number(enquiryAttention[0]?.count || 0);
@@ -182,6 +183,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
           }) },
           attention: [
             ...pendingInvitations.map((row:Record<string,unknown>) => ({ kind:"invitation", id:row.id, title:`Invitation awaiting ${row.email}`, detail:row.organisation_name || "Organisation" })),
+            ...failedInvitations.map((row:Record<string,unknown>) => ({ kind:"invitation", id:row.id, title:`Invitation failed for ${row.email}`, detail:row.delivery_error || "Review and resend the invitation" })),
             ...pendingClients.map((row:Record<string,unknown>) => ({ kind:"client", id:row.id, title:`${row.adviser_name} → ${row.charity_name}`, detail:"Awaiting charity approval" })),
             ...expiring.map(row => ({ kind:"complimentary", id:row.id, title:`${row.name} complimentary access`, detail:`Expires ${new Date(String(row.complimentary_end)).toLocaleDateString("en-GB")}` })),
             ...(newEnquiries ? [{ kind:"enquiry", title:`${newEnquiries} new ${newEnquiries === 1 ? "enquiry" : "enquiries"}`, detail:"Review and follow up", target:"feedback" }] : []),
@@ -336,10 +338,12 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       if (!organisation) return json({ error: "Organisation not found." }, 404);
       await syncOrganisation(request, organisation);
       const delivered = await platformAction(request, { action: "founder-invite", organisationId: platformOrganisationId(organisation), email, role });
-      const invitation = (await founderQuery("INSERT INTO research_console.founder_invitations(organisation_id,email,role,status,invited_by) VALUES($1,$2,$3,'pending',$4) RETURNING *", [id, email, role, actor.email]))[0];
+      const platformInvitation = delivered.invitation && typeof delivered.invitation === "object" ? delivered.invitation as Record<string, unknown> : {};
+      const deliveryStatus = ["pending", "sent", "delivered", "failed", "accepted"].includes(String(platformInvitation.status)) ? String(platformInvitation.status) : "pending";
+      const invitation = (await founderQuery("INSERT INTO research_console.founder_invitations(organisation_id,email,role,status,invited_by) VALUES($1,$2,$3,$4,$5) RETURNING *", [id, email, role, deliveryStatus, actor.email]))[0];
       await founderQuery("INSERT INTO research_console.founder_memberships(organisation_id,email,role,status) VALUES($1,$2,$3,'invited') ON CONFLICT(organisation_id,email) DO UPDATE SET role=excluded.role,status='invited'", [id, email, role]);
       await audit(actor.email, "invitation_recorded", "organisation", id, null, invitation);
-      return json({ ...invitation, delivery: "sent", platform: delivered.invitation }, 201);
+      return json({ ...invitation, delivery: deliveryStatus, platform: platformInvitation }, 201);
     }
     if (resource === "clients" && (id === "link" || action === "link")) {
       const adviser = String(body.adviserOrganisationId || "");
@@ -366,6 +370,11 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     if (resource === "invitations" && id && action === "revoke") {
       const live = await platformAction(request, { action: "founder-revoke-invitation", invitationId:id });
       await audit(actor.email, "invitation_revoked", "invitation", id, null, live);
+      return json(live);
+    }
+    if (resource === "invitations" && id && action === "resend") {
+      const live = await platformAction(request, { action: "founder-resend-invitation", invitationId:id });
+      await audit(actor.email, "invitation_resent", "invitation", id, null, live);
       return json(live);
     }
     if (resource === "feedback" && id && action === "update") {

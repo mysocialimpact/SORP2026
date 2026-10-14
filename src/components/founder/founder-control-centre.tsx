@@ -7,6 +7,7 @@ import {
   Accountant,
   AccountantData,
   Dashboard,
+  Invitation,
   Organisation,
   OrganisationDetail,
   PlanData,
@@ -135,12 +136,16 @@ export function FounderControlCentre() {
     if (!selectedOrganisation) return;
     const element = event.currentTarget;
     const form = new FormData(element);
+    const email = String(form.get("email") || "").trim().toLowerCase();
+    const confirmedEmail = String(form.get("confirmEmail") || "").trim().toLowerCase();
     await perform(async () => {
-      await founderCall(`organisation/${selectedOrganisation.id}/invite`, { method: "POST", body: JSON.stringify({ email: form.get("email"), role: form.get("role") }) });
+      if (email !== confirmedEmail) throw new Error("The email addresses do not match. Check the recipient before sending.");
+      const result = await founderCall<{ delivery?:string; platform?:Invitation }>(`organisation/${selectedOrganisation.id}/invite`, { method: "POST", body: JSON.stringify({ email, role: form.get("role") }) });
       element.reset();
       await loadDashboard();
       setOrganisationDetail(await founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`));
-      setNotice(`Invitation sent to ${String(form.get("email"))}.`);
+      const status = result.platform?.status || result.delivery || "pending";
+      setNotice(status === "delivered" ? `Invitation delivered to ${email}.` : status === "sent" ? `Email provider accepted the invitation to ${email}.` : `Invitation submitted for ${email}. Delivery confirmation is pending.`);
     }, "The invitation was not sent.");
   };
 
@@ -175,6 +180,16 @@ export function FounderControlCentre() {
     }, "The invitation could not be revoked.");
   };
 
+  const resendInvitation = async (id?: string) => {
+    if (!id) return;
+    await perform(async () => {
+      const result = await founderCall<{ invitation?:Invitation }>(`invitations/${id}/resend`, { method:"POST", body:"{}" });
+      await loadDashboard();
+      const status = result.invitation?.status || "pending";
+      setNotice(status === "delivered" ? "Invitation delivered." : status === "sent" ? "Email provider accepted the resent invitation." : "Invitation resubmitted; provider confirmation is pending.");
+    }, "The invitation could not be resent.");
+  };
+
   const openOrganisationFrom = async (dashboard: Dashboard, organisation: Organisation) => {
     setData(dashboard);
     setSelectedOrganisation(organisation);
@@ -202,7 +217,7 @@ export function FounderControlCentre() {
       {view === "billing" && <BillingWorkspace data={data} plans={plans} onOpenOrganisation={openOrganisation} />}
       {view === "accountants" && <AccountantWorkspace data={accountants} onSelect={setSelectedFirm} />}
       {view === "feedback" && <section className="founder-section"><FounderFeedbackWorkspace /></section>}
-      {view === "platform" && <PlatformWorkspace data={data} plans={plans} onRevokeInvitation={revokeInvitation} busy={busy} />}
+      {view === "platform" && <PlatformWorkspace data={data} plans={plans} onRevokeInvitation={revokeInvitation} onResendInvitation={resendInvitation} busy={busy} />}
     </div>
 
     {creating && <Drawer title="Create organisation" onClose={() => setCreating(false)}><form className="founder-form-grid" onSubmit={createOrganisation}><label className="founder-span">Organisation name<input name="name" required minLength={2} autoFocus /></label><label>Type<select name="type" defaultValue="Charity"><option>Charity</option><option>Adviser</option><option>Other</option></select></label><button disabled={busy}>Create organisation</button><p className="founder-note founder-span">This creates a real account record; it is not demonstration data.</p></form></Drawer>}
@@ -326,10 +341,14 @@ function AccountantWorkspace({ data, onSelect }: { data: AccountantData | null; 
   </section>;
 }
 
-function PlatformWorkspace({ data, plans, onRevokeInvitation, busy }: { data: Dashboard; plans: PlanData | null; onRevokeInvitation:(id?:string)=>void; busy:boolean }) {
+function invitationStatus(status?:string) {
+  return ({ preparing:"Pending", pending:"Pending", sent:"Successfully sent", delivered:"Delivered", failed:"Failed", accepted:"Accepted", revoked:"Revoked", expired:"Expired" } as Record<string,string>)[String(status)] || label(status);
+}
+
+function PlatformWorkspace({ data, plans, onRevokeInvitation, onResendInvitation, busy }: { data: Dashboard; plans: PlanData | null; onRevokeInvitation:(id?:string)=>void; onResendInvitation:(id?:string)=>void; busy:boolean }) {
   return <section className="founder-section">
     <div className="founder-section-title"><div><p className="founder-kicker">Platform management</p><h2>Administration and audit</h2></div><p>Real controls are connected; unavailable commercial capabilities are labelled.</p></div>
-    <div className="founder-home-grid"><article><p className="founder-kicker">Invitations</p><h2>{data.invitations.length} recorded</h2>{data.invitations.length ? <ul className="founder-attention">{data.invitations.slice(0, 12).map((row, index) => <li key={row.id || index}><span>I</span><div><strong>{row.email}</strong><p>{row.organisation_name || row.organisationName || "Organisation"} · {label(row.role)} · {label(row.status)}</p>{row.status === "pending" && row.id ? <button className="founder-link" disabled={busy} onClick={()=>onRevokeInvitation(row.id)}>Revoke invitation</button> : null}</div></li>)}</ul> : <p className="founder-muted">No invitations recorded.</p>}</article>
+    <div className="founder-home-grid"><article><p className="founder-kicker">Invitations</p><h2>{data.invitations.length} recorded</h2>{data.invitations.length ? <ul className="founder-attention">{data.invitations.slice(0, 12).map((row, index) => { const canRetry=["pending","sent","failed","expired"].includes(String(row.status)); return <li key={row.id || index}><span>I</span><div><strong>{row.email}</strong><p>{row.organisation_name || row.organisationName || "Organisation"} · {label(row.role)} · {invitationStatus(row.status)}</p>{row.delivery_error ? <p role="alert">{row.delivery_error}</p> : null}<small>{row.accepted_at ? `Accepted ${displayDate(row.accepted_at, true)}` : row.delivered_at ? `Delivered ${displayDate(row.delivered_at, true)}` : row.last_sent_at ? `Last submitted ${displayDate(row.last_sent_at, true)}` : `Created ${displayDate(row.created_at || row.createdAt, true)}`}{row.delivery_attempts ? ` · ${row.delivery_attempts} attempt${row.delivery_attempts === 1 ? "" : "s"}` : ""}</small>{row.id ? <div><button className="founder-link" disabled={busy || !canRetry} onClick={()=>onResendInvitation(row.id)}>Resend Invitation</button>{!["accepted","revoked"].includes(String(row.status)) ? <button className="founder-link" disabled={busy} onClick={()=>onRevokeInvitation(row.id)}>Revoke invitation</button> : null}</div> : null}</div></li>; })}</ul> : <p className="founder-muted">No invitations recorded.</p>}</article>
       <article><p className="founder-kicker">Configuration</p><h2>Connection status</h2><dl className="founder-status-list"><div><dt>Plan entitlements</dt><dd>Connected</dd></div><div><dt>Complimentary access</dt><dd>Connected</dd></div><div><dt>Automated billing</dt><dd>{plans?.billingConnected ? "Connected" : "Not connected"}</dd></div><div><dt>Billing discounts</dt><dd>{plans?.discountsConnected ? "Connected" : "Not connected"}</dd></div></dl></article></div>
     <div className="founder-section-title founder-section-title--table"><div><p className="founder-kicker">Administrative audit history</p><h2>Meaningful founder changes</h2></div></div><ActivityList rows={data.audit.slice(0, 30)} />
   </section>;

@@ -91,6 +91,18 @@ export type Invitation = {
   created_at?: string;
   createdAt?: string;
   expires_at?: string;
+  accepted_at?: string;
+  delivery_id?: string | null;
+  delivery_error?: string | null;
+  delivery_attempts?: number;
+  last_sent_at?: string | null;
+  delivered_at?: string | null;
+  deliveryId?: string | null;
+  deliveryError?: string | null;
+  deliveryAttempts?: number;
+  lastSentAt?: string | null;
+  deliveredAt?: string | null;
+  acceptedAt?: string | null;
 };
 
 export type Dashboard = {

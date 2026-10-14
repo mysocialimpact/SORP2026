@@ -41,6 +41,7 @@ export function OrganisationDrawer({ organisation, detail, data, busy, onClose, 
       </table></div> : <p className="founder-muted">No registered users are associated with this organisation.</p>}
       <form className="founder-inline-form" onSubmit={onInvite}>
         <label>Email<input name="email" type="email" required /></label>
+        <label>Confirm email<input name="confirmEmail" type="email" required /></label>
         <label>Role<select name="role" defaultValue="member"><option value="owner">Owner</option><option value="admin">Administrator</option><option value="member">Member</option></select></label>
         <button disabled={busy}>Send invitation</button>
       </form>
