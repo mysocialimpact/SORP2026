@@ -91,8 +91,8 @@ test("founder can administer plans, invitations and consent-based adviser access
   await expect(page).toHaveURL(/\/founder\//);
   await expect(page.getByRole("heading", { name: "Control the platform." })).toBeVisible();
   await page.getByRole("link", { name: /View My Dashboard/ }).click();
-  await expect(page.getByRole("link", { name: /Open Founder Control Centre/ })).toBeVisible();
-  await page.getByRole("link", { name: /Open Founder Control Centre/ }).click();
+  await expect(page.getByRole("link", { name: "Founder Control Centre" })).toBeVisible();
+  await page.getByRole("link", { name: "Founder Control Centre" }).click();
 
   await createOrganisation(page, "Test Adviser Ltd", "Adviser");
   await createOrganisation(page, "Test Charity Ltd", "Charity");
@@ -133,9 +133,9 @@ test("founder can administer plans, invitations and consent-based adviser access
   await expect(page.getByRole("status")).toContainText("charity owner approves");
   await relationDialog.getByRole("button", { name: "Close" }).click();
 
-  await charityPage.goto("/dashboard/");
-  await expect(charityPage.getByText("Test Adviser Ltd has requested access.")).toBeVisible();
-  await charityPage.getByRole("button", { name: "Approve access" }).click();
+  await charityPage.goto("/settings/#access");
+  await expect(charityPage.getByRole("heading", { name: "Test Adviser Ltd → Test Charity Ltd" })).toBeVisible();
+  await charityPage.getByRole("button", { name: "Approve", exact: true }).click();
   await expect(charityPage.getByRole("status")).toContainText("approved");
 
   await adviserPage.goto("/adviser/");
@@ -152,8 +152,9 @@ test("founder can administer plans, invitations and consent-based adviser access
   const denied = await adviserPage.request.post("/api/readiness-account/", { data: { action: "adviser-client", adviserOrganisationId: testAdviser.platform_organisation_id, charityOrganisationId: unrelated.platform_organisation_id } });
   expect(denied.status()).toBe(403);
 
-  await charityPage.goto("/dashboard/");
-  await expect(charityPage.getByText("Test Adviser Ltd can access Test Charity Ltd.")).toBeVisible();
+  await charityPage.goto("/settings/#access");
+  await expect(charityPage.getByRole("heading", { name: "Test Adviser Ltd → Test Charity Ltd" })).toBeVisible();
+  charityPage.once("dialog", dialog => dialog.accept());
   await charityPage.getByRole("button", { name: "Revoke access" }).click();
   await expect(charityPage.getByRole("status")).toContainText("revoked");
   const revoked = await adviserPage.request.post("/api/readiness-account/", { data: { action: "adviser-client", adviserOrganisationId: testAdviser.platform_organisation_id, charityOrganisationId: testCharity.platform_organisation_id } });

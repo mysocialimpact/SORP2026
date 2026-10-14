@@ -6,6 +6,7 @@ const founderAuth = await readFile(new URL("../../src/lib/founder/auth.ts", impo
 const adviser = await readFile(new URL("../../src/components/adviser/adviser-workspace.tsx", import.meta.url), "utf8");
 const invitation = await readFile(new URL("../../src/components/platform/invitation-acceptance.tsx", import.meta.url), "utf8");
 const dashboardAccess = await readFile(new URL("../../src/components/console/founder-link.tsx", import.meta.url), "utf8");
+const accountSettings = await readFile(new URL("../../src/components/account-settings.tsx", import.meta.url), "utf8");
 const platformAuth = await readFile(new URL("../../src/lib/platform/auth.ts", import.meta.url), "utf8");
 const accountPortal = await readFile(new URL("../../src/components/account-portal.tsx", import.meta.url), "utf8");
 const founderRoute = await readFile(new URL("../../src/app/api/founder/[...path]/route.ts", import.meta.url), "utf8");
@@ -35,10 +36,12 @@ test("expired or revoked adviser entitlements do not expose the adviser workspac
   assert.match(dashboardAccess, /\["Adviser","Enterprise"\]\.includes\(item\.entitlement\?\.plan/);
 });
 
-test("charity administrators can revoke active adviser access from their dashboard", () => {
-  assert.match(dashboardAccess, /activeClientAccess/);
-  assert.match(dashboardAccess, /Revoke access/);
-  assert.match(dashboardAccess, /action:"client-access-decide"/);
+test("charity administrators manage adviser access in Settings with confirmation", () => {
+  assert.doesNotMatch(dashboardAccess, /Revoke access/);
+  assert.match(accountSettings, /activeClientAccess/);
+  assert.match(accountSettings, /window\.confirm/);
+  assert.match(accountSettings, /action:"client-access-decide"/);
+  assert.match(accountSettings, /\["owner","admin"\]/);
 });
 
 test("invitation acceptance requires an authenticated account", () => {

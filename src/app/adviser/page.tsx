@@ -5,7 +5,8 @@ import "./adviser.css";
 
 export const metadata: Metadata = { title: "Adviser Workspace", robots: { index: false, follow: false } };
 
-export default async function AdviserPage() {
+export default async function AdviserPage({searchParams}:{searchParams:Promise<{client?:string}>}) {
   const identity = await protectAdviserPage();
-  return <main id="main" className="adviser-workspace-page"><AdviserWorkspace name={identity.account.name} memberships={identity.advisers} /></main>;
+  const params=await searchParams;
+  return <main id="main" className="adviser-workspace-page"><AdviserWorkspace name={identity.account.name} memberships={identity.advisers} initialClient={params.client} /></main>;
 }

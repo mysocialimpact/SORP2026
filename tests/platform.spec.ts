@@ -71,21 +71,84 @@ test("dashboard shows genuine readiness and native Social Impact Excellence stat
   await expect(page.getByRole("heading", { level: 1 })).toContainText("QA");
   const progressOverview = page.getByRole("region", { name: "Where you are." });
   await expect(progressOverview).toBeVisible();
-  await expect(progressOverview.getByText("Are You SORP Ready?", { exact: true })).toBeVisible();
-  const readinessProgress = progressOverview.getByRole("progressbar", { name: "Are You SORP Ready?: In progress" });
+  await expect(progressOverview.getByText("SORP Readiness", { exact: true })).toBeVisible();
+  const readinessProgress = progressOverview.getByRole("progressbar", { name: "SORP Readiness: In progress" });
   await expect(readinessProgress).toHaveAttribute("aria-valuenow", "63");
-  await expect(readinessProgress.locator("xpath=..")).toContainText("In progress63%");
-  await expect(progressOverview.locator("li").filter({ hasText: "Live beta · separate service" })).toHaveCount(1);
-  await expect(progressOverview.locator("li").filter({ hasText: "Not started" })).toHaveCount(3);
-  await expect(page.getByRole("heading", { name: "Your SORP tools." })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Strengthen your impact." })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Continue assessment/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/");
-  await expect(page.getByText("Ready to start", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Start assessment" })).toHaveAttribute("href", "/social-impact-excellence/assessment/");
-  const impactColumns = await page.locator(".dashboard-product-group--impact .dashboard-products").evaluate(
-    grid => getComputedStyle(grid).gridTemplateColumns.split(" ").length,
-  );
-  expect(impactColumns).toBe(page.viewportSize()!.width > 700 ? 2 : 1);
+  await expect(progressOverview.locator("li").filter({ hasText: "Not yet started" })).toHaveCount(3);
+  await expect(page.getByRole("heading", { name: "You’re partway through your SORP assessment." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Continue assessment →" }).first()).toHaveAttribute("href", "/are-you-sorp-ready/review/");
+  await expect(page.getByRole("heading", { name: "Focus here." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What changed." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Settings" })).toHaveAttribute("href", "/settings/");
+  await expect(page.locator(".dashboard-card,.dashboard-products")).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
+});
+
+test("account settings keeps delegated access out of the dashboard and confirms revocation", async ({ page }) => {
+  const writes: Record<string, unknown>[] = [];
+  await page.route("**/api/readiness-account/**", async route => {
+    if (route.request().method() === "POST") { writes.push(route.request().postDataJSON()); return route.fulfill({ json: { ok: true } }); }
+    return route.fulfill({ json: { signedIn: true, account: { name: "Will Jones", email: "will@example.invalid", position: "CEO", organisation: "Brainstrust" }, platformAccess: { memberships: [{ organisationId: "brainstrust", name: "Brainstrust", type: "Charity", role: "owner", entitlement: { plan: "Free", payablePrice: 0 } }], activeClientAccess: [{ id: "access-1", adviserName: "FLUID", charityName: "Brainstrust", permissions: { progress: true, answers: true, edit: false, invitations: false } }] } } });
+  });
+  await page.goto("/settings/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Account settings.");
+  const accessSettings = page.locator("#access");
+  await expect(accessSettings.getByRole("heading", { name: "FLUID → Brainstrust" })).toBeVisible();
+  await expect(accessSettings.getByText("Progress · Individual answers")).toBeVisible();
+  page.once("dialog", dialog => dialog.accept());
+  await page.getByRole("button", { name: "Revoke access" }).click();
+  await expect(page.getByRole("status")).toContainText("revoked");
+  expect(writes).toContainEqual({ action: "client-access-decide", accessId: "access-1", decision: "deny" });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
+});
+
+test("settings does not offer relationship controls for a charity the user cannot administer", async ({ page }) => {
+  await page.route("**/api/readiness-account/**", route => route.fulfill({ json: {
+    signedIn: true,
+    account: { name: "Mixed Role", email: "mixed@example.invalid", organisation: "Member Charity" },
+    platformAccess: {
+      memberships: [
+        { organisationId: "owned", name: "Owned Charity", type: "Charity", role: "owner" },
+        { organisationId: "member", name: "Member Charity", type: "Charity", role: "member" },
+      ],
+      activeClientAccess: [{ id: "access-member", adviserName: "Careful Adviser", charityName: "Member Charity", charityOrganisationId: "member", permissions: { progress: true, answers: false, edit: false, invitations: false } }],
+    },
+  } }));
+  await page.goto("/settings/#access");
+  const accessSettings = page.locator("#access");
+  await expect(accessSettings.getByText("View only · ask an organisation administrator to make changes.")).toBeVisible();
+  await expect(accessSettings.getByRole("button", { name: "Revoke access" })).toHaveCount(0);
+});
+
+test("adviser dashboard prioritises its real client portfolio and links to an authorised organisation", async ({ page }) => {
+  await page.route("**/api/readiness-account/**", async route => {
+    if (route.request().method() === "GET") return route.fulfill({ json: {
+      signedIn: true,
+      account: { id: "fluid-user", name: "Alex Adviser", email: "alex@example.invalid", organisation: "FLUID" },
+      platformAccess: { memberships: [{ organisationId: "fluid", name: "FLUID", type: "Adviser", role: "admin", entitlement: { plan: "Adviser", status: "active" } }] },
+    } });
+    const input = route.request().postDataJSON() as Record<string, unknown>;
+    if (input.action === "adviser-workspace") return route.fulfill({ json: {
+      organisation: { name: "FLUID" },
+      clients: [
+        { organisationId: "brainstrust", name: "Brainstrust", status: "active", memberCount: 2, updatedAt: "2026-10-14T09:00:00Z", permissions: { progress: true, answers: true, edit: false, invitations: false } },
+        { organisationId: "pending-charity", name: "Pending Charity", status: "pending", memberCount: 0, permissions: { progress: true, answers: false, edit: false, invitations: false } },
+      ],
+    } });
+    if (input.action === "adviser-client") return route.fulfill({ json: { assessments: [{ accountId: "brain-user", currentStage: 3, completedStages: [1, 2], status: "in_progress", lastSavedAt: "2026-10-14T08:00:00Z" }] } });
+    return route.fulfill({ status: 400, json: { error: "Unexpected test action" } });
+  });
+  await page.goto("/dashboard/");
+  await expect(page.getByRole("heading", { name: "Your client portfolio." })).toBeVisible();
+  await expect(page.locator(".dashboard-overview dl div").filter({ hasText: "Authorised organisations" }).getByRole("definition")).toHaveText("1");
+  await expect(page.locator(".dashboard-overview dl div").filter({ hasText: "Assessments in progress" }).getByRole("definition")).toHaveText("1");
+  await expect(page.getByRole("heading", { name: "Continue with Brainstrust." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open organisation workspace →" })).toHaveAttribute("href", "/adviser/?client=brainstrust");
+  await expect(page.getByText("SORP readiness · Stage 3 of 7")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
 });
 
 test("authenticated users can talk to Marcus, send lightweight feedback, and see published improvements", async ({ page }) => {

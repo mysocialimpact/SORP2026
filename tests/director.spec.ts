@@ -84,18 +84,16 @@ test("dashboard shows a completed snapshot as Started without changing SIE", asy
   );
   await page.goto("/dashboard/");
   await expect(
-    page.getByRole("progressbar", {
-      name: "My Impact Director: Started · snapshot complete",
-    }),
+    page.getByRole("progressbar", { name: "My Impact Director: Started · snapshot complete" }),
   ).toHaveAttribute("aria-valuenow", "100");
   await expect(
-    page.getByRole("link", { name: "Open my report & next steps" }),
+    page.getByRole("link", { name: "Open My Impact Director" }),
   ).toHaveAttribute("href", "/my-impact-director/#assessment");
   await expect(
     page.getByRole("progressbar", {
-      name: "Social Impact Excellence: In progress",
+      name: "Social Impact Excellence: Assessment completed · 3.0/5",
     }),
-  ).toHaveAttribute("aria-valuenow", "20");
+  ).toHaveAttribute("aria-valuenow", "100");
 });
 test("reduced motion and keyboard stars work; unavailable progress is not a false success", async ({
   page,
