@@ -7,6 +7,7 @@ const google = readFileSync(new URL("../../src/app/booking-google.ts", import.me
 const googleCallback = readFileSync(new URL("../../src/app/api/booking/google/callback/route.ts", import.meta.url), "utf8");
 const backendProxy = readFileSync(new URL("../../src/app/backend-proxy.ts", import.meta.url), "utf8");
 const reviewStyles = readFileSync(new URL("../../src/app/sorp-candidate-review.css", import.meta.url), "utf8");
+const assessmentModeStyles = readFileSync(new URL("../../src/app/assessment-mode.css", import.meta.url), "utf8");
 
 test("the saved account gate sits before public report retrieval and captures the required profile", () => {
   assert.match(review, /\["find", "confirmation", "account"\]/);
@@ -20,21 +21,18 @@ test("the saved account gate sits before public report retrieval and captures th
   assert.match(review, /await startHomework\(\)/);
 });
 
-test("email account access remains available while Google account controls are disabled", () => {
+test("email account access remains available inside the dedicated assessment shell", () => {
   assert.match(review, /const GOOGLE_ACCOUNT_SIGN_IN_ENABLED = false/);
-  assert.match(review, /className="scr-header-actions"/);
-  assert.match(review, /GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <a className="scr-header-login"/);
   assert.match(review, /!account && GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <>/);
   assert.match(review, /CREATE MY FREE ACCOUNT →/);
   assert.match(review, /SIGN IN AND CONTINUE →/);
-  assert.match(review, /<b>SIGNED IN<\/b>/);
-  assert.match(review, /action: "logout"/);
-  assert.match(review, /BUILD 120 · 10 OCTOBER 2026 · 13:38 BST/);
-  assert.match(review, /className="scr-inline-build"/);
-  assert.match(reviewStyles, /\.scr-header-actions\{display:flex/);
+  assert.match(review, /function AssessmentHeader/);
+  assert.match(review, /href="\/are-you-sorp-ready\/"/);
+  assert.match(review, /function AssessmentProgress/);
+  assert.doesNotMatch(review, /BUILD 120|scr-inline-build|scr-beta-badge/);
   assert.match(reviewStyles, /\.scr-account-switch\{display:flex;width:100%;min-height:76px/);
-  assert.match(reviewStyles, /\.scr-inline-build\{[^}]*color:#6a6864/);
-  assert.match(reviewStyles, /@media\(max-width:900px\)[\s\S]*grid-template-columns:minmax\(0,1fr\) auto/);
+  assert.match(assessmentModeStyles, /--assessment-header-height: 56px/);
+  assert.match(assessmentModeStyles, /grid-template-columns: repeat\(8/);
 });
 
 test("Google account callback stays on the destination while the existing backend handles the account", () => {
