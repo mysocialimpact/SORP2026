@@ -54,9 +54,15 @@ export default function Home() {
             <h2 id="home-vision-title">Imagine a world where social impact was taken as seriously as financial performance.</h2>
           </div>
           <figure className="homepage-vision-founders">
-            <div className="homepage-vision-portraits" aria-hidden="true">
-              <Image src="/images/marcus-warry-cutout.webp" alt="" width={1205} height={1306} sizes="(max-width: 700px) 34vw, 190px" />
-              <Image src="/images/chris-arnold-cutout.webp" alt="" width={1205} height={1306} sizes="(max-width: 700px) 34vw, 190px" />
+            <div className="homepage-vision-portraits">
+              <div className="homepage-vision-person">
+                <Image src="/images/marcus-vision.webp" alt="Marcus Warry" width={600} height={803} sizes="(max-width: 700px) 40vw, 190px" />
+                <strong>Marcus Warry <small>ACA</small></strong>
+              </div>
+              <div className="homepage-vision-person">
+                <Image src="/images/chris-vision.webp" alt="Dr Chris Arnold" width={600} height={534} sizes="(max-width: 700px) 40vw, 190px" />
+                <strong>Dr Chris Arnold</strong>
+              </div>
             </div>
             <figcaption>Co-founders, My Social Impact</figcaption>
           </figure>
