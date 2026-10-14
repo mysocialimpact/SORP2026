@@ -41,8 +41,14 @@ test.beforeEach(async ({ page }) => {
 
 test("founder shell has one product navigation, one persistent administration row and no customer chrome", async ({ page }) => {
   await page.goto("/founder/");
-  await expect(page.getByRole("heading", { name: "FOUNDER CONTROL CENTRE" })).toBeVisible();
-  await expect(page.getByText("Your SORP 2026 platform at a glance.")).toBeVisible();
+  await expect(page.getByText("FOUNDER CONTROL CENTRE", { exact: true })).toBeVisible();
+  await expect(page.locator(".founder-header")).toHaveCount(0);
+  const wordmarkBox = await page.locator(".founder-mode-header .gateway-wordmark").boundingBox();
+  const controlTitleBox = await page.locator(".founder-control-title").boundingBox();
+  expect(wordmarkBox).not.toBeNull();
+  expect(controlTitleBox).not.toBeNull();
+  expect(controlTitleBox!.x).toBeGreaterThan(wordmarkBox!.x + wordmarkBox!.width);
+  expect(Math.abs((controlTitleBox!.y + controlTitleBox!.height / 2) - (wordmarkBox!.y + wordmarkBox!.height / 2))).toBeLessThan(8);
 
   const productNavigation = page.getByRole("navigation", { name: "SORP2026 products" });
   const administration = page.getByRole("navigation", { name: "Founder administration" });
@@ -52,7 +58,7 @@ test("founder shell has one product navigation, one persistent administration ro
   await expect(administration.getByRole("link")).toHaveCount(5);
   expect(await page.locator(".platform-sticky-navigation").evaluate(element => getComputedStyle(element).position)).toBe("sticky");
 
-  await expect(page.getByRole("link", { name: /View My Dashboard/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /View My Dashboard/ })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /Our Mission|Find Accountants/ })).toHaveCount(0);
   await expect(page.getByText("Where you are.")).toHaveCount(0);
   await expect(page.locator(".shared-hello,.gateway-footer,.folder-action-bar")).toHaveCount(0);

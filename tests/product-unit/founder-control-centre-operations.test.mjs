@@ -17,8 +17,8 @@ const route = await readFile(new URL("../../src/app/api/founder/[...path]/route.
 const auth = await readFile(new URL("../../src/lib/founder/auth.ts", import.meta.url), "utf8");
 
 test("founder home uses the requested operational identity and the one shared set of six product tabs", () => {
-  assert.match(centre, /FOUNDER CONTROL CENTRE/);
-  assert.match(centre, /Your SORP 2026 platform at a glance/);
+  assert.match(header, /FOUNDER CONTROL CENTRE/);
+  assert.doesNotMatch(centre, /<h1>FOUNDER CONTROL CENTRE<\/h1>/);
   for (const label of ["Home", "Are You SORP Ready?", "Ask SORP", "Charity Impact Reports", "Social Impact Excellence", "My Impact Director"]) assert.match(productDefinitions, new RegExp(label.replace(/[?]/g, "\\?")));
   assert.equal((layout.match(/<ProductFolderTabs\b/g) || []).length, 1);
   assert.match(productTabs, /founderMode \? `\/founder\/#\$\{founderTarget\}` : tab\.href/);
@@ -37,8 +37,8 @@ test("founder administration navigation is persistent, complete and hash-synchro
 
 test("founder shell removes customer chrome while public shell remains intact", () => {
   assert.match(header, /founder-mode-header/);
-  assert.match(header, />Founder<\/span>/);
-  assert.match(header, /View My Dashboard/);
+  assert.match(header, /founder-control-title/);
+  assert.doesNotMatch(header, /View My Dashboard|founder-mode-indicator/);
   for (const publicLabel of ["Our Mission", "Find Accountants", "Talk to us"]) assert.match(header, new RegExp(publicLabel));
   assert.match(footer, /startsWith\("\/founder\/"\)\) return null/);
   assert.match(sayHello, /if \(founderMode\) return null/);

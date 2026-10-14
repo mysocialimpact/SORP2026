@@ -89,14 +89,11 @@ test("founder can administer plans, invitations and consent-based adviser access
   page.setDefaultTimeout(10_000);
   await login(page, founder);
   await expect(page).toHaveURL(/\/founder\//);
-  await expect(page.getByRole("heading", { name: "FOUNDER CONTROL CENTRE" })).toBeVisible();
+  await expect(page.getByText("FOUNDER CONTROL CENTRE", { exact: true })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "SORP2026 products" }).getByRole("link")).toHaveCount(6);
   await expect(page.getByRole("navigation", { name: "Founder administration" }).getByRole("link")).toHaveCount(5);
   await expect(page.getByText("Where you are.")).toHaveCount(0);
   await expect(page.locator(".shared-hello,.gateway-footer,.folder-action-bar")).toHaveCount(0);
-  await page.getByRole("link", { name: /View My Dashboard/ }).click();
-  await expect(page.getByRole("link", { name: /^Founder/ })).toBeVisible();
-  await page.getByRole("link", { name: /^Founder/ }).click();
 
   await createOrganisation(page, "Test Adviser Ltd", "Adviser");
   await createOrganisation(page, "Test Charity Ltd", "Charity");
@@ -242,7 +239,7 @@ test("founder interface remains usable at iPhone width", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page, founder);
   await expect(page).toHaveURL(/\/founder\//);
-  await expect(page.getByRole("heading", { name: "FOUNDER CONTROL CENTRE" })).toBeVisible();
+  await expect(page.getByText("FOUNDER CONTROL CENTRE", { exact: true })).toBeVisible();
   const adminNavigation = page.getByRole("navigation", { name: "Founder administration" });
   await expect(adminNavigation).toBeVisible();
   expect(await adminNavigation.locator(".founder-admin-navigation-track").evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);

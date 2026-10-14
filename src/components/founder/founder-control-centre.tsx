@@ -192,10 +192,6 @@ export function FounderControlCentre() {
   if (!data) return <div className="founder-shell founder-loading"><p className="founder-kicker">Founder Control Centre</p><h1>Opening your workspace…</h1></div>;
 
   return <main className="founder-shell">
-    <header className="founder-header">
-      <div><p className="founder-kicker">Private founder workspace</p><h1>FOUNDER CONTROL CENTRE</h1><p>Your SORP 2026 platform at a glance.</p></div>
-    </header>
-
     {notice && <p className="founder-notice" role="status">{notice}</p>}
     {error && <p className="founder-error" role="alert">{error}<button onClick={() => setError("")}>Dismiss</button></p>}
 

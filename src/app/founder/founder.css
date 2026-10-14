@@ -4,9 +4,9 @@
 .founder-shell { max-width:1440px; margin:0 auto; }
 .founder-loading { padding-top:10vh; }
 .founder-kicker { margin:0; color:var(--founder-green); font-size:11px; font-weight:850; letter-spacing:.15em; text-transform:uppercase; }
-.founder-mode-header .gateway-header-inner { gap:24px; }
-.founder-header-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
-.founder-mode-indicator { cursor:default; user-select:none; }
+.founder-mode-header .gateway-header-inner { justify-content:flex-start; }
+.platform-sticky-navigation .founder-mode-header .gateway-brand-lockup { display:inline-flex; flex-direction:row; align-items:center; gap:18px; }
+.platform-sticky-navigation .founder-mode-header .founder-control-title { display:inline-block; max-width:none; margin:0; padding-left:18px; border-left:1px solid var(--g-line); color:#565158; font-family:var(--sans); font-size:12px; font-style:normal; font-weight:700; letter-spacing:.08em; line-height:1.2; white-space:nowrap; }
 .founder-admin-navigation { border-top:1px solid #ded9d0; border-bottom:1px solid #cfc8bc; background:#f4f0e8; box-shadow:0 4px 10px #2423290a; }
 .founder-admin-navigation-track { display:flex; align-items:stretch; gap:2px; overflow-x:auto; scrollbar-width:none; }
 .founder-admin-navigation-track::-webkit-scrollbar { display:none; }
@@ -15,9 +15,6 @@
 .founder-admin-navigation a:hover,.founder-admin-navigation a:focus-visible { color:var(--founder-ink); background:#fff9; }
 .founder-admin-navigation a.is-active { color:var(--founder-ink); background:white; }
 .founder-admin-navigation a.is-active::after { background:var(--founder-green); }
-.founder-header { display:flex; justify-content:space-between; gap:48px; align-items:flex-start; padding:10px 0 24px; }
-.founder-header h1 { max-width:980px; margin:8px 0; font-size:clamp(42px,5vw,72px); line-height:.95; letter-spacing:-.06em; }
-.founder-header p:last-child { margin:0; color:#69656d; font-size:18px; }
 .founder-notice,.founder-error { margin:18px 0 0; padding:12px 15px; border-left:4px solid #3d754c; background:#e2f1df; }
 .founder-error { border-color:#a94733; background:#fae5df; }
 .founder-error button { float:right; border:0; background:none; cursor:pointer; text-decoration:underline; }
@@ -179,14 +176,12 @@ button.founder-stat:hover { background:#36343d; }
 }
 @media (max-width:720px) {
   .founder-page { padding:24px 14px 70px; }
-  .founder-mode-header .gateway-header-inner { grid-template-columns:minmax(0,1fr) auto; }
-  .founder-header-actions { gap:4px; }
-  .founder-mode-header .founder-mode-indicator { min-height:32px; padding:7px 9px!important; font-size:10px; }
-  .founder-mode-header .gateway-account-control { min-height:32px; padding:7px 9px!important; font-size:10px; white-space:nowrap; }
+  .founder-mode-header .gateway-header-inner { display:flex; }
+  .platform-sticky-navigation .founder-mode-header .gateway-brand-lockup { gap:11px; }
+  .platform-sticky-navigation .founder-mode-header .founder-control-title { padding-left:12px; font-size:9px; letter-spacing:.055em; }
   .founder-admin-navigation a { padding:10px 12px 9px; font-size:10px; }
   .founder-admin-navigation a::after { right:12px; left:12px; }
-  .founder-header,.founder-section-title,.founder-feedback-heading { display:grid; gap:18px; }
-  .founder-header h1 { font-size:clamp(38px,12vw,50px); }
+  .founder-section-title,.founder-feedback-heading { display:grid; gap:18px; }
   .founder-stats,.founder-stats--overview { grid-template-columns:1fr 1fr; }
   .founder-stat { min-height:96px; padding:15px; }
   .founder-search-card { padding:15px; }.founder-search-results { left:15px; right:15px; top:99px; }
