@@ -105,6 +105,12 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "We could not complete that request. Please try again.");
+      if (data.verificationRequired === true) {
+        setMode("login");
+        setError("Check your email for a verification link, then sign in. Your account is not active yet.");
+        setBusy(false);
+        return;
+      }
       if (embedded) {
         // Refresh the existing shared session and all account controls together.
         returnToEmbeddedProduct(destination);
@@ -141,6 +147,6 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
       {mode === "login" && <Link className="account-forgot" href="/forgot-password/">Forgotten your password?</Link>}
       <button className="gateway-action account-submit" disabled={busy} type="submit">{busy ? "Please wait…" : mode === "login" ? "Log in to SORP2026 →" : "Create my SORP2026 account →"}</button>
     </form>}
-    <p className="account-note">{embedded ? "One free account for your eligible SORP2026 and My Social Impact tools. You’ll return straight to this assessment. No SORP review required." : "One account for every SORP2026 product. If you previously used Social Impact Excellence, sign up with the same email address and eligible saved work will reconnect automatically. Google sign-in remains unavailable until its existing configuration is fully verified."}</p>
+    <p className="account-note">{embedded ? "One free account for your eligible SORP2026 tools. You’ll return straight to this assessment. No SORP review required." : "One account for your SORP2026 tools. If you previously used Social Impact Excellence, contact support before creating a new account so your saved work can be checked. Google sign-in is currently unavailable."}</p>
   </div>;
 }

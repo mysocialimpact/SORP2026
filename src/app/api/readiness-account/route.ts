@@ -1,10 +1,21 @@
 import { proxyExistingSorpBackend } from "../../backend-proxy.ts";
 import { isReadinessComplete } from "../../../lib/readiness-status.ts";
+import { independentAuthCutover } from "../../../lib/sorp-auth/switch.ts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const GET = (request: Request) => proxyExistingSorpBackend(request, "/api/readiness-account");
+export async function GET(request: Request) {
+  if (independentAuthCutover()) {
+    const { independentAccountGET } = await import("../../../lib/sorp-auth/compat.ts");
+    return independentAccountGET(request);
+  }
+  return proxyExistingSorpBackend(request, "/api/readiness-account");
+}
 export async function POST(request: Request) {
+  if (independentAuthCutover()) {
+    const { independentAccountPOST } = await import("../../../lib/sorp-auth/compat.ts");
+    return independentAccountPOST(request);
+  }
   const payload = await request.clone().json().catch(() => ({}));
   if (payload.action === "create-report-upload") {
     const accountRequest = new Request(request.url, { method: "GET", headers: request.headers });

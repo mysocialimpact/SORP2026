@@ -2,8 +2,18 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AccessError } from "@/lib/access-error";
+import { independentIdentity } from "@/lib/sorp-auth/identity";
+import { independentAuthCutover } from "@/lib/sorp-auth/switch";
 export { AccessError } from "@/lib/access-error";
 export async function authenticate(cookie: string) {
+  if (independentAuthCutover()) {
+    if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
+    const identity = await independentIdentity(new Headers({ cookie }));
+    if (!identity) throw new AccessError(401, "Please log in again.");
+    if (!identity.platformAccess.founder) throw new AccessError(403,
+      "This console is private to authorised platform founders.");
+    return identity.account.email.toLowerCase();
+  }
   const origin = process.env.SORP_BACKEND_ORIGIN;
   if (!origin)
     throw new AccessError(503, "Private access needs configuration.");

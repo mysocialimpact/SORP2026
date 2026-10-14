@@ -838,8 +838,16 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         body: JSON.stringify(action === "save" ? { action, progress } : action === "signup" ? { action, name: saveProfile.name, position: saveProfile.position, email: saveProfile.email, password: saveProfile.password, progress } : { action, email: saveProfile.email, password: saveProfile.password }),
       });
       const raw = await response.text();
-      let data: { account?: ReadinessAccount; progress?: Partial<SavedProgress>; error?: string };
+      let data: { account?: ReadinessAccount; progress?: Partial<SavedProgress>; error?: string; verificationRequired?: boolean };
       try { data = raw ? JSON.parse(raw) as typeof data : {}; } catch { throw new Error("The secure saving service sent an incomplete response. Your assessment is still safe on this device and nothing has been lost. Please wait a moment and try again."); }
+      if (response.ok && data.verificationRequired) {
+        window.localStorage.setItem(storageKey, JSON.stringify({ ...progress,
+          saveProfile: { name: saveProfile.name, position: saveProfile.position, email: saveProfile.email } }));
+        setSaveStatus("idle");
+        setAccountMode("login");
+        setSaveError("Check your email to verify your new account, then sign in. Your assessment remains saved on this device.");
+        return;
+      }
       if (!response.ok || !data.account) throw new Error(data.error || "The secure saving service could not complete the request. Your assessment is still safe on this device and nothing has been lost. Please wait a moment and try again.");
       setAccount(data.account);
       if (action === "login") {

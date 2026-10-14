@@ -52,11 +52,31 @@ export function ReportReviewIntake() {
       });
       const prepared = await prepareResponse.json();
       if (!prepareResponse.ok || !prepared.upload?.url || !prepared.upload?.token) throw new Error(prepared.error || "The secure upload could not be prepared.");
-      const form = new FormData(); form.append("token", prepared.upload.token); form.append("file", file, file.name);
-      const uploadResponse = await fetch(prepared.upload.url, { method: "POST", body: form, credentials: "omit", referrerPolicy: "no-referrer" });
-      const uploaded = await uploadResponse.json().catch(() => ({}));
-      if (!uploadResponse.ok || !uploaded.ok) throw new Error(uploaded.error || "The report could not be uploaded securely.");
-      setReviews(current => [uploaded.review, ...current.filter(item => item.id !== uploaded.review.id)]);
+      let uploaded: { ok?: boolean; review?: Review; error?: string } = {};
+      let uploadResponse: Response | null = null;
+      if (prepared.upload.mode === "chunked") {
+        const chunkBytes = Number(prepared.upload.chunkBytes);
+        if (chunkBytes !== 3 * 1024 * 1024 || new URL(prepared.upload.url).origin !== window.location.origin) {
+          throw new Error("The secure upload destination is invalid.");
+        }
+        for (let index = 0; index < Math.ceil(file.size / chunkBytes); index += 1) {
+          const form = new FormData();
+          form.append("token", prepared.upload.token);
+          form.append("index", String(index));
+          form.append("file", file.slice(index * chunkBytes, (index + 1) * chunkBytes), file.name);
+          uploadResponse = await fetch(prepared.upload.url, { method: "POST", body: form,
+            credentials: "same-origin", referrerPolicy: "no-referrer" });
+          uploaded = await uploadResponse.json().catch(() => ({}));
+          if (!uploadResponse.ok || !uploaded.ok) throw new Error(uploaded.error || "The report could not be uploaded securely.");
+        }
+      } else {
+        const form = new FormData(); form.append("token", prepared.upload.token); form.append("file", file, file.name);
+        uploadResponse = await fetch(prepared.upload.url, { method: "POST", body: form, credentials: "omit", referrerPolicy: "no-referrer" });
+        uploaded = await uploadResponse.json().catch(() => ({}));
+      }
+      if (!uploadResponse?.ok || !uploaded.ok) throw new Error(uploaded.error || "The report could not be uploaded securely.");
+      if (!uploaded.review) throw new Error("The report upload is incomplete.");
+      setReviews(current => [uploaded.review!, ...current.filter(item => item.id !== uploaded.review!.id)]);
       setFile(null); setContext("");
       setUploadMessage("Your report is stored securely and visible in your SORP2026 account. No payment has been taken.");
     } catch (caught) { setFileError(caught instanceof Error ? caught.message : "The secure upload did not complete. No payment was taken."); }

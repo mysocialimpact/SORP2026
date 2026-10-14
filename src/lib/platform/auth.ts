@@ -2,6 +2,8 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AccessError } from "@/lib/access-error";
+import { independentIdentity } from "@/lib/sorp-auth/identity";
+import { independentAuthCutover } from "@/lib/sorp-auth/switch";
 
 export type PlatformMembership = {
   organisationId: string;
@@ -18,6 +20,13 @@ export type PlatformIdentity = {
 };
 
 export async function platformIdentity(cookie: string): Promise<PlatformIdentity> {
+  if (independentAuthCutover()) {
+    if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
+    const identity = await independentIdentity(new Headers({ cookie }));
+    if (!identity) throw new AccessError(401, "Please log in again.");
+    return { account: identity.account, founder: identity.platformAccess.founder,
+      memberships: identity.platformAccess.memberships as PlatformMembership[] };
+  }
   const origin = process.env.SORP_BACKEND_ORIGIN;
   if (!origin) throw new AccessError(503, "Platform access needs configuration.");
   if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
