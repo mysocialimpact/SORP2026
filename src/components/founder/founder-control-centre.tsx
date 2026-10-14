@@ -295,10 +295,25 @@ function OrganisationDirectory({ data, query, setQuery, results, onOpenOrganisat
 }
 
 function OrganisationTable({ organisations, onOpen }: { organisations: Organisation[]; onOpen: (organisation: Organisation) => void }) {
+  const [sort, setSort] = useState<{ key: "name" | "users" | "progress" | "lastActivity"; direction: "asc" | "desc" }>({ key: "lastActivity", direction: "desc" });
+  const sorted = useMemo(() => [...organisations].sort((left, right) => {
+    const values = {
+      name: [left.name, right.name],
+      users: [Number(left.member_count || 0), Number(right.member_count || 0)],
+      progress: [Number(left.progress || 0), Number(right.progress || 0)],
+      lastActivity: [Date.parse(left.last_activity || left.updated_at || "") || 0, Date.parse(right.last_activity || right.updated_at || "") || 0],
+    }[sort.key];
+    const comparison = typeof values[0] === "string"
+      ? String(values[0]).localeCompare(String(values[1]))
+      : Number(values[0]) - Number(values[1]);
+    return sort.direction === "asc" ? comparison : -comparison;
+  }), [organisations, sort]);
+  const sortBy = (key: typeof sort.key) => setSort(current => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
+  const heading = (text: string, key: typeof sort.key) => <button className="founder-sort" onClick={() => sortBy(key)}>{text}<span aria-hidden="true">{sort.key === key ? (sort.direction === "asc" ? " ↑" : " ↓") : " ↕"}</span></button>;
   if (!organisations.length) return <div className="founder-empty"><strong>No matching organisations</strong><p>Try another organisation, person or email address.</p></div>;
   return <div className="founder-table-wrap"><table className="founder-table">
-    <thead><tr><th>Organisation</th><th>Users</th><th>Products</th><th>Progress</th><th>Last active</th></tr></thead>
-    <tbody>{organisations.map(row => {
+    <thead><tr><th aria-sort={sort.key === "name" ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{heading("Organisation", "name")}</th><th aria-sort={sort.key === "users" ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{heading("Users", "users")}</th><th>Products</th><th aria-sort={sort.key === "progress" ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{heading("Progress", "progress")}</th><th aria-sort={sort.key === "lastActivity" ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{heading("Last active", "lastActivity")}</th></tr></thead>
+    <tbody>{sorted.map(row => {
       const activeProducts = Object.entries(row.products || {}).filter(([, status]) => status !== "not_started" && status !== "not_recorded").map(([name]) => label(name));
       return <tr key={row.id}><td><button className="founder-link founder-link--strong" onClick={() => onOpen(row)}>{row.name}</button><small>{row.type} · {row.plan}{row.complimentary ? " · Complimentary" : ""}</small></td><td>{row.member_count || 0}</td><td>{activeProducts.length ? activeProducts.join(", ") : "None recorded"}</td><td>{Number(row.progress || 0)}%</td><td>{displayDate(row.last_activity || row.updated_at, true)}</td></tr>;
     })}</tbody>

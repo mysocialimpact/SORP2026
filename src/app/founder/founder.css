@@ -67,6 +67,9 @@ button.founder-stat:hover { background:#36343d; }
 .founder-table { width:100%; min-width:840px; border-collapse:collapse; }
 .founder-table th,.founder-table td { padding:14px 15px; border-bottom:1px solid #e5e0d8; text-align:left; vertical-align:top; }
 .founder-table th { color:#77727a; font-size:10px; font-weight:850; letter-spacing:.09em; text-transform:uppercase; }
+.founder-sort { align-items:center; background:none; border:0; color:inherit; cursor:pointer; display:inline-flex; font:inherit; gap:2px; letter-spacing:inherit; padding:0; text-transform:inherit; }
+.founder-sort:hover,.founder-sort:focus-visible { color:#242329; }
+.founder-visually-hidden { clip:rect(0 0 0 0); clip-path:inset(50%); height:1px; overflow:hidden; position:absolute; white-space:nowrap; width:1px; }
 .founder-table td { font-size:13px; line-height:1.4; }
 .founder-table td small { display:block; margin-top:4px; color:#77727a; font-size:10px; }
 .founder-link { padding:0; border:0; background:none; color:var(--founder-ink); cursor:pointer; font:inherit; text-align:left; text-decoration:underline; text-decoration-color:#aaa; text-underline-offset:3px; }

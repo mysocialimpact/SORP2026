@@ -23,6 +23,9 @@ test("product dashboards use recorded rows and state truthful empty analytics", 
   assert.match(products, /data\.products\.impactDirector/);
   assert.match(products, /Topic analytics are not currently collected/);
   assert.match(products, /Conversation content is not shown/);
+  assert.match(products, /Search organisation, user or status/);
+  assert.match(products, /founder-sort/);
+  assert.match(centre, /aria-sort/);
 });
 
 test("founder organisation and user data remain server-authorised", () => {
