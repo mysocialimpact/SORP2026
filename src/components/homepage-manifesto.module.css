@@ -25,10 +25,8 @@
 .founders { grid-area: founders; align-self: center; min-width: 0; margin: 0; }
 .portraits { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
 .portraits > * { display: block; width: 100%; min-width: 0; aspect-ratio: 3 / 4; height: auto; }
-.marcus { object-fit: contain; background: #eeeadd; }
-.photoPending { margin-top: 34px; display: flex; flex-direction: column; justify-content: end; padding: 20px; background: #cfddcf; color: #284537; }
-.photoPending span { font-size: 20px; line-height: 1.1; }
-.photoPending small { margin-top: 12px; font-size: 11px; line-height: 1.4; }
+.marcus { object-fit: contain; object-position: center bottom; background: #eeeadd; }
+.chris { margin-top: 34px; object-fit: cover; object-position: center; background: linear-gradient(145deg, #8e9395, #73787a); }
 .founders figcaption { display: grid; gap: 16px; margin-top: 22px; line-height: 1.4; }
 .founderNames strong { display: block; font-size: 15px; font-weight: 600; }
 .founderNames > span { display: block; margin-top: 4px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #cfddcf; }
@@ -48,8 +46,7 @@
   .vision { padding-top: 20px; }
   .vision h2 { font-size: 25px; }
   .portraits { gap: 10px; }
-  .photoPending { margin-top: 22px; padding: 12px; }
-  .photoPending span { font-size: 16px; }
+  .chris { margin-top: 22px; }
   .founders figcaption { gap: 12px; margin-top: 18px; }
   .founderNames strong { font-size: 13px; }
   .founderNames > span { font-size: 9px; }

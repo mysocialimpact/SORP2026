@@ -11,16 +11,16 @@ export function HomepageManifesto() {
     const root = section.current;
     if (!root || !window.IntersectionObserver) return;
     root.setAttribute("data-animated", "true");
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          root.setAttribute("data-active", "true");
-          entry.target.setAttribute("data-revealed", "true");
-          observer.unobserve(entry.target);
-        }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+
+      root.setAttribute("data-active", "true");
+      root.querySelectorAll("[data-reveal]").forEach((element) => {
+        element.setAttribute("data-revealed", "true");
       });
-    }, { threshold: 0.3, rootMargin: "-120px 0px -12% 0px" });
-    root.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
+      observer.unobserve(root);
+    }, { threshold: 0.24, rootMargin: "0px 0px -8% 0px" });
+    observer.observe(root);
     return () => observer.disconnect();
   }, []);
 
@@ -37,7 +37,7 @@ export function HomepageManifesto() {
       <figure className={styles.founders} data-reveal>
         <div className={styles.portraits}>
           <Image className={styles.marcus} src="/images/marcus-editorial.webp" alt="Marcus Warry" width={640} height={857} sizes="(max-width: 700px) 40vw, 240px" />
-          <div className={styles.photoPending}><span>Dr Chris Arnold</span><small>Preview: awaiting the original attached photograph file.</small></div>
+          <Image className={styles.chris} src="/images/chris-vision.webp" alt="Dr Chris Arnold" width={600} height={534} sizes="(max-width: 700px) 40vw, 240px" />
         </div>
         <figcaption>
           <span className={styles.founderNames}><strong>Marcus Warry &amp; Dr Chris Arnold</strong><span>Co-founders, My Social Impact</span></span>
