@@ -1,9 +1,14 @@
+"use client";
+
 import { site } from "@/lib/site";
 import { IdeasBrand, MsiBrand } from "./brand";
 import { Arrow } from "./ui";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname === "/founder" || pathname.startsWith("/founder/")) return null;
   const builtAt = process.env.NEXT_PUBLIC_SITE_BUILT_AT!;
   const buildDate = new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",

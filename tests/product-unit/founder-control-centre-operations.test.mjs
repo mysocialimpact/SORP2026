@@ -4,15 +4,45 @@ import { readFile } from "node:fs/promises";
 
 const centre = await readFile(new URL("../../src/components/founder/founder-control-centre.tsx", import.meta.url), "utf8");
 const products = await readFile(new URL("../../src/components/founder/product-dashboard.tsx", import.meta.url), "utf8");
+const productTabs = await readFile(new URL("../../src/components/product-folder-tabs.tsx", import.meta.url), "utf8");
+const productDefinitions = await readFile(new URL("../../src/lib/products.ts", import.meta.url), "utf8");
+const founderNavigation = await readFile(new URL("../../src/lib/founder-navigation.ts", import.meta.url), "utf8");
+const founderAdminNavigation = await readFile(new URL("../../src/components/founder/founder-admin-navigation.tsx", import.meta.url), "utf8");
+const layout = await readFile(new URL("../../src/app/layout.tsx", import.meta.url), "utf8");
+const header = await readFile(new URL("../../src/components/header.tsx", import.meta.url), "utf8");
+const footer = await readFile(new URL("../../src/components/footer.tsx", import.meta.url), "utf8");
+const sayHello = await readFile(new URL("../../src/components/say-hello.tsx", import.meta.url), "utf8");
+const actionBar = await readFile(new URL("../../src/components/product-action-bar.tsx", import.meta.url), "utf8");
 const route = await readFile(new URL("../../src/app/api/founder/[...path]/route.ts", import.meta.url), "utf8");
 const auth = await readFile(new URL("../../src/lib/founder/auth.ts", import.meta.url), "utf8");
 
-test("founder home uses the requested operational identity and six product tabs", () => {
-  assert.match(centre, /Founder Control Centre/);
+test("founder home uses the requested operational identity and the one shared set of six product tabs", () => {
+  assert.match(centre, /FOUNDER CONTROL CENTRE/);
   assert.match(centre, /Your SORP 2026 platform at a glance/);
-  for (const label of ["Home", "Are You SORP Ready?", "Ask SORP", "Charity Impact Reports", "Social Impact Excellence", "My Impact Director"]) assert.match(centre, new RegExp(label.replace(/[?]/g, "\\?")));
+  for (const label of ["Home", "Are You SORP Ready?", "Ask SORP", "Charity Impact Reports", "Social Impact Excellence", "My Impact Director"]) assert.match(productDefinitions, new RegExp(label.replace(/[?]/g, "\\?")));
+  assert.equal((layout.match(/<ProductFolderTabs\b/g) || []).length, 1);
+  assert.match(productTabs, /founderMode \? `\/founder\/#\$\{founderTarget\}` : tab\.href/);
+  assert.doesNotMatch(centre, /founder-product-nav|founder-admin-nav/);
   assert.match(centre, /Search organisations or users/);
   assert.doesNotMatch(centre, /Continue your assessment|Where you are|Recommended next step/);
+});
+
+test("founder administration navigation is persistent, complete and hash-synchronised", () => {
+  for (const label of ["Organisations & Users", "Accounts & Billing", "Accountants & Advisers", "Feedback & Enquiries", "Platform Management"]) assert.match(founderNavigation, new RegExp(label.replace(/[&]/g, "&")));
+  assert.match(layout, /<PlatformNavigation><Header \/><ProductFolderTabs \/><FounderAdminNavigation \/><\/PlatformNavigation>/);
+  assert.match(founderAdminNavigation, /aria-current=\{active === item\.key \? "page" : undefined\}/);
+  assert.match(founderAdminNavigation, /FOUNDER_VIEW_EVENT/);
+  assert.match(centre, /FOUNDER_VIEW_EVENT/);
+});
+
+test("founder shell removes customer chrome while public shell remains intact", () => {
+  assert.match(header, /founder-mode-header/);
+  assert.match(header, />Founder<\/span>/);
+  assert.match(header, /View My Dashboard/);
+  for (const publicLabel of ["Our Mission", "Find Accountants", "Talk to us"]) assert.match(header, new RegExp(publicLabel));
+  assert.match(footer, /startsWith\("\/founder\/"\)\) return null/);
+  assert.match(sayHello, /if \(founderMode\) return null/);
+  assert.match(actionBar, /if \(founderMode\) return null/);
 });
 
 test("product dashboards use recorded rows and state truthful empty analytics", () => {

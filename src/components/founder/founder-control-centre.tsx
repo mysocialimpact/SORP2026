@@ -6,7 +6,6 @@ import { ActivityList, Drawer, OrganisationDrawer, UserDrawer } from "./account-
 import {
   Accountant,
   AccountantData,
-  AdminSection,
   Dashboard,
   Organisation,
   OrganisationDetail,
@@ -19,29 +18,11 @@ import {
   money,
 } from "./founder-model";
 import { ProductDashboard } from "./product-dashboard";
-
-type View = ProductKey | AdminSection;
-
-const productTabs: Array<{ key: ProductKey; label: string }> = [
-  { key: "home", label: "Home" },
-  { key: "readiness", label: "Are You SORP Ready?" },
-  { key: "askSorp", label: "Ask SORP" },
-  { key: "impactReports", label: "Charity Impact Reports" },
-  { key: "excellence", label: "Social Impact Excellence" },
-  { key: "impactDirector", label: "My Impact Director" },
-];
-
-const adminTabs: Array<{ key: AdminSection; label: string }> = [
-  { key: "organisations", label: "Organisations & Users" },
-  { key: "billing", label: "Accounts & Billing" },
-  { key: "accountants", label: "Accountants & Advisers" },
-  { key: "feedback", label: "Feedback & Enquiries" },
-  { key: "platform", label: "Platform Management" },
-];
+import { FOUNDER_VIEW_EVENT, founderViewFromHash, navigateFounderView, type FounderView } from "@/lib/founder-navigation";
 
 export function FounderControlCentre() {
   const [data, setData] = useState<Dashboard | null>(null);
-  const [view, setView] = useState<View>("home");
+  const [view, setView] = useState<FounderView>("home");
   const [query, setQuery] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -70,6 +51,18 @@ export function FounderControlCentre() {
   }, []);
 
   useEffect(() => {
+    const syncHash = () => setView(founderViewFromHash(window.location.hash));
+    const syncEvent = (event: Event) => setView((event as CustomEvent<{ view?: FounderView }>).detail?.view || founderViewFromHash(window.location.hash));
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    window.addEventListener(FOUNDER_VIEW_EVENT, syncEvent);
+    return () => {
+      window.removeEventListener("hashchange", syncHash);
+      window.removeEventListener(FOUNDER_VIEW_EVENT, syncEvent);
+    };
+  }, []);
+
+  useEffect(() => {
     if (view === "accountants" && !accountants) {
       void founderCall<AccountantData>("accountants").then(setAccountants).catch(caught => setError(message(caught, "Unable to load firms.")));
     }
@@ -87,8 +80,9 @@ export function FounderControlCentre() {
     };
   }, [data, query]);
 
-  const switchView = (next: View) => {
+  const switchView = (next: FounderView) => {
     setView(next);
+    navigateFounderView(next);
     window.requestAnimationFrame(() => document.querySelector(".founder-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
@@ -199,23 +193,15 @@ export function FounderControlCentre() {
 
   return <main className="founder-shell">
     <header className="founder-header">
-      <div><p className="founder-kicker">Private founder workspace</p><h1>Founder Control Centre</h1><p>Your SORP 2026 platform at a glance.</p></div>
-      <div className="founder-identity"><strong>{data.founder.name}</strong><span>{data.founder.email}</span><a href="/dashboard/">View My Dashboard →</a></div>
+      <div><p className="founder-kicker">Private founder workspace</p><h1>FOUNDER CONTROL CENTRE</h1><p>Your SORP 2026 platform at a glance.</p></div>
     </header>
-
-    <nav className="founder-product-nav" aria-label="Founder product dashboards">
-      {productTabs.map(tab => <button key={tab.key} className={view === tab.key ? "is-active" : ""} onClick={() => switchView(tab.key)}>{tab.label}</button>)}
-    </nav>
-    <nav className="founder-admin-nav" aria-label="Founder administration">
-      {adminTabs.map(tab => <button key={tab.key} className={view === tab.key ? "is-active" : ""} onClick={() => switchView(tab.key)}>{tab.label}</button>)}
-    </nav>
 
     {notice && <p className="founder-notice" role="status">{notice}</p>}
     {error && <p className="founder-error" role="alert">{error}<button onClick={() => setError("")}>Dismiss</button></p>}
 
     <div className="founder-workspace">
       {view === "home" && <HomeDashboard data={data} query={query} setQuery={setQuery} results={results} onOpenOrganisation={openOrganisation} onOpenUser={openUser} onSwitch={switchView} />}
-      {(["readiness", "askSorp", "impactReports", "excellence", "impactDirector"] as View[]).includes(view) && <ProductDashboard active={view as Exclude<ProductKey, "home">} data={data} onOpenOrganisation={openOrganisation} onOpenUser={openUser} />}
+      {(["readiness", "askSorp", "impactReports", "excellence", "impactDirector"] as FounderView[]).includes(view) && <ProductDashboard active={view as Exclude<ProductKey, "home">} data={data} onOpenOrganisation={openOrganisation} onOpenUser={openUser} />}
       {view === "organisations" && <OrganisationDirectory data={data} query={query} setQuery={setQuery} results={results} onOpenOrganisation={openOrganisation} onOpenUser={openUser} onCreate={() => setCreating(true)} />}
       {view === "billing" && <BillingWorkspace data={data} plans={plans} onOpenOrganisation={openOrganisation} />}
       {view === "accountants" && <AccountantWorkspace data={accountants} onSelect={setSelectedFirm} />}
@@ -239,9 +225,9 @@ function HomeDashboard({ data, query, setQuery, results, onOpenOrganisation, onO
   results: { organisations: Organisation[]; users: Dashboard["users"] };
   onOpenOrganisation: (candidate: string | Organisation) => void;
   onOpenUser: (id?: string) => void;
-  onSwitch: (view: View) => void;
+  onSwitch: (view: FounderView) => void;
 }) {
-  const metrics: Array<[number, string, View]> = [
+  const metrics: Array<[number, string, FounderView]> = [
     [data.metrics.organisations, "Total organisations", "organisations"],
     [data.metrics.registeredUsers, "Registered users", "organisations"],
     [data.metrics.newOrganisationsThisWeek, "New this week", "organisations"],

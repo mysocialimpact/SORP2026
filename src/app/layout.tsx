@@ -19,6 +19,7 @@ import { ProductFolderTabs } from "@/components/product-folder-tabs";
 import { PlatformNavigation } from "@/components/platform-navigation";
 import { ProductActionBar } from "@/components/product-action-bar";
 import { SayHello } from "@/components/say-hello";
+import { FounderAdminNavigation } from "@/components/founder/founder-admin-navigation";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
@@ -57,7 +58,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <PlatformNavigation><Header /><ProductFolderTabs /></PlatformNavigation>
+        <PlatformNavigation><Header /><ProductFolderTabs /><FounderAdminNavigation /></PlatformNavigation>
         {children}
         <SayHello />
         <Footer />

@@ -26,12 +26,14 @@ function readinessAction(progress?: ReadinessProgress): Action {
 export function ProductActionBar() {
   const pathname = usePathname();
   const path = `${pathname.replace(/\/$/, "")}/`;
+  const founderMode = path.startsWith("/founder/");
   const folder = folderForPath(path);
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [director, setDirector] = useState<{ completed?: boolean; started?: boolean } | null>(null);
   const bar = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    if (founderMode) return;
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
       .then(async response => response.ok ? setAccount(await response.json()) : setAccount({ signedIn: false }))
@@ -46,7 +48,7 @@ export function ProductActionBar() {
         }).catch(() => undefined);
     }
     return () => controller.abort();
-  }, [path]);
+  }, [founderMode, path]);
 
   const action = useMemo(() => {
     if (path === "/" || path.startsWith("/are-you-sorp-ready/") || path === "/dashboard/") return readinessAction(account?.signedIn ? account.progress : undefined);
@@ -58,13 +60,18 @@ export function ProductActionBar() {
   }, [account, director, path]);
 
   useLayoutEffect(() => {
+    if (founderMode) {
+      document.documentElement.style.removeProperty("--folder-action-height");
+      return;
+    }
     if (!bar.current) return;
     const element = bar.current;
     const measure = () => document.documentElement.style.setProperty("--folder-action-height", `${element.getBoundingClientRect().height}px`);
     const observer = new ResizeObserver(measure); measure(); observer.observe(element);
     return () => { observer.disconnect(); document.documentElement.style.removeProperty("--folder-action-height"); };
-  }, []);
+  }, [founderMode]);
 
+  if (founderMode) return null;
   return <>
     <aside ref={bar} className="folder-action-bar" data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
       <Link className="folder-action-primary" href={action.href}>{action.label} <span aria-hidden="true">→</span></Link>

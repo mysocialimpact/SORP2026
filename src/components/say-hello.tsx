@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Arrow } from "@/components/ui";
 import { AuthenticatedContinuousImprovement, type AuthenticatedAccount } from "@/components/authenticated-continuous-improvement";
 
 export function SayHello() {
+  const pathname = usePathname();
+  const founderMode = pathname === "/founder" || pathname.startsWith("/founder/");
   const [email, setEmail] = useState("");
   const [newsletter, setNewsletter] = useState(false);
   const [message, setMessage] = useState("");
@@ -14,6 +17,7 @@ export function SayHello() {
   const [identity, setIdentity] = useState<AuthenticatedAccount | false | null>(null);
 
   useEffect(() => {
+    if (founderMode) return;
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
       .then(async response => {
@@ -28,16 +32,17 @@ export function SayHello() {
         }
       }).catch(() => setIdentity(false));
     return () => controller.abort();
-  }, []);
+  }, [founderMode]);
 
   useEffect(() => {
+    if (founderMode) return;
     function applyContactIntent(event: Event) {
       const detail = (event as CustomEvent<{ message?: string }>).detail;
       if (detail?.message) setMessage(detail.message);
     }
     window.addEventListener("sorp2026:contact-intent", applyContactIntent);
     return () => window.removeEventListener("sorp2026:contact-intent", applyContactIntent);
-  }, []);
+  }, [founderMode]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,6 +69,7 @@ export function SayHello() {
     }
   }
 
+  if (founderMode) return null;
   if (identity) return <AuthenticatedContinuousImprovement identity={identity} />;
   if (identity === null) return <section className="shared-hello shared-hello-loading" aria-label="Loading contact options" />;
 

@@ -1,7 +1,23 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AccountControl } from "./account-control";
 import { Arrow } from "./ui";
 export function Header() {
+  const pathname = usePathname();
+  const founderMode = pathname === "/founder" || pathname.startsWith("/founder/");
+  if (founderMode) return <header className="header gateway-header founder-mode-header">
+    <div className="gateway-width gateway-header-inner">
+      <Link className="gateway-brand-lockup" href="/founder/#home" aria-label="SORP 2026 Founder Control Centre">
+        <span className="gateway-wordmark">SORP<span>2026</span><i aria-hidden="true" /></span>
+      </Link>
+      <div className="founder-header-actions">
+        <span className="gateway-founder-control founder-mode-indicator">Founder</span>
+        <Link className="gateway-account-control" href="/dashboard/">View My Dashboard <Arrow diagonal /></Link>
+      </div>
+    </div>
+  </header>;
   return (
     <header className="header gateway-header">
       <div className="gateway-width gateway-header-inner">

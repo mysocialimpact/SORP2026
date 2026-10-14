@@ -17,7 +17,7 @@ async function login(page: Page, account: { email: string; password: string }) {
 }
 
 async function createOrganisation(page: Page, name: string, type: "Charity" | "Adviser") {
-  await page.getByRole("button", { name: /Organisations & Accounts/ }).click();
+  await page.getByRole("link", { name: /Organisations & Users/ }).click();
   await page.getByRole("button", { name: /New organisation/ }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Organisation name").fill(name);
@@ -30,7 +30,7 @@ async function createOrganisation(page: Page, name: string, type: "Charity" | "A
 async function manage(page: Page, name: string) {
   const existing = page.getByRole("dialog");
   if (await existing.isVisible().catch(() => false)) await existing.getByRole("button", { name: "Close" }).click();
-  await page.getByRole("button", { name: /Organisations & Accounts/ }).click();
+  await page.getByRole("link", { name: /Organisations & Users/ }).click();
   await page.getByPlaceholder("Name, type or email").fill(name);
   const row = page.getByRole("row", { name: new RegExp(name) });
   await expect(row).toBeVisible();
@@ -89,10 +89,14 @@ test("founder can administer plans, invitations and consent-based adviser access
   page.setDefaultTimeout(10_000);
   await login(page, founder);
   await expect(page).toHaveURL(/\/founder\//);
-  await expect(page.getByRole("heading", { name: "Control the platform." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "FOUNDER CONTROL CENTRE" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "SORP2026 products" }).getByRole("link")).toHaveCount(6);
+  await expect(page.getByRole("navigation", { name: "Founder administration" }).getByRole("link")).toHaveCount(5);
+  await expect(page.getByText("Where you are.")).toHaveCount(0);
+  await expect(page.locator(".shared-hello,.gateway-footer,.folder-action-bar")).toHaveCount(0);
   await page.getByRole("link", { name: /View My Dashboard/ }).click();
-  await expect(page.getByRole("link", { name: "Founder Control Centre" })).toBeVisible();
-  await page.getByRole("link", { name: "Founder Control Centre" }).click();
+  await expect(page.getByRole("link", { name: /^Founder/ })).toBeVisible();
+  await page.getByRole("link", { name: /^Founder/ }).click();
 
   await createOrganisation(page, "Test Adviser Ltd", "Adviser");
   await createOrganisation(page, "Test Charity Ltd", "Charity");
@@ -195,11 +199,11 @@ test("founder can administer plans, invitations and consent-based adviser access
   await page.getByPlaceholder("Name, type or email").fill("");
   await expect(page.getByRole("row", { name: /Test Adviser Ltd/ })).toContainText("Enterprise");
 
-  await page.getByRole("button", { name: /Platform Management/ }).click();
+  await page.getByRole("link", { name: /Platform Management/ }).click();
   await expect(page.getByText("complimentary_access_revoked", { exact: true })).toBeVisible();
   await expect(page.getByText("client_access_changed", { exact: true }).first()).toBeVisible();
 
-  await page.getByRole("button", { name: /Accountants & Advisers/ }).click();
+  await page.getByRole("link", { name: /Accountants & Advisers/ }).click();
   await page.getByPlaceholder("Firm, town or domain").fill("Burton Sweet");
   const firmRow = page.getByRole("row", { name: /Burton Sweet/ });
   const scoreBefore = await firmRow.locator("td").nth(2).textContent();
@@ -238,8 +242,11 @@ test("founder interface remains usable at iPhone width", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page, founder);
   await expect(page).toHaveURL(/\/founder\//);
-  await expect(page.getByRole("heading", { name: "Control the platform." })).toBeVisible();
-  await page.getByRole("button", { name: /Organisations & Accounts/ }).click();
+  await expect(page.getByRole("heading", { name: "FOUNDER CONTROL CENTRE" })).toBeVisible();
+  const adminNavigation = page.getByRole("navigation", { name: "Founder administration" });
+  await expect(adminNavigation).toBeVisible();
+  expect(await adminNavigation.locator(".founder-admin-navigation-track").evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  await adminNavigation.getByRole("link", { name: /Organisations & Users/ }).click();
   await page.getByPlaceholder("Name, type or email").fill("Test Adviser Ltd");
   await page.getByRole("row", { name: /Test Adviser Ltd/ }).getByRole("button", { name: /Open/ }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
