@@ -27,6 +27,8 @@ test("Ask SORP is a native, evidence-led product experience", async ({ page }) =
   await expect(page.locator("iframe")).toHaveCount(0);
 
   await page.getByRole("button", { name: "What changes under SORP 2026?" }).click();
+  await expect(page).toHaveURL(/\/ask-sorp\/workspace\//);
+  await page.getByRole("button", { name: "Ask SORP →" }).click();
   await expect(page.getByText("SORP 1.27", { exact: true })).toBeVisible();
   await expect(page.getByText("Trustees’ annual report · PDF page 22")).toBeVisible();
   expect(requestBody?.question).toBe("What changes under SORP 2026?");
@@ -34,10 +36,9 @@ test("Ask SORP is a native, evidence-led product experience", async ({ page }) =
   expect(requestBody?.sessionId).toMatch(/^[a-f0-9-]{36}$/i);
 
   const sticky = page.getByRole("complementary", { name: "Page actions" });
-  await expect(sticky).toBeVisible();
-  expect(await sticky.evaluate(element => getComputedStyle(element).position)).toBe("fixed");
+  await expect(sticky).toBeHidden();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 
-  const accessibility = await new AxeBuilder({ page }).include(".ask-page").withTags(["wcag2a", "wcag2aa"]).analyze();
+  const accessibility = await new AxeBuilder({ page }).include(".ask-workspace-page").withTags(["wcag2a", "wcag2aa"]).analyze();
   expect(accessibility.violations).toEqual([]);
 });
