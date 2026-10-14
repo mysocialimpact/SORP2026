@@ -8,6 +8,7 @@ const googleCallback = readFileSync(new URL("../../src/app/api/booking/google/ca
 const backendProxy = readFileSync(new URL("../../src/app/backend-proxy.ts", import.meta.url), "utf8");
 const reviewStyles = readFileSync(new URL("../../src/app/sorp-candidate-review.css", import.meta.url), "utf8");
 const assessmentModeStyles = readFileSync(new URL("../../src/app/assessment-mode.css", import.meta.url), "utf8");
+const workspaceHeader = readFileSync(new URL("../../src/components/product-workspace-header.tsx", import.meta.url), "utf8");
 
 test("the saved account gate sits before public report retrieval and captures the required profile", () => {
   assert.match(review, /\["find", "confirmation", "account"\]/);
@@ -26,8 +27,8 @@ test("email account access remains available inside the dedicated assessment she
   assert.match(review, /!account && GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <>/);
   assert.match(review, /CREATE MY FREE ACCOUNT →/);
   assert.match(review, /SIGN IN AND CONTINUE →/);
-  assert.match(review, /function AssessmentHeader/);
-  assert.match(review, /href="\/are-you-sorp-ready\/"/);
+  assert.match(review, /ProductWorkspaceHeader productName="Are You SORP Ready\?" backHref="\/are-you-sorp-ready\/"/);
+  assert.match(workspaceHeader, /Back to website/);
   assert.match(review, /function AssessmentProgress/);
   assert.doesNotMatch(review, /BUILD 120|scr-inline-build|scr-beta-badge/);
   assert.match(reviewStyles, /\.scr-account-switch\{display:flex;width:100%;min-height:76px/);

@@ -10,7 +10,7 @@ type Action = { label: string; href: string };
 type AccountResponse = { signedIn?: boolean; progress?: ReadinessProgress };
 
 function defaultAction(path: string): Action {
-  if (path.startsWith("/ask-sorp/")) return { label: "Ask a question", href: "/ask-sorp/#ask-sorp-live" };
+  if (path.startsWith("/ask-sorp/")) return { label: "Ask a question", href: "/ask-sorp/workspace/" };
   if (path.startsWith("/charity-impact-reports/")) return { label: "Get your report reviewed", href: "/charity-impact-reports/review/" };
   if (path.startsWith("/social-impact-excellence/")) return { label: "Explore Social Impact Excellence", href: "/social-impact-excellence/#excellence-start" };
   if (path.startsWith("/my-impact-director/")) return { label: "Start your free assessment", href: "/my-impact-director/#assessment" };

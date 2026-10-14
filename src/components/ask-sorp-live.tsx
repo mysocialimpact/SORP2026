@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Citation = {
   reference: string;
@@ -33,6 +34,12 @@ const exampleQuestions = [
   "What should trustees know about impact reporting?",
 ];
 
+type AskSorpLiveProps = {
+  mode?: "launcher" | "workspace";
+  initialQuestion?: string;
+  onBusyChange?: (busy: boolean) => void;
+};
+
 function Paragraphs({ children }: { children: string }) {
   const paragraphs = children.split(/\n{2,}/).map(item => item.trim()).filter(Boolean);
   return <>{paragraphs.map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 24)}`}>{paragraph}</p>)}</>;
@@ -47,17 +54,22 @@ function validAnswer(value: unknown): value is Answer {
     && Array.isArray(answer.follow_up_suggestions);
 }
 
-export function AskSorpLive() {
+export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyChange }: AskSorpLiveProps) {
+  const router = useRouter();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(initialQuestion.slice(0, 1200));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const sessionId = useRef("");
   const latestAnswer = useRef<HTMLElement>(null);
+  const conversation = useRef<HTMLDivElement>(null);
+
+  useEffect(() => onBusyChange?.(busy), [busy, onBusyChange]);
 
   useEffect(() => {
+    if (mode !== "workspace") return;
     try {
       const saved = JSON.parse(sessionStorage.getItem(storageKey) || "null") as {
         sessionId?: unknown;
@@ -81,16 +93,17 @@ export function AskSorpLive() {
     } catch {
       // A new conversation remains available if browser storage is disabled.
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
+    if (mode !== "workspace") return;
     if (!sessionId.current || (!turns.length && !history.length)) return;
     try {
       sessionStorage.setItem(storageKey, JSON.stringify({ sessionId: sessionId.current, turns, history }));
     } catch {
       // The current conversation still works if browser storage is unavailable.
     }
-  }, [turns, history]);
+  }, [turns, history, mode]);
 
   function getSessionId() {
     if (!sessionId.current) sessionId.current = crypto.randomUUID();
@@ -100,6 +113,10 @@ export function AskSorpLive() {
   async function ask(question: string) {
     const value = question.trim();
     if (busy || value.length < 3) return;
+    if (mode === "launcher") {
+      router.push(`/ask-sorp/workspace/?question=${encodeURIComponent(value)}`);
+      return;
+    }
     setBusy(true);
     setError("");
     setNotice("");
@@ -129,7 +146,10 @@ export function AskSorpLive() {
         { role: "assistant" as const, content: `${data.short_answer}\n\n${data.interpretation}` },
       ].slice(-6));
       setDraft("");
-      requestAnimationFrame(() => latestAnswer.current?.focus({ preventScroll: true }));
+      requestAnimationFrame(() => {
+        latestAnswer.current?.focus({ preventScroll: true });
+        latestAnswer.current?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Ask SORP is temporarily unavailable. Please try again.");
       setDraft(value);
@@ -144,7 +164,7 @@ export function AskSorpLive() {
   }
 
   return (
-    <section className="ask-assistant" aria-labelledby="ask-assistant-title">
+    <section className={`ask-assistant ask-assistant--${mode}`} aria-labelledby="ask-assistant-title">
       <header className="ask-assistant-bar">
         <div>
           <span className="ask-live-dot" aria-hidden="true" />
@@ -154,6 +174,7 @@ export function AskSorpLive() {
       </header>
 
       <div className="ask-assistant-body">
+        <div className="ask-assistant-scroll" ref={conversation}>
         {!turns.length && (
           <div className="ask-assistant-welcome">
             <p className="ask-eyebrow">Start with a real question</p>
@@ -227,6 +248,7 @@ export function AskSorpLive() {
 
         {notice && <p className="ask-notice" role="status">{notice}</p>}
         {error && <p className="ask-error" role="alert">{error}</p>}
+        </div>
 
         <form className="ask-composer" onSubmit={submit}>
           <label htmlFor="ask-sorp-question">Your SORP 2026 question</label>
@@ -239,10 +261,11 @@ export function AskSorpLive() {
               maxLength={1200}
               rows={3}
               disabled={busy}
+              autoFocus={mode === "workspace" && Boolean(initialQuestion)}
             />
             <button type="submit" disabled={busy || draft.trim().length < 3}>{busy ? "Checking the source…" : "Ask SORP →"}</button>
           </div>
-          <p>Evidence-backed guidance to support—not replace—the judgement of trustees, accountants and professional advisers.</p>
+          <p>{mode === "launcher" ? "Your question opens in a focused Ask SORP workspace." : "Evidence-backed guidance to support—not replace—the judgement of trustees, accountants and professional advisers."}</p>
         </form>
       </div>
     </section>

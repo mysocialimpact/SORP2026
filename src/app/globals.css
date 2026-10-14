@@ -21,6 +21,8 @@
 body:has(.scr-page) > .header,
 body:has(.scr-page) > .footer,
 body:has(.scr-page) > .platform-sticky-navigation,
+body:has(.ask-workspace-page) > .platform-sticky-navigation,
+body:has(.ask-workspace-page) > .footer,
 body:has(.sorp-conversation-page) > .header,
 body:has(.sorp-conversation-page) > .footer,
 body:has(.sorp-workspace) > .header,
@@ -34,6 +36,9 @@ body:has(.sie-team-response) > .footer {
 body:has(.scr-page) > .shared-hello,
 body:has(.scr-page) > .folder-action-bar,
 body:has(.scr-page) > .folder-action-clearance,
+body:has(.ask-workspace-page) > .shared-hello,
+body:has(.ask-workspace-page) > .folder-action-bar,
+body:has(.ask-workspace-page) > .folder-action-clearance,
 body:has(.sorp-conversation-page) > .shared-hello,
 body:has(.sorp-conversation-page) > .folder-action-bar,
 body:has(.sorp-conversation-page) > .folder-action-clearance,
@@ -48,6 +53,7 @@ body:has(.sie-team-response) > .folder-action-bar,
 body:has(.sie-team-response) > .folder-action-clearance {
   display: none;
 }
+body:has(.ask-workspace-page) { overflow: hidden; }
 * {
   box-sizing: border-box;
 }

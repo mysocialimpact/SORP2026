@@ -23,7 +23,7 @@ export default function AskSorp() {
             <h1>Ask SORP 2026.<br /><span>Get the answers you need.</span></h1>
             <p className="ask-hero-lead">An AI-powered SORP assistant for UK charities, trustees, accountants and professional advisers.</p>
             <p className="ask-hero-support">Ask questions about SORP 2026 and get clear, practical answers backed by references to the official guidance.</p>
-            <a className="ask-primary-action" href="#ask-sorp-live">Ask SORP a question <Arrow /></a>
+            <a className="ask-primary-action" href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></a>
             <p className="ask-reassurance">Clear answers. Official references. Free to explore.</p>
           </div>
           <div className="ask-hero-visual" aria-hidden="true">
@@ -40,7 +40,7 @@ export default function AskSorp() {
             <h2 id="ask-live-section-title">Ask now.<br />See the source.</h2>
             <p>This is the established My Social Impact Ask SORP intelligence, available here in a native SORP2026 experience. The evidence index, answer checks and citation service remain in one place.</p>
           </div>
-          <AskSorpLive />
+          <AskSorpLive mode="launcher" />
         </section>
 
         <section id="ask-how" className="ask-how" aria-labelledby="ask-how-title">

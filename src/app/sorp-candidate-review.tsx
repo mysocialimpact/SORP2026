@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import Link from "next/link";
+import { ProductWorkspaceHeader } from "@/components/product-workspace-header";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { tierFromSetup, tierLabel, type AssessmentSetup } from "./sorp-questionnaire";
@@ -251,19 +252,6 @@ function GoogleMark() {
 }
 
 const GOOGLE_ACCOUNT_SIGN_IN_ENABLED = false;
-
-function AssessmentHeader({ busy = false }: { busy?: boolean }) {
-  return <header className="scr-assessment-header">
-    <div className="scr-assessment-lockup" aria-label="SORP 2026, Are You SORP Ready?">
-      <span className="scr-assessment-wordmark"><strong>SORP</strong> 2026<i aria-hidden="true" /></span>
-      <span className="scr-assessment-divider" aria-hidden="true" />
-      <strong className="scr-assessment-name">Are You SORP Ready?</strong>
-    </div>
-    <Link className="scr-assessment-exit" href="/are-you-sorp-ready/" onClick={(click) => {
-      if (busy && !window.confirm("This step is still working. Leave the assessment? Your completed progress is saved.")) click.preventDefault();
-    }}><span aria-hidden="true">←</span><span className="scr-assessment-exit-label">Back to website</span></Link>
-  </header>;
-}
 
 function AssessmentProgress({ phase, complete = false }: { phase: number; complete?: boolean }) {
   const current = complete ? phases.length - 1 : phase;
@@ -749,13 +737,13 @@ export function SorpCandidateReview() {
     return <><p className="scr-kicker">THE RIGHT ENTITY</p><h2>Let’s check the charity record.</h2><p>A non-charity entity should not be assessed as if SORP applies to it.</p></>;
   }
 
-  if (!loaded) return <main className="sorp-conversation-page scr-page"><AssessmentHeader/><p className="scr-loading">Opening your SORP review…</p></main>;
+  if (!loaded) return <main className="sorp-conversation-page scr-page"><ProductWorkspaceHeader productName="Are You SORP Ready?" backHref="/are-you-sorp-ready/"/><p className="scr-loading">Opening your SORP review…</p></main>;
   const introScreen = introductionScreens.find(screen => screen === saved.step);
   const discoveryScreen = ["find", "confirmation", "account", "homework", "assessment"].includes(saved.step);
   const snapshotScreen = ["quick-generating", "quick-ready", "quick"].includes(saved.step);
   const journeyScreen = saved.step === "report" && saved.reportView === 1 ? "report-agenda" : saved.step;
   return <main id="main" className={`sorp-conversation-page scr-page scr-screen--${journeyScreen}${snapshotScreen ? " scr-page--snapshot" : ""}${discoveryScreen ? ` scr-page--discovery scr-discovery--${saved.step}` : ""}${introScreen ? " scr-page--opening" : ""}${saved.step === "scope" ? " scr-page--scope" : saved.step === "public-methodology" ? " scr-page--public-methodology" : saved.step === "benefits" ? " scr-page--benefits" : saved.step === "intro" ? " scr-page--intro" : saved.step === "find" ? " scr-page--find" : saved.step === "quick" ? " scr-page--quick" : saved.step === "quick-feedback" ? " scr-page--quick-feedback" : saved.step === "method" ? " scr-page--method" : saved.step === "help" ? " scr-page--help" : saved.step === "tar-recovery" ? " scr-page--tar-recovery" : ""}`}>
-    <AssessmentHeader busy={Boolean(busy)}/>
+    <ProductWorkspaceHeader productName="Are You SORP Ready?" backHref="/are-you-sorp-ready/" busy={Boolean(busy)} busyMessage="This step is still working. Leave the assessment? Your completed progress is saved."/>
     <AssessmentProgress phase={phase} complete={saved.step === "done"}/>
     <div key={["scope", "public-methodology", "intro", "benefits", "find"].includes(saved.step) ? saved.step : "assessment"} className={`scr-workspace${["scope", "public-methodology", "intro", "benefits", "find"].includes(saved.step) ? " scr-opening-enter" : ""}`}>
       <SorpScreenContext.Provider value={journeyScreen}><section className="scr-main" aria-live={["homework", "assessment"].includes(saved.step) ? undefined : "polite"}>
