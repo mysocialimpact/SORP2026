@@ -79,7 +79,19 @@ export function ExperienceCloud() {
         <h2 id="experience-title">Experience across our team</h2>
       </div>
       <div className="gateway-width experience-controls">
-        <button type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>{paused ? "Resume movement" : "Pause movement"}</button>
+        <button
+          type="button"
+          aria-pressed={paused}
+          aria-label={paused ? "Resume movement" : "Pause movement"}
+          title={paused ? "Resume movement" : "Pause movement"}
+          onClick={() => setPaused(!paused)}
+        >
+          <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16">
+            {paused
+              ? <path d="M6 4.5 15 10l-9 5.5z" fill="currentColor" />
+              : <><path d="M6 4h3v12H6z" fill="currentColor" /><path d="M12 4h3v12h-3z" fill="currentColor" /></>}
+          </svg>
+        </button>
       </div>
       <div className="experience-landscape-stage">
         {rows.map((names, index) => <ExperienceRow key={index} names={names} index={index} paused={paused} />)}

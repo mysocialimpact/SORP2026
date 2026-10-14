@@ -49,8 +49,17 @@ export default function Home() {
           <h2 id="ambition-title">Greater impact.<span>Accessible to everyone.</span></h2>
         </section>
         <section className="gateway-opening-vision gateway-home-vision homepage-vision" aria-labelledby="home-vision-title">
-          <p className="gateway-kicker">Our vision</p>
-          <h2 id="home-vision-title">Imagine a world where social impact was taken as seriously as financial performance.</h2>
+          <div className="homepage-vision-copy">
+            <p className="gateway-kicker">Our vision</p>
+            <h2 id="home-vision-title">Imagine a world where social impact was taken as seriously as financial performance.</h2>
+          </div>
+          <figure className="homepage-vision-founders">
+            <div className="homepage-vision-portraits" aria-hidden="true">
+              <Image src="/images/marcus-warry-cutout.webp" alt="" width={1205} height={1306} sizes="(max-width: 700px) 34vw, 190px" />
+              <Image src="/images/chris-arnold-cutout.webp" alt="" width={1205} height={1306} sizes="(max-width: 700px) 34vw, 190px" />
+            </div>
+            <figcaption>Co-founders, My Social Impact</figcaption>
+          </figure>
         </section>
         <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
           <p className="gateway-kicker">This is where most people start.</p>
@@ -63,7 +72,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/">Read the official Charities SORP <Arrow diagonal /></a></p>
+          <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/" target="_blank" rel="noopener noreferrer">Read the official Charities SORP <Arrow diagonal /></a></p>
         </section>
       </div>
       <ExperienceCloud />
@@ -72,7 +81,7 @@ export default function Home() {
           <div className="gateway-people-intro">
             <h2 id="people-title">Our team</h2>
             <p>
-              Developed by My Social Impact—combining financial rigour,
+              Developed by My Social Impact, combining financial rigour,
               monitoring and evaluation, technology, practical charity
               experience and creative thinking.
             </p>

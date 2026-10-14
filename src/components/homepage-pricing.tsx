@@ -128,6 +128,21 @@ export function HomepagePricing() {
         </div>
       </div>
 
+      <div className="gateway-width">
+        <div className="homepage-beta-invitation">
+          <div>
+            <p className="gateway-kicker">Early beta</p>
+            <h3>We’re offering complimentary access to our early beta users.</h3>
+          </div>
+          <a
+            href="#say-hello"
+            onClick={() => window.dispatchEvent(new CustomEvent("sorp2026:contact-intent", { detail: { message: "I’d like to request complimentary early beta access." } }))}
+          >
+            Request free beta access →
+          </a>
+        </div>
+      </div>
+
       <ol id="homepage-plans" ref={track} className="homepage-plan-track" onScroll={updateControls} tabIndex={0} aria-label="Membership plans; swipe or use the arrow buttons to explore">
         {plans.map((plan) => (
           <li key={plan.id} className={`homepage-plan is-${plan.id}`}>
@@ -148,11 +163,11 @@ export function HomepagePricing() {
         <div className="homepage-human-support">
           <div><p className="gateway-kicker">Software first. Humans when useful.</p><h3>Core technology stays as accessible as we can make it.</h3></div>
           <div>
-            <p>Paid subscriptions will cover heavier usage and additional software. Human advice remains optional and separate.</p>
+            <p>Use the software independently, then bring in human expertise only when it would genuinely help.</p>
             <ul>
-              <li><strong>£0</strong> Initial automated charity impact report review</li>
-              <li><Link href="/are-you-sorp-ready/review/booking?session=30"><strong>£50</strong> 30-minute My Social Impact consultation</Link></li>
-              <li><Link href="/are-you-sorp-ready/review/booking?session=60"><strong>£100</strong> 60-minute My Social Impact consultation</Link></li>
+              <li><strong>£0</strong> Self-service tools made as useful as possible, so charities can achieve more without our direct involvement.</li>
+              <li><Link href="/are-you-sorp-ready/review/booking?session=30"><strong>£50</strong> A 30-minute conversation when expert help would be useful.</Link></li>
+              <li><Link href="/are-you-sorp-ready/review/booking?session=60"><strong>£100</strong> A 60-minute consultation when you need more time and advice.</Link></li>
               <li><strong>Bespoke</strong> Ongoing advice, report development and Impact Director support</li>
             </ul>
             <Link className="homepage-directory-link" href="/accountants-advisers/">Need specialist SORP or accounting advice? Find Accountants &amp; Advisers ↗</Link>
