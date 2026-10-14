@@ -9,6 +9,7 @@ import { HomepageContribution } from "@/components/voluntary-contribution";
 import { site } from "@/lib/site";
 import { HomepageAudience } from "@/components/homepage-welcome";
 import { HomepagePricing } from "@/components/homepage-pricing";
+import { HomepageManifesto } from "@/components/homepage-manifesto";
 import "./homepage.css";
 export const metadata: Metadata = {
   title: "SORP 2026 — Reporting for greater impact",
@@ -44,29 +45,7 @@ export default function Home() {
           We’re excited about SORP 2026 and better charity reporting. <strong>Even more so about what charities can achieve with the insight it brings.</strong>
         </p>
         <HomepageAudience />
-        <section className="homepage-ambition" aria-labelledby="ambition-title">
-          <p className="gateway-kicker">Our ambition</p>
-          <h2 id="ambition-title">Greater impact.<span>Accessible to everyone.</span></h2>
-        </section>
-        <section className="gateway-opening-vision gateway-home-vision homepage-vision" aria-labelledby="home-vision-title">
-          <div className="homepage-vision-copy">
-            <p className="gateway-kicker">Our vision</p>
-            <h2 id="home-vision-title">Imagine a world where social impact was taken as seriously as financial performance.</h2>
-          </div>
-          <figure className="homepage-vision-founders">
-            <div className="homepage-vision-portraits">
-              <div className="homepage-vision-person">
-                <Image src="/images/marcus-vision.webp" alt="Marcus Warry" width={600} height={803} sizes="(max-width: 700px) 40vw, 190px" />
-                <strong>Marcus Warry <small>ACA</small></strong>
-              </div>
-              <div className="homepage-vision-person">
-                <Image src="/images/chris-vision.webp" alt="Dr Chris Arnold" width={600} height={534} sizes="(max-width: 700px) 40vw, 190px" />
-                <strong>Dr Chris Arnold</strong>
-              </div>
-            </div>
-            <figcaption>Co-founders, My Social Impact</figcaption>
-          </figure>
-        </section>
+        <HomepageManifesto />
         <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
           <p className="gateway-kicker">This is where most people start.</p>
           <div className="homepage-start">
