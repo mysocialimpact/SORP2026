@@ -106,18 +106,31 @@
   padding: clamp(30px, 3.5vw, 44px);
   background: #cfddcf;
   color: #242329;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(250px, .55fr);
+  gap: clamp(24px, 4vw, 58px);
+  align-items: end;
+  overflow: hidden;
 }
 .homepage-story .homepage-vision::after { display: none; }
 .homepage-story .homepage-vision .gateway-kicker { margin-bottom: 18px; color: #355747; }
 .homepage-story .homepage-vision h2 { max-width: 1040px; font-size: clamp(38px, 4vw, 56px); line-height: 1; }
+.homepage-vision-founders { align-self: stretch; display: flex; flex-direction: column; justify-content: flex-end; margin: 0; }
+.homepage-vision-portraits { display: flex; align-items: flex-end; justify-content: center; min-height: 210px; }
+.homepage-vision-portraits img { width: 56%; max-width: 190px; height: auto; margin: 0 -7%; object-fit: contain; filter: drop-shadow(0 10px 14px #3557472c); }
+.homepage-vision-portraits img:first-child { z-index: 1; }
+.homepage-vision-founders figcaption { margin-top: 9px; color: #355747; font-size: 12px; font-weight: 700; letter-spacing: .045em; text-align: center; text-transform: uppercase; }
 @media (max-width: 700px) {
   .homepage-ambition { margin-top: 44px; padding: 30px 24px 32px; }
   .homepage-ambition .gateway-kicker { margin-bottom: 18px; }
   .homepage-ambition h2 { font-size: clamp(42px, 12.5vw, 56px); line-height: .96; }
   .homepage-ambition > p:last-child { margin-top: 24px; padding-top: 20px; font-size: 17px; }
-  .homepage-story .homepage-vision { margin: 12px 0 56px; padding: 28px 24px 30px; }
+  .homepage-story .homepage-vision { grid-template-columns: minmax(0, 1fr) minmax(120px, .48fr); gap: 14px; margin: 12px 0 56px; padding: 28px 18px 24px 24px; }
   .homepage-story .homepage-vision .gateway-kicker { margin-bottom: 15px; }
-  .homepage-story .homepage-vision h2 { font-size: clamp(32px, 9.8vw, 44px); line-height: 1.02; }
+  .homepage-story .homepage-vision h2 { font-size: clamp(27px, 8vw, 40px); line-height: 1.02; }
+  .homepage-vision-portraits { min-height: 150px; }
+  .homepage-vision-portraits img { width: 65%; margin-inline: -13%; }
+  .homepage-vision-founders figcaption { font-size: 9px; line-height: 1.3; }
 }
 .gateway-home-cover {
   position: relative;
@@ -315,6 +328,22 @@
   font-size: clamp(19px, 1.8vw, 25px);
   color: #625f65;
 }
+.homepage-beta-invitation {
+  display: flex;
+  justify-content: space-between;
+  gap: clamp(24px, 5vw, 70px);
+  align-items: center;
+  margin: 0 0 30px;
+  padding: 22px 26px;
+  border: 1px solid #263b35;
+  border-radius: 6px;
+  background: #d8ff52;
+}
+.homepage-beta-invitation .gateway-kicker { margin-bottom: 7px; color: #355747; }
+.homepage-beta-invitation h3 { max-width: 780px; font-size: clamp(22px, 2.3vw, 32px); line-height: 1.04; letter-spacing: -.045em; }
+.homepage-beta-invitation > a { flex: 0 0 auto; padding: 13px 17px; border-radius: 3px; background: #242329; color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; }
+.homepage-beta-invitation > a:hover { background: #355747; }
+.homepage-beta-invitation > a:focus-visible { outline: 3px solid #6148bc; outline-offset: 3px; }
 .homepage-pricing-controls { display: flex; gap: 8px; padding-bottom: 6px; }
 .homepage-pricing-controls button {
   width: 50px;
@@ -418,6 +447,9 @@
 .homepage-human-support li strong { display: block; color: #d8ff52; font-size: 18px; }
 .homepage-human-support a { color: inherit; text-decoration: none; }
 .homepage-human-support a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.gateway-mission-cta { display: inline-flex; margin-top: 22px; padding: 12px 16px; border: 1px solid currentColor; border-radius: 3px; color: inherit; font-size: 14px; font-weight: 750; text-decoration: none; }
+.gateway-mission-cta:hover { background: #242329; color: #fff; }
+.gateway-mission-cta:focus-visible { outline: 3px solid #6148bc; outline-offset: 3px; }
 .homepage-directory-link { display: inline-block; margin-top: 28px; color: #d8ff52 !important; font-size: 14px; font-weight: 600; }
 .homepage-talk-cue {
   display: grid;
@@ -473,6 +505,8 @@
   .homepage-pricing-controls { flex: 0 0 auto; }
   .homepage-pricing-controls button { width: 43px; height: 43px; }
   .homepage-pricing-controls button:first-child { display: none; }
+  .homepage-beta-invitation { display: grid; gap: 18px; padding: 20px; }
+  .homepage-beta-invitation > a { width: 100%; text-align: center; }
   .homepage-plan-track { gap: 14px; padding-inline: 20px; scroll-padding-inline-start: 20px; }
   .homepage-plan { flex-basis: calc(88vw - 20px); min-height: 0; padding: 26px 23px 30px; }
   .homepage-plan.is-free { flex-basis: calc(88vw - 20px); }

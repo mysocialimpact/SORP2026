@@ -138,7 +138,7 @@ export function HomepageContribution({ mission = false }: { mission?: boolean })
         </> : <>
           <p>We make as much of this platform free as we possibly can. Human review is there if you want it.</p>
           <p>If the free tools have helped you, an entirely voluntary contribution helps us keep them free and reach more charities — especially smaller ones.</p>
-          <Link className="gateway-quiet-link" href="/our-mission/">Our Mission →</Link>
+          <Link className="gateway-mission-cta" href="/our-mission/">Discover our mission →</Link>
         </>}
       </div>
       <div className="gateway-contribution-panel">
