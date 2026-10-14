@@ -20,6 +20,7 @@
 /* Product workspaces own their full-screen navigation and completion flow. */
 body:has(.scr-page) > .header,
 body:has(.scr-page) > .footer,
+body:has(.scr-page) > .platform-sticky-navigation,
 body:has(.sorp-conversation-page) > .header,
 body:has(.sorp-conversation-page) > .footer,
 body:has(.sorp-workspace) > .header,

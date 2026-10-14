@@ -68,9 +68,17 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
   await start.click();
   await expect(page).toHaveURL(/\/are-you-sorp-ready\/review\/?$/);
   await expect(page.locator(".si-welcome")).toBeVisible();
-  for (const selector of [".sorp-workspace-brand", ".scr-top", ".scr-bottom"]) {
+  await expect(page.locator(".platform-sticky-navigation")).toBeHidden();
+  await expect(page.locator(".scr-assessment-header")).toContainText("SORP 2026");
+  await expect(page.locator(".scr-assessment-header")).toContainText("Are You SORP Ready?");
+  await expect(page.getByRole("link", { name: /Back to website/ })).toHaveAttribute("href", "/are-you-sorp-ready/");
+  await expect(page.locator(".scr-top nav li")).toHaveCount(8);
+  await expect(page.locator(".scr-top [aria-current=step]")).toContainText("Introduction");
+  for (const selector of [".scr-assessment-header", ".scr-top", ".scr-bottom"]) {
     expect(await hasOpaqueBackground(page.locator(selector))).toBeTruthy();
   }
+  const shellHeight = await page.locator(".scr-assessment-header, .scr-top").evaluateAll((elements) => elements.reduce((height, element) => height + element.getBoundingClientRect().height, 0));
+  expect(shellHeight).toBeLessThanOrEqual(110);
   const forwardMotion = await page.locator(".scr-forward-trace[data-measured]").evaluate((element) => {
     const styles = getComputedStyle(element);
     return { name: styles.animationName, duration: Number.parseFloat(styles.animationDuration) };
@@ -91,6 +99,7 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
     expect(await contrastRatio(primary)).toBeGreaterThanOrEqual(4.5);
     await primary.click();
   }
+  await expect(page.locator(".scr-top [aria-current=step]")).toContainText("Find charity");
   await page.locator(".scr-find input").fill("1165694");
   const findCharity = page.getByRole("button", { name: /FIND MY CHARITY/ });
   await expect(findCharity).toHaveCount(2);

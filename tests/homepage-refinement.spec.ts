@@ -45,8 +45,11 @@ test("sticky navigation and compact homepage retain access and team order", asyn
 test("assessment sticky controls clear the platform navigation", async ({ page }) => {
   await page.goto("/are-you-sorp-ready/review/?entry=intro");
   await page.evaluate(() => window.scrollTo(0, 600));
-  const nav = (await page.locator(".platform-sticky-navigation").boundingBox())!;
-  const brand = page.locator(".scr-page .sorp-workspace-brand");
-  if (await brand.count()) expect((await brand.boundingBox())!.y).toBeGreaterThanOrEqual(nav.height - 1);
-  await expect(page.locator(".platform-sticky-navigation").getByRole("link", { name: "Our Mission" })).toBeVisible();
+  await expect(page.locator(".platform-sticky-navigation")).toBeHidden();
+  const header = page.locator(".scr-assessment-header");
+  const progress = page.locator(".scr-top");
+  expect((await header.boundingBox())!.y).toBe(0);
+  expect((await header.boundingBox())!.height).toBeLessThanOrEqual(60);
+  expect((await progress.boundingBox())!.y).toBeLessThanOrEqual(60);
+  await expect(page.getByRole("link", { name: /Back to website/ })).toBeVisible();
 });

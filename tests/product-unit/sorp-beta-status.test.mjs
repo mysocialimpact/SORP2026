@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-test("the review keeps beta visible and explains it only where relevant", async () => {
+test("the focused header removes beta metadata while relevant journey copy remains honest", async () => {
   const [review, introduction, homework, publishedReview] = await Promise.all([
     readFile(new URL("../../src/app/sorp-candidate-review.tsx", import.meta.url), "utf8"),
     readFile(new URL("../../src/app/sorp-introduction.tsx", import.meta.url), "utf8"),
@@ -10,7 +10,7 @@ test("the review keeps beta visible and explains it only where relevant", async 
     readFile(new URL("../../src/app/api/published-review/route.ts", import.meta.url), "utf8"),
   ]);
 
-  assert.match(review, /Are You SORP Ready\? <small className="scr-beta-badge">BETA<\/small>/);
+  assert.doesNotMatch(review, /scr-beta-badge|scr-inline-build/);
   assert.doesNotMatch(introduction, /\bbeta\b/i);
   assert.match(review, /HELP THE NEXT CHARITY/);
   assert.match(review, /One quick piece of feedback helps us improve the tool/);

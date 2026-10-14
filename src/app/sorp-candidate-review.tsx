@@ -28,6 +28,7 @@ import "./sorp-discovery.css";
 import "./sorp-snapshot-experience.css";
 import "./sorp-screen-layout.css";
 import "./sorp-journey-progress.css";
+import "./assessment-mode.css";
 
 type Step = "scope" | "public-methodology" | "intro" | "benefits" | "find" | "confirmation" | "account" | "homework" | "assessment" | "quick-generating" | "tar-recovery" | "quick-ready" | "quick" | "quick-feedback" | "method" | "criterion" | "complete" | "generating" | "report-ready" | "report" | "email-ready" | "final-feedback" | "support" | "before-go" | "next" | "help" | "done" | "non-sorp";
 type Correction = { answer?: CanonicalAnswer; context: string; savedContext?: string; reviewed: boolean; widerSource?: string; widerNote?: string };
@@ -38,8 +39,6 @@ type ReviewLocation = Pick<Saved, "step" | "criterion" | "reportView">;
 type ReviewHistory = { past: ReviewLocation[]; current: ReviewLocation; future: ReviewLocation[] };
 const KEY = "msi-sorp-canonical-methodology-v1";
 const HISTORY_KEY = `${KEY}-history`;
-const BUILD = "BUILD 120 · 10 OCTOBER 2026 · 13:38 BST";
-const BUILD_COMPACT = "B120 · 10/10 · 13:38";
 const SORP_SOURCE = "https://www.charitysorp.org/documents/d/guest/charities-sorp-2026-1";
 const initial: Saved = { sessionId: "", step: "scope", query: "", research: null, candidate: null, state: null, intelligence: null, verifiedTar: null, report: null, homeworkFailure: null, email: "", emailConfirm: "", name: "", role: "", roleOther: "", criterion: 0, corrections: {}, reportView: 0, emailSent: false, supportPaid: false, quickRating: 0, quickComment: "", finalRating: 0, finalComment: "" };
 const locationOf = ({ step, criterion, reportView }: Saved): ReviewLocation => ({ step, criterion, reportView });
@@ -253,6 +252,31 @@ function GoogleMark() {
 
 const GOOGLE_ACCOUNT_SIGN_IN_ENABLED = false;
 
+function AssessmentHeader({ busy = false }: { busy?: boolean }) {
+  return <header className="scr-assessment-header">
+    <div className="scr-assessment-lockup" aria-label="SORP 2026, Are You SORP Ready?">
+      <span className="scr-assessment-wordmark"><strong>SORP</strong> 2026<i aria-hidden="true" /></span>
+      <span className="scr-assessment-divider" aria-hidden="true" />
+      <strong className="scr-assessment-name">Are You SORP Ready?</strong>
+    </div>
+    <Link className="scr-assessment-exit" href="/are-you-sorp-ready/" onClick={(click) => {
+      if (busy && !window.confirm("This step is still working. Leave the assessment? Your completed progress is saved.")) click.preventDefault();
+    }}><span aria-hidden="true">←</span><span className="scr-assessment-exit-label">Back to website</span></Link>
+  </header>;
+}
+
+function AssessmentProgress({ phase, complete = false }: { phase: number; complete?: boolean }) {
+  const current = complete ? phases.length - 1 : phase;
+  return <div className="scr-top">
+    <div className="scr-progress-summary" aria-live="polite"><span>Step {current + 1} of {phases.length}</span><strong>{complete ? "Complete" : phases[current]}</strong></div>
+    <nav aria-label="Review progress"><ol>{phases.map((label, index) => {
+      const finished = complete || index < current;
+      const active = !complete && index === current;
+      return <li key={label} className={finished ? "is-complete" : active ? "is-current" : ""} aria-current={active ? "step" : undefined} title={`${index + 1}. ${label}`}><i aria-hidden="true">{finished ? "✓" : index + 1}</i><b>{label}</b></li>;
+    })}</ol></nav>
+  </div>;
+}
+
 export function SorpCandidateReview() {
   const router = useRouter();
   const [saved, setSaved] = useState<Saved>(initial);
@@ -280,7 +304,6 @@ export function SorpCandidateReview() {
   const [accountPassword, setAccountPassword] = useState("");
   const [accountPasswordConfirm, setAccountPasswordConfirm] = useState("");
   const [accountBusy, setAccountBusy] = useState(false);
-  const [accountActionBusy, setAccountActionBusy] = useState(false);
   const [accountError, setAccountError] = useState("");
   const [googleSignInStarting, setGoogleSignInStarting] = useState(false);
   const [reportDragActive, setReportDragActive] = useState(false);
@@ -505,18 +528,6 @@ export function SorpCandidateReview() {
     } catch (cause) { setAccountError(cause instanceof Error ? cause.message : "Sign-in did not complete. Your progress remains safe on this device."); }
     finally { setAccountBusy(false); }
   }
-  async function signOutAccount() {
-    if (accountActionBusy) return;
-    setAccountActionBusy(true); setAccountError("");
-    try {
-      const response = await fetch("/api/readiness-account", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "logout" }) });
-      if (!response.ok) throw new Error("Sign out did not complete. Please try again.");
-      setAccount(null);
-      setSaved(current => current.candidate ? { ...current, step: "account" } : current);
-      event("account_signed_out");
-    } catch (cause) { setAccountError(cause instanceof Error ? cause.message : "Sign out did not complete. Please try again."); }
-    finally { setAccountActionBusy(false); }
-  }
   async function startHomework() {
     if (!saved.candidate || busy) return;
     if (validPreparedDocument(saved.preparedDocument) || verifiedCanonicalTar(saved.verifiedTar)) { go("homework"); return; }
@@ -738,14 +749,14 @@ export function SorpCandidateReview() {
     return <><p className="scr-kicker">THE RIGHT ENTITY</p><h2>Let’s check the charity record.</h2><p>A non-charity entity should not be assessed as if SORP applies to it.</p></>;
   }
 
-  if (!loaded) return <main className="sorp-conversation-page scr-page"><header className="sorp-workspace-brand"><Link className="scr-header-brand" href="/are-you-sorp-ready"><span>My Social Impact</span><strong>Are You SORP Ready? <small className="scr-beta-badge">BETA</small><small className="scr-inline-build" aria-label={BUILD}><span>{BUILD}</span><i>{BUILD_COMPACT}</i></small></strong></Link>{GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <a className="scr-header-login" href="/api/readiness-account/google/start"><GoogleMark/><span>LOG IN <b>WITH GOOGLE</b></span></a>}</header><p className="scr-loading">Opening your SORP review…</p></main>;
+  if (!loaded) return <main className="sorp-conversation-page scr-page"><AssessmentHeader/><p className="scr-loading">Opening your SORP review…</p></main>;
   const introScreen = introductionScreens.find(screen => screen === saved.step);
   const discoveryScreen = ["find", "confirmation", "account", "homework", "assessment"].includes(saved.step);
   const snapshotScreen = ["quick-generating", "quick-ready", "quick"].includes(saved.step);
   const journeyScreen = saved.step === "report" && saved.reportView === 1 ? "report-agenda" : saved.step;
   return <main id="main" className={`sorp-conversation-page scr-page scr-screen--${journeyScreen}${snapshotScreen ? " scr-page--snapshot" : ""}${discoveryScreen ? ` scr-page--discovery scr-discovery--${saved.step}` : ""}${introScreen ? " scr-page--opening" : ""}${saved.step === "scope" ? " scr-page--scope" : saved.step === "public-methodology" ? " scr-page--public-methodology" : saved.step === "benefits" ? " scr-page--benefits" : saved.step === "intro" ? " scr-page--intro" : saved.step === "find" ? " scr-page--find" : saved.step === "quick" ? " scr-page--quick" : saved.step === "quick-feedback" ? " scr-page--quick-feedback" : saved.step === "method" ? " scr-page--method" : saved.step === "help" ? " scr-page--help" : saved.step === "tar-recovery" ? " scr-page--tar-recovery" : ""}`}>
-    <header className="sorp-workspace-brand"><Link className="scr-header-brand" href="/are-you-sorp-ready"><span>My Social Impact</span><strong>Are You SORP Ready? <small className="scr-beta-badge">BETA</small><small className="scr-inline-build" aria-label={BUILD}><span>{BUILD}</span><i>{BUILD_COMPACT}</i></small></strong></Link><div className="scr-header-actions"><div className="sorp-workspace-brand-meta"><p>SORP is the requirement.<br /><strong>Better impact is the opportunity.</strong></p></div>{account ? <div className="scr-header-account"><span><i aria-hidden="true">✓</i><span><b>SIGNED IN</b><small title={account.email}>{account.email}</small></span></span><button type="button" disabled={accountActionBusy} onClick={() => void signOutAccount()}>{accountActionBusy ? "SIGNING OUT…" : "SIGN OUT"}</button></div> : GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <a className="scr-header-login" href="/api/readiness-account/google/start" onClick={() => { setGoogleSignInStarting(true); event("header_google_sign_in_started"); }}><GoogleMark/><span>{googleSignInStarting ? "OPENING GOOGLE…" : <>LOG IN <b>WITH GOOGLE</b></>}</span></a>}</div></header>
-    <div className="scr-top">{saved.step !== "scope" && saved.step !== "intro" && saved.step !== "find" && <div><small>{BUILD}</small><h2>{saved.step === "done" ? "You’re done" : phases[phase]}</h2></div>}<nav aria-label="Review progress">{phases.map((label, index) => <span key={label} className={saved.step === "done" || index < phase ? "is-complete" : index === phase ? "is-current" : ""}><i>{saved.step === "done" || index < phase ? "✓" : index + 1}</i><b>{label}</b></span>)}</nav></div>
+    <AssessmentHeader busy={Boolean(busy)}/>
+    <AssessmentProgress phase={phase} complete={saved.step === "done"}/>
     <div key={["scope", "public-methodology", "intro", "benefits", "find"].includes(saved.step) ? saved.step : "assessment"} className={`scr-workspace${["scope", "public-methodology", "intro", "benefits", "find"].includes(saved.step) ? " scr-opening-enter" : ""}`}>
       <SorpScreenContext.Provider value={journeyScreen}><section className="scr-main" aria-live={["homework", "assessment"].includes(saved.step) ? undefined : "polite"}>
         {introScreen && <SorpIntroduction screen={introScreen} />}
@@ -859,7 +870,7 @@ export function SorpCandidateReview() {
         {error && saved.step !== "tar-recovery" && <div className="scr-error" role="alert">{["homework", "assessment"].includes(saved.step) && <p>We’re genuinely sorry this step could not finish.</p>}{error}{["homework", "assessment"].includes(saved.step) && <><p>Your completed progress is saved. You can retry using the button below, or <a href={supportEmailHref}>email My Social Impact about this problem</a>.</p><p>This tool is still in beta. Reports of problems help us improve the experience.</p></>}</div>}
       </section></SorpScreenContext.Provider>{!introScreen && !discoveryScreen && !snapshotScreen && saved.step !== "quick-feedback" && <aside className="scr-guide scr-supporting-guide">{guide()}</aside>}</div>
     <footer className="scr-bottom">
-      <div><button type="button" className="scr-back" disabled={!navigation.past.length || !!busy} onClick={back}>← BACK</button><button type="button" className="scr-forward" disabled={!navigation.future.length || !!busy} onClick={forward}>FORWARD →</button></div>
+      <div><button type="button" className="scr-back" disabled={!navigation.past.length || !!busy} onClick={back}>← BACK</button>{navigation.future.length > 0 && <button type="button" className="scr-forward" disabled={!!busy} onClick={forward}>FORWARD →</button>}</div>
       <div>
         {saved.step === "scope" && <button onClick={() => go("public-methodology")}>NEXT <span>→</span></button>}
         {saved.step === "public-methodology" && <button onClick={() => go("intro")}>NEXT <span>→</span></button>}

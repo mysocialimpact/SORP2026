@@ -51,7 +51,12 @@ try {
     });
     await page.addInitScript(({ key, initial }) => { if (!sessionStorage.getItem('qa-seeded')) { localStorage.setItem(key, JSON.stringify(initial)); sessionStorage.setItem('qa-seeded','true'); } }, { key, initial });
     await page.goto(base + '/are-you-sorp-ready/review');
-    await page.locator('.scr-header-account').waitFor();
+    await page.locator('.scr-assessment-header').waitFor();
+    assert.equal(await page.locator('.platform-sticky-navigation').isVisible(), false);
+    assert.equal(await page.locator('.scr-top nav li').count(), 8);
+    assert.match(await page.locator('.scr-top [aria-current=step]').textContent(), /Published report/i);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    assert.equal(await page.locator('.scr-bottom').evaluate(element => getComputedStyle(element).position), 'fixed');
     await page.screenshot({ path: `/tmp/sorp-before-${viewport.width}.png`, fullPage: true, animations: 'disabled' });
     await page.getByRole('button', { name: /LOCATE AND READ MY REPORT/ }).evaluate((button) => button.click());
     await page.waitForFunction(() => document.querySelector('.sj-milestones'));
@@ -66,8 +71,9 @@ try {
     await page.screenshot({ path: `/tmp/sorp-document-${viewport.width}.png`, fullPage: true, animations: 'disabled' });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await page.reload();
-    await page.locator('.scr-header-account').waitFor();
+    await page.locator('.scr-assessment-header').waitFor();
     await page.getByRole('button', { name: /CONTINUE TO ASSESSMENT/ }).click();
+    assert.match(await page.locator('.scr-top [aria-current=step]').textContent(), /Assessment/i);
     await page.getByText('Every answer starts with your report.').waitFor();
     assert.equal(await page.locator('.sj-question-map .is-complete').count(), 0);
     assert.deepEqual(operations, ['prepare-tar', 'assess-tar']);
@@ -84,13 +90,15 @@ try {
     await page.getByRole('button', { name: 'FINISH EXPLANATION ✓' }).click();
     await page.getByRole('button', { name: /VIEW MY HISTORICAL SNAPSHOT/ }).waitFor();
     await page.reload();
-    await page.locator('.scr-header-account').waitFor();
+    await page.locator('.scr-assessment-header').waitFor();
     await page.locator('.sj-assessment.is-assessed').waitFor();
     assert.deepEqual(operations, ['prepare-tar', 'assess-tar']);
     await page.getByRole('button', {name:/VIEW MY HISTORICAL SNAPSHOT/}).click();
+    assert.match(await page.locator('.scr-top [aria-current=step]').textContent(), /Historical snapshot/i);
     await page.getByRole('button', {name:/CONTINUE TO CURRENT READINESS/}).click();
     await page.getByRole('button', {name:'SKIP FOR NOW',exact:true}).click();
     await page.getByRole('button', {name:/START MY CURRENT READINESS REVIEW/}).click();
+    assert.match(await page.locator('.scr-top [aria-current=step]').textContent(), /Current readiness/i);
     for(let q=0;q<19;q++) {
       await page.locator('.scr-answer-grid button').first().click();
       await page.locator('.scr-bottom > div:last-child > button').click();
@@ -98,10 +106,12 @@ try {
     await page.getByRole('button', {name:/BUILD MY PERSONALISED REPORT/}).click();
     console.log('Report input check',await page.evaluate(key=>{const s=JSON.parse(localStorage.getItem(key));return {step:s.step,hasEmail:!!s.email,hasReport:!!s.report,setup:s.state?.setup,answers:Object.values(s.corrections).filter(x=>x.reviewed).length};},key));
     await page.getByRole('button', {name:/VIEW MY PERSONALISED REPORT/}).click({timeout:30000});
+    assert.match(await page.locator('.scr-top [aria-current=step]').textContent(), /Your report/i);
     assert.equal(emailRequests,0,'Opening the report does not request an email prematurely');
     await page.getByRole('button', {name:/SEE MY PRIORITIES/}).click();
     await page.screenshot({path:`/tmp/sorp-report-${viewport.width}.png`,fullPage:true});
     await page.getByRole('button', {name:/FINISH MY REVIEW/}).click();
+    assert.match(await page.locator('.scr-top [aria-current=step]').textContent(), /What next/i);
     await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)).emailSent,key);
     await expect.poll(()=>savedProgress.emailSent).toBe(true);
     assert.equal(emailRequests,1);

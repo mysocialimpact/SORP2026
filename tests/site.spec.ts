@@ -147,7 +147,7 @@ test("the digital filing folder keeps all five products in one accessible sequen
   expect(axe.violations).toEqual([]);
 });
 
-test("supporting pages remain inside the Home folder section", async ({ page }) => {
+test("supporting pages remain in Home while the review enters dedicated assessment mode", async ({ page }) => {
   for (const [path, title] of [["/our-mission/", "Our Mission"], ["/contact/", "Contact"]] as const) {
     await page.goto(path);
     const folder = page.getByRole("navigation", { name: "SORP2026 products" });
@@ -157,8 +157,9 @@ test("supporting pages remain inside the Home folder section", async ({ page }) 
   }
 
   await page.goto("/are-you-sorp-ready/review/?entry=intro");
-  await expect(page.getByRole("navigation", { name: "SORP2026 products" }).getByRole("link", { name: /Are You SORP Ready/ })).toHaveAttribute("aria-current", "location");
-  await expect(page.locator(".gateway-header .gateway-account-control")).toHaveCount(1);
+  await expect(page.getByRole("navigation", { name: "SORP2026 products" })).toBeHidden();
+  await expect(page.locator(".scr-assessment-header")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Back to website/ })).toHaveAttribute("href", "/are-you-sorp-ready/");
 });
 
 test("the compact header uses the folder as primary navigation", async ({ page }) => {
