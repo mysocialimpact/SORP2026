@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Arrow } from "@/components/ui";
+import { AuthenticatedContinuousImprovement, type AuthenticatedAccount } from "@/components/authenticated-continuous-improvement";
 
 export function SayHello() {
   const [email, setEmail] = useState("");
@@ -9,18 +10,22 @@ export function SayHello() {
   const [recognised, setRecognised] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [feedback, setFeedback] = useState("");
+  const [identity, setIdentity] = useState<AuthenticatedAccount | false | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
       .then(async response => {
-        if (!response.ok) return;
+        if (!response.ok) { setIdentity(false); return; }
         const data = await response.json();
         if (data.signedIn && typeof data.account?.email === "string") {
           setEmail(current => current || data.account.email);
           setRecognised(true);
+          setIdentity(data as AuthenticatedAccount);
+        } else {
+          setIdentity(false);
         }
-      }).catch(() => undefined);
+      }).catch(() => setIdentity(false));
     return () => controller.abort();
   }, []);
 
@@ -48,6 +53,9 @@ export function SayHello() {
       setFeedback(cause instanceof Error ? cause.message : "We could not send your message. Please try again.");
     }
   }
+
+  if (identity) return <AuthenticatedContinuousImprovement identity={identity} />;
+  if (identity === null) return <section className="shared-hello shared-hello-loading" aria-label="Loading contact options" />;
 
   return <section className="shared-hello" id="say-hello" aria-labelledby="say-hello-title">
     <div className="gateway-width shared-hello-layout">

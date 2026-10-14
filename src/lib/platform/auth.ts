@@ -12,7 +12,7 @@ export type PlatformMembership = {
 };
 
 export type PlatformIdentity = {
-  account: { id: string; email: string; name: string };
+  account: { id: string; email: string; name: string; organisation?: string; position?: string };
   founder: boolean;
   memberships: PlatformMembership[];
 };
@@ -30,7 +30,30 @@ export async function platformIdentity(cookie: string): Promise<PlatformIdentity
   const account = data.account;
   if (data.signedIn !== true || !account || typeof account.id !== "string" || typeof account.email !== "string") throw new AccessError(401, "Please log in again.");
   const memberships = Array.isArray(data.platformAccess?.memberships) ? data.platformAccess.memberships.filter((item: unknown) => item && typeof item === "object") as PlatformMembership[] : [];
-  return { account: { id: account.id, email: account.email, name: typeof account.name === "string" ? account.name : account.email }, founder: data.platformAccess?.founder === true, memberships };
+  return {
+    account: {
+      id: account.id,
+      email: account.email,
+      name: typeof account.name === "string" ? account.name : account.email,
+      organisation: typeof account.organisation === "string" ? account.organisation : undefined,
+      position: typeof account.position === "string" ? account.position : undefined,
+    },
+    founder: data.platformAccess?.founder === true,
+    memberships,
+  };
+}
+
+export async function protectPlatformRequest(request: Request) {
+  const identity = await platformIdentity(request.headers.get("cookie") || "");
+  if (!["GET", "HEAD"].includes(request.method)) {
+    const url = new URL(request.url);
+    const origin = request.headers.get("origin");
+    const expected = `${request.headers.get("x-forwarded-proto") || url.protocol.replace(":", "")}://${request.headers.get("host") || url.host}`;
+    if (origin !== expected || request.headers.get("sec-fetch-site") === "cross-site") {
+      throw new AccessError(403, "Please submit from this website.");
+    }
+  }
+  return identity;
 }
 
 export async function protectAdviserPage() {

@@ -90,23 +90,22 @@ test("hero frames SORP as the requirement and better impact as the opportunity",
 });
 
 test("contact form recognises accounts and confirms only an accepted server response", async ({ page }) => {
-  await page.route("**/api/readiness-account/", route => route.fulfill({ json: { signedIn: true, account: { email: "preview@example.org" } } }));
+  await page.route("**/api/readiness-account/", route => route.fulfill({ json: { signedIn: true, account: { id: "preview", name: "Preview Person", email: "preview@example.org", organisation: "Preview Charity" } } }));
   const writes: Record<string, unknown>[] = [];
-  await page.route("**/api/hello", async route => {
+  await page.route("**/api/continuous-improvement/**", async route => {
+    if (route.request().method() === "GET") return route.fulfill({ json: { improvements: [] } });
     writes.push(route.request().postDataJSON());
-    await route.fulfill({ json: { accepted: true, emailSent: true } });
+    await route.fulfill({ status: 201, json: { accepted: true, id: "preview-enquiry" } });
   });
   await page.goto("/");
-  const form = page.locator(".shared-hello-form");
-  await expect(form.getByLabel("Email address")).toHaveValue("preview@example.org");
-  await expect(form.getByLabel("Email address")).toHaveAttribute("required", "");
-  await expect(form.getByLabel(/Message/)).not.toHaveAttribute("required", "");
-  await expect(form.getByRole("checkbox")).toHaveCount(1);
-  await form.getByLabel(/Message/).fill("Please show us a demo.");
-  await form.getByRole("button", { name: "Say hello" }).click();
-  await expect(form).toContainText("hello is on its way");
+  const section = page.locator(".continuous-improvement");
+  await expect(section).toContainText("Hi Preview · Preview Charity");
+  await section.getByRole("button", { name: /Ask a question/ }).click();
+  await section.getByLabel("What would you like to ask?").fill("Please show us a demo.");
+  await section.getByRole("button", { name: "Send to Marcus →" }).click();
+  await expect(section).toContainText("message is on its way to Marcus");
   expect(writes).toHaveLength(1);
-  expect(writes[0]).toMatchObject({ email: "preview@example.org", message: "Please show us a demo.", newsletter: false });
+  expect(writes[0]).toMatchObject({ kind: "contact", enquiryType: "question", message: "Please show us a demo." });
 });
 
 test("pricing is free-first, honest about planned plans and leads directly into Let’s talk", async ({ page }) => {
