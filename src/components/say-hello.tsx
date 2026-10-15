@@ -13,6 +13,7 @@ export function SayHello() {
   const [recognised, setRecognised] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [feedback, setFeedback] = useState("");
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
 
   useEffect(() => {
     if (founderMode) return;
@@ -64,24 +65,58 @@ export function SayHello() {
     }
   }
 
+  async function copyFounderEmail() {
+    const address = "marcus@mysocialimpact.org";
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(address);
+      } else {
+        const fallback = document.createElement("textarea");
+        fallback.value = address;
+        fallback.setAttribute("readonly", "");
+        fallback.style.position = "fixed";
+        fallback.style.opacity = "0";
+        document.body.appendChild(fallback);
+        fallback.select();
+        const copied = document.execCommand("copy");
+        fallback.remove();
+        if (!copied) throw new Error("Clipboard unavailable");
+      }
+      setCopyStatus("copied");
+    } catch {
+      setCopyStatus("error");
+    }
+  }
+
   if (founderMode) return null;
 
   return <section className="shared-hello" id="say-hello" aria-labelledby="say-hello-title">
     <div className="gateway-width shared-hello-layout">
       <div className="shared-hello-invitation">
         <h2 id="say-hello-title">Talk to us.</h2>
-        <div className="shared-hello-details" aria-label="My Social Impact contact details">
-          <a href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org</a>
-          <address><span>Somerset</span>10 Market Place, Shepton Mallet</address>
-          <address><span>London</span>POPHub, Whitcomb Street, London</address>
-        </div>
       </div>
       <form className="shared-hello-form" onSubmit={submit}>
         {recognised && <p className="shared-hello-account">We’ve used the email from your account.</p>}
-        <label htmlFor="shared-hello-email">Email address</label>
-        <input id="shared-hello-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} />
-        <label htmlFor="shared-hello-message">Message <span>Optional</span></label>
-        <textarea id="shared-hello-message" name="message" rows={3} maxLength={3000} value={message} onChange={event => setMessage(event.target.value)} placeholder="Request a demo, ask a question, share an idea, give feedback, or just say hello…" />
+        <div className="shared-hello-field">
+          <label htmlFor="shared-hello-email">Your email address</label>
+          <input id="shared-hello-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} />
+        </div>
+        <div className="shared-hello-field">
+          <label htmlFor="shared-hello-message">Message <span>Optional</span></label>
+          <textarea id="shared-hello-message" name="message" rows={3} maxLength={3000} value={message} onChange={event => setMessage(event.target.value)} placeholder="Request a demo, ask a question, share an idea, give feedback, or just say hello…" />
+        </div>
+        <div className="shared-hello-details" aria-label="My Social Impact contact details">
+          <button className={`shared-hello-copy is-${copyStatus}`} type="button" onClick={() => void copyFounderEmail()} aria-label="Copy marcus@mysocialimpact.org to clipboard">
+            <span>{copyStatus === "copied" ? "Email copied" : copyStatus === "error" ? "Couldn’t copy — tap the address" : "Copy email address"}</span>
+            <strong>marcus@mysocialimpact.org</strong>
+            <b aria-hidden="true">{copyStatus === "copied" ? "✓" : "Copy"}</b>
+          </button>
+          <div className="shared-hello-offices">
+            <address><span>Somerset</span>10 Market Place, Shepton Mallet</address>
+            <address><span>London</span>POPHub, Whitcomb Street, London</address>
+          </div>
+          <p className="shared-hello-copy-status" aria-live="polite">{copyStatus === "copied" ? "Marcus’s email address has been copied to your clipboard." : copyStatus === "error" ? <><a href="mailto:marcus@mysocialimpact.org">Email Marcus directly</a> if copying is unavailable.</> : ""}</p>
+        </div>
         <label className="shared-hello-consent"><input type="checkbox" checked={newsletter} onChange={event => setNewsletter(event.target.checked)} /><span>I’d also like occasional updates about SORP 2026 and the free tools.</span></label>
         <label className="shared-hello-honeypot" htmlFor="shared-hello-website" aria-hidden="true">Website<input id="shared-hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
         <button className="shared-hello-submit" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Message sent ✓" : "Send message"} <Arrow /></button>
