@@ -27,7 +27,7 @@ export function PartnerEnquiry({ firmName = "" }: { firmName?: string }) {
     <div><label htmlFor="partner-firm">Firm<input id="partner-firm" name="firm" required defaultValue={firmName} maxLength={160}/></label><label htmlFor="partner-role">Your role<input id="partner-role" name="role" required maxLength={120}/></label></div>
     <label htmlFor="partner-message">How can we help?<textarea id="partner-message" name="message" rows={3} maxLength={1600} placeholder={firmName ? "Tell us your relationship to this firm and any corrections needed." : "Tell us about your charity practice and your interest in the directory."}/></label>
     <label className="directory-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off"/></label>
-    <p>No payment or subscription is created. We’ll verify your relationship to the firm before updating its profile. <Link href="/privacy/">Privacy notice</Link>.</p>
+    <p>We’ll check your relationship to the firm and review the evidence before updating its profile. Enquiring does not confer verification. <Link href="/privacy/">Privacy notice</Link>.</p>
     <button type="submit" disabled={state === "sending" || state === "sent"}>{state === "sending" ? "Sending…" : state === "sent" ? "Enquiry received ✓" : "Send enquiry →"}</button>
     {feedback && <p role={state === "error" ? "alert" : "status"}>{feedback}</p>}
     {state === "error" && <a href="mailto:marcus@mysocialimpact.org?subject=Charity%20accountants%20directory">Email Marcus directly ↗</a>}

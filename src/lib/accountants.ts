@@ -33,6 +33,8 @@ export type Firm = {
   featured?: boolean;
   featuredPriority?: number;
   placementLabel?: string;
+  msiVerified?: boolean;
+  msiVerificationDecided?: boolean;
   humanReviewed?: boolean;
   humanReviewedAt?: string;
   overview?: string;

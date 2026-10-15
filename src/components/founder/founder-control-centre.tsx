@@ -371,8 +371,8 @@ function FirmDrawer({ firm, busy, onClose, onSaved, onError, onNotice }: { firm:
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     try {
-      await founderCall(`accountants/${firm.id}/directory`, { method: "POST", body: JSON.stringify({ publicVisible: form.get("publicVisible") === "on", featured: form.get("featured") === "on", featuredPriority: Number(form.get("featuredPriority") || 0), placementLabel: form.get("placementLabel") }) });
-      await founderCall(`accountants/${firm.id}/human-review`, { method: "POST", body: JSON.stringify({ reviewed: form.get("humanReviewed") === "on", notes: form.get("reviewNotes") }) });
+      await founderCall(`accountants/${firm.id}/directory`, { method: "POST", body: JSON.stringify({ publicVisible: form.get("publicVisible") === "on", featured: form.get("featured") === "on", featuredPriority: Number(form.get("featuredPriority") || 0), placementLabel: form.get("placementLabel"), msiVerified: form.get("msiVerified") === "on", verificationNote: form.get("verificationNote") }) });
+      if ((form.get("humanReviewed") === "on") !== Boolean(firm.approved_at)) await founderCall(`accountants/${firm.id}/human-review`, { method: "POST", body: JSON.stringify({ reviewed: form.get("humanReviewed") === "on", notes: form.get("reviewNotes") }) });
       onSaved(await founderCall<AccountantData>("accountants"));
       onNotice("Directory controls saved. The independent research score was not changed.");
     } catch (caught) { onError(message(caught, "The directory controls could not be saved.")); }
@@ -381,6 +381,9 @@ function FirmDrawer({ firm, busy, onClose, onSaved, onError, onNotice }: { firm:
     <div className="founder-record-summary"><div><span>Independent score</span><strong>{firm.overall_score === null ? "Not scored" : Number(firm.overall_score).toFixed(1)}</strong></div><div><span>Research completed</span><strong>{displayDate(firm.research_completed_at)}</strong></div><div><span>Public listing</span><strong>{firm.public_visible ? "Visible" : "Hidden"}</strong></div></div>
     <div className="founder-firm-links"><a href={`/console/firms/${firm.id}`} target="_blank" rel="noreferrer">Full research report ↗</a>{firm.public_slug && <a href={`/accountants-advisers/${firm.public_slug}/`} target="_blank" rel="noreferrer">Public profile ↗</a>}</div>
     <form className="founder-form-grid" onSubmit={save}>
+      <label className="founder-check"><input type="checkbox" name="msiVerified" defaultChecked={Boolean(firm.msi_verified)} /> Verified by My Social Impact</label>
+      <label className="founder-span">MSI verification decision<textarea name="verificationNote" maxLength={2000} placeholder="Required when awarding or withdrawing: record the human assessment and editorial reason." /></label>
+      <p className="founder-note founder-span">Award only after additional human assessment of the firm’s charity expertise and credibility. This is separate from checking research, payment and placement. Uncheck to withdraw; every decision is recorded.</p>
       <label className="founder-check"><input type="checkbox" name="humanReviewed" defaultChecked={Boolean(firm.approved_at)} /> Human Reviewed</label>
       <label className="founder-span">Review note<textarea name="reviewNotes" placeholder="Record what was checked" /></label>
       <label className="founder-check"><input type="checkbox" name="publicVisible" defaultChecked={firm.public_visible} /> Visible in public directory</label>

@@ -182,6 +182,24 @@ test("redesign retains a visible real map, all five spotlights and one search", 
   for (const name of ['Burton Sweet','ECOVIS Wingrave Yeats','Moore Kingston Smith','Forvis Mazars','Lanham & Francis']) {
     await expect(page.locator('.adviser-spotlight').getByRole('heading',{name,exact:true})).toBeVisible();
   }
-  await expect(page.getByRole('link',{name:'Make room for your firm ↗'})).toHaveAttribute('href','/accountants-advisers/partners/');
+  await expect(page.getByRole('link',{name:'Claim your listing / Talk to us ↗'})).toHaveAttribute('href','/accountants-advisers/partners/');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+
+test("human verification stays explicit and Burton is only a preview", async ({ page }) => {
+  await page.goto(path);
+  await expect(page.locator('.adviser-hero')).not.toContainText('£39');
+  await expect(page.locator('[data-verification="approved"]')).toHaveCount(0);
+  await expect(page.locator('.adviser-spotlight [data-verification="preview"]')).toContainText('Design preview · not awarded');
+  await page.getByLabel('Find a charity accountant', { exact: true }).fill('Burton Sweet');
+  if (await page.getByRole('button', {name:'List',exact:true}).isVisible()) await page.getByRole('button', {name:'List',exact:true}).click();
+  await expect(page.locator('.directory-result [data-verification="preview"]')).toContainText('has not been awarded');
+  await page.goto(`${path}burton-sweet/`);
+  await expect(page.locator('[data-verification="preview"]')).toContainText('Design preview · not awarded');
+  await expect(page.locator('[data-verification="approved"]')).toHaveCount(0);
+  await page.goto(`${path}partners/`);
+  await expect(page.locator('main')).not.toContainText('£39');
+  await expect(page.locator('main')).toContainText('Not listed yet?');
+  await expect(page.getByLabel('Work email')).toBeVisible();
 });

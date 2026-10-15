@@ -171,6 +171,7 @@ export type Accountant = {
   featured: boolean;
   featured_priority: number;
   placement_label: string | null;
+  msi_verified?: boolean;
   public_slug: string | null;
 };
 

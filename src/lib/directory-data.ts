@@ -38,6 +38,8 @@ export async function getDirectoryFirms(): Promise<Firm[]> {
       featured: control?.directory_configured ? control.featured : firm.featured,
       featuredPriority: control?.directory_configured ? control.featured_priority : firm.featuredPriority,
       placementLabel: control?.directory_configured ? control.placement_label : (firm.placementLabel || (firm.featured ? "Editorial launch feature" : undefined)),
+      msiVerified: control?.msi_verified === true,
+      msiVerificationDecided: control?.msi_verification_decided === true,
       humanReviewed: Boolean(control?.approved_at),
       humanReviewedAt: control?.approved_at || undefined,
     }];
