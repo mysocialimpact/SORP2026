@@ -44,7 +44,7 @@
 
 .folder-action-bar {
   position: fixed; inset: auto 0 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  display: grid; grid-template-columns: minmax(220px, 1fr) auto auto; align-items: center; gap: 8px;
   padding: 9px max(24px, calc((100vw - 1280px) / 2)) calc(9px + env(safe-area-inset-bottom));
   background: color-mix(in srgb, var(--action-accent, #cfddcf) 22%, #25252b 78%);
   border-top: 3px solid var(--action-accent, #cfddcf);
@@ -86,7 +86,7 @@ body:has(form:focus-within, .directory-app :focus) .folder-action-bar { visibili
   .platform-sticky-navigation[data-compact="true"] .gateway-header-inner { min-height: 48px; padding-block: 6px; }
   .platform-sticky-navigation[data-compact="true"] .gateway-directory-nav { gap: 18px; }
   .platform-sticky-navigation[data-compact="true"] .product-folder-tab { flex-basis: 150px; min-width: 150px; }
-  .folder-action-bar { padding-inline: 10px; gap: 14px; }
+  .folder-action-bar { padding-inline: 10px; gap: 7px; }
   .folder-action-bar a { font-size: 12px; gap: 10px; }
   .folder-action-primary { min-width:0;padding-inline:12px;flex:1; }
   .folder-action-secondary { flex-shrink: 0; }
@@ -94,6 +94,22 @@ body:has(form:focus-within, .directory-app :focus) .folder-action-bar { visibili
   .folder-action-bar.is-readiness a { min-width: 0; padding-inline: 9px; }
 }
 @media (max-width: 620px) {
+  .folder-action-bar:not(.is-readiness) {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, .8fr) minmax(0, .8fr);
+    padding: 6px 7px calc(6px + env(safe-area-inset-bottom));
+  }
+  .folder-action-bar:not(.is-readiness) a {
+    min-width: 0;
+    min-height: 52px;
+    justify-content: center;
+    gap: 4px;
+    padding: 7px 5px;
+    font-size: 10px;
+    line-height: 1.12;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .folder-action-bar:not(.is-readiness) a span { display: none; }
   .folder-action-bar.is-readiness {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     padding: 6px 7px calc(6px + env(safe-area-inset-bottom));

@@ -19,14 +19,27 @@ test.beforeEach(async ({ page }) => {
 
 test("the marketing page launches a focused workspace from every Ask SORP action", async ({ page }) => {
   await page.goto("/ask-sorp/");
-  await expect(page.getByRole("heading", { name: /Ask SORP 2026/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Over 300 pages of SORP/ })).toBeVisible();
   await expect(page.locator(".platform-sticky-navigation")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Ask SORP a question/ })).toHaveAttribute("href", "/ask-sorp/workspace/");
-  await expect(page.locator(".folder-action-bar").getByRole("link", { name: /Ask a question/ })).toHaveAttribute("href", "/ask-sorp/workspace/");
+  await expect(page.getByRole("heading", { name: "SORP shouldn’t be difficult to understand." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Help your charity clients more quickly and efficiently." })).toBeVisible();
+  await expect(page.locator(".ask-plan-grid > li")).toContainText(["FREE", "PLUS", "ADVISER", "BESPOKE"]);
+  await expect(page.getByText("Three Ask SORP questions for everyone. Explore the tool at no cost.")).toBeVisible();
+  await expect(page.getByText("Free early beta access")).toBeVisible();
+  const beta = page.getByRole("link", { name: /Request free beta access/ });
+  await expect(beta).toHaveAttribute("href", "#say-hello");
+  await beta.click();
+  await expect(page).toHaveURL(/#say-hello$/);
+  await expect(page.getByRole("heading", { name: "Talk to us." })).toBeInViewport();
+  await page.goto("/ask-sorp/");
+  await expect(page.getByRole("link", { name: /Ask SORP a question/ }).first()).toHaveAttribute("href", "/ask-sorp/workspace/");
+  const fixedAction = page.locator(".folder-action-bar");
+  await expect(fixedAction.getByRole("link", { name: /Ask SORP a question/ })).toHaveAttribute("href", "/ask-sorp/workspace/");
+  await expect(fixedAction.getByRole("link")).toHaveText([/Ask SORP a question/, /Give feedback/, /Talk to us/]);
 
-  await page.getByRole("button", { name: /What changes under SORP 2026/ }).click();
-  await expect(page).toHaveURL(/\/ask-sorp\/workspace\/\?question=What(?:%20|\+)changes/);
-  await expect(page.getByLabel("Your SORP 2026 question")).toHaveValue("What changes under SORP 2026?");
+  await page.getByRole("link", { name: /Ask SORP a question/ }).first().click();
+  await expect(page).toHaveURL(/\/ask-sorp\/workspace\/$/);
+  await expect(page.getByLabel("Your SORP 2026 question")).toHaveValue("");
   await expect(page.locator(".platform-sticky-navigation")).toBeHidden();
   await expect(page.locator(".folder-action-bar")).toBeHidden();
   await expect(page.locator(".shared-hello")).toBeHidden();
@@ -70,7 +83,7 @@ test("questions, citations, follow-ups and the saved conversation work inside th
 
   await page.getByRole("link", { name: "Back to website" }).click();
   await expect(page).toHaveURL(/\/ask-sorp\/$/);
-  await page.getByRole("link", { name: /Ask SORP a question/ }).click();
+  await page.getByRole("link", { name: /Ask SORP a question/ }).first().click();
   await expect(page.locator(".ask-answer-copy").getByText(answer.short_answer)).toBeVisible();
 });
 

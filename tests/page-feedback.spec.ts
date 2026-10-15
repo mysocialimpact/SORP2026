@@ -8,6 +8,7 @@ const publicPages = [
   "/social-impact-excellence/",
   "/my-impact-director/",
   "/our-mission/",
+  "/accountants-advisers/",
   "/contact/",
 ];
 
@@ -23,6 +24,10 @@ test("every public page finishes with Feedback, Talk to us, then the shared foot
     await expect(page.locator(".gateway-footer"), `footer on ${path}`).toHaveCount(1);
     await expect(page.getByRole("heading", { name: "Help us make this better." })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Talk to us." })).toBeVisible();
+    const actionBar = page.locator(".folder-action-bar");
+    await expect(actionBar).toHaveCount(1);
+    await expect(actionBar.getByRole("link").nth(-2)).toContainText("Give feedback");
+    await expect(actionBar.getByRole("link").nth(-1)).toContainText("Talk to us");
     const order = await page.locator("body > .page-feedback, body > .shared-hello, body > .gateway-footer").evaluateAll(elements => elements.map(element => element.className));
     expect(order[0]).toContain("page-feedback");
     expect(order[1]).toContain("shared-hello");

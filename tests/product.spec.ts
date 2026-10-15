@@ -63,9 +63,9 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
   await expect(fixedAction).toBeVisible();
   await expect(fixedAction.getByRole("link", { name: /Play Presentation/ })).toHaveAttribute("href", "/are-you-sorp-ready/presentation/");
   await expect(fixedAction.getByRole("link", { name: /Start Free Review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
-  await expect(fixedAction.getByRole("link", { name: /Give Feedback/ })).toHaveAttribute("href", "#page-feedback");
-  await expect(fixedAction.getByRole("link", { name: /Talk to Us/ })).toHaveAttribute("href", "#say-hello");
-  await expect(fixedAction.getByRole("link")).toHaveText([/Play Presentation/, /Start Free Review/, /Give Feedback/, /Talk to Us/]);
+  await expect(fixedAction.getByRole("link", { name: /Give feedback/ })).toHaveAttribute("href", "#page-feedback");
+  await expect(fixedAction.getByRole("link", { name: /Talk to us/ })).toHaveAttribute("href", "#say-hello");
+  await expect(fixedAction.getByRole("link")).toHaveText([/Play Presentation/, /Start Free Review/, /Give feedback/, /Talk to us/]);
   await expect(fixedAction).toHaveCSS("position", "fixed");
   const fixedBox = (await fixedAction.boundingBox())!;
   expect(fixedBox.height).toBeLessThanOrEqual(90);
