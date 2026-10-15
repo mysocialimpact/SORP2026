@@ -57,3 +57,23 @@ test("account origin checks, durable rate limits and expired sessions deny acces
   const persisted = await db.query('SELECT count(*)::int n FROM sorp_auth."rateLimit"');
   assert.ok(persisted.rows[0].n > 0);
 });
+
+test("registration attempts are throttled before they can trigger unlimited mail", async () => {
+  const prefix = `limit-${randomUUID()}-`;
+  const statuses: number[] = [];
+  try {
+    for (let attempt = 0; attempt < 7; attempt += 1) {
+      const response = await independentAccountPOST(new Request(`${origin}/api/readiness-account`, {
+        method: "POST", headers: { "content-type": "application/json", origin,
+          "x-forwarded-for": "198.51.100.77" },
+        body: JSON.stringify({ action: "signup", name: "Synthetic applicant", position: "Trustee",
+          email: `${prefix}${attempt}@example.invalid`, password,
+          progress: { started: true, state: { currentStage: 1 } } }),
+      }));
+      statuses.push(response.status);
+    }
+    assert.ok(statuses.includes(429), `Expected registration throttling; saw ${statuses.join(",")}`);
+  } finally {
+    await db.query('DELETE FROM sorp_auth."user" WHERE email LIKE $1', [`${prefix}%@example.invalid`]);
+  }
+});
