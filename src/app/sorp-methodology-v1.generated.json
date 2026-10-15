@@ -79,7 +79,7 @@
       "id": "OA3",
       "title": "SHORT- AND LONGER-TERM AIMS",
       "sorp": "1.23–1.24",
-      "question": "Are your aims and objectives for this reporting period clear — and can you explain how they relate to your longer-term aims?",
+      "question": "Are your aims and objectives for this reporting period clear, and can you explain how they relate to your longer-term aims?",
       "why": "Impact develops over time. SORP specifically requires larger charities to explain the relationship between immediate and longer-term aims.",
       "tiers": [
         {
@@ -254,7 +254,7 @@
       "id": "AP2",
       "title": "DIFFERENCE TO BENEFICIARIES AND WIDER SOCIETY",
       "sorp": "1.27",
-      "question": "Can you explain how your work made a difference to your beneficiaries — and whether it created wider benefits for society?",
+      "question": "Can you explain how your work made a difference to your beneficiaries and whether it created wider benefits for society?",
       "why": "SORP says trustees SHOULD CONSIDER the difference their work makes to beneficiaries and wider society.",
       "tiers": [
         {
@@ -330,7 +330,7 @@
         }
       ],
       "rubric": [
-        "The report clearly explains the difference/effect the charity is making on beneficiaries and/or wider society — recognisably impact rather than merely activity/output.",
+        "The report clearly explains the difference/effect the charity is making on beneficiaries and/or wider society, recognisably impact rather than merely activity/output.",
         "Impact is substantially explained but one important dimension is thin or partly conflated with outcomes/outputs.",
         "Some genuine impact/effect is present, but the explanation is weak, incomplete or heavily reliant on outputs.",
         "Broad impact claims are made with little explanation of the actual difference.",
@@ -372,7 +372,7 @@
       "id": "AP6",
       "title": "OUTPUTS ACHIEVED",
       "sorp": "1.31",
-      "question": "Can you explain the outputs your activities actually achieved — particularly where you had numerical targets?",
+      "question": "Can you explain the outputs your activities actually achieved, particularly where you had numerical targets?",
       "why": "Output reporting shows what was delivered and how that compares with targets where they existed.",
       "tiers": [
         {
@@ -401,7 +401,7 @@
       "id": "AP7",
       "title": "FACTORS AFFECTING RESULTS",
       "sorp": "1.32",
-      "question": "Can you explain the significant positive and negative factors that affected your results — including things outside your control — and, where relevant, how they influenced future plans?",
+      "question": "Can you explain the significant positive and negative factors that affected your results, including things outside your control, and, where relevant, how they influenced future plans?",
       "why": "Credible reporting explains what helped or hindered results and how that informed plans.",
       "tiers": [
         {
@@ -587,7 +587,7 @@
     },
     {
       "title": "LEARNING AND FUTURE DIRECTION",
-      "subtitle": "MSI grouping — not an official SORP heading",
+      "subtitle": "MSI grouping: not an official SORP heading",
       "prefix": "LF"
     },
     {
@@ -815,5 +815,5 @@
     },
     "legacy": "Pre-V1.0 and 15-question assessments retain their original methodology identity and are never reinterpreted as Canonical V1.0."
   },
-  "generatedFrom": "GENERATED FROM COW CONSOLE CANONICAL METHODOLOGY V1.0 — DO NOT EDIT DIRECTLY"
+  "generatedFrom": "GENERATED FROM COW CONSOLE CANONICAL METHODOLOGY V1.0: DO NOT EDIT DIRECTLY"
 }

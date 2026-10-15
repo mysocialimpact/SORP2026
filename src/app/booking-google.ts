@@ -117,7 +117,7 @@ export async function createBookingEvent(service: BookingService, start: string,
   const description = [`Booked through My Social Impact.`, `Organisation: ${safeDetails.organisation}`, safeDetails.evidence ? `Wider-evidence reference: ${safeDetails.evidence}` : ""].filter(Boolean).join("\n");
   const body = {
     id,
-    summary: `${service.name} — ${safeDetails.organisation}`,
+    summary: `${service.name}: ${safeDetails.organisation}`,
     description,
     start: { dateTime: start, timeZone: BOOKING_TIME_ZONE },
     end: { dateTime: end, timeZone: BOOKING_TIME_ZONE },

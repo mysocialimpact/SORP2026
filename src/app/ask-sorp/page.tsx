@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 import "./ask-sorp.css";
 
 export const metadata: Metadata = {
-  title: "Ask SORP 2026 — Evidence-led answers",
+  title: "Ask SORP 2026: Evidence-led answers",
   description: "Ask questions about SORP 2026 and get clear, practical answers with references to the official Charities SORP guidance.",
   ...(site.live ? { alternates: { canonical: "/ask-sorp/" } } : {}),
 };
@@ -36,7 +36,7 @@ export default function AskSorp() {
 
         <section id="ask-sorp-live" className="ask-live-section" aria-labelledby="ask-live-section-title">
           <div className="ask-live-intro">
-            <p className="ask-eyebrow">The tool—not a demo</p>
+            <p className="ask-eyebrow">The tool, not a demo</p>
             <h2 id="ask-live-section-title">Ask now.<br />See the source.</h2>
             <p>This is the established My Social Impact Ask SORP intelligence, available here in a native SORP2026 experience. The evidence index, answer checks and citation service remain in one place.</p>
           </div>

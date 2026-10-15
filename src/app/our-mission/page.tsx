@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const promises = [
   [
     "Free wherever possible",
-    "Useful digital tools should be open to the charities that need them—not only those with the largest budgets.",
+    "Useful digital tools should be open to the charities that need them, not only those with the largest budgets.",
   ],
   [
     "Affordable when people are needed",
@@ -51,7 +51,7 @@ export default function OurMissionPage() {
             <p>
               Technology and AI are opening up exciting possibilities for doing
               good. We’re building practical tools to put those possibilities into
-              the hands of charities and small organisations—helping them get the
+              the hands of charities and small organisations, helping them get the
               support they need and create greater impact.
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function OurMissionPage() {
           </p>
           <p>
             But technology does not remove the need for judgement, perspective
-            or care. We will always be honest about where a tool can take you—and
+            or care. We will always be honest about where a tool can take you, and
             where thoughtful human input is still needed.
           </p>
         </div>

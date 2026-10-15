@@ -179,7 +179,7 @@ export function Score({
   const level = evidenceLevel(firm.total, boundaries);
   return (
     <div className="rc-score-inline">
-      <strong>{firm.total ?? "—"}</strong>
+      <strong>{firm.total ?? "N/A"}</strong>
       <span>
         {level === null
           ? "Not scored"

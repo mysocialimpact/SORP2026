@@ -110,7 +110,7 @@ export const coreQuestions: CoreQuestion[] = [
   {
     id: 3,
     section: "objectives",
-    question: "Have you set clear aims and objectives for this reporting period — and can you explain how they relate to your longer-term aims?",
+    question: "Have you set clear aims and objectives for this reporting period, and can you explain how they relate to your longer-term aims?",
     explanation: "Tier 2 and Tier 3 charities must give a more detailed understanding of short- and longer-term aims. For Tier 1, this remains useful readiness and good reporting practice rather than an additional Tier 2 MUST.",
     sources: ["1.23", "1.24"],
     classification: tiered("MSI_READINESS", "MUST", "MUST"),
@@ -120,7 +120,7 @@ export const coreQuestions: CoreQuestion[] = [
   {
     id: 4,
     section: "objectives",
-    question: "Can you explain how your significant programmes, projects or services contribute to your aims — including the change or difference you are trying to create?",
+    question: "Can you explain how your significant programmes, projects or services contribute to your aims: including the change or difference you are trying to create?",
     explanation: "This reflects the SORP focus on significant activities, their contribution to stated aims and the changes or differences the charity seeks to make.",
     sources: ["1.22", "1.24"],
     classification: tiered("SHOULD", "MUST", "MUST"),
@@ -130,7 +130,7 @@ export const coreQuestions: CoreQuestion[] = [
   {
     id: 5,
     section: "achievements",
-    question: "Have you decided what success looks like — and what measures or indicators you use to assess performance?",
+    question: "Have you decided what success looks like, and what measures or indicators you use to assess performance?",
     explanation: "SORP asks Tier 2 and Tier 3 charities to consider the criteria or measures used to assess success and recommends reporting measures or indicators.",
     sources: ["1.24", "1.31"],
     classification: tiered("MSI_READINESS", "MUST", "MUST"),
@@ -161,7 +161,7 @@ export const coreQuestions: CoreQuestion[] = [
   {
     id: 8,
     section: "achievements",
-    question: "Can you summarise your main achievements and explain the difference your work has made to beneficiaries — and, where relevant, wider society?",
+    question: "Can you summarise your main achievements and explain the difference your work has made to beneficiaries and, where relevant, wider society?",
     explanation: "All tiers must summarise the charity’s main achievements. SORP asks trustees to consider the difference made to beneficiaries and wider benefits to society.",
     sources: ["1.27"],
     classification: tiered("MUST", "MUST", "MUST"),
@@ -201,7 +201,7 @@ export const coreQuestions: CoreQuestion[] = [
   {
     id: 12,
     section: "learning",
-    question: "Can you identify the important positive and negative factors that affected your results — including things outside your control?",
+    question: "Can you identify the important positive and negative factors that affected your results: including things outside your control?",
     explanation: "Tier 2 and Tier 3 reporting should comment on significant positive and negative factors affecting objectives and, where relevant, their influence on future plans.",
     sources: ["1.32"],
     classification: tiered("MSI_READINESS", "SHOULD", "SHOULD"),
@@ -211,7 +211,7 @@ export const coreQuestions: CoreQuestion[] = [
   {
     id: 13,
     section: "learning",
-    question: "Can you explain your plans for the future — including how experience or lessons learned are influencing priorities, activities or the use of resources?",
+    question: "Can you explain your plans for the future: including how experience or lessons learned are influencing priorities, activities or the use of resources?",
     explanation: "All tiers must provide a summary of future plans. Tier 2 and Tier 3 have additional requirements, and SORP recommends explaining how learning influenced future plans and resource allocation.",
     sources: ["1.47", "1.48", "1.49"],
     classification: tiered("MUST", "MUST", "MUST"),
@@ -343,11 +343,11 @@ export function classificationFor(question: CoreQuestion | AdditionalCheck, setu
 
 export function eligibilityFor(setup: AssessmentSetup) {
   const reasons: string[] = [];
-  let status = "YES — SORP 2026 APPEARS TO APPLY";
+  let status = "YES: SORP 2026 APPEARS TO APPLY";
   let tone = "yes";
 
   if (["roi", "not_sure"].includes(setup.jurisdiction) || setup.accounts === "not_sure") {
-    status = "PROVISIONAL — WE NEED TO KEEP AN EYE ON THIS";
+    status = "PROVISIONAL: WE NEED TO KEEP AN EYE ON THIS";
     tone = "provisional";
   }
   if (setup.jurisdiction === "elsewhere" || setup.accounts === "receipts" || (setup.startDate && setup.startDate < "2026-01-01")) {

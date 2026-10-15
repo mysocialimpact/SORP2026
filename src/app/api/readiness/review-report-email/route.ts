@@ -18,8 +18,8 @@ export async function POST(request: Request) {
     heading: "Talk your report through with My Social Impact",
     explanation: "We’ll go through your report, answer questions and agree the most useful next steps.",
     reviews: [
-      { duration: 30, price: "£50", label: "30-minute SORP Review — £50", cta: "BOOK 30 MINUTES", url: tracked(30) },
-      { duration: 60, price: "£100", label: "60-minute SORP Review — £100", cta: "BOOK 60 MINUTES", url: tracked(60) },
+      { duration: 30, price: "£50", label: "30-minute SORP Review: £50", cta: "BOOK 30 MINUTES", url: tracked(30) },
+      { duration: 60, price: "£100", label: "60-minute SORP Review: £100", cta: "BOOK 60 MINUTES", url: tracked(60) },
     ],
     implementationSupport: "Need help making the changes? After your review, we can help you implement what is needed. Practical SORP-readiness and Social Impact Excellence support starts from £250, depending on the work required. This can include addressing reporting priorities and beginning a year-round approach to defining, measuring, managing and communicating impact.",
     serviceBoundary: "The assessment identifies the important areas worth discussing. The human review is where MSI discusses what work, if any, the charity actually needs.",

@@ -85,7 +85,7 @@ export function ReportReviewIntake() {
     <aside className="review-order">
       <p className="gateway-kicker">Written review + meeting</p><strong>£100</strong>
       <ul><li>Human review of your existing report</li><li>Practical written feedback</li><li>60-minute expert discussion</li><li>Private access through your dashboard</li></ul>
-      <div className="review-connection-note"><b>Secure upload first</b><p>Your PDF is stored privately before payment. Online payment remains paused until the £100 Charity Impact Report checkout—not the separate readiness-review checkout—has been verified.</p></div>
+      <div className="review-connection-note"><b>Secure upload first</b><p>Your PDF is stored privately before payment. Online payment remains paused until the £100 Charity Impact Report checkout, not the separate readiness-review checkout, has been verified.</p></div>
       <button className="gateway-action" type="button" disabled={!file || busy} onClick={() => void upload()}>{busy ? "Uploading securely…" : file ? "Upload my report securely" : "Choose your report first"}</button>
       <a className="gateway-quiet-link" href={`mailto:marcus@mysocialimpact.org?subject=${encodeURIComponent("Charity Impact Report review")}&body=${encodeURIComponent(`Hello Marcus,\n\nI would like to arrange the £100 Charity Impact Report review.\n\nAccount: ${account.email}\nOrganisation: ${account.organisation || ""}\n`)}`}>Arrange the review with Marcus <Arrow diagonal /></a>
       <p className="review-order-small">No payment is taken by this upload. Do not email sensitive documents; use the secure PDF upload above.</p>

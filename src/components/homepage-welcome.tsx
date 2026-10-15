@@ -106,10 +106,10 @@ export function HomepageHello() {
       if (!response.ok || !result.accepted) throw new Error(result.error || "Your message was not accepted.");
       setStatus("sent");
       setFeedback(result.emailSent
-        ? "Thank you — your message has been emailed to My Social Impact."
+        ? "Thank you. Your message has been emailed to My Social Impact."
         : result.queued
-          ? "Thank you — your message is saved and queued for delivery to My Social Impact."
-          : "Thank you — your message has been securely logged for My Social Impact.");
+          ? "Thank you. Your message is saved and queued for delivery to My Social Impact."
+          : "Thank you. Your message has been securely logged for My Social Impact.");
     } catch (cause) {
       setStatus("error");
       setFeedback(cause instanceof Error ? cause.message : "We could not send your message. Please try again.");

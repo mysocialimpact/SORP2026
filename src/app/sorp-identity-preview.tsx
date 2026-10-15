@@ -24,7 +24,7 @@ export function SorpIdentityPreview({ website, name }: { website: string; name: 
       {status === "loading" && <span role="status">Loading website preview…</span>}
       {/* A static image works even when the charity blocks iframe embedding. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`https://image.thum.io/get/noanimate/width/1000/crop/600/${homepage}`} alt={`${name} official homepage — logo, header and branding`} width={1000} height={500} referrerPolicy="no-referrer" decoding="async" onLoad={event => setStatus(event.currentTarget.naturalWidth >= 400 ? "ready" : "failed")} onError={() => setStatus("failed")} />
+      <img src={`https://image.thum.io/get/noanimate/width/1000/crop/600/${homepage}`} alt={`${name} official homepage: logo, header and branding`} width={1000} height={500} referrerPolicy="no-referrer" decoding="async" onLoad={event => setStatus(event.currentTarget.naturalWidth >= 400 ? "ready" : "failed")} onError={() => setStatus("failed")} />
     </div>
   </figure>;
 }

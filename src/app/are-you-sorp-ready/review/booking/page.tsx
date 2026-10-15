@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SorpReviewBooking } from "../../../sorp-review-booking";
 import "../../../sorp-ready.css";
 
-export const metadata: Metadata = { title: "Book a conversation — My Social Impact", description: "Book a free 10-minute conversation, a £50 30-minute session, or a £100 60-minute session with My Social Impact.", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Book a conversation: My Social Impact", description: "Book a free 10-minute conversation, a £50 30-minute session, or a £100 60-minute session with My Social Impact.", robots: { index: false, follow: false } };
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ source?: string }> }) {
   const source = (await searchParams).source;

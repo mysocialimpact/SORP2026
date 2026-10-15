@@ -171,13 +171,13 @@ export function Report({ id }: { id: string }) {
             <DateText value={f.research_completed_at} />
             <br />
             Confidence: {f.confidence || "Not assessed"} ·{" "}
-            {a ? a.origin : "Incomplete — no score awarded"}
+            {a ? a.origin : "Incomplete: no score awarded"}
           </p>
         </div>
         <div className="rc-overall">
           <span>PUBLIC EVIDENCE SCORE</span>
           <strong>
-            {f.total ?? "—"}
+            {f.total ?? "N/A"}
             <small>/100</small>
           </strong>
           <p>
@@ -192,7 +192,7 @@ export function Report({ id }: { id: string }) {
       </section>
       <div className="rc-notice">
         {a?.origin.startsWith("Automated") && (
-          <strong>Provisional — awaiting Marcus’s review. </strong>
+          <strong>Provisional: awaiting Marcus’s review. </strong>
         )}
         This assessment measures publicly available evidence of
         charity-accounting experience. It is not a rating of service quality.
@@ -258,7 +258,7 @@ export function Report({ id }: { id: string }) {
           <div>
             <strong>
               {["failed", "interrupted"].includes(activeRun.status)
-                ? "Research incomplete — action needed"
+                ? "Research incomplete: action needed"
                 : activeRun.stage}
             </strong>
             <p>
@@ -322,7 +322,7 @@ export function Report({ id }: { id: string }) {
                     </div>
                   </div>
                   <strong>
-                    {score ?? "—"}
+                    {score ?? "N/A"}
                     <small>/{c.max}</small>
                   </strong>
                   <span className="rc-expand">+</span>
@@ -388,7 +388,7 @@ export function Report({ id }: { id: string }) {
                     <p key={s.id}>
                       <Source url={s.url} label={s.title || s.url} /> ·{" "}
                       {s.status}
-                      {s.error ? " — " + s.error : ""}
+                      {s.error ? ": " + s.error : ""}
                     </p>
                   ))}
                   <h4>What is missing?</h4>
@@ -428,7 +428,7 @@ export function Report({ id }: { id: string }) {
             [
               "Charity service evidence",
               data.evidence.some((e) => e.category === "services")
-                ? "Recorded — inspect sources"
+                ? "Recorded: inspect sources"
                 : "Not identified in saved evidence",
             ],
             [
@@ -592,7 +592,7 @@ export function Report({ id }: { id: string }) {
                   {[
                     "Note",
                     "Agree with assessment",
-                    "Research completed — unscored",
+                    "Research completed: unscored",
                     "Approved",
                     "Not qualified",
                     "Needs more evidence",
@@ -661,7 +661,7 @@ export function Report({ id }: { id: string }) {
         <details className="rc-panel rc-section">
           <summary>
             {a
-              ? "Edit scores — preserve this assessment"
+              ? "Edit scores: preserve this assessment"
               : "Create a manual evidence assessment"}
           </summary>
           <AssessmentForm
@@ -1142,7 +1142,7 @@ function ComparisonResults({ ids }: { ids: string }) {
                 <h2>{r.firm.name} →</h2>
               </Link>
               <div className="rc-compare-score">
-                {a?.total ?? "—"}
+                {a?.total ?? "N/A"}
                 <small>/100</small>
               </div>
               <Badge>
@@ -1154,7 +1154,7 @@ function ComparisonResults({ ids }: { ids: string }) {
                 <div className="rc-compare-category" key={c.id}>
                   <span>{c.name}</span>
                   <strong>
-                    {a?.scores[c.id] ?? "—"}/{c.max}
+                    {a?.scores[c.id] ?? "N/A"}/{c.max}
                   </strong>
                   <div className="rc-bar">
                     <i

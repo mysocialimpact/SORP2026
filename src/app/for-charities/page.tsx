@@ -56,7 +56,7 @@ export default function Charities() {
           reporting responsibilities.
         </p>
         <Button href={site.readiness ?? "/readiness"}>
-          Check your readiness — free
+          Check your readiness: free
         </Button>
       </section>
     </Article>
