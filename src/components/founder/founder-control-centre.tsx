@@ -372,7 +372,7 @@ function FirmDrawer({ firm, busy, onClose, onSaved, onError, onNotice }: { firm:
     const form = new FormData(event.currentTarget);
     try {
       await founderCall(`accountants/${firm.id}/directory`, { method: "POST", body: JSON.stringify({ publicVisible: form.get("publicVisible") === "on", featured: form.get("featured") === "on", featuredPriority: Number(form.get("featuredPriority") || 0), placementLabel: form.get("placementLabel"), msiVerified: form.get("msiVerified") === "on", verificationNote: form.get("verificationNote") }) });
-      if ((form.get("humanReviewed") === "on") !== Boolean(firm.approved_at)) await founderCall(`accountants/${firm.id}/human-review`, { method: "POST", body: JSON.stringify({ reviewed: form.get("humanReviewed") === "on", notes: form.get("reviewNotes") }) });
+      if ((form.get("humanReviewed") === "on") !== Boolean(firm.approved_at) || String(form.get("reviewNotes") || "").trim()) await founderCall(`accountants/${firm.id}/human-review`, { method: "POST", body: JSON.stringify({ reviewed: form.get("humanReviewed") === "on", notes: form.get("reviewNotes") }) });
       onSaved(await founderCall<AccountantData>("accountants"));
       onNotice("Directory controls saved. The independent research score was not changed.");
     } catch (caught) { onError(message(caught, "The directory controls could not be saved.")); }
