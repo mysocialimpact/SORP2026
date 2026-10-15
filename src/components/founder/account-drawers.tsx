@@ -130,8 +130,9 @@ export function OrganisationDrawer({ organisation, detail, data, busy, invitatio
       <form className="founder-form-grid" onSubmit={onClientAccess}>
         <label className="founder-span">Charity<select name="charity" required defaultValue=""><option value="" disabled>Choose a charity</option>{data.organisations.filter(row => row.type === "Charity").map(row => <option key={row.id} value={row.id}>{row.name}</option>)}</select></label>
         <label className="founder-check"><input type="checkbox" name="answers" /> View individual answers</label>
-        <label className="founder-check"><input type="checkbox" name="edit" /> Contribute to assessments</label>
-        <label className="founder-check"><input type="checkbox" name="invitations" /> Manage client invitations</label>
+        {data.metrics.source.startsWith("Independent SORP") && <label className="founder-check"><input type="checkbox" name="reports" /> View uploaded charity reports</label>}
+        {!data.metrics.source.startsWith("Independent SORP") && <><label className="founder-check"><input type="checkbox" name="edit" /> Contribute to assessments</label>
+        <label className="founder-check"><input type="checkbox" name="invitations" /> Manage client invitations</label></>}
         <button disabled={busy}>Request charity approval</button>
       </form>
       <p className="founder-note">An Adviser plan never grants automatic access to confidential charity data.</p>

@@ -2,10 +2,20 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AccessError } from "@/lib/access-error";
+import { independentIdentity } from "@/lib/sorp-auth/identity";
+import { independentAuthCutover } from "@/lib/sorp-auth/switch";
 
 type FounderIdentity = { id?: string; email: string; name?: string };
 
 export async function founderIdentity(cookie?: string): Promise<FounderIdentity> {
+  if (independentAuthCutover()) {
+    if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
+    const identity = await independentIdentity(new Headers({ cookie }));
+    if (!identity) throw new AccessError(401, "Please log in again.");
+    if (!identity.platformAccess.founder) throw new AccessError(403,
+      "This control centre is private to authorised platform administrators.");
+    return { id: identity.account.id, email: identity.account.email.toLowerCase(), name: identity.account.name };
+  }
   const origin = process.env.SORP_BACKEND_ORIGIN;
   if (!origin) throw new AccessError(503, "Founder access needs configuration.");
   if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");

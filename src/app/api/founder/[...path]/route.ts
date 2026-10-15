@@ -3,6 +3,8 @@ import { founderQuery } from "@/lib/founder/db";
 import { AccessError } from "@/lib/access-error";
 import { listDirectoryControls, setDirectoryControls, setHumanReviewed } from "@/lib/console/directory-controls";
 import { firms as publicFirms } from "@/lib/accountants";
+import { independentAuthCutover } from "@/lib/sorp-auth/switch";
+import { independentFounderGET, independentFounderPOST } from "@/lib/sorp-auth/founder-console";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +21,8 @@ class PlatformActionError extends Error {
 }
 
 async function platformAction(request: Request, body: Record<string, unknown>) {
+  if (independentAuthCutover()) throw new PlatformActionError(503,
+    "This founder action must use independent SORP account records.");
   const origin = process.env.SORP_BACKEND_ORIGIN;
   if (!origin) throw new PlatformActionError(503, "The account service is not configured.");
   let response: Response;
@@ -124,6 +128,10 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     const [resource, id, action] = path.path;
     const url = new URL(request.url);
     if (request.method === "GET") {
+      if (independentAuthCutover()) {
+        const independent = await independentFounderGET(actor, resource, id, url);
+        if (independent) return independent;
+      }
       if (resource === "dashboard") {
         const [membershipCount, invitations, auditRows, live, feedbackAttention, enquiryAttention, directorRows] = await Promise.all([
           founderQuery<{ count: string }>("SELECT count(*) FROM research_console.founder_memberships WHERE status='active'"),
@@ -298,6 +306,10 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     }
     if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
     const body = await request.json().catch(() => ({}));
+    if (independentAuthCutover()) {
+      const independent = await independentFounderPOST(actor, resource, id, action, body);
+      if (independent) return independent;
+    }
     if (resource === "organisations") {
       const name = String(body.name || "").trim();
       const type = ["Charity", "Adviser", "Other"].includes(body.type) ? body.type : "Other";

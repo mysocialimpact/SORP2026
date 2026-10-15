@@ -494,7 +494,13 @@ export function SorpCandidateReview() {
       const progress = { ...saved, email: saved.email.trim().toLowerCase(), emailConfirm: saved.email.trim().toLowerCase(), name: saved.name.trim() };
       const body = action === "save" ? { action, progress } : action === "signup" ? { action, name: saved.name.trim(), position: role, email: saved.email.trim().toLowerCase(), password: accountPassword, progress } : { action, email: saved.email.trim().toLowerCase(), password: accountPassword };
       const response = await fetch("/api/readiness-account", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-      const data = await response.json() as { account?: ReadinessAccount; progress?: Partial<Saved>; error?: string };
+      const data = await response.json() as { account?: ReadinessAccount; progress?: Partial<Saved>; error?: string; verificationRequired?: boolean };
+      if (response.ok && data.verificationRequired) {
+        setAccountPassword(""); setAccountPasswordConfirm("");
+        setAccountMode("login");
+        setAccountError("Check your email to verify your new account, then sign in. Your review remains saved on this device.");
+        return;
+      }
       if (!response.ok || !data.account) throw new Error(data.error || "The secure account service could not complete sign-in.");
       setAccount(data.account);
       const accountPosition = data.account.position && data.account.position !== "TO CONFIRM" ? data.account.position : "";

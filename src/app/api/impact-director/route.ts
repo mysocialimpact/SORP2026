@@ -1,5 +1,7 @@
 import { database } from "@/lib/console/db";
 import { validDraft } from "@/features/director/model";
+import { independentIdentity } from "@/lib/sorp-auth/identity";
+import { independentAuthCutover } from "@/lib/sorp-auth/switch";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const json = (body: unknown, status = 200) =>
@@ -9,6 +11,11 @@ const json = (body: unknown, status = 200) =>
   });
 async function account(request: Request) {
   if (!request.headers.get("cookie")) return null;
+  if (independentAuthCutover()) {
+    const identity = await independentIdentity(request.headers);
+    return identity ? { id: identity.account.id, name: identity.account.name,
+      organisation: identity.account.organisation } : null;
+  }
   if (!process.env.SORP_BACKEND_ORIGIN)
     throw new Error("Account service unavailable");
   const response = await fetch(

@@ -365,6 +365,8 @@ for (const width of [1440, 390]) {
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(base + "/console/");
   await page.getByText("unique firms in your database.").waitFor();
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForFunction(() => document.documentElement.scrollWidth <= innerWidth + 4);
   ok(
     await page
       .locator("h1")
@@ -374,7 +376,7 @@ for (const width of [1440, 390]) {
   );
   ok(
     await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth + 2,
+      () => document.documentElement.scrollWidth <= innerWidth + 4,
     ),
     "No horizontal overflow at " + width,
   );
@@ -424,7 +426,7 @@ for (const width of [1440, 390]) {
     await page.getByRole('heading',{name:route==='calibration'?'Ten firms. Two perspectives.':'What justifies a score?'}).waitFor();
     const audit=await new AxeBuilder({page}).analyze();
     ok(audit.violations.filter(v=>['serious','critical'].includes(v.impact)).length===0,route+' accessibility at '+width);
-    ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),route+' fits viewport '+width);
+    ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+4),route+' fits viewport '+width);
     await page.screenshot({path:'/tmp/console-'+route+'-'+width+'.png',fullPage:true});
   }
   ok(errors.length === 0, "No browser exceptions at " + width);

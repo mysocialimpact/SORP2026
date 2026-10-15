@@ -7,6 +7,7 @@ export function PasswordRecovery({ reset = false }: { reset?: boolean }) {
   const [available, setAvailable] = useState<"checking" | "yes" | "no">("checking");
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
+  const [independentLink, setIndependentLink] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
@@ -15,11 +16,13 @@ export function PasswordRecovery({ reset = false }: { reset?: boolean }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    const value = new URLSearchParams(window.location.hash.slice(1)).get("token") || "";
+    const link = new URLSearchParams(window.location.hash.slice(1));
+    const value = link.get("token") || "";
     // Keep a reset token only in this tab's memory, never URLs/history/storage.
     if (reset) window.history.replaceState(window.history.state, "", window.location.pathname);
     queueMicrotask(() => {
-      setToken(/^[a-f0-9]{64}$/.test(value) ? value : "");
+      setToken(/^[A-Za-z0-9_-]{20,128}$/.test(value) ? value : "");
+      setIndependentLink(link.get("sorp-auth") === "1");
       try {
         const saved = JSON.parse(localStorage.getItem("msi-sorp-canonical-methodology-v1") || "null");
         if (typeof saved?.email === "string") setEmail(saved.email);
@@ -37,13 +40,14 @@ export function PasswordRecovery({ reset = false }: { reset?: boolean }) {
     if (reset && password !== confirmation) { setError("Those passwords do not match."); return; }
     setBusy(true);
     try {
-      const body = reset ? { action: "reset-password", token, password } : { action: "request-reset", email: email.trim() };
-      const response = await fetch("/api/readiness-account/", {
+      const independentReset = reset && independentLink;
+      const body = independentReset ? { token, newPassword: password } : reset ? { action: "reset-password", token, password } : { action: "request-reset", email: email.trim() };
+      const response = await fetch(independentReset ? "/api/sorp-auth/reset-password" : "/api/readiness-account/", {
         method: "POST", headers: { "content-type": "application/json" },
         cache: "no-store", referrerPolicy: "no-referrer", body: JSON.stringify(body), signal: AbortSignal.timeout(25000),
       });
       const data = await response.json();
-      if (!response.ok || data.ok !== true) throw new Error(data.error || "We couldn’t complete that request. Please try again.");
+      if (!response.ok || (independentReset ? data.status !== true : data.ok !== true)) throw new Error(data.error || "We couldn’t complete that request. Please try again.");
       setComplete(true);
       setToken(""); setPassword(""); setConfirmation("");
     } catch (cause) {
