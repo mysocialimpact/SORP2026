@@ -128,21 +128,6 @@ export function HomepagePricing() {
         </div>
       </div>
 
-      <div className="gateway-width">
-        <div className="homepage-beta-invitation">
-          <div>
-            <p className="gateway-kicker">Early beta</p>
-            <h3>We’re offering complimentary access to our early beta users.</h3>
-          </div>
-          <a
-            href="#say-hello"
-            onClick={() => window.dispatchEvent(new CustomEvent("sorp2026:contact-intent", { detail: { message: "I’d like to request complimentary early beta access." } }))}
-          >
-            Request free beta access →
-          </a>
-        </div>
-      </div>
-
       <ol id="homepage-plans" ref={track} className="homepage-plan-track" onScroll={updateControls} tabIndex={0} aria-label="Membership plans; swipe or use the arrow buttons to explore">
         {plans.map((plan) => (
           <li key={plan.id} className={`homepage-plan is-${plan.id}`}>
@@ -157,6 +142,21 @@ export function HomepagePricing() {
           </li>
         ))}
       </ol>
+
+      <div className="gateway-width">
+        <div className="homepage-beta-invitation">
+          <div>
+            <p className="gateway-kicker">Early beta</p>
+            <h3>We’re offering complimentary access to our early beta users.</h3>
+          </div>
+          <a
+            href="#say-hello"
+            onClick={() => window.dispatchEvent(new CustomEvent("sorp2026:contact-intent", { detail: { message: "I’d like to request complimentary early beta access." } }))}
+          >
+            Request free beta access →
+          </a>
+        </div>
+      </div>
 
       <div className="gateway-width homepage-pricing-foot">
         <p>Proposed monthly prices are per organisation and exclude VAT where applicable. Plus and Adviser are planned products and are not yet available to purchase.</p>

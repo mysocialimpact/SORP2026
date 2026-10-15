@@ -39,10 +39,19 @@ export function HomepageManifesto() {
           <Image className={styles.marcus} src="/images/marcus-editorial.webp" alt="Marcus Warry" width={640} height={857} sizes="(max-width: 700px) 40vw, 240px" />
           <Image className={styles.chris} src="/images/chris-vision.webp" alt="Dr Chris Arnold" width={600} height={534} sizes="(max-width: 700px) 40vw, 240px" />
         </div>
-        <figcaption>
-          <span className={styles.founderNames}><strong>Marcus Warry &amp; Dr Chris Arnold</strong><span>Co-founders, My Social Impact</span></span>
-          <Image className={styles.logo} src="/brand/my-social-impact.png" alt="My Social Impact" width={1088} height={124} sizes="150px" />
-        </figcaption>
+        <div className={styles.founderProfiles}>
+          <div>
+            <strong>Marcus Warry, ACA</strong>
+            <span>Chartered Accountant</span>
+            <span>Social Impact Consultant</span>
+          </div>
+          <div>
+            <strong>Dr Chris Arnold</strong>
+            <span>Creative Director</span>
+            <span>Social Impact Strategist</span>
+          </div>
+        </div>
+        <figcaption>Co-founders, My Social Impact</figcaption>
       </figure>
     </section>
   );
