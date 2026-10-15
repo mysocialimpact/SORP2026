@@ -53,6 +53,11 @@ for (const path of routes) test(`folder continuity and actions: ${path}`, async 
   const bar = page.locator(".folder-action-bar");
   await expect(bar).toHaveCount(1);
   await expect(bar).toBeVisible();
+  await expect(bar.getByRole("link", { name: "Give feedback" })).toHaveAttribute("href", "#page-feedback");
+  await expect(bar.getByRole("link", { name: "Talk to us" })).toHaveAttribute("href", "#say-hello");
+  const labels = await bar.getByRole("link").allTextContents();
+  expect(labels.at(-2)).toContain("Give feedback");
+  expect(labels.at(-1)).toContain("Talk to us");
   const box = (await bar.boundingBox())!;
   expect(box.y + box.height).toBeCloseTo(await page.evaluate(() => innerHeight), 0);
   await page.screenshot({ path: info.outputPath("scrolled.png") });

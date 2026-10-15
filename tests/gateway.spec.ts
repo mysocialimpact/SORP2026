@@ -22,12 +22,14 @@ test("Ask SORP is a native, evidence-led product experience", async ({ page }) =
   });
 
   await page.goto("/ask-sorp/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Ask SORP 2026.Get the answers you need.");
-  await expect(page.getByText("Charity leaders", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Over 300 pages of SORP.Now you can just ask.");
+  await expect(page.getByText("For charities", { exact: true })).toBeVisible();
+  await expect(page.getByText("For accountants & advisers", { exact: true })).toBeVisible();
   await expect(page.locator("iframe")).toHaveCount(0);
 
-  await page.getByRole("button", { name: "What changes under SORP 2026?" }).click();
+  await page.getByRole("link", { name: /Ask SORP a question/ }).first().click();
   await expect(page).toHaveURL(/\/ask-sorp\/workspace\//);
+  await page.getByLabel("Your SORP 2026 question").fill("What changes under SORP 2026?");
   await page.getByRole("button", { name: "Ask SORP →" }).click();
   await expect(page.getByText("SORP 1.27", { exact: true })).toBeVisible();
   await expect(page.getByText("Trustees’ annual report · PDF page 22")).toBeVisible();

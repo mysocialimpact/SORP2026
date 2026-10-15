@@ -10,10 +10,11 @@ type Action = { label: string; href: string };
 type AccountResponse = { signedIn?: boolean; progress?: ReadinessProgress };
 
 function defaultAction(path: string): Action {
-  if (path.startsWith("/ask-sorp/")) return { label: "Ask a question", href: "/ask-sorp/workspace/" };
+  if (path.startsWith("/ask-sorp/")) return { label: "Ask SORP a question", href: "/ask-sorp/workspace/" };
   if (path.startsWith("/charity-impact-reports/")) return { label: "Get your report reviewed", href: "/charity-impact-reports/review/" };
   if (path.startsWith("/social-impact-excellence/")) return { label: "Explore Social Impact Excellence", href: "/social-impact-excellence/#excellence-start" };
   if (path.startsWith("/my-impact-director/")) return { label: "Start your free assessment", href: "/my-impact-director/#assessment" };
+  if (path.startsWith("/accountants-advisers/")) return { label: "Find an accountant", href: "/accountants-advisers/" };
   return { label: "Start your free SORP review", href: "/are-you-sorp-ready/review/?entry=intro" };
 }
 
@@ -77,8 +78,8 @@ export function ProductActionBar() {
     <aside ref={bar} className={`folder-action-bar${readinessLanding ? " is-readiness" : ""}`} data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
       {readinessLanding && <Link className="folder-action-utility folder-action-presentation" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>}
       <Link className="folder-action-primary" href={action.href}>{readinessLanding && !account?.signedIn ? "Start Free Review" : action.label} <span aria-hidden="true">→</span></Link>
-      {readinessLanding && <a className="folder-action-utility folder-action-feedback" href="#page-feedback">Give Feedback <span aria-hidden="true">→</span></a>}
-      <a className="folder-action-secondary" href="#say-hello">{readinessLanding ? "Talk to Us" : "Talk to us"} <span aria-hidden="true">→</span></a>
+      <a className="folder-action-utility folder-action-feedback" href="#page-feedback">Give feedback <span aria-hidden="true">→</span></a>
+      <a className="folder-action-secondary" href="#say-hello">Talk to us <span aria-hidden="true">→</span></a>
     </aside>
     <div className="folder-action-clearance" aria-hidden="true" />
   </>;
