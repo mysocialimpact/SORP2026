@@ -69,12 +69,17 @@ html:has(.scr-page) { scroll-padding-top: 114px; }
   flex: 0 0 auto;
   align-items: center;
   gap: 9px;
-  padding: 8px 4px 8px 10px;
+  padding: 7px 14px 7px 12px;
+  border: 1px solid rgba(17, 16, 15, .5);
+  border-radius: 999px;
+  background: #fff;
   color: var(--ink);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: .015em;
   text-decoration: none;
+  box-shadow: 0 2px 8px rgba(17, 16, 15, .05);
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
 .scr-assessment-exit > span:first-child {
@@ -83,6 +88,12 @@ html:has(.scr-page) { scroll-padding-top: 114px; }
   transition: transform 160ms ease;
 }
 
+.scr-assessment-exit:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(17, 16, 15, .14);
+}
 .scr-assessment-exit:hover > span:first-child { transform: translateX(-3px); }
 .scr-assessment-exit:focus-visible {
   border-radius: 2px;
@@ -221,7 +232,7 @@ body .scr-page.scr-page--tar-recovery .scr-bottom { position: fixed; }
   .scr-assessment-wordmark i { width: 6px; height: 6px; margin-left: 4px; }
   .scr-assessment-divider { height: 19px; }
   .scr-assessment-name { max-width: 155px; font-size: 12px; }
-  .scr-assessment-exit { min-height: 44px; gap: 6px; padding: 6px 2px 6px 6px; font-size: 11px; }
+  .scr-assessment-exit { min-height: 42px; gap: 6px; padding: 6px 11px 6px 9px; font-size: 11px; }
   .scr-assessment-exit > span:first-child { font-size: 16px; }
 
   body .scr-page .scr-top {
@@ -302,9 +313,8 @@ body .scr-page.scr-page--tar-recovery .scr-bottom { position: fixed; }
 }
 
 @media (max-width: 390px) {
-  .scr-assessment-name { max-width: 122px; font-size: 11px; }
-  .scr-assessment-exit-label { font-size: 0; }
-  .scr-assessment-exit-label::after { content: "Back"; font-size: 11px; }
+  .scr-assessment-divider,
+  .scr-assessment-name { display: none; }
   body .scr-page .scr-top { grid-template-columns: 103px minmax(0, 1fr); gap: 5px; padding-inline: 10px; }
   .scr-page .scr-top nav ol { gap: 1px; }
   .scr-page .scr-top nav li i { width: 16px; height: 16px; flex-basis: 16px; }

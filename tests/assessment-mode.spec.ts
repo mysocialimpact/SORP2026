@@ -16,9 +16,12 @@ async function expectFocusedShell(page: import("@playwright/test").Page) {
   await expect(page.getByRole("link", { name: /Back to website/ })).toHaveAttribute("href", "/are-you-sorp-ready/");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const header = (await page.locator(".scr-assessment-header").boundingBox())!;
+  const exit = (await page.getByRole("link", { name: /Back to website/ }).boundingBox())!;
   const progress = (await page.locator(".scr-top").boundingBox())!;
   const actions = (await page.locator(".scr-bottom").boundingBox())!;
   expect(header.height).toBeLessThanOrEqual(60);
+  expect(exit.width).toBeGreaterThanOrEqual(88);
+  expect(exit.height).toBeGreaterThanOrEqual(40);
   expect(progress.y).toBeLessThanOrEqual(60);
   expect(actions.y + actions.height).toBeLessThanOrEqual(page.viewportSize()!.height + 1);
 }

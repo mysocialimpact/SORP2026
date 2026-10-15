@@ -14,6 +14,21 @@ body:has(.sf-presentation) {
 body:has(.sf-presentation) .global-build-stamp {
   display: none;
 }
+.sorp-presentation-workspace {
+  height: 100dvh;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #f0eee9;
+}
+.sorp-presentation-workspace .sf-presentation {
+  position: relative;
+  inset: auto;
+  height: calc(100dvh - var(--assessment-header-height, 56px));
+  min-height: 0;
+}
+.sorp-presentation-workspace .sf-presentation .sorp-film {
+  width: min(100%, 1440px, calc((100dvh - var(--assessment-header-height, 56px) - 76px) * 16 / 9));
+}
 .sf-presentation .sorp-film {
   width: min(100%, 1440px, calc((100dvh - 132px) * 16 / 9));
 }
@@ -586,6 +601,9 @@ body:has(.sf-presentation) .global-build-stamp {
   .sf-presentation .sorp-film {
     width: min(100%, calc((100dvh - 112px) * 2 / 3));
   }
+  .sorp-presentation-workspace .sf-presentation .sorp-film {
+    width: min(100%, calc((100dvh - var(--assessment-header-height, 52px) - 82px) * 2 / 3));
+  }
   .sf-stage {
     aspect-ratio: 2/3;
     font-size: 3.5cqw;
@@ -893,6 +911,9 @@ body:has(.sf-presentation) .global-build-stamp {
   }
   .sf-presentation .sorp-film {
     width: min(100%, calc((100dvh - 96px) * 16 / 9));
+  }
+  .sorp-presentation-workspace .sf-presentation .sorp-film {
+    width: min(100%, calc((100dvh - var(--assessment-header-height, 46px) - 58px) * 16 / 9));
   }
   .sf-controls {
     grid-template-columns: 1fr auto 1fr;

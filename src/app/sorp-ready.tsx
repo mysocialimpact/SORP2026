@@ -28,7 +28,7 @@ export function SorpReadyPage() {
             <strong>100% free. No obligation.</strong>
             <div className="sr-hero-actions">
               <StartReview />
-              <a className="sr-play" href="#presentation">Play Presentation <span aria-hidden="true">▶</span></a>
+              <Link className="sr-play" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>
             </div>
           </div>
         </FolderHero>
@@ -70,7 +70,7 @@ export function SorpReadyPage() {
             </div>
             <div>
               <p>Find out how the review works, what it covers and how it can help your charity prepare.</p>
-              <a className="sr-text-link" href="#presentation-player">Play Presentation <span aria-hidden="true">→</span></a>
+              <Link className="sr-text-link" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">→</span></Link>
             </div>
           </div>
           <div id="presentation-player" className="sr-presentation-player">
