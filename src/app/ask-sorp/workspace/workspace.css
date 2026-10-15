@@ -111,3 +111,31 @@
 @media (prefers-reduced-motion: reduce) {
   .ask-workspace .ask-assistant-scroll { scroll-behavior: auto; }
 }
+
+.ask-workspace .ask-continuation { margin: 34px 0 8px; border-top: 1px solid var(--ask-ink); padding-top: 32px; max-width: 1100px; }
+.ask-workspace .ask-continuation > h2 { margin: 8px 0 12px; font-size: clamp(30px, 3.7vw, 50px); line-height: 1.06; }
+.ask-workspace .ask-continuation > p { max-width: 680px; }
+.ask-workspace .ask-continuation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 24px; }
+.ask-workspace .ask-continuation-card { min-width: 0; margin-top: 14px; padding: clamp(20px, 2.5vw, 30px); border: 1px solid var(--ask-ink); background: var(--ask-white); }
+.ask-workspace .ask-continuation-grid .ask-continuation-card { margin-top: 0; }
+.ask-workspace .ask-continuation-card > span { display: block; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ask-violet); }
+.ask-workspace .ask-continuation-card h3 { margin: 9px 0; font-size: clamp(22px, 2.3vw, 30px); }
+.ask-workspace .ask-continuation-card p { line-height: 1.5; }
+.ask-workspace .ask-continuation-offers { margin: 20px 0; padding-block: 5px; border-block: 1px solid var(--ask-line); }
+.ask-workspace .ask-continuation-offers p { margin: 10px 0; }
+.ask-workspace .ask-continuation-offers small { display: block; }
+.ask-workspace .ask-continuation-action { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; margin-top: 12px; border: 1px solid var(--ask-ink); padding: 10px 16px; background: var(--ask-lime); color: var(--ask-ink); font: inherit; font-weight: 800; text-decoration: none; cursor: pointer; }
+.ask-workspace .ask-continuation-action:disabled { opacity: .6; cursor: default; }
+.ask-workspace .ask-continuation-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 22px 0; }
+.ask-workspace .ask-continuation-form label { display: block; font-size: 13px; font-weight: 700; }
+.ask-workspace .ask-continuation-form input:not([type=checkbox]), .ask-workspace .ask-continuation-form textarea { display: block; width: 100%; margin-top: 6px; border: 1px solid var(--ask-ink); border-radius: 0; padding: 10px; background: #fff; color: var(--ask-ink); font: inherit; }
+.ask-workspace .ask-continuation-form .ask-continuation-check { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0; font-weight: 400; }
+.ask-workspace .ask-continuation-stars { display: flex; gap: 5px; margin: 12px 0 18px; }
+.ask-workspace .ask-continuation-stars button { border: 0; padding: 0 4px; background: transparent; color: var(--ask-violet); font-size: 32px; cursor: pointer; }
+.ask-workspace .ask-composer--complete { min-height: 54px; display: flex; align-items: center; }
+.ask-workspace .ask-composer--complete p { margin: 0; font-size: 13px; }
+@media (max-width: 640px) {
+  .ask-workspace .ask-continuation-grid, .ask-workspace .ask-continuation-fields { grid-template-columns: 1fr; }
+  .ask-workspace .ask-continuation-card { padding: 19px; }
+  .ask-workspace .ask-composer--complete p { position: static; width: auto; height: auto; clip-path: none; }
+}
