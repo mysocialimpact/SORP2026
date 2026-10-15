@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AskSorpContinuation } from "@/components/ask-sorp-continuation";
 
 type Citation = {
   reference: string;
@@ -246,11 +247,12 @@ export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyCh
           {busy && <div className="ask-thinking" role="status"><span aria-hidden="true" /><div><strong>Finding the relevant SORP evidence…</strong><p>Checking the answer against the source before showing it.</p></div></div>}
         </div>
 
+        {turns.length === 3 && <AskSorpContinuation turns={turns} sessionId={getSessionId()} />}
         {notice && <p className="ask-notice" role="status">{notice}</p>}
         {error && <p className="ask-error" role="alert">{error}</p>}
         </div>
 
-        <form className="ask-composer" onSubmit={submit}>
+        {turns.length < 3 ? <form className="ask-composer" onSubmit={submit}>
           <label htmlFor="ask-sorp-question">Your SORP 2026 question</label>
           <div>
             <textarea
@@ -266,7 +268,7 @@ export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyCh
             <button type="submit" disabled={busy || draft.trim().length < 3}>{busy ? "Checking the source…" : "Ask SORP →"}</button>
           </div>
           <p>{mode === "launcher" ? "Your question opens in a focused Ask SORP workspace." : "Evidence-backed guidance to support, not replace, the judgement of trustees, accountants and professional advisers."}</p>
-        </form>
+        </form> : <div className="ask-composer ask-composer--complete"><p>Three free answers complete · Your conversation and next steps are above.</p></div>}
       </div>
     </section>
   );
