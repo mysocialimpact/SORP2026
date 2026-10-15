@@ -73,6 +73,11 @@
 .directory-result-actions { display: flex; flex-wrap: wrap; gap: 12px 22px; padding-top: 10px; font-size: 13px; font-weight: 600; }
 .directory-result-actions a { text-decoration: none; padding: 4px 0; }
 .directory-result > small { display: block; font-size: 10px; margin-top: 12px; }
+.directory-external-recognitions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; }
+.directory-external-recognition { display: inline-flex; flex-direction: column; gap: 3px; max-width: 100%; padding: 9px 12px; border: 1px solid #b8b3a8; border-radius: 4px; background: #f7f3e9; color: #30302e; text-decoration: none; overflow-wrap: anywhere; font-size: 12px; line-height: 1.35; }
+.directory-external-recognition span:first-child { font-size: 11px; }
+.directory-external-recognition strong { font-weight: 600; }
+.directory-external-recognition:hover, .directory-external-recognition:focus-visible { border-color: #575344; text-decoration: underline; }
 .directory-load-more { width: 100%; display: flex; justify-content: space-between; border: 1px solid #a6a79e; border-radius: 4px; padding: 16px; margin-top: 22px; background: transparent; font-size: 14px !important; }
 .directory-load-more span { color: #60615c; }
 .directory-distance-note { font-size: 11px; padding: 12px 0 0; }

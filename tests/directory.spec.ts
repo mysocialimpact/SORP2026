@@ -1,10 +1,31 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { firms, normalisePostcode, selectFirms, milesBetween, serviceLabels } from "../src/lib/accountants";
+import { ExternalRecognition } from "../src/components/directory/external-recognition";
 import { GET } from "../src/app/api/directory/postcode/route";
 
 const path = "/accountants-advisers/";
 const baseFilters = { query: "", services: [], origin: null, area: null, evidenced: false };
+test("survey resource is visible and unverified recognition is not presented as a badge", async ({ page }) => {
+  await page.goto(path);
+  const section = page.getByRole("region", { name: "Other independent research into charity accountants" });
+  await expect(section).toContainText("bookkeeping, accounts preparation, independent examinations, audits, SORP compliance, taxation and financial advice");
+  await expect(section.getByRole("link", { name: "Explore the Charity Finance Audit Survey →" })).toHaveAttribute("href", "https://www.civilsociety.co.uk/finance/charity-audit-survey-2025-the-new-sorp-and-ai-are-shaking-up-the-charity-audit-world.html");
+  await expect(page.locator(".directory-external-recognition")).toHaveCount(0);
+});
+
+test("external recognition requires verification and links the exact survey result", () => {
+  const sourceUrl = "https://example.org/verified-survey-result";
+  const sample = { ...firms[0], externalRecognitions: [{ publisher: "Charity Finance", survey: "Audit Survey", year: 2025, category: "larger-firm category", result: "1st for overall service", sourceUrl, verified: false }] };
+  expect(renderToStaticMarkup(createElement(ExternalRecognition, { firm: sample }))).toBe("");
+  sample.externalRecognitions[0].verified = true;
+  const html = renderToStaticMarkup(createElement(ExternalRecognition, { firm: sample }));
+  expect(html).toContain("Charity Finance Audit Survey 2025");
+  expect(html).toContain("1st for overall service — larger-firm category");
+  expect(html).toContain(sourceUrl);
+});
 test.beforeEach(async ({ page }) => {
   // External tiles are network-dependent; these tests exercise the real map library, not a mock map.
   await page.route("https://tile.openstreetmap.org/**", route => route.abort());
