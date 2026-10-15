@@ -42,16 +42,36 @@ test("a visitor can rate, comment and submit the current page", async ({ page })
   await section.getByRole("radio", { name: "5 stars" }).click();
   await expect(section.getByText("5 out of 5")).toBeVisible();
   await section.getByLabel("Anything you’d like to add? Optional").fill("The examples made this page easy to understand.");
+  await section.getByLabel("Would you like us to get back to you? Leave your email address here.").fill("visitor@example.org");
   await section.getByRole("button", { name: "Submit feedback →" }).click();
-  await expect(section.getByText("Your feedback has been received.")).toBeVisible();
+  await expect(section.getByText("Brilliant! Thank you so much.")).toBeVisible();
   expect(submissions).toHaveLength(1);
   expect(submissions[0]).toMatchObject({
     kind: "feedback",
     rating: 5,
     category: "general",
     comment: "The examples made this page easy to understand.",
+    contactEmail: "visitor@example.org",
     pagePath: "/ask-sorp/",
   });
+});
+
+test("successful submissions receive the correct rating-specific response", async ({ page }) => {
+  await page.route("**/api/continuous-improvement/**", route => route.fulfill({ status: 201, json: { accepted: true, id: "feedback-rating" } }));
+  const messages = [
+    "We’re sorry we missed the mark.",
+    "Thank you for being honest with us.",
+    "Thank you — that’s really helpful.",
+    "Lovely to hear. Thank you!",
+    "Brilliant! Thank you so much.",
+  ];
+  for (let rating = 1; rating <= 5; rating += 1) {
+    await page.goto("/");
+    const section = page.locator(".page-feedback");
+    await section.getByRole("radio", { name: `${rating} star${rating === 1 ? "" : "s"}` }).click();
+    await section.getByRole("button", { name: "Submit feedback →" }).click();
+    await expect(section.getByText(messages[rating - 1])).toBeVisible();
+  }
 });
 
 test("failed submissions preserve the visitor’s rating and comment", async ({ page }) => {

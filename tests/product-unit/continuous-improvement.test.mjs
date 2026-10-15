@@ -32,6 +32,11 @@ test("feedback accepts visitors, preserves signed-in identity and keeps contact 
   assert.match(route, /input\.website/);
   assert.match(route, /Please submit from this website/);
   assert.match(route, /SELECT id FROM research_console\.founder_feedback WHERE submission_id=\$1/);
+  assert.match(route, /contactEmail/);
+  assert.match(route, /technical_context/);
+  assert.match(founderRoute, /AS anonymous/);
+  assert.match(founderRoute, /AS contact_email/);
+  assert.match(founderUi, /Anonymous visitor/);
   assert.doesNotMatch(route, /password|session[_ -]?token|assessment answer/i);
 });
 

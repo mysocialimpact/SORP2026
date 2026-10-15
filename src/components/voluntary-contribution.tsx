@@ -130,7 +130,7 @@ export function HomepageContribution({ mission = false }: { mission?: boolean })
     <div className="gateway-width gateway-contribution-inner">
       <div className="gateway-contribution-copy">
         <p className="gateway-kicker">Help the next charity</p>
-        <h2 id="contribution-title">{mission ? "Found the tools useful? Help us make more." : <>Found this useful?<br />Help us keep it free.</>}</h2>
+        <h2 id="contribution-title">{mission ? "Found the tools useful? Help us make more." : <>Help the next charity find this useful.<br />Help us keep it free.</>}</h2>
         {mission ? <>
           <p>You don’t need to use our consultancy services to be part of this. If our free tools give you what you need, that’s a result we’re proud of.</p>
           <p>If you’d like to support our mission, a few pounds helps us keep these tools free, improve them and build more for smaller charities and organisations.</p>
@@ -138,7 +138,7 @@ export function HomepageContribution({ mission = false }: { mission?: boolean })
         </> : <>
           <p>We make as much of this platform free as we possibly can. Human review is there if you want it.</p>
           <p>If the free tools have helped you, an entirely voluntary contribution helps us keep them free and reach more charities, especially smaller ones.</p>
-          <Link className="gateway-mission-cta" href="/our-mission/">Discover our mission →</Link>
+          <Link className="gateway-mission-cta" href="/our-mission/">New here? Discover our mission →</Link>
         </>}
       </div>
       <div className="gateway-contribution-panel">

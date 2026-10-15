@@ -10,7 +10,10 @@
 .experience-lane { display: flex; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; overscroll-behavior-x: contain; padding: 9px 0; }
 .experience-lane::-webkit-scrollbar { display: none; }
 .experience-lane-group { display: flex; align-items: center; flex: 0 0 auto; gap: 16px; padding-right: 16px; }
-.experience-tile { position: relative; display: grid; place-items: center; flex: 0 0 auto; min-height: 90px; max-width: 300px; padding: 16px 24px; border: 1px solid #ffffff26; border-radius: 5px; color: #d9d5dd; font-size: 18px; line-height: 1.12; text-align: center; }
+.experience-tile { position: relative; display: grid; place-items: center; flex: 0 0 auto; min-width: 190px; min-height: 96px; max-width: 360px; padding: 16px 24px; border: 1px solid #ffffff26; border-radius: 5px; color: #faf9f6; font-size: 27px; font-weight: 650; line-height: 1.08; letter-spacing: -.035em; text-align: center; }
+.experience-tile.tone-1 { color: #d8ff52; }
+.experience-tile.tone-2 { color: #f0a7c1; }
+.experience-tile.tone-3 { color: #c8dbed; }
 .experience-tile.is-featured { min-width: 220px; max-width: 360px; min-height: 112px; font-size: 32px; font-weight: 650; letter-spacing: -.045em; background: #302e35; color: #faf9f6; animation: experience-spotlight 43s ease-in-out infinite; animation-delay: var(--reveal-delay); }
 .experience-tile.is-featured.tone-1 { color: #d8ff52; }
 .experience-tile.is-featured.tone-2 { color: #f0a7c1; }
@@ -43,7 +46,7 @@
   .experience-landscape-stage { margin-top: 16px; }
   .experience-lane { padding: 6px 0; }
   .experience-lane-group { gap: 10px; padding-right: 10px; }
-  .experience-tile { min-height: 66px; max-width: 190px; padding: 12px 16px; font-size: 14px; }
+  .experience-tile { min-width: 150px; min-height: 76px; max-width: 250px; padding: 12px 16px; font-size: 21px; }
   .experience-tile.is-featured { min-width: 160px; max-width: 240px; min-height: 82px; font-size: 25px; }
   .experience-logo img { width: 135px; height: 54px; }
   .experience-explore { margin-top: 16px; }

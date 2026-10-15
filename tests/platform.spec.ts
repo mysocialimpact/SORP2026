@@ -242,7 +242,7 @@ test("authenticated users can send page-attributed feedback before the shared Ta
   await page.getByRole("radio", { name: "4 stars" }).click();
   await page.getByLabel("Anything you’d like to add? Optional").fill("Clear and useful.");
   await page.getByRole("button", { name: "Submit feedback →" }).click();
-  await expect(page.locator(".page-feedback-success")).toContainText("Your feedback has been received.");
+  await expect(page.locator(".page-feedback-success")).toContainText("Lovely to hear. Thank you!");
   expect(submissions[0]).toMatchObject({ kind: "feedback", rating: 4, category: "general", pagePath: "/about/" });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
