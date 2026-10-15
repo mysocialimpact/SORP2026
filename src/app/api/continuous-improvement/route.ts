@@ -1,6 +1,7 @@
 import { AccessError } from "@/lib/console/auth";
+import { createHash } from "node:crypto";
 import { founderQuery } from "@/lib/founder/db";
-import { protectPlatformRequest, type PlatformIdentity } from "@/lib/platform/auth";
+import { platformIdentity, protectPlatformRequest, type PlatformIdentity } from "@/lib/platform/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,9 +20,23 @@ type Input = {
   comment?: unknown;
   enquiryType?: unknown;
   message?: unknown;
+  website?: unknown;
 };
 
-function profile(identity: PlatformIdentity) {
+function profile(identity: PlatformIdentity | null, request: Request) {
+  if (!identity) {
+    const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const userAgent = request.headers.get("user-agent") || "unknown";
+    const anonymousId = createHash("sha256").update(`${forwarded}|${userAgent}`).digest("hex").slice(0, 32);
+    return {
+      accountId: `anonymous:${anonymousId}`,
+      name: "Website visitor",
+      email: "",
+      organisationId: null,
+      organisationName: "Not provided",
+      accountType: "Anonymous",
+    };
+  }
   const membership = identity.memberships.find(item => item.name === identity.account.organisation) || identity.memberships[0];
   return {
     accountId: identity.account.id,
@@ -48,7 +63,7 @@ async function rateLimited(table: "founder_feedback" | "founder_contact_enquirie
     `SELECT count(*) FROM research_console.${table} WHERE account_id=$1 AND created_at > now() - interval '1 hour'`,
     [accountId],
   );
-  return Number(rows[0]?.count || 0) >= 8;
+  return Number(rows[0]?.count || 0) >= (accountId.startsWith("anonymous:") ? 20 : 8);
 }
 
 export async function GET(request: Request) {
@@ -66,14 +81,21 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const identity = await protectPlatformRequest(request);
+    const url = new URL(request.url);
+    const origin = request.headers.get("origin");
+    const expected = `${request.headers.get("x-forwarded-proto") || url.protocol.replace(":", "")}://${request.headers.get("host") || url.host}`;
+    if (origin !== expected || request.headers.get("sec-fetch-site") === "cross-site") return json({ error: "Please submit from this website." }, 403);
     const raw = await request.text();
     if (raw.length > 12_000) return json({ error: "That submission is too long." }, 413);
     const input = JSON.parse(raw) as Input;
+    if (typeof input.website === "string" && input.website.trim()) return json({ accepted: true });
     const id = submissionId(input.submissionId);
     if (!id) return json({ error: "Please refresh the page and try again." }, 400);
     const source = pagePath(input.pagePath);
-    const person = profile(identity);
+    let identity: PlatformIdentity | null = null;
+    try { identity = await platformIdentity(request.headers.get("cookie") || ""); }
+    catch (error) { if (!(error instanceof AccessError)) throw error; }
+    const person = profile(identity, request);
 
     if (input.kind === "feedback") {
       const duplicate = await founderQuery<{ id: string }>("SELECT id FROM research_console.founder_feedback WHERE submission_id=$1", [id]);
@@ -94,6 +116,7 @@ export async function POST(request: Request) {
     }
 
     if (input.kind === "contact") {
+      if (!identity) return json({ error: "Please log in before sending an account enquiry." }, 401);
       const duplicate = await founderQuery<{ id: string }>("SELECT id FROM research_console.founder_contact_enquiries WHERE submission_id=$1", [id]);
       if (duplicate[0]) return json({ accepted: true, id: duplicate[0].id, duplicate: true });
       if (await rateLimited("founder_contact_enquiries", person.accountId)) return json({ error: "We’ve received several messages from this account. Please try again a little later." }, 429);

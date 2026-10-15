@@ -222,7 +222,7 @@ test("adviser dashboard prioritises its real client portfolio and links to an au
   expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
 });
 
-test("authenticated users can talk to Marcus, send lightweight feedback, and see published improvements", async ({ page }) => {
+test("authenticated users can send page-attributed feedback before the shared Talk to us section", async ({ page }) => {
   const submissions: Record<string, unknown>[] = [];
   await page.route("**/api/readiness-account/**", route => route.fulfill({ json: {
     signedIn: true,
@@ -230,28 +230,20 @@ test("authenticated users can talk to Marcus, send lightweight feedback, and see
     platformAccess: { memberships: [{ organisationId: "qa-charity", name: "QA Charity", type: "Charity", role: "admin" }] },
   } }));
   await page.route("**/api/continuous-improvement/**", async route => {
-    if (route.request().method() === "GET") return route.fulfill({ json: { improvements: [{ id: "improvement-1", said: "Reports were hard to find.", did: "Reports now have a clearer home.", link_url: "/dashboard/", published_at: "2026-10-14T10:00:00Z" }] } });
     submissions.push(route.request().postDataJSON());
     return route.fulfill({ status: 201, json: { accepted: true, id: `submission-${submissions.length}` } });
   });
   await page.goto("/about/");
-  const contactHeading = page.getByRole("heading", { name: "Need a hand? Talk to Marcus." });
-  const feedbackHeading = page.getByRole("heading", { name: "We’re building this with you." });
+  const feedbackHeading = page.getByRole("heading", { name: "Help us make this better." });
+  const contactHeading = page.getByRole("heading", { name: "Talk to us." });
   await expect(contactHeading).toBeVisible();
   await expect(feedbackHeading).toBeVisible();
-  expect(await contactHeading.evaluate((contact, feedback) => Boolean(contact.compareDocumentPosition(feedback as Node) & Node.DOCUMENT_POSITION_FOLLOWING), await feedbackHeading.elementHandle())).toBe(true);
-  await expect(page.getByRole("link", { name: /Book a conversation/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/booking/?session=free&source=contact");
+  expect(await feedbackHeading.evaluate((feedback, contact) => Boolean(feedback.compareDocumentPosition(contact as Node) & Node.DOCUMENT_POSITION_FOLLOWING), await contactHeading.elementHandle())).toBe(true);
   await page.getByRole("radio", { name: "4 stars" }).click();
-  await page.getByRole("button", { name: "Send feedback →" }).click();
-  await expect(page.getByRole("heading", { name: "You’re helping us build something better!" })).toBeVisible();
+  await page.getByLabel("Anything you’d like to add? Optional").fill("Clear and useful.");
+  await page.getByRole("button", { name: "Submit feedback →" }).click();
+  await expect(page.locator(".page-feedback-success")).toContainText("Your feedback has been received.");
   expect(submissions[0]).toMatchObject({ kind: "feedback", rating: 4, category: "general", pagePath: "/about/" });
-  await expect(page.getByRole("heading", { name: "You said. We did." })).toBeVisible();
-  await expect(page.getByText("Reports now have a clearer home.")).toBeVisible();
-  await page.getByRole("button", { name: /Ask a question/ }).click();
-  await page.getByLabel("What would you like to ask?").fill("Can Marcus help us plan our reporting timetable?");
-  await page.getByRole("button", { name: "Send to Marcus →" }).click();
-  await expect(page.getByText("Thanks! Your message is on its way to Marcus.")).toBeVisible();
-  expect(submissions[1]).toMatchObject({ kind: "contact", enquiryType: "question", pagePath: "/about/" });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -259,10 +251,11 @@ test("failed beta feedback keeps the user’s words for a retry", async ({ page 
   await page.route("**/api/readiness-account/**", route => route.fulfill({ json: { signedIn: true, account: { id: "qa", name: "QA Person", email: "qa@example.invalid" } } }));
   await page.route("**/api/continuous-improvement/**", route => route.request().method() === "GET" ? route.fulfill({ json: { improvements: [] } }) : route.fulfill({ status: 503, json: { error: "Temporary storage problem." } }));
   await page.goto("/about/");
-  const comment = page.getByLabel("What could we do better? Optional if you’ve chosen a rating");
+  await page.getByRole("radio", { name: "2 stars" }).click();
+  const comment = page.getByLabel("Anything you’d like to add? Optional");
   await comment.fill("Please keep this exact feedback after a failure.");
-  await page.getByRole("button", { name: "Send feedback →" }).click();
-  await expect(page.locator(".continuous-form-error")).toContainText("Temporary storage problem");
+  await page.getByRole("button", { name: "Submit feedback →" }).click();
+  await expect(page.locator(".page-feedback-error")).toContainText("Temporary storage problem");
   await expect(comment).toHaveValue("Please keep this exact feedback after a failure.");
 });
 

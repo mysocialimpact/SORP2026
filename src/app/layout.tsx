@@ -18,6 +18,7 @@ import { Footer } from "@/components/footer";
 import { ProductFolderTabs } from "@/components/product-folder-tabs";
 import { PlatformNavigation } from "@/components/platform-navigation";
 import { ProductActionBar } from "@/components/product-action-bar";
+import { PageFeedback } from "@/components/page-feedback";
 import { SayHello } from "@/components/say-hello";
 import { FounderAdminNavigation } from "@/components/founder/founder-admin-navigation";
 import { site } from "@/lib/site";
@@ -65,6 +66,7 @@ export default function RootLayout({
         </a>
         <PlatformNavigation><Header /><ProductFolderTabs /><FounderAdminNavigation /></PlatformNavigation>
         {children}
+        <PageFeedback />
         <SayHello />
         <Footer />
         <ProductActionBar />
