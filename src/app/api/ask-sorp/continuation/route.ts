@@ -18,13 +18,18 @@ export async function GET() {
     const data = await response.json();
     const subscriptions = data?.config?.subscriptions;
     if (!subscriptions?.prices) throw new Error("Pricing unavailable");
+    let foundingAvailable = false;
+    try {
+      const availabilityResponse = await fetch(`${origin}/api/subscription`, { cache: "no-store", signal: AbortSignal.timeout(10000) });
+      if (availabilityResponse.ok) foundingAvailable = (await availabilityResponse.json())?.foundingAvailable === true;
+    } catch { /* Base access options are still available if the offer-status service is not. */ }
     return Response.json({ offers: {
       professionalName: subscriptions.professionalName,
       practiceName: subscriptions.practiceName,
       professionalAllowance: subscriptions.professionalAllowance,
       fairUse: subscriptions.fairUse,
       foundingActive: subscriptions.foundingActive,
-      foundingAvailable: false, // Availability must be verified in the original account checkout.
+      foundingAvailable,
       prices: subscriptions.prices,
     } }, { headers: { "cache-control": "no-store" } });
   } catch {
