@@ -13,8 +13,27 @@ import { HomepageManifesto } from "@/components/homepage-manifesto";
 import "./homepage.css";
 export const metadata: Metadata = {
   title: "SORP 2026 — Reporting for greater impact",
-  description: "Explore SORP 2026 charity reporting tools for charities, trustees, accountants and advisers. A My Social Impact social enterprise initiative: free tools, stronger evidence and support for greater impact.",
-  openGraph: { title: "SORP 2026 — Reporting for greater impact", description: "SORP is the requirement. Better impact is the opportunity. Practical tools and human expertise from My Social Impact." },
+  description: "Free tools and affordable expertise to help charities navigate SORP 2026 and achieve greater impact.",
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    url: "/",
+    siteName: "SORP 2026",
+    title: "SORP 2026 — Reporting for greater impact",
+    description: "Free tools and affordable expertise to help charities navigate SORP 2026 and achieve greater impact.",
+    images: [{
+      url: "/social-share-2026.png",
+      width: 1200,
+      height: 630,
+      alt: "SORP 2026 — Reporting for greater impact. A UK-based social enterprise initiative.",
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SORP 2026 — Reporting for greater impact",
+    description: "Free tools and affordable expertise to help charities navigate SORP 2026 and achieve greater impact.",
+    images: ["/social-share-2026.png"],
+  },
   ...(site.live ? { alternates: { canonical: "/" } } : {}),
 };
 export default function Home() {

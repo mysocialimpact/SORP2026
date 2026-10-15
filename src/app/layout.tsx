@@ -24,29 +24,34 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
   title: {
-    default: "SORP 2026. Made simpler.",
+    default: "SORP 2026 — Reporting for greater impact",
     template: "%s | SORP 2026",
   },
   description:
-    "Practical tools for charities, accountants and advisers navigating SORP 2026. Independent tools developed by My Social Impact.",
+    "Free tools and affordable expertise to help charities navigate SORP 2026 and achieve greater impact.",
   robots: { index: site.live, follow: site.live },
   openGraph: {
     type: "website",
     locale: "en_GB",
     siteName: "SORP 2026",
-    title: "SORP 2026. Made simpler.",
+    title: "SORP 2026 — Reporting for greater impact",
     description:
-      "A clearer path through SORP 2026. Independent guidance and practical tools from My Social Impact.",
+      "Free tools and affordable expertise to help charities navigate SORP 2026 and achieve greater impact.",
     images: [
       {
-        url: "/opengraph-image",
+        url: "/social-share-2026.png",
         width: 1200,
         height: 630,
-        alt: "SORP 2026. Made simpler. Tools by My Social Impact.",
+        alt: "SORP 2026 — Reporting for greater impact. A UK-based social enterprise initiative.",
       },
     ],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "SORP 2026 — Reporting for greater impact",
+    description: "Free tools and affordable expertise to help charities navigate SORP 2026 and achieve greater impact.",
+    images: ["/social-share-2026.png"],
+  },
 };
 export const viewport: Viewport = { themeColor: "#faf9f6", viewportFit: "cover" };
 export default function RootLayout({
