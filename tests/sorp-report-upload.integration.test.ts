@@ -14,12 +14,19 @@ if (!/^postgres(?:ql)?:\/\/[^@]+@127\.0\.0\.1:55432\/sorp_test$/.test(url))
 const db = new Pool({ connectionString: url });
 const ownerId = randomUUID();
 const otherId = randomUUID();
+const adviserId = randomUUID();
+const charityOrganisationId = randomUUID();
+const adviserOrganisationId = randomUUID();
 const password = "synthetic-report-password-2026";
 const origin = "http://localhost:3000";
 
 after(async () => {
-  await db.query("DELETE FROM sorp_auth.report_review WHERE user_id IN ($1,$2)", [ownerId, otherId]);
-  await db.query('DELETE FROM sorp_auth."user" WHERE id IN ($1,$2)', [ownerId, otherId]);
+  await db.query("DELETE FROM sorp_auth.report_review WHERE user_id IN ($1,$2,$3)", [ownerId, otherId, adviserId]);
+  await db.query("DELETE FROM sorp_auth.adviser_client_access WHERE charity_organisation_id=$1", [charityOrganisationId]);
+  await db.query("DELETE FROM sorp_auth.membership WHERE organisation_id IN ($1,$2)", [charityOrganisationId, adviserOrganisationId]);
+  await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id IN ($1,$2)", [charityOrganisationId, adviserOrganisationId]);
+  await db.query("DELETE FROM sorp_auth.organisation WHERE id IN ($1,$2)", [charityOrganisationId, adviserOrganisationId]);
+  await db.query('DELETE FROM sorp_auth."user" WHERE id IN ($1,$2,$3)', [ownerId, otherId, adviserId]);
   await db.end();
 });
 
@@ -59,12 +66,19 @@ async function chunk(token: string, index: number, bytes: Uint8Array, cookie: st
 test("report upload is readiness-gated, session-bound, private and validates complete PDF bytes", async () => {
   const owner = await createUser(ownerId);
   const other = await createUser(otherId);
+  const adviser = await createUser(adviserId);
+  await db.query(`INSERT INTO sorp_auth.organisation(id,name,type) VALUES
+    ($1,'Synthetic charity','Charity'),($2,'Synthetic adviser','Adviser')`, [charityOrganisationId, adviserOrganisationId]);
+  await db.query(`INSERT INTO sorp_auth.entitlement(organisation_id,plan) VALUES($1,'Free'),($2,'Adviser')`,
+    [charityOrganisationId, adviserOrganisationId]);
+  await db.query(`INSERT INTO sorp_auth.membership(organisation_id,user_id,role) VALUES
+    ($1,$2,'owner'),($3,$4,'owner')`, [charityOrganisationId, ownerId, adviserOrganisationId, adviserId]);
   assert.equal((await account("save", other, { progress: { step: "done", sessionId: "synthetic-other" } })).status, 200);
   const pdf = Buffer.alloc(3 * 1024 * 1024 + 100, 32);
   pdf.write("%PDF-1.7\n", 0);
   pdf.write("%%EOF\n", pdf.length - 6);
   const meta = { filename: "trust-report.pdf", contentType: "application/pdf", sizeBytes: pdf.length,
-    organisation: "Synthetic charity", customerContext: "Synthetic only" };
+    organisation: "Synthetic charity", organisationId: charityOrganisationId, customerContext: "Synthetic only" };
   assert.equal((await account("create-report-upload", owner, meta)).status, 403);
   assert.equal((await account("save", owner, { progress: { step: "done", sessionId: "synthetic" } })).status, 200);
   const prepared = await account("create-report-upload", owner, meta);
@@ -80,6 +94,7 @@ test("report upload is readiness-gated, session-bound, private and validates com
   assert.equal(listing.reviews.length, 1);
   assert.equal(listing.reviews[0].status, "awaiting_payment");
   assert.deepEqual((await (await account("list-report-reviews", other)).json() as { reviews: unknown[] }).reviews, []);
+  assert.deepEqual((await (await account("list-report-reviews", adviser)).json() as { reviews: unknown[] }).reviews, []);
   assert.equal((await chunk(upload.token, 0, pdf.subarray(0, 3 * 1024 * 1024), owner)).status, 403);
   const stored = await db.query<{ file_bytes: Buffer }>("SELECT file_bytes FROM sorp_auth.report_review WHERE id=$1", [listing.reviews[0].id]);
   assert.deepEqual(stored.rows[0].file_bytes, pdf);
@@ -93,6 +108,21 @@ test("report upload is readiness-gated, session-bound, private and validates com
       { headers: { cookie: owner } }), ctx);
     assert.equal(ownDownload.status, 200);
     assert.deepEqual(Buffer.from(await ownDownload.arrayBuffer()), pdf);
+    const reportUrl = `${origin}/api/sorp-report-download/${listing.reviews[0].id}`;
+    const reportContext = { params: Promise.resolve({ id: listing.reviews[0].id }) };
+    await db.query(`INSERT INTO sorp_auth.adviser_client_access
+      (adviser_organisation_id,charity_organisation_id,permissions,status,requested_by)
+      VALUES($1,$2,'{"reports":true}'::jsonb,'requested',$3)`,
+    [adviserOrganisationId, charityOrganisationId, adviserId]);
+    assert.equal((await downloadReport(new Request(reportUrl, { headers: { cookie: adviser } }), reportContext)).status, 404);
+    await db.query(`UPDATE sorp_auth.adviser_client_access SET status='active',approved_by=$2
+      WHERE charity_organisation_id=$1`, [charityOrganisationId, ownerId]);
+    assert.equal((await downloadReport(new Request(reportUrl, { headers: { cookie: adviser } }), reportContext)).status, 200);
+    assert.equal((await (await account("list-report-reviews", adviser)).json() as { reviews: unknown[] }).reviews.length, 1);
+    await db.query(`UPDATE sorp_auth.adviser_client_access SET status='revoked'
+      WHERE charity_organisation_id=$1`, [charityOrganisationId]);
+    assert.equal((await downloadReport(new Request(reportUrl, { headers: { cookie: adviser } }), reportContext)).status, 404);
+    assert.deepEqual((await (await account("list-report-reviews", adviser)).json() as { reviews: unknown[] }).reviews, []);
   } finally {
     if (previousCutover === undefined) delete process.env.SORP_AUTH_CUTOVER_ENABLED;
     else process.env.SORP_AUTH_CUTOVER_ENABLED = previousCutover;
@@ -118,4 +148,13 @@ test("report upload is readiness-gated, session-bound, private and validates com
   const badToken = (await bad.json() as { upload: { token: string } }).upload.token;
   assert.equal((await chunk(badToken, 0, Buffer.from("not-pdf!"), owner)).status, 400);
   assert.equal((await (await account("list-report-reviews", owner)).json() as { reviews: unknown[] }).reviews.length, 2);
+  for (let index = 0; index < 4; index += 1) {
+    await db.query(`INSERT INTO sorp_auth.report_review(user_id,filename,size_bytes,status,file_bytes)
+      VALUES($1,$2,$3,'closed',$4)`, [ownerId, `quota-${index}.pdf`, 15 * 1024 * 1024, Buffer.from("%PDF-%%EOF")]);
+  }
+  assert.equal((await account("create-report-upload", owner, { ...meta, sizeBytes: 15 * 1024 * 1024 })).status, 403);
+  await db.query("DELETE FROM sorp_auth.report_review WHERE user_id=$1 AND filename LIKE 'quota-%'", [ownerId]);
+  await db.query("UPDATE sorp_auth.membership SET status='revoked' WHERE organisation_id=$1 AND user_id=$2", [charityOrganisationId, ownerId]);
+  assert.deepEqual((await (await account("list-report-reviews", owner)).json() as { reviews: unknown[] }).reviews, []);
+  assert.equal((await account("create-report-upload", owner, meta)).status, 403);
 });

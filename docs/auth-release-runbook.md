@@ -1,7 +1,7 @@
 # SORP independent authentication release runbook
 
-Status: prepared on 14 October 2026. Production cutover is **not authorised**.
-The work branch has not been deployed. No Brainstrust email has been sent.
+Status: revised on 15 October 2026. Production cutover is **not authorised**.
+No Brainstrust email has been sent by this work.
 
 ## Controls that must stay off
 
@@ -13,6 +13,9 @@ The work branch has not been deployed. No Brainstrust email has been sent.
   scheduled. Never enable this endpoint during cutover.
 - Brainstrust verification, recovery and invitation email is blocked in code.
   Only a reviewed change after Marcus's explicit approval can release it.
+- `SORP_AUTH_EMAIL_DELIVERY_ENABLED=false` (or absent) blocks all SORP account
+  mail even if a Resend key is present. Migration tests additionally require
+  exact addresses in `SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS`; no domain wildcards.
 
 ## Code-only production deployment with cutover off
 
@@ -34,37 +37,36 @@ usable. The production project currently has no `SORP_AUTH_DATABASE_URL`,
 
 ## Independent staging and data protection
 
-1. Obtain a complete Cow D1 export from the service owner and a full target
-   Neon backup through a direct connection. The Sites row reader omits one Cow
-   account and truncates Brainstrust's assessment; it is not a backup.
-2. Restore both backups into isolated environments. Verify row counts,
-   Brainstrust's full progress digest, team IDs, and report file bytes.
-   Rehearse recovery before changing production. The current Neon point-in-time
-   retention observed was six hours, so retain a separate verified backup.
-3. Apply `008_sorp_auth_provider.sql` then `009_sorp_auth_application.sql` to
+1. Preserve the existing Cow service and D1 records. Obtain a complete export
+   of Brainstrust's assessment or a verified, owner-authorised recovery path
+   before disabling any old service. The Sites row reader truncates the
+   assessment and is not a backup. Do not migrate old passwords or sessions.
+2. Back up the target Neon database through a direct connection and restore it
+   to an isolated branch. Verify row counts, auth IDs, permissions and report
+   bytes. Neon history observed was six hours, so retain a separate backup.
+3. Apply `008_sorp_auth_provider.sql`, `009_sorp_auth_application.sql`, then
+   `010_sorp_report_ownership.sql` to
    a fresh isolated staging database. These migrations passed from scratch in
    local PostgreSQL; no production migration has run. Use a direct connection
    for migrations and a scoped, pooled role for application traffic.
 4. Set the SORP auth database URL, a new secret of at least 32 characters,
    `SORP_AUTH_BASE_URL`, and the SORP-only Resend key in protected staging
-   settings. Test verification, recovery, forwarding and replies with
-   non-Brainstrust addresses. Do not expose these values in logs or artifacts.
+   settings. Explicitly enable account mail for a finite allowlist of approved
+   synthetic addresses. Test verification, recovery, invitations, expired and
+   reused links, delivery failures, forwarding and replies. Do not expose
+   credentials in logs or artifacts.
 5. Confirm the founder's intended original account ID/email, verify ownership,
    set a new credential, enroll TOTP, and run `grant-sorp-founder.ts` first as a
    dry run. Apply the grant only after the exact ID, email and new MFA session
    are verified. Do not merge with the separate `public.users` identity by email.
-6. Verify Brainstrust's full progress export and source timestamp. Prepare its
-   original account ID, import its team manifest, then import assessment
-   progress only after verified ownership. The private local team and founder
-   reconciliation manifests are outside the repository in
-   `/workspace/sorp-migration-private/`; revalidate the live source before use.
-   Keep the original Cow records intact.
-7. Run `reconcile-sorp-organisations.ts` as a dry run, then apply it after the
-   verified Brainstrust team import. It maps `brainstrust` to the original team
-   organisation ID and `fluid-adviser` to FLUID. It does not grant an adviser
-   membership or carry forward the Cow client access automatically. Verify
-   FLUID ownership and charity approval before enabling that access.
-8. Inventory existing MSI Charity Impact Report objects and any account-linked
+6. Reconcile the founder identity and FLUID membership from current records.
+   The private local manifests in `/workspace/sorp-migration-private/` are
+   working evidence, not a full production backup. Revalidate the live source.
+   Keep Brainstrust's legacy account quarantined. Marcus will coordinate its
+   new login separately; attach the preserved assessment only after ownership
+   is verified. Do not expose its old account or grant an adviser access by
+   matching an email or organisation name.
+7. Inventory existing MSI Charity Impact Report objects and any account-linked
    product records; migrate by immutable owner ID with count and digest checks.
    Test a 15 MB PDF, owner listing, founder download, denial to another account,
    backup/restore, and Neon storage capacity. The independent path stores PDFs
@@ -72,8 +74,8 @@ usable. The production project currently has no `SORP_AUTH_DATABASE_URL`,
 
 ## Cutover gate and rollback
 
-Enable the switch only when Resend works, backups restore, the complete
-Brainstrust assessment is protected, genuine customer access is verified,
+Enable the switch only when Resend works, backups restore, Brainstrust's
+assessment remains recoverable, its legacy account remains quarantined,
 founder and adviser permissions are reconciled, all critical integration and
 browser checks pass, and the current Cow account path is still available for
 rollback. Do not contact Brainstrust until Marcus explicitly approves it.

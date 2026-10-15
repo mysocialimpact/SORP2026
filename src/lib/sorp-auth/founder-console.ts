@@ -1,5 +1,6 @@
 import "server-only";
 import { sorpAuthPool } from "./auth";
+import { founderQuery } from "@/lib/founder/db";
 import { founderCreateOrganisation, founderInviteMember, founderRequestClientAccess,
   founderRevokeInvitation, founderSetPlan } from "./admin";
 
@@ -54,12 +55,12 @@ async function directoryData() {
       LEFT JOIN sorp_auth.organisation o ON o.id=m.organisation_id
       WHERE p.product_id='social-impact-excellence' ORDER BY p.updated_at DESC LIMIT 1000`),
     db.query(`SELECT r.id::text,r.user_id "accountId",u.name "user",u.email,
-      m.organisation_id "organisationId",coalesce(o.name,r.organisation) organisation,
+      coalesce(r.organisation_id,m.organisation_id) "organisationId",coalesce(o.name,r.organisation) organisation,
       r.filename,r.status,r.status='feedback_ready' "feedbackReady",r.updated_at "updatedAt"
       FROM sorp_auth.report_review r JOIN sorp_auth."user" u ON u.id=r.user_id
       LEFT JOIN LATERAL (SELECT organisation_id FROM sorp_auth.membership
         WHERE user_id=u.id AND status='active' ORDER BY (role='owner') DESC LIMIT 1) m ON true
-      LEFT JOIN sorp_auth.organisation o ON o.id=m.organisation_id
+      LEFT JOIN sorp_auth.organisation o ON o.id=coalesce(r.organisation_id,m.organisation_id)
       WHERE r.status<>'uploading' ORDER BY r.updated_at DESC LIMIT 1000`),
   ]);
   return { users: people.rows, products: { readiness: readiness.rows,
@@ -99,6 +100,12 @@ async function dashboard(actor: { email: string; name?: string }) {
   const pendingClients = clientAccess.rows.filter(row => row.status === "requested");
   const expiring = orgs.filter(row => row.complimentary && row.complimentary_end &&
     new Date(row.complimentary_end).getTime() < Date.now() + 30 * 86400000);
+  const [newFeedback, newEnquiries] = await Promise.all([
+    founderQuery<{ count: string }>("SELECT count(*)::text count FROM research_console.founder_feedback WHERE status='new'")
+      .then(rows => Number(rows[0]?.count || 0)).catch(() => 0),
+    founderQuery<{ count: string }>("SELECT count(*)::text count FROM research_console.founder_contact_enquiries WHERE status='new'")
+      .then(rows => Number(rows[0]?.count || 0)).catch(() => 0),
+  ]);
   const plans = ["Free", "Plus", "Adviser", "Enterprise"];
   return { founder: { email: actor.email, name: actor.name || "Founder" },
     metrics: { organisations: orgs.length, activeUsers: activeUsers.rows[0].count,
@@ -123,6 +130,8 @@ async function dashboard(actor: { email: string; name?: string }) {
         title: `${row.adviser_name} → ${row.charity_name}`, detail: "Awaiting charity approval" })),
       ...expiring.map(row => ({ kind: "complimentary", id: row.id,
         title: `${row.name} complimentary access`, detail: `Expires ${new Date(row.complimentary_end).toLocaleDateString("en-GB")}` })),
+      ...(newEnquiries ? [{ kind: "enquiry", title: `${newEnquiries} new enquiries`, detail: "Review and follow up", target: "feedback" }] : []),
+      ...(newFeedback ? [{ kind: "feedback", title: `${newFeedback} new feedback items`, detail: "Review customer feedback", target: "feedback" }] : []),
     ],
     unavailable: ["Verified billing revenue", "Billing discounts and promotions", "AI usage and cost", "Ask SORP token cost"] };
 }
@@ -175,7 +184,7 @@ async function userDetail(id: string) {
 }
 
 /** Returns null only for unrelated research-console routes. */
-export async function independentFounderGET(actor: { email: string; name?: string },
+export async function independentFounderGET(actor: { id?: string; email: string; name?: string },
   resource: string, id: string | undefined, url: URL): Promise<Response | null> {
   if (resource === "dashboard") return json(await dashboard(actor));
   if (resource === "organisations") return json(await organisations());
@@ -187,6 +196,8 @@ export async function independentFounderGET(actor: { email: string; name?: strin
   ], billingConnected: false, discountsConnected: false });
   if (resource === "user" && id) {
     const detail = await userDetail(id);
+    if (detail && actor.id) await sorpAuthPool().query(`INSERT INTO sorp_auth.audit_event
+      (actor_user_id,action,target_type,target_id) VALUES($1,'founder_account_viewed','user',$2)`, [actor.id, id]);
     return detail ? json(detail) : json({ error: "User not found." }, 404);
   }
   if (resource === "organisation" && id) {

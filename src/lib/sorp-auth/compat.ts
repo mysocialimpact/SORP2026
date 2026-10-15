@@ -4,7 +4,7 @@ import { independentIdentity } from "./identity";
 import { openTeamResponse, removeTeamInvitation, saveTeamResponse, teamInvite,
   teamWorkspace, updateTeamRound } from "./team";
 import { acceptOrganisationInvitation, adviserClient, adviserCreateClient, adviserInviteMember,
-  adviserWorkspace, decideClientAccess,
+  adviserWorkspace, createOwnOrganisation, decideClientAccess,
   readClientAssessment } from "./admin";
 import { listReportReviews, prepareReportUpload } from "./report-review";
 
@@ -71,7 +71,7 @@ export async function independentAccountGET(request: Request) {
     return json({ available: true });
   }
   const identity = await independentIdentity(request.headers);
-  return json(identity ? { signedIn: true, ...accountPayload(identity) } : { signedIn: false });
+  return json(identity ? { signedIn: true, authProvider: "sorp", ...accountPayload(identity) } : { signedIn: false });
 }
 
 /** Preview of the current UI's basic account actions, without an old-service fallback. */
@@ -145,10 +145,16 @@ export async function independentAccountPOST(request: Request) {
 
   const identity = await independentIdentity(request.headers);
   if (!identity) return error("Please sign in to your verified SORP account.", 401);
+  if (action === "create-own-organisation") {
+    try { return json(await createOwnOrganisation(identity.account.id, input), 201); }
+    catch { return error("The organisation could not be created. Check its name and your existing workspaces.", 400); }
+  }
   if (action === "list-report-reviews") return json(await listReportReviews(identity.account.id));
   if (action === "create-report-upload") {
     try { return json(await prepareReportUpload(request, identity.account.id, identity.progress, input), 201); }
-    catch { return error("Complete your readiness review and choose a valid PDF no larger than 15 MB.", 403); }
+    catch (cause) { const message = cause instanceof Error ? cause.message : "";
+      return error(message.includes("storage limit") ? message :
+        "Complete your readiness review, choose an available charity workspace and a valid PDF no larger than 15 MB.", 403); }
   }
   if (action === "invitation-accept") {
     try { return json(await acceptOrganisationInvitation(identity.account.id, identity.account.email,

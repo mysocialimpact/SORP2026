@@ -34,7 +34,16 @@ const invitationId = randomUUID();
 let signupId: string | undefined;
 let createdOrgId: string | undefined;
 let adviserClientOrgId: string | undefined;
+const selfOrganisationIds: string[] = [];
 const password = "correct-horse-battery-staple-2026";
+const previousEmailDelivery = process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED;
+const previousEmailRecipients = process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS;
+function approveSyntheticRecipient(email: string) {
+  assert.ok(email.endsWith("@example.invalid"));
+  process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED = "true";
+  process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS = [process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS, email]
+    .filter(Boolean).join(",");
+}
 
 before(async () => { await db.query('TRUNCATE sorp_auth."rateLimit"'); });
 
@@ -47,6 +56,10 @@ async function post(action: string, body: Record<string, unknown>, cookie = "", 
 }
 
 after(async () => {
+  if (previousEmailDelivery === undefined) delete process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED;
+  else process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED = previousEmailDelivery;
+  if (previousEmailRecipients === undefined) delete process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS;
+  else process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS = previousEmailRecipients;
   await db.query("DELETE FROM sorp_auth.team_response WHERE round_id=$1", [roundId]);
   await db.query("DELETE FROM sorp_auth.team_invitation WHERE round_id=$1", [roundId]);
   await db.query("DELETE FROM sorp_auth.team_round WHERE id=$1", [roundId]);
@@ -71,6 +84,11 @@ after(async () => {
     await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id=$1", [createdOrgId]);
     await db.query("DELETE FROM sorp_auth.organisation WHERE id=$1", [createdOrgId]);
   }
+  for (const id of selfOrganisationIds) {
+    await db.query("DELETE FROM sorp_auth.membership WHERE organisation_id=$1", [id]);
+    await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id=$1", [id]);
+    await db.query("DELETE FROM sorp_auth.organisation WHERE id=$1", [id]);
+  }
   await db.query('DELETE FROM sorp_auth."user" WHERE id=$1', [founderId]);
   await db.query('DELETE FROM sorp_auth."user" WHERE id=$1', [customerId]);
   await db.query("DELETE FROM sorp_auth.account_import WHERE user_id=$1", [exportUserId]);
@@ -81,6 +99,7 @@ after(async () => {
 
 test("registration requires email verification before an independent session", async () => {
   const email = `signup-${randomUUID()}@example.invalid`;
+  approveSyntheticRecipient(email);
   const previousFetch = globalThis.fetch;
   let verificationLink = "";
   globalThis.fetch = async (input, init) => {
@@ -109,6 +128,26 @@ test("registration requires email verification before an independent session", a
   } finally { globalThis.fetch = previousFetch; }
 });
 
+test("verified accounts can create isolated free charity and adviser workspaces once", async () => {
+  assert.ok(signupId);
+  const email = (await db.query<{ email: string }>('SELECT email FROM sorp_auth."user" WHERE id=$1', [signupId])).rows[0].email;
+  const signed = await post("login", { email, password }, "", "192.0.2.44");
+  assert.equal(signed.status, 200);
+  const cookie = signed.headers.get("set-cookie")?.split(";")[0] || "";
+  const charity = await post("create-own-organisation", { name: "Synthetic new charity", type: "Charity" }, cookie);
+  assert.equal(charity.status, 201, await charity.clone().text());
+  selfOrganisationIds.push((await charity.json() as { id: string }).id);
+  assert.equal((await post("create-own-organisation", { name: "Another charity", type: "Charity" }, cookie)).status, 400);
+  const adviser = await post("create-own-organisation", { name: "Synthetic new adviser", type: "Adviser" }, cookie);
+  assert.equal(adviser.status, 201);
+  selfOrganisationIds.push((await adviser.json() as { id: string }).id);
+  const plans = await db.query<{ plan: string }>("SELECT plan FROM sorp_auth.entitlement WHERE organisation_id=ANY($1::text[])", [selfOrganisationIds]);
+  assert.equal(plans.rows.length, 2);
+  assert.ok(plans.rows.every(row => row.plan === "Free"));
+  assert.equal((await post("adviser-workspace", { adviserOrganisationId: selfOrganisationIds[1] }, cookie)).status, 403,
+    "creating an adviser workspace must not grant a paid entitlement");
+});
+
 test("a complete customer assessment imports by verified original ID without overwriting newer work", async () => {
   const email = `synthetic-${exportUserId}@brainstrust.org.uk`;
   await db.query('INSERT INTO sorp_auth."user" (id,name,email,"emailVerified") VALUES($1,$2,$3,false)',
@@ -134,6 +173,7 @@ test("a complete customer assessment imports by verified original ID without ove
 
 test("a customer claims the original ID with a new password and keeps the linked team response", async () => {
   const email = `customer-${customerId}@example.invalid`;
+  approveSyntheticRecipient(email);
   assert.equal(await prepareCustomer({ id: customerId, email, name: "Synthetic customer" }, url), "prepared");
   assert.equal(await prepareCustomer({ id: customerId, email, name: "Synthetic customer" }, url), "already_prepared");
   const previousFetch = globalThis.fetch;
@@ -189,7 +229,8 @@ test("a customer claims the original ID with a new password and keeps the linked
     assert.equal(workspace.aggregate.completed, 1);
     assert.equal(workspace.aggregate.available, false);
     assert.equal("result" in workspace.invitations[0], false, "confidential individual scores stay hidden");
-    await assert.rejects(teamWorkspace(signupId!), /Exactly one active charity team membership/);
+    assert.notEqual((await teamWorkspace(signupId!)).organisation.id, customerOrgId,
+      "a different charity owner cannot enter the customer's team workspace");
     const invite = await post("team-invite", { email: `participant-${randomUUID()}@example.invalid`, name: "Synthetic participant" }, cookie);
     assert.equal(invite.status, 200);
     const invitationToken = (await invite.json() as { invitation: { invitationToken: string } }).invitation.invitationToken;
@@ -376,6 +417,7 @@ test("founder access needs verified MFA and a new session, and revocation is imm
     return Response.json({ id: "synthetic-message" });
   };
   try {
+    approveSyntheticRecipient(customerEmail);
     const expired = await founderInviteMember(founderId, { organisationId: createdOrgId, email: customerEmail, role: "member" });
     await db.query("UPDATE sorp_auth.invitation SET expires_at=now()-interval '1 second' WHERE id=$1", [expired.id]);
     const expiredToken = new URL(invitationLinks.at(-1)!).pathname.split("/").filter(Boolean).at(-1);
@@ -415,8 +457,10 @@ test("founder access needs verified MFA and a new session, and revocation is imm
     assert.equal(delegated.status, 200);
     assert.equal((await delegated.json() as { assessments: Array<{ progress?: { confidentialAnswer?: string } }> })
       .assessments[0].progress?.confidentialAnswer, "synthetic");
+    const colleagueEmail = `colleague-${randomUUID()}@example.invalid`;
+    approveSyntheticRecipient(colleagueEmail);
     const colleague = await post("adviser-invite", { adviserOrganisationId: adviserOrgId,
-      email: `colleague-${randomUUID()}@example.invalid`, role: "member" }, founderCookie);
+      email: colleagueEmail, role: "member" }, founderCookie);
     assert.equal(colleague.status, 201);
     assert.equal((await post("adviser-invite", { adviserOrganisationId: adviserOrgId,
       email: `colleague-${randomUUID()}@example.invalid`, role: "admin" }, customerCookie)).status, 403);

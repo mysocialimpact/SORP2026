@@ -5,6 +5,8 @@ import { sendSorpAuthEmail, sendSorpInvitationEmail } from "../src/lib/sorp-auth
 const previousFetch = globalThis.fetch;
 const previousKey = process.env.RESEND_API_KEY;
 const previousBase = process.env.SORP_AUTH_BASE_URL;
+const previousEnabled = process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED;
+const previousAllowed = process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS;
 
 after(() => {
   globalThis.fetch = previousFetch;
@@ -12,11 +14,20 @@ after(() => {
   else process.env.RESEND_API_KEY = previousKey;
   if (previousBase === undefined) delete process.env.SORP_AUTH_BASE_URL;
   else process.env.SORP_AUTH_BASE_URL = previousBase;
+  if (previousEnabled === undefined) delete process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED;
+  else process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED = previousEnabled;
+  if (previousAllowed === undefined) delete process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS;
+  else process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS = previousAllowed;
 });
 
 test("auth links use the intended SORP sender and reject a foreign destination", async () => {
   process.env.RESEND_API_KEY = "synthetic-test-key";
   process.env.SORP_AUTH_BASE_URL = "https://sorp2026.org";
+  process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS = "customer@example.invalid,will@brainstrust.org.uk";
+  delete process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED;
+  await assert.rejects(sendSorpAuthEmail("verify", "customer@example.invalid", "https://sorp2026.org/api/sorp-auth/verify-email?token=synthetic"), /disabled/);
+  process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED = "true";
+  await assert.rejects(sendSorpAuthEmail("verify", "unlisted@example.invalid", "https://sorp2026.org/api/sorp-auth/verify-email?token=synthetic"), /disabled/);
   let calls = 0;
   globalThis.fetch = async (input, init) => {
     calls += 1;

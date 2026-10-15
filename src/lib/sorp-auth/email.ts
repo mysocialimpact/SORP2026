@@ -4,7 +4,15 @@ const FROM = "SORP 2026 <accounts@sorp2026.org>";
 const REPLY_TO = "marcus@mysocialimpact.org";
 
 function assertRecipientReleased(to: string) {
-  if (to.trim().toLowerCase().endsWith("@brainstrust.org.uk")) {
+  const recipient = to.trim().toLowerCase();
+  // Delivery stays off until the founder explicitly enables a finite test list.
+  const approved = (process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS || "")
+    .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
+  if (process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED !== "true" ||
+      !approved.includes(recipient) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+    throw new Error("SORP account email is disabled for this recipient.");
+  }
+  if (recipient.endsWith("@brainstrust.org.uk")) {
     throw new Error("Brainstrust account email requires Marcus's explicit approval and a code review.");
   }
 }

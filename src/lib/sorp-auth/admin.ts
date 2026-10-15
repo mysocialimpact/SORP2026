@@ -57,6 +57,33 @@ export async function founderCreateOrganisation(actorId: string, input: Input) {
   finally { client.release(); }
 }
 
+/** A verified person can create one new workspace of each type; names confer no legacy access. */
+export async function createOwnOrganisation(userId: string, input: Input) {
+  const name = typeof input.name === "string" ? input.name.trim() : "";
+  const type = input.type;
+  if (name.length < 2 || name.length > 200 || (type !== "Charity" && type !== "Adviser"))
+    throw new Error("Choose a charity or adviser organisation and enter its name.");
+  const id = randomUUID();
+  const client = await sorpAuthPool().connect();
+  try {
+    await client.query("BEGIN");
+    await client.query('SELECT id FROM sorp_auth."user" WHERE id=$1 AND "emailVerified"=true FOR UPDATE', [userId]);
+    const existing = await client.query(`SELECT 1 FROM sorp_auth.membership m
+      JOIN sorp_auth.organisation o ON o.id=m.organisation_id
+      WHERE m.user_id=$1 AND m.role='owner' AND m.status='active' AND o.type=$2`, [userId, type]);
+    if (existing.rowCount) throw new Error("You already own this type of organisation workspace.");
+    await client.query("INSERT INTO sorp_auth.organisation(id,name,type) VALUES($1,$2,$3)", [id, name, type]);
+    await client.query("INSERT INTO sorp_auth.entitlement(organisation_id) VALUES($1)", [id]);
+    await client.query(`INSERT INTO sorp_auth.membership(organisation_id,user_id,role)
+      VALUES($1,$2,'owner')`, [id, userId]);
+    await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id)
+      VALUES($1,'self_service_organisation_created','organisation',$2)`, [userId, id]);
+    await client.query("COMMIT");
+    return { id, name, type, role: "owner", plan: "Free" };
+  } catch (error) { await client.query("ROLLBACK"); throw error; }
+  finally { client.release(); }
+}
+
 export async function founderSetPlan(actorId: string, input: Input) {
   const organisationId = String(input.organisationId || "");
   const plan = String(input.plan || "");
@@ -186,6 +213,7 @@ export async function founderRequestClientAccess(actorId: string, input: Input) 
     throw new Error("Adviser editing and client invitation delegation are not enabled in the independent service.");
   }
   const allowed = { progress: permissions.progress === true, answers: permissions.answers === true,
+    reports: permissions.reports === true,
     edit: permissions.edit === true, invitations: permissions.invitations === true };
   const client = await sorpAuthPool().connect();
   try {
@@ -415,6 +443,7 @@ export async function adviserCreateClient(userId: string, input: Input) {
       (adviser_organisation_id,charity_organisation_id,permissions,status,requested_by)
       VALUES($1,$2,$3::jsonb,'requested',$4) RETURNING id`,
     [adviserId, charityId, JSON.stringify({ progress: true, answers: permissions.answers === true,
+      reports: permissions.reports === true,
       edit: false, invitations: false }), userId]);
     await client.query(`INSERT INTO sorp_auth.invitation
       (id,organisation_id,email,role,token_hash,invited_by,expires_at)
