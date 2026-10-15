@@ -639,13 +639,29 @@
 .gateway-mission {
   overflow: hidden;
 }
+.mission-home-cover {
+  isolation: isolate;
+}
+.mission-home-cover::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  opacity: .22;
+  background: repeating-linear-gradient(108deg, transparent 0 54px, #36584712 55px 56px);
+  mask-image: linear-gradient(90deg, transparent, #000 48%, transparent);
+}
+.mission-home-cover .supporting-breadcrumb {
+  color: #53655b;
+}
 .mission-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(290px, .65fr);
   gap: clamp(60px, 9vw, 135px);
   align-items: end;
-  min-height: min(810px, calc(100svh - 88px));
-  padding-block: clamp(76px, 9vw, 130px);
+  min-height: min(760px, calc(100svh - 88px));
+  padding-block: clamp(64px, 8vw, 112px);
 }
 .mission-hero-copy h1 {
   max-width: 980px;
@@ -655,7 +671,7 @@
 }
 .mission-hero-copy h1 em {
   display: block;
-  color: #b83210;
+  color: #355747;
   font-family: "Instrument Serif", Georgia, serif;
   font-weight: 400;
 }
