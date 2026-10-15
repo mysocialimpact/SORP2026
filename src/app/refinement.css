@@ -3,7 +3,10 @@
 .platform-sticky-navigation .gateway-header { position: static; }
 .platform-sticky-navigation .gateway-header-inner { min-height: 76px; padding-block: 12px; }
 .platform-sticky-navigation .gateway-tagline { font-family: var(--sans); font-style: normal; font-size: 11px; letter-spacing: .08em; }
-.platform-sticky-navigation .gateway-directory-nav { display: flex; gap: 24px; font-size: 12px; }
+.platform-sticky-navigation .gateway-directory-nav { display: flex; align-items: center; gap: 24px; font-size: 12px; }
+.platform-sticky-navigation .gateway-directory-nav a { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.platform-sticky-navigation .gateway-directory-nav svg { transition: transform .2s ease; }
+.platform-sticky-navigation .gateway-directory-nav a:hover svg { transform: translate(2px, -2px); }
 .platform-sticky-navigation .product-folder { position: static; }
 .platform-sticky-navigation .product-folder-tabs { padding-top: 12px; }
 .platform-sticky-navigation .product-folder-tab { min-height: 66px; padding-top: 10px; padding-bottom: 10px; }
@@ -39,11 +42,11 @@ body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigat
   .platform-sticky-navigation .gateway-brand-lockup { display: block; }
   .platform-sticky-navigation .gateway-wordmark { font-size: 25px; }
   .platform-sticky-navigation .gateway-tagline { display: block; border: 0; margin: 3px 0 0; padding: 0; font-size: 8px; letter-spacing: .06em; }
-  .platform-sticky-navigation .gateway-account-control { grid-column: 2; grid-row: 1; padding: 8px 12px; font-size: 12px; }
+  .platform-sticky-navigation .gateway-account-control { grid-column: 2; grid-row: 1; min-height: 38px; padding: 8px 12px; border: 1px solid var(--g-ink); border-radius: 999px; font-size: 12px; }
   .platform-sticky-navigation .gateway-account-group{grid-column:2;grid-row:1;justify-self:end;gap:3px}.platform-sticky-navigation .gateway-founder-control{padding:8px 9px!important;min-height:34px;font-size:11px}.platform-sticky-navigation .gateway-account-group .gateway-account-control{grid-column:auto;grid-row:auto}
-  .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; gap: 14px; overflow-x: auto; font-size: 10px; scrollbar-width: none; }
+  .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; gap: clamp(6px, 2.5vw, 14px); min-width: 0; overflow-x: auto; font-size: 10px; scrollbar-width: none; }
   .platform-sticky-navigation .gateway-directory-nav::-webkit-scrollbar { display: none; }
-  .platform-sticky-navigation .gateway-directory-nav a { flex: 0 0 auto; }
+  .platform-sticky-navigation .gateway-directory-nav a { flex: 0 0 auto; min-height: 36px; padding-block: 6px; }
   .platform-sticky-navigation .product-folder-tabs { padding-top: 6px; }
   .platform-sticky-navigation .product-folder-tab { min-height: 60px; width: 168px; flex-basis: 168px; padding: 8px 12px; }
   .platform-sticky-navigation .product-folder-tab strong { font-size: 13px; }
