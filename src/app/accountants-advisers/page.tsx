@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function DirectoryPage() {
   const firms = await getDirectoryFirms();
   return <main id="main" className="directory-page adviser-directory">
-    <DirectoryExplorer firms={firms} spotlight={<DirectorySpotlight/>}/>
+    <DirectoryExplorer firms={firms} spotlight={<DirectorySpotlight firms={firms}/>}/>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", name: "UK Charity Accountants Directory", url: `${site.origin}${directoryPath}`, description: "An independent directory of UK accountants with stated charity specialisms." }).replace(/</g,"\\u003c") }}/>
   </main>;
 }

@@ -214,3 +214,24 @@
   .directory-partner-grid { margin-top: 36px; gap: 36px; }
 }
 @media (prefers-reduced-motion: reduce) { .directory-page *, .directory-page *::before, .directory-page *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+/* MSI human verification is separate from website-evidence status. */
+.msi-verification { display: inline-flex; flex-direction: column; gap: 5px; max-width: 100%; margin: 12px 0; padding: 10px 13px; border: 1px solid #54715e; border-radius: 8px; background: #eaf1e6; color: #213d2c; font-size: 13px; line-height: 1.5; font-weight: 650; }
+.msi-verification.is-preview { border-style: dashed; background: #f6f1e4; color: #514126; }
+.msi-verification .msi-verification-preview { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.msi-verification small { display: block; font-size: 11px; font-weight: 400; color: inherit; max-width: 32em; }
+.adviser-trust h2 em { color: #d9e8bf; }
+.adviser-trust ul { list-style: none; margin: 22px 0; padding: 0; }
+.adviser-trust li { padding: 14px 0; border-top: 1px solid #788878; }
+.adviser-trust li span { display: block; margin-top: 4px; font-size: 14px; line-height: 1.6; color: #e6ecdf; }
+.adviser-approach { padding-top: 68px; padding-bottom: 55px; }
+.adviser-approach h2 { font-size: clamp(32px,3.5vw,48px); }
+.adviser-trust-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 30px; margin-top: 30px; }
+.adviser-trust-grid h3 { font-size: 20px; }
+.adviser-trust-grid p { font-size: 15px; line-height: 1.75; }
+.adviser-firm-invitation { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; border-top: 1px solid #b5beb0; padding-top: 35px; padding-bottom: 50px; align-items: center; }
+.adviser-firm-invitation h2 { font-size: clamp(30px,3vw,42px); }
+.adviser-firm-invitation p { font-size: 16px; }
+.adviser-firm-invitation a { display: block; border: 1px solid #526649; border-radius: 4px; padding: 16px; color: #213d2c; font-weight: 650; text-decoration: none; }
+.adviser-firm-invitation small { display: block; margin-top: 12px; font-size: 12px; }
+@media(max-width:760px) { .adviser-trust-grid,.adviser-firm-invitation { grid-template-columns: 1fr; gap: 18px; } .adviser-approach { padding-top: 40px; } }

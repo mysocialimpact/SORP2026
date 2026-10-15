@@ -1,4 +1,5 @@
 import "server-only";
+import { verificationDecision } from "../directory-verification";
 import { transaction, query } from "./db";
 import { audit, reviewFirm } from "./repository";
 
@@ -18,6 +19,8 @@ export type DirectoryControlRow = {
   featured_priority: number;
   placement_label: string;
   directory_configured: boolean;
+  msi_verified: boolean;
+  msi_verification_decided: boolean;
 };
 
 const directoryProjection = `
@@ -27,7 +30,9 @@ const directoryProjection = `
     COALESCE((f.credentials->'directory'->>'visible')::boolean,true) public_visible,
     COALESCE((f.credentials->'directory'->>'featured')::boolean,false) featured,
     COALESCE((f.credentials->'directory'->>'featuredPriority')::integer,0) featured_priority,
-    COALESCE(NULLIF(f.credentials->'directory'->>'placementLabel',''),'Editorial feature') placement_label
+    COALESCE(NULLIF(f.credentials->'directory'->>'placementLabel',''),'Editorial feature') placement_label,
+    COALESCE((f.credentials->'directory'->'msiVerification'->>'approved')::boolean,false) msi_verified,
+    (f.credentials->'directory'->'msiVerification'->>'decidedAt' IS NOT NULL) msi_verification_decided
   FROM research_console.firms f
   LEFT JOIN LATERAL (
     SELECT total FROM research_console.assessments
@@ -70,7 +75,9 @@ export async function setDirectoryControls(
       await c.query("SELECT * FROM research_console.firms WHERE id=$1 AND merged_into IS NULL FOR UPDATE", [id])
     ).rows[0];
     if (!before) throw new Error("Firm not found.");
-    const directory = { visible, featured, featuredPriority, placementLabel };
+    const previous = before.credentials?.directory || {};
+    const msiVerification = verificationDecision(previous.msiVerification, input.msiVerified, input.verificationNote, actor);
+    const directory = { ...previous, visible, featured, featuredPriority, placementLabel, ...(msiVerification ? { msiVerification } : {}) };
     const after = (
       await c.query(
         `UPDATE research_console.firms

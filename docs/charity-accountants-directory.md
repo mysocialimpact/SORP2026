@@ -34,7 +34,7 @@ The script emits JSON to stdout. It does not overwrite files or invent missing v
 
 The form reuses `/api/hello` and the existing SORP message backend, with a clear directory subject, firm/name/role and message. It uses existing origin validation, validation limits, honeypot and submission ID handling. It does not grant listing ownership, change data or create newsletter consent. Messages distinguish email-sent, queued and accepted responses; failures offer the existing direct email contact. No test messages should be sent to third-party firms.
 
-The £39/month partner proposition is explicitly proposed, with planned benefits. There is no checkout, charge or automatic subscription. Claims require manual relationship verification and editorial review before changing the JSON dataset.
+The public directory leads with charity needs, research evidence and human judgement. The former £39/month proposition has been removed from the directory and enquiry page. Claims and introductions use the existing enquiry form and require manual relationship verification and editorial review; submitting a form does not grant ownership or verification.
 
 ## Verification
 
@@ -49,3 +49,15 @@ The cloud environment's enforced egress policy blocks direct firm websites, Post
 The Vercel preview returned live postcode locations for BS1 4DJ (Bristol), CF10 1EP (Cardiff), EH1 1YZ (Edinburgh) and BT1 5GS (Belfast), plus HTTP 400 for an invalid input. The same endpoint successfully resolved all 108 unique directory postcodes, now persisted as current location evidence. Burton Sweet's deployed profile returned HTTP 200 with its named team, claim action and structured data. These checks made no enquiry submissions and sent no emails.
 
 Map selection was repeated five times on each of desktop and mobile (10 passes). Cluster animation was disabled to avoid stale layers after the mobile map is hidden/revealed, while retaining ordinary map panning and zoom controls. Accessible region roles were added after the browser audit caught labels on generic containers. Existing authentication and Growth Engine behaviour remain unchanged.
+
+## MSI human verification — October 2026
+
+The public `Verified by My Social Impact` designation is separate from imported `classification: Verified`, research approval (`approved_at` / Human Reviewed), and featured placement. None of those automatically awards the designation.
+
+In Founder → Accountants & Advisers, open a firm, select **Verified by My Social Impact**, enter the human-assessment reason under **MSI verification decision**, then save. To withdraw, clear the checkbox and record a reason. The existing protected directory endpoint stores approval, actor, decision time and note in `credentials.directory.msiVerification`, with the existing audit trail. No table migration, authentication or payment changes are required. Public pages receive only designation/decision booleans, never the private note or actor. Independent scores and placement priority are not changed by verification.
+
+Burton Sweet shows a dashed **Design preview · not awarded** example until its first explicit verification decision. An approved decision replaces it with the genuine badge; withdrawal removes it rather than restoring the demonstration. No firm was awarded the designation by this release. Badge display is consistent across cards, shortlist and profile; the compact map popup links to the full profile without repeating the longer preview.
+
+The spotlight receives the same visible directory data, so a hidden or unfeatured Burton Sweet is not silently retained as a spotlight. Its placement label follows the founder setting. Any paid placement must be explicitly labelled as paid promotion. There is no payment-to-score or payment-to-verification connection.
+
+Verification: production build and lint (two pre-existing warnings), 142 unit tests, desktop/mobile directory browser checks including all 111 profiles, source/coordinate preservation, shortlist, postcode distance order, map controls, enquiry payload interception and accessibility. Enquiry tests intercept delivery; no external email is sent. Map tiles and postcode UI responses in the browser suite are fixtures/blocked network, not claims of live provider availability.
