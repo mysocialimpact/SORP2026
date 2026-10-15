@@ -100,3 +100,25 @@ test("direct workspace, refresh and browser navigation remain predictable", asyn
   await page.goForward();
   await expect(page).toHaveURL(/\/ask-sorp\/$/);
 });
+
+test("three answers retain the same continuation session across refresh", async ({ page }) => {
+  const sessions: string[] = [];
+  await page.route("**/api/ask-sorp/", async route => {
+    sessions.push(String(route.request().postDataJSON().sessionId));
+    await route.fulfill({ json: answer });
+  });
+  await page.route("**/api/ask-sorp/continuation/", route => route.fulfill({ json: { offers: null } }));
+  await page.goto("/ask-sorp/workspace/");
+  for (let round = 1; round <= 3; round += 1) {
+    await page.getByLabel("Your SORP 2026 question").fill(`Synthetic SORP question ${round}?`);
+    await page.getByRole("button", { name: "Ask SORP →" }).click();
+    await expect(page.locator(".ask-answer-copy")).toHaveCount(round);
+  }
+  await expect(page.getByRole("heading", { name: "Keep your SORP conversation moving." })).toBeVisible();
+  expect(new Set(sessions).size).toBe(1);
+  const email = page.getByRole("textbox", { name: "Work email *" });
+  await email.fill("synthetic@example.invalid");
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Keep your SORP conversation moving." })).toBeVisible();
+  await expect(email).toHaveValue("synthetic@example.invalid");
+});

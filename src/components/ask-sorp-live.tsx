@@ -64,6 +64,7 @@ export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyCh
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const sessionId = useRef("");
+  const [continuationSessionId, setContinuationSessionId] = useState("");
   const latestAnswer = useRef<HTMLElement>(null);
   const conversation = useRef<HTMLDivElement>(null);
 
@@ -87,7 +88,11 @@ export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyCh
           && "content" in item && typeof item.content === "string",
         )).slice(-6) : [];
       const frame = requestAnimationFrame(() => {
-        if (restoredTurns.length) setTurns(restoredTurns);
+        if (restoredTurns.length) {
+          if (!sessionId.current) sessionId.current = crypto.randomUUID();
+          setContinuationSessionId(sessionId.current);
+          setTurns(restoredTurns);
+        }
         if (restoredHistory.length) setHistory(restoredHistory);
       });
       return () => cancelAnimationFrame(frame);
@@ -107,7 +112,10 @@ export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyCh
   }, [turns, history, mode]);
 
   function getSessionId() {
-    if (!sessionId.current) sessionId.current = crypto.randomUUID();
+    if (!sessionId.current) {
+      sessionId.current = crypto.randomUUID();
+      setContinuationSessionId(sessionId.current);
+    }
     return sessionId.current;
   }
 
@@ -247,7 +255,7 @@ export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyCh
           {busy && <div className="ask-thinking" role="status"><span aria-hidden="true" /><div><strong>Finding the relevant SORP evidence…</strong><p>Checking the answer against the source before showing it.</p></div></div>}
         </div>
 
-        {turns.length === 3 && <AskSorpContinuation turns={turns} sessionId={getSessionId()} />}
+        {turns.length === 3 && continuationSessionId && <AskSorpContinuation turns={turns} sessionId={continuationSessionId} />}
         {notice && <p className="ask-notice" role="status">{notice}</p>}
         {error && <p className="ask-error" role="alert">{error}</p>}
         </div>

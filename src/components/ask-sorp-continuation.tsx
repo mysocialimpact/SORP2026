@@ -23,16 +23,19 @@ export function AskSorpContinuation({ turns, sessionId }: { turns: Turn[]; sessi
   const [feedbackId] = useState(() => crypto.randomUUID());
 
   useEffect(() => {
+    let frame: number | undefined;
     try {
       const saved = JSON.parse(sessionStorage.getItem(identityKey) || "null");
-      if (saved && typeof saved.email === "string") setIdentity({ ...emptyIdentity, ...saved });
+      if (saved && typeof saved.email === "string") {
+        frame = requestAnimationFrame(() => setIdentity({ ...emptyIdentity, ...saved }));
+      }
     } catch { /* Keep the form usable when storage is unavailable. */ }
     let cancelled = false;
     fetch("/api/ask-sorp/continuation/", { cache: "no-store" })
       .then(response => response.ok ? response.json() : null)
       .then(data => { if (!cancelled && data?.offers) setOffers(data.offers); })
       .catch(() => {});
-    return () => { cancelled = true; };
+    return () => { cancelled = true; if (frame !== undefined) cancelAnimationFrame(frame); };
   }, []);
 
   function update<K extends keyof Identity>(key: K, value: Identity[K]) {

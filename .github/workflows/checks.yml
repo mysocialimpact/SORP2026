@@ -81,7 +81,7 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_PASSWORD: synthetic-ci-password
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: sorp_test
         ports:
           - 55432:5432
@@ -91,7 +91,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      SORP_AUTH_DATABASE_URL: postgresql://postgres:synthetic-ci-password@127.0.0.1:55432/sorp_test
+      SORP_AUTH_DATABASE_URL: postgresql://postgres@127.0.0.1:55432/sorp_test
       SORP_AUTH_SECRET: synthetic-ci-secret-at-least-thirty-two-characters
       SORP_AUTH_BASE_URL: http://localhost:3000
       RESEND_API_KEY: synthetic-ci-key
@@ -103,5 +103,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --input-type=module -e 'import {Pool} from "pg"; import {readFileSync} from "node:fs"; const db=new Pool({connectionString:process.env.SORP_AUTH_DATABASE_URL}); for(const file of ["008_sorp_auth_provider.sql","009_sorp_auth_application.sql","010_sorp_report_ownership.sql"]) await db.query(readFileSync(`migrations/${file}`,"utf8")); await db.end()'
+      - run: node --input-type=module -e 'import {Pool} from "pg"; import {readFileSync} from "node:fs"; const db=new Pool({connectionString:process.env.SORP_AUTH_DATABASE_URL}); for(const file of ["008_sorp_auth_provider.sql","009_sorp_auth_application.sql","010_sorp_report_ownership.sql","011_sorp_auth_audit_integrity.sql"]) await db.query(readFileSync(`migrations/${file}`,"utf8")); await db.query("CREATE ROLE sorp_auth_runtime LOGIN"); await db.query(readFileSync("scripts/provision-sorp-auth-runtime.sql","utf8")); await db.end()'
+      - run: npx tsx --test tests/sorp-auth-role.integration.test.ts
       - run: npx tsx --test tests/sorp-auth-email.test.ts tests/sorp-auth-export.test.ts tests/sorp-auth-security.integration.test.ts tests/sorp-auth.integration.test.ts tests/sorp-reconciliation.integration.test.ts tests/sorp-report-upload.integration.test.ts
+        env:
+          SORP_AUTH_DATABASE_URL: postgresql://sorp_auth_runtime@127.0.0.1:55432/sorp_test
