@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Arrow } from "@/components/ui";
-import { AuthenticatedContinuousImprovement, type AuthenticatedAccount } from "@/components/authenticated-continuous-improvement";
 
 export function SayHello() {
   const pathname = usePathname();
@@ -14,23 +13,19 @@ export function SayHello() {
   const [recognised, setRecognised] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [feedback, setFeedback] = useState("");
-  const [identity, setIdentity] = useState<AuthenticatedAccount | false | null>(null);
 
   useEffect(() => {
     if (founderMode) return;
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
       .then(async response => {
-        if (!response.ok) { setIdentity(false); return; }
+        if (!response.ok) return;
         const data = await response.json();
         if (data.signedIn && typeof data.account?.email === "string") {
           setEmail(current => current || data.account.email);
           setRecognised(true);
-          setIdentity(data as AuthenticatedAccount);
-        } else {
-          setIdentity(false);
         }
-      }).catch(() => setIdentity(false));
+      }).catch(() => undefined);
     return () => controller.abort();
   }, [founderMode]);
 
@@ -70,8 +65,6 @@ export function SayHello() {
   }
 
   if (founderMode) return null;
-  if (identity) return <AuthenticatedContinuousImprovement identity={identity} />;
-  if (identity === null) return <section className="shared-hello shared-hello-loading" aria-label="Loading contact options" />;
 
   return <section className="shared-hello" id="say-hello" aria-labelledby="say-hello-title">
     <div className="gateway-width shared-hello-layout">

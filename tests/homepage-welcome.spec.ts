@@ -34,7 +34,7 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
       gaps: [
         cover.getBoundingClientRect().top - edge.getBoundingClientRect().bottom,
       ],
-      sequence: [".gateway-opening", ".homepage-audience", ".homepage-ambition", ".gateway-home-vision", ".gateway-sorp-section"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
+      sequence: [".gateway-opening", ".homepage-audience", "#our-ambition", ".gateway-sorp-section"].map(selector => document.querySelector(selector)!.getBoundingClientRect().top),
     };
   });
   expect(surfaces.edge).toBe(surfaces.cover);
@@ -43,21 +43,18 @@ test("Home divider joins the hero and products precede the vision", async ({ pag
   expect(surfaces.sequence).toEqual([...surfaces.sequence].sort((a, b) => a - b));
 });
 
-test("the middle story is one compact ambition and a distinct vision", async ({ page }, testInfo) => {
+test("the middle story is one compact ambition and vision composition", async ({ page }, testInfo) => {
   await page.goto("/");
-  const ambition = page.locator(".homepage-ambition");
-  const vision = page.locator(".homepage-vision");
-  await expect(ambition.getByText("Our ambition", { exact: true })).toBeVisible();
-  await expect(ambition.getByRole("heading")).toHaveText("Greater impact.Accessible to everyone.");
-  await expect(vision.getByRole("heading")).toHaveText("Imagine a world where social impact was taken as seriously as financial performance.");
+  const manifesto = page.locator("#our-ambition");
+  await expect(manifesto.getByText("Our ambition", { exact: true })).toBeVisible();
+  await expect(manifesto.getByRole("heading", { name: /Greater impact\.\s*Accessible to everyone\./ })).toBeVisible();
+  await expect(manifesto.getByRole("heading", { name: "Imagine a world where social impact was taken as seriously as financial performance." })).toBeVisible();
   for (const removed of ["Too useful to leave in a filing cabinet.", "Better evidence.", "Better decisions.", "Big possibilities. Smaller barriers."]) {
     await expect(page.getByText(removed, { exact: false })).toHaveCount(0);
   }
-  const ambitionBox = (await ambition.boundingBox())!;
-  const visionBox = (await vision.boundingBox())!;
-  expect(ambitionBox.height + visionBox.height).toBeLessThan(page.viewportSize()!.width > 700 ? 700 : 760);
-  await ambition.screenshot({ path: testInfo.outputPath("ambition.png") });
-  await vision.screenshot({ path: testInfo.outputPath("vision.png") });
+  const box = (await manifesto.boundingBox())!;
+  expect(box.height).toBeLessThan(page.viewportSize()!.width > 700 ? 700 : 800);
+  await manifesto.screenshot({ path: testInfo.outputPath("ambition-vision.png") });
 });
 
 test("one compact starting point links directly to the working review", async ({ page }, testInfo) => {
@@ -89,23 +86,21 @@ test("hero frames SORP as the requirement and better impact as the opportunity",
   expect(positions).toEqual([...positions].sort((a, b) => a - b));
 });
 
-test("contact form recognises accounts and confirms only an accepted server response", async ({ page }) => {
+test("Talk to us recognises accounts and confirms only an accepted server response", async ({ page }) => {
   await page.route("**/api/readiness-account/", route => route.fulfill({ json: { signedIn: true, account: { id: "preview", name: "Preview Person", email: "preview@example.org", organisation: "Preview Charity" } } }));
   const writes: Record<string, unknown>[] = [];
-  await page.route("**/api/continuous-improvement/**", async route => {
-    if (route.request().method() === "GET") return route.fulfill({ json: { improvements: [] } });
+  await page.route("**/api/hello", async route => {
     writes.push(route.request().postDataJSON());
-    await route.fulfill({ status: 201, json: { accepted: true, id: "preview-enquiry" } });
+    await route.fulfill({ status: 200, json: { accepted: true, emailSent: true } });
   });
   await page.goto("/");
-  const section = page.locator(".continuous-improvement");
-  await expect(section).toContainText("Hi Preview · Preview Charity");
-  await section.getByRole("button", { name: /Ask a question/ }).click();
-  await section.getByLabel("What would you like to ask?").fill("Please show us a demo.");
-  await section.getByRole("button", { name: "Send to Marcus →" }).click();
-  await expect(section).toContainText("message is on its way to Marcus");
+  const section = page.locator(".shared-hello");
+  await expect(section.getByLabel("Email address")).toHaveValue("preview@example.org");
+  await section.getByLabel("Message Optional").fill("Please show us a demo.");
+  await section.getByRole("button", { name: /Send message/ }).click();
+  await expect(section).toContainText("hello is on its way");
   expect(writes).toHaveLength(1);
-  expect(writes[0]).toMatchObject({ kind: "contact", enquiryType: "question", message: "Please show us a demo." });
+  expect(writes[0]).toMatchObject({ email: "preview@example.org", message: "Please show us a demo.", source: "/" });
 });
 
 test("pricing is free-first, honest about planned plans and leads directly into Let’s talk", async ({ page }) => {
@@ -131,16 +126,16 @@ test("pricing is free-first, honest about planned plans and leads directly into 
   await expect.poll(() => track.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
   await expect(pricing.getByRole("link", { name: /£50/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/booking/?session=30");
   await expect(pricing.getByRole("link", { name: /Find Accountants & Advisers/ })).toHaveAttribute("href", "/accountants-advisers/");
-  expect(await pricing.evaluate(element => element.closest("main")?.nextElementSibling?.id)).toBe("say-hello");
+  expect(await pricing.evaluate(element => element.closest("main")?.nextElementSibling?.id)).toBe("page-feedback");
 });
 
 test("shared Say hello has two text fields, optional message and newsletter consent", async ({ page }) => {
   await page.goto("/");
   const talk = page.locator(".shared-hello");
-  await expect(talk.getByRole("heading", { name: /Just looking around.*Say hello/ })).toBeVisible();
-  await expect(talk.getByPlaceholder("A question, an idea, some feedback — or just hello…")).toBeVisible();
+  await expect(talk.getByRole("heading", { name: "Talk to us." })).toBeVisible();
+  await expect(talk.getByPlaceholder("Request a demo, ask a question, share an idea, give feedback, or just say hello…")).toBeVisible();
   await expect(talk.locator(".shared-hello-form > input, .shared-hello-form > textarea")).toHaveCount(2);
   await expect(talk.getByRole("checkbox")).toBeVisible();
-  await expect(talk.getByRole("button", { name: "Say hello" })).toBeVisible();
+  await expect(talk.getByRole("button", { name: /Send message/ })).toBeVisible();
   await expect(talk.getByRole("button", { name: /Copy/ })).toHaveCount(0);
 });

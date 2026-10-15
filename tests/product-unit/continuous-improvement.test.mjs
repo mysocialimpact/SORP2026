@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const component = await readFile(new URL("../../src/components/authenticated-continuous-improvement.tsx", import.meta.url), "utf8");
+const component = await readFile(new URL("../../src/components/page-feedback.tsx", import.meta.url), "utf8");
+const layout = await readFile(new URL("../../src/app/layout.tsx", import.meta.url), "utf8");
 const route = await readFile(new URL("../../src/app/api/continuous-improvement/route.ts", import.meta.url), "utf8");
 const founderRoute = await readFile(new URL("../../src/app/api/founder/[...path]/route.ts", import.meta.url), "utf8");
 const founderUi = await readFile(new URL("../../src/components/founder/feedback-workspace.tsx", import.meta.url), "utf8");
@@ -10,22 +11,26 @@ const migration = await readFile(new URL("../../migrations/006_founder_feedback.
 const founderRuntimeMigration = await readFile(new URL("../../migrations/007_founder_control_runtime.sql", import.meta.url), "utf8");
 const founderDatabase = await readFile(new URL("../../src/lib/founder/db.ts", import.meta.url), "utf8");
 
-test("authenticated contact and beta feedback share one global component", () => {
-  assert.match(component, /Need a hand\?/);
-  assert.match(component, /Book a conversation/);
-  assert.match(component, /Ask a question/);
-  assert.match(component, /Get some advice/);
-  assert.match(component, /\[1,2,3,4,5\]/);
-  assert.match(component, /!rating && !comment\.trim\(\)/);
-  assert.match(component, /feedbackState === "sent"/);
+test("one global page-feedback component precedes Talk to us and supports five-star submissions", () => {
+  assert.match(component, /Help us make this better\./);
+  assert.match(component, /How useful was this page\?/);
+  assert.match(component, /\[1, 2, 3, 4, 5\]/);
+  assert.match(component, /if \(!rating \|\| state === "sending"\) return/);
+  assert.match(component, /state === "sent"/);
   assert.match(component, /if \(!response\.ok \|\| !result\.accepted\) throw/);
+  assert.match(component, /pagePath: pathname/);
+  assert.ok(layout.indexOf("<PageFeedback />") < layout.indexOf("<SayHello />"));
+  assert.ok(layout.indexOf("<SayHello />") < layout.indexOf("<Footer />"));
 });
 
-test("submissions require platform identity and keep contact separate from feedback", () => {
-  assert.match(route, /protectPlatformRequest\(request\)/);
+test("feedback accepts visitors, preserves signed-in identity and keeps contact separate", () => {
+  assert.match(route, /platformIdentity\(request\.headers\.get\("cookie"\)/);
+  assert.match(route, /accountId: `anonymous:\$\{anonymousId\}`/);
   assert.match(route, /founder_feedback/);
   assert.match(route, /founder_contact_enquiries/);
   assert.match(route, /created_at > now\(\) - interval '1 hour'/);
+  assert.match(route, /input\.website/);
+  assert.match(route, /Please submit from this website/);
   assert.match(route, /SELECT id FROM research_console\.founder_feedback WHERE submission_id=\$1/);
   assert.doesNotMatch(route, /password|session[_ -]?token|assessment answer/i);
 });
