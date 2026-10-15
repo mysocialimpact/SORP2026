@@ -129,13 +129,28 @@ test("pricing is free-first, honest about planned plans and leads directly into 
   expect(await pricing.evaluate(element => element.closest("main")?.nextElementSibling?.id)).toBe("page-feedback");
 });
 
-test("shared Say hello has two text fields, optional message and newsletter consent", async ({ page }) => {
+test("shared Talk to us puts a clear copy-email action and offices beneath the message fields", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async (value: string) => { (window as typeof window & { copiedEmail?: string }).copiedEmail = value; } },
+    });
+  });
   await page.goto("/");
   const talk = page.locator(".shared-hello");
   await expect(talk.getByRole("heading", { name: "Talk to us." })).toBeVisible();
   await expect(talk.getByPlaceholder("Request a demo, ask a question, share an idea, give feedback, or just say hello…")).toBeVisible();
-  await expect(talk.locator(".shared-hello-form > input, .shared-hello-form > textarea")).toHaveCount(2);
+  await expect(talk.locator(".shared-hello-field > input, .shared-hello-field > textarea")).toHaveCount(2);
   await expect(talk.getByRole("checkbox")).toBeVisible();
   await expect(talk.getByRole("button", { name: /Send message/ })).toBeVisible();
-  await expect(talk.getByRole("button", { name: /Copy/ })).toHaveCount(0);
+  const copy = talk.getByRole("button", { name: "Copy marcus@mysocialimpact.org to clipboard" });
+  await expect(copy).toContainText("Copy email address");
+  await copy.click();
+  await expect(copy).toContainText("Email copied");
+  await expect(talk).toContainText("email address has been copied to your clipboard");
+  expect(await page.evaluate(() => (window as typeof window & { copiedEmail?: string }).copiedEmail)).toBe("marcus@mysocialimpact.org");
+  await expect(talk.locator(".shared-hello-details")).toContainText("10 Market Place, Shepton Mallet");
+  await expect(talk.locator(".shared-hello-details")).toContainText("POPHub, Whitcomb Street, London");
+  const order = await talk.locator(".shared-hello-field, .shared-hello-details").evaluateAll(elements => elements.map(element => element.className));
+  expect(order).toEqual(["shared-hello-field", "shared-hello-field", "shared-hello-details"]);
 });
