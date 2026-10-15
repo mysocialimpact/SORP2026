@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { directoryPath, firmPath, normalisePostcode, selectFirms, serviceLabels, type Bounds, type Firm, type Point, type Service } from "@/lib/accountants";
 import type { MapView } from "./directory-map";
+import { FolderHero } from "@/components/folder-hero";
 const DirectoryMap = dynamic(() => import("./directory-map"), { ssr: false, loading: () => <div className="directory-map-loading">Opening your UK map…</div> });
 const storageKey = "sorp2026.accountant-shortlist";
 
@@ -98,7 +99,7 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
   }
 
   return <>
-    <header className="adviser-hero">
+    <FolderHero product="home" as="header" className="adviser-hero">
       <div className="directory-width adviser-hero-grid">
         <div className="adviser-hero-copy">
           <p className="directory-eyebrow">For charities. For the people who advise them.</p>
@@ -115,7 +116,7 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
         <aside className="adviser-invite"><div className="adviser-price">£39<span>/month</span></div><p className="directory-eyebrow">For accountancy firms</p><h2>Be seen by charities looking for your expertise.</h2><p>Claim your listing. Tell a richer story. Put your firm where charities look for help.</p><Link href={`${directoryPath}partners/`}>Make room for your firm ↗</Link><small>Proposed founding membership. Professional tools planned. Enquiries open; no payment taken.</small></aside>
         <div className="adviser-icaew"><a href="https://www.icaew.com/" target="_blank" rel="noopener noreferrer">ICAEW<span>Chartered Accountants</span></a><p>We’re starting with ICAEW firms because our founder, Marcus Warry, is an ICAEW Chartered Accountant. ICAEW is the Institute of Chartered Accountants in England and Wales. This is an independent directory, not an ICAEW endorsement.</p><details><summary>About the directory</summary><p>We haven’t personally assessed every firm. Inclusion is based on stated charity specialisms and public information. The original 110 records and researched Burton Sweet listing are preserved. Each profile links to its sources. Map pins represent office postcode centres, not entrances.</p></details></div>
       </div>
-    </header>
+    </FolderHero>
     {spotlight}
     <section id="directory" className="adviser-directory-stage directory-width" aria-label="Find and compare charity accountants">
     <header className="adviser-directory-heading"><div><p className="directory-eyebrow">The directory · A–Z</p><h2>Your next conversation<br/>starts here.</h2></div><p>Choose a firm on the map or in the list.<br/>Save up to three. Find your fit.</p></header>

@@ -3,7 +3,7 @@ body:has(.adviser-directory) .product-folder-sheet-edge { background: #cfddcf; }
 .adviser-directory { padding-bottom: 0; }
 .adviser-directory .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .adviser-directory .directory-width { width: min(1370px, calc(100% - 96px)); }
-.adviser-hero { position: relative; padding: 64px 0 28px; background: radial-gradient(ellipse at 88% 8%, #bacdac 0, transparent 52%), linear-gradient(#cfddcf, #e1e8d7 78%, #faf9f6); }
+.adviser-hero { position: relative; padding: 64px 0 28px; }
 .adviser-hero::before { content: ""; pointer-events: none; position: absolute; inset: 0; opacity: .2; background: repeating-linear-gradient(0deg, transparent 0 35px, #7d95731c 36px); mask-image: linear-gradient(90deg,transparent,black); }
 .adviser-hero-grid { position: relative; display: grid; grid-template-columns: minmax(0,1.65fr) minmax(300px,1fr); gap: 46px 7%; align-items: start; }
 .adviser-directory h1 { font-size: clamp(56px,6.9vw,100px); }

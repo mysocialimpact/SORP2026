@@ -4,6 +4,7 @@ import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
 import { HomepageContribution } from "@/components/voluntary-contribution";
 import { SupportingBreadcrumb } from "@/components/supporting-breadcrumb";
+import { FolderHero } from "@/components/folder-hero";
 
 export const metadata: Metadata = {
   title: "Our Mission",
@@ -34,35 +35,37 @@ const promises = [
 export default function OurMissionPage() {
   return (
     <main id="main" className="gateway gateway-mission">
-      <div className="gateway-width"><SupportingBreadcrumb current="Our Mission" /></div>
-      <section
-        className="gateway-width mission-hero"
-        aria-labelledby="mission-title"
-      >
-        <div className="mission-hero-copy">
-          <p className="gateway-kicker">
-            We’re a social enterprise. We’re on a mission.
-          </p>
-          <h1 id="mission-title">
-            We’re on a mission to help solve more <em>social and environmental problems.</em>
-          </h1>
-          <p>
-            Technology and AI are opening up exciting possibilities for doing
-            good. We’re building practical tools to put those possibilities into
-            the hands of charities and small organisations—helping them get the
-            support they need and create greater impact.
-          </p>
-        </div>
-        <div
-          className="mission-hero-outcome"
-          aria-label="Our goal: greater impact"
+      <FolderHero product="home" as="div" className="mission-home-cover">
+        <div className="gateway-width"><SupportingBreadcrumb current="Our Mission" /></div>
+        <section
+          className="gateway-width mission-hero"
+          aria-labelledby="mission-title"
         >
-          <span>Our goal</span>
-          <strong>More problems solved.</strong>
-          <strong>More potential unlocked.</strong>
-          <strong>Greater impact.</strong>
-        </div>
-      </section>
+          <div className="mission-hero-copy">
+            <p className="gateway-kicker">
+              We’re a social enterprise. We’re on a mission.
+            </p>
+            <h1 id="mission-title">
+              We’re on a mission to help solve more <em>social and environmental problems.</em>
+            </h1>
+            <p>
+              Technology and AI are opening up exciting possibilities for doing
+              good. We’re building practical tools to put those possibilities into
+              the hands of charities and small organisations—helping them get the
+              support they need and create greater impact.
+            </p>
+          </div>
+          <div
+            className="mission-hero-outcome"
+            aria-label="Our goal: greater impact"
+          >
+            <span>Our goal</span>
+            <strong>More problems solved.</strong>
+            <strong>More potential unlocked.</strong>
+            <strong>Greater impact.</strong>
+          </div>
+        </section>
+      </FolderHero>
 
       <section
         className="mission-vision"
