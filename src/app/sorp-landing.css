@@ -10,6 +10,9 @@
   font-family: var(--font-sans), Arial, sans-serif;
 }
 
+html:has(.sr-story),
+body:has(.sr-story) { max-width: 100%; overflow-x: clip; }
+
 .sr-story * { box-sizing: border-box; }
 .sr-story h1, .sr-story h2, .sr-story h3, .sr-story p { margin-top: 0; }
 .sr-story h1, .sr-story h2, .sr-story h3 { font-family: var(--font-sans), Arial, sans-serif; letter-spacing: -.055em; }

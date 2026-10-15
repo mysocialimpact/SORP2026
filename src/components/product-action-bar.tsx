@@ -31,6 +31,7 @@ export function ProductActionBar() {
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [director, setDirector] = useState<{ completed?: boolean; started?: boolean } | null>(null);
   const bar = useRef<HTMLElement>(null);
+  const readinessLanding = path === "/are-you-sorp-ready/";
 
   useEffect(() => {
     if (founderMode) return;
@@ -73,9 +74,11 @@ export function ProductActionBar() {
 
   if (founderMode) return null;
   return <>
-    <aside ref={bar} className="folder-action-bar" data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
-      <Link className="folder-action-primary" href={action.href}>{action.label} <span aria-hidden="true">→</span></Link>
-      <a className="folder-action-secondary" href="#say-hello">Talk to us <span aria-hidden="true">→</span></a>
+    <aside ref={bar} className={`folder-action-bar${readinessLanding ? " is-readiness" : ""}`} data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
+      {readinessLanding && <Link className="folder-action-utility folder-action-presentation" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>}
+      <Link className="folder-action-primary" href={action.href}>{readinessLanding && !account?.signedIn ? "Start Free Review" : action.label} <span aria-hidden="true">→</span></Link>
+      {readinessLanding && <a className="folder-action-utility folder-action-feedback" href="#page-feedback">Give Feedback <span aria-hidden="true">→</span></a>}
+      <a className="folder-action-secondary" href="#say-hello">{readinessLanding ? "Talk to Us" : "Talk to us"} <span aria-hidden="true">→</span></a>
     </aside>
     <div className="folder-action-clearance" aria-hidden="true" />
   </>;

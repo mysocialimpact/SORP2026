@@ -49,7 +49,11 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
   await expect(page.getByRole("heading", { name: "How your score works" })).toBeVisible();
   const fixedAction = page.locator(".folder-action-bar");
   await expect(fixedAction).toBeVisible();
-  await expect(fixedAction.getByRole("link", { name: /Start your free SORP review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
+  await expect(fixedAction.getByRole("link", { name: /Play Presentation/ })).toHaveAttribute("href", "/are-you-sorp-ready/presentation/");
+  await expect(fixedAction.getByRole("link", { name: /Start Free Review/ })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
+  await expect(fixedAction.getByRole("link", { name: /Give Feedback/ })).toHaveAttribute("href", "#page-feedback");
+  await expect(fixedAction.getByRole("link", { name: /Talk to Us/ })).toHaveAttribute("href", "#say-hello");
+  await expect(fixedAction.getByRole("link")).toHaveText([/Play Presentation/, /Start Free Review/, /Give Feedback/, /Talk to Us/]);
   await expect(fixedAction).toHaveCSS("position", "fixed");
   const fixedBox = (await fixedAction.boundingBox())!;
   expect(fixedBox.height).toBeLessThanOrEqual(90);
@@ -107,6 +111,60 @@ test("presentation and assessment remain on SORP2026", async ({ page }, testInfo
     await expect(button).toBeEnabled();
     expect(await contrastRatio(button)).toBeGreaterThanOrEqual(4.5);
   }
+});
+
+test("presentation mode uses the focused product shell", async ({ page }) => {
+  await page.goto("/are-you-sorp-ready/");
+  await page.locator(".sr-hero-actions").getByRole("link", { name: /Play Presentation/ }).click();
+  await expect(page).toHaveURL(/\/are-you-sorp-ready\/presentation\/$/);
+  await expect(page.locator(".platform-sticky-navigation")).toBeHidden();
+  await expect(page.locator(".scr-assessment-header")).toContainText("SORP 2026");
+  await expect(page.locator(".scr-assessment-header")).toContainText("Are You SORP Ready?");
+  const back = page.getByRole("link", { name: "Back to website" });
+  await expect(back).toBeVisible();
+  await expect(back).toHaveAttribute("href", "/are-you-sorp-ready/");
+  await expect(page.locator(".sorp-film")).toHaveAttribute("data-ready", "true");
+  await expect(page.locator(".sf-chapters button")).toHaveCount(9);
+  await expect(page.locator(".folder-action-bar")).toBeHidden();
+  await expect(page.locator(".page-feedback")).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
+  const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+  expect(accessibility.violations).toEqual([]);
+
+  await page.getByRole("button", { name: "Next →" }).click();
+  await expect(page.locator(".sorp-film")).toHaveAttribute("data-slide", "1");
+  await back.click();
+  await expect(page).toHaveURL(/\/are-you-sorp-ready\/$/);
+});
+
+test("readiness feedback controls do not overlap at desktop, tablet or mobile widths", async ({ page }) => {
+  await page.route("**/api/continuous-improvement/**", route => route.fulfill({ status: 201, json: { accepted: true, id: "readiness-feedback" } }));
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 834, height: 1112 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/are-you-sorp-ready/#page-feedback");
+    const section = page.locator(".page-feedback");
+    const heading = (await section.locator(".page-feedback-heading").boundingBox())!;
+    const rating = (await section.locator(".page-feedback-rating").boundingBox())!;
+    const comment = (await section.locator("textarea").boundingBox())!;
+    const separated = (left: typeof heading, right: typeof heading) =>
+      left.x + left.width <= right.x + 1 || right.x + right.width <= left.x + 1 ||
+      left.y + left.height <= right.y + 1 || right.y + right.height <= left.y + 1;
+    expect(separated(heading, rating)).toBe(true);
+    expect(separated(rating, comment)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    for (const star of await section.getByRole("radio").all()) {
+      const box = (await star.boundingBox())!;
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+  }
+
+  const section = page.locator(".page-feedback");
+  await section.getByRole("radio", { name: "5 stars" }).click();
+  await section.getByLabel("Anything you’d like to add? Optional").fill("Clear and easy to use.");
+  await section.getByRole("button", { name: "Submit feedback →" }).click();
+  await expect(section.getByText("Your feedback has been received.")).toBeVisible();
 });
 
 test("destination APIs fail safely without production credentials", async ({ request }) => {

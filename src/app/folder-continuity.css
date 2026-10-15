@@ -59,6 +59,20 @@
 .folder-action-primary:hover { background: color-mix(in srgb,var(--action-accent,#cfddcf) 82%,#fff); }
 .folder-action-secondary:hover { color: var(--action-accent,#cfddcf); }
 .folder-action-bar a:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.folder-action-bar.is-readiness {
+  display: grid;
+  grid-template-columns: auto minmax(240px, 1fr) auto auto;
+  gap: 8px;
+}
+.folder-action-bar.is-readiness .folder-action-primary { width: 100%; min-width: 0; }
+.folder-action-utility {
+  padding: 10px 13px;
+  border: 1px solid color-mix(in srgb, var(--action-accent, #cfddcf) 38%, transparent);
+  border-radius: 3px;
+  color: #fff;
+}
+.folder-action-bar.is-readiness .folder-action-secondary { padding-inline: 13px 2px; }
+.folder-action-utility:hover { border-color: var(--action-accent, #cfddcf); color: var(--action-accent, #cfddcf); }
 .folder-action-clearance { height: var(--folder-action-height, 76px); background: #242428; }
 /* Task controls take precedence while completing the inline assessment or typing. */
 body:has(#assessment [data-mode]) .folder-action-bar[data-action-page="/my-impact-director/"],
@@ -76,6 +90,26 @@ body:has(form:focus-within, .directory-app :focus) .folder-action-bar { visibili
   .folder-action-bar a { font-size: 12px; gap: 10px; }
   .folder-action-primary { min-width:0;padding-inline:12px;flex:1; }
   .folder-action-secondary { flex-shrink: 0; }
+  .folder-action-bar.is-readiness { gap: 5px; }
+  .folder-action-bar.is-readiness a { min-width: 0; padding-inline: 9px; }
+}
+@media (max-width: 620px) {
+  .folder-action-bar.is-readiness {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 6px 7px calc(6px + env(safe-area-inset-bottom));
+  }
+  .folder-action-bar.is-readiness a {
+    min-height: 52px;
+    justify-content: center;
+    gap: 4px;
+    padding: 7px 5px;
+    font-size: 10px;
+    line-height: 1.12;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .folder-action-bar.is-readiness a span { display: none; }
+  .folder-action-bar.is-readiness .folder-action-secondary { padding-inline: 5px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .platform-sticky-navigation, .platform-sticky-navigation * { transition: none; animation: none; }
