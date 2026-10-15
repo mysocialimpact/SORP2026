@@ -39,7 +39,7 @@ test("founder shell removes customer chrome while public shell remains intact", 
   assert.match(header, /founder-mode-header/);
   assert.match(header, /founder-control-title/);
   assert.doesNotMatch(header, /View My Dashboard|founder-mode-indicator/);
-  for (const publicLabel of ["Our Mission", "Find Accountants", "Talk to us"]) assert.match(header, new RegExp(publicLabel));
+  for (const publicLabel of ["Our Mission", "Find Accountants", "Talk to Us"]) assert.match(header, new RegExp(publicLabel));
   assert.match(footer, /startsWith\("\/founder\/"\)\) return null/);
   assert.match(sayHello, /if \(founderMode\) return null/);
   assert.match(actionBar, /if \(founderMode\) return null/);

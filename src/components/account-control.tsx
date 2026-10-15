@@ -24,7 +24,7 @@ export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
   if(founder||adviser)return <div className="gateway-account-group">{founder&&<Link className="gateway-founder-control" href="/founder/" onClick={onNavigate}>Founder <Arrow diagonal /></Link>}{adviser&&<Link className="gateway-founder-control" href="/adviser/" onClick={onNavigate}>Adviser <Arrow diagonal /></Link>}<Link className="gateway-account-control" href="/dashboard/" onClick={onNavigate}>My Dashboard <Arrow diagonal /></Link></div>;
   return (
     <Link className="gateway-account-control" href={signedIn ? "/dashboard/" : "/login/"} onClick={onNavigate}>
-      {signedIn === null ? "Account" : signedIn ? "My Dashboard" : "Log in"}
+      {signedIn ? "My Dashboard" : "Log in"}
       <Arrow diagonal />
     </Link>
   );

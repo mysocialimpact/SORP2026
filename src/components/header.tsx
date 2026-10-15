@@ -26,9 +26,9 @@ export function Header() {
           <span className="gateway-tagline">REPORTING FOR GREATER IMPACT</span>
         </Link>
         <nav className="gateway-directory-nav" aria-label="Platform information">
-          <Link href="/our-mission/">Our Mission</Link>
-          <Link href="/accountants-advisers/">Find Accountants &amp; Advisers <Arrow diagonal /></Link>
-          <Link href="#say-hello">Talk to us</Link>
+          <Link href="/our-mission/">Our Mission <Arrow diagonal /></Link>
+          <Link href="/accountants-advisers/">Find Accountants <Arrow diagonal /></Link>
+          <Link href="#say-hello">Talk to Us <Arrow diagonal /></Link>
         </nav>
         <AccountControl />
       </div>
