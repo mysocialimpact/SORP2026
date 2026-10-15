@@ -20,8 +20,8 @@ function Question({ test }: { test: Test }) {
     {test.note && <p className="scr-public-method-v1-scope"><strong>SCOPE NOTE</strong> {test.note}</p>}
     {test.na && <p className="scr-public-method-v1-scope"><strong>NOT APPLICABLE</strong> {test.na}</p>}
     <details className="scr-public-method-v1-rubric"><summary>SEE THE FULL EVIDENCE RUBRIC <span aria-hidden="true">+</span></summary>
-      <ol>{test.rubric.map((description, index) => <li key={index}><strong>{4 - index} — {answers[index]}</strong><span>{description}</span></li>)}</ol>
-      <p><strong>{test.id === "S2" ? "NOT SURE — 0 FOR SCORING" : "NOT SURE"}</strong> {test.notSure}</p>
+      <ol>{test.rubric.map((description, index) => <li key={index}><strong>{4 - index}: {answers[index]}</strong><span>{description}</span></li>)}</ol>
+      <p><strong>{test.id === "S2" ? "NOT SURE: 0 FOR SCORING" : "NOT SURE"}</strong> {test.notSure}</p>
       {test.na && <p><strong>NOT APPLICABLE</strong> {test.na}</p>}
     </details>
   </article>;
@@ -33,7 +33,7 @@ export function SorpPublicMethodology({ expanded = false }: { expanded?: boolean
       <p className="scr-kicker">OUR METHODOLOGY · QUICK READ</p>
       <h1>SORP 2026 IS OUR SOURCE OF TRUTH.</h1>
       <p className="scr-public-method-lead">ARE YOU SORP READY? assesses Impact &amp; Sustainability Reporting Readiness for SORP 2026.</p>
-      <p>This review is built directly from the impact and sustainability reporting requirements in <strong>Module 1 — Trustees’ Annual Report</strong> of Charities SORP 2026. We use SORP’s terminology, tiers and MUST / SHOULD / MAY distinctions wherever possible. MSI’s own evidence and quality judgements are labelled <strong>MSI methodology</strong>, not SORP requirements.</p>
+      <p>This review is built directly from the impact and sustainability reporting requirements in <strong>Module 1: Trustees’ Annual Report</strong> of Charities SORP 2026. We use SORP’s terminology, tiers and MUST / SHOULD / MAY distinctions wherever possible. MSI’s own evidence and quality judgements are labelled <strong>MSI methodology</strong>, not SORP requirements.</p>
     </header>
 
     <section className="scr-public-method-v1-definitions" aria-label="SORP 2026 definitions">
@@ -67,7 +67,7 @@ export function SorpPublicMethodology({ expanded = false }: { expanded?: boolean
     <details className="scr-public-method-detail" open={expanded}><summary><span><small>WANT TO SEE EXACTLY HOW THE REVIEW IS BUILT?</small><strong>READ THE DETAILED METHODOLOGY</strong></span><span className="scr-public-method-detail-mark" aria-hidden="true">+</span></summary>
       <div className="scr-public-method-detail-body"><p className="scr-kicker">THE DETAIL · CANONICAL MSI METHODOLOGY V1.0</p>
         <section className="scr-public-method-detail-group"><h2>A. SOURCE, SCOPE AND STRUCTURE</h2>
-          <h3>WHY MODULE 1?</h3><p>Module 1 — Trustees’ Annual Report — contains the narrative requirements relevant to purposes, aims, activities, achievements, performance, impact, future plans and sustainability. Other SORP material is used only where needed to interpret Module 1, including tiering, MUST / SHOULD / MAY, glossary definitions and relevant terminology.</p>
+          <h3>WHY MODULE 1?</h3><p>Module 1, Trustees’ Annual Report, contains the narrative requirements relevant to purposes, aims, activities, achievements, performance, impact, future plans and sustainability. Other SORP material is used only where needed to interpret Module 1, including tiering, MUST / SHOULD / MAY, glossary definitions and relevant terminology.</p>
           <h3>HOW THE 19-QUESTION FRAMEWORK WORKS</h3><p>The canonical MSI methodology contains 19 atomic questions: 7 Objectives and activities, 7 Achievements and performance, 3 Learning and future direction, and 2 Sustainability. The number 19 was not chosen as a target. It emerged from mapping the agreed in-scope provisions into distinct tests while avoiding duplication and double-counting.</p>
           <p>Every charity will ultimately answer all 19. Tiering changes <strong>requirement status</strong>, not visibility.</p>
           <h3>TWO DIFFERENT RESULTS</h3><p><strong>SORP REQUIREMENT STATUS</strong> asks whether applicable mandatory impact and sustainability reporting requirements are demonstrated. Applicable MUSTs drive this status. SHOULDs, MAYs and higher-tier practice cannot compensate for an unmet MUST.</p>
@@ -106,17 +106,17 @@ export function SorpPublicMethodology({ expanded = false }: { expanded?: boolean
         <section className="scr-public-method-detail-group"><h2>E. HISTORICAL EVIDENCE AND CURRENT POSITION</h2>
           <h3>{assessmentProtocol.title}</h3>
           <p>{assessmentProtocol.historicalAssessment.pipeline.join(" → ")}</p>
-          <ol className="scr-public-method-v1-rules">{assessmentProtocol.historicalAssessment.steps.map(step => <li key={step.title}><strong>{step.title}</strong> — {step.rule}</li>)}</ol>
+          <ol className="scr-public-method-v1-rules">{assessmentProtocol.historicalAssessment.steps.map(step => <li key={step.title}><strong>{step.title}</strong>: {step.rule}</li>)}</ol>
           <h3>APPLICABILITY BEFORE SCORING</h3><p>{assessmentProtocol.applicability.requiredFacts.join(", ")}. {assessmentProtocol.applicability.unknownFact} {assessmentProtocol.applicability.oa2} {assessmentProtocol.applicability.s2}</p>
-          <h3>LAYER 1 — HISTORICAL TAR</h3><p>This assesses what the latest validated published Trustees’ Annual Report actually demonstrates: <strong>HISTORICAL TAR REPORTING STRENGTH %</strong> and <strong>HISTORICAL MANDATORY SORP STATUS</strong>. Each historical finding should retain the question ID, answer, exact source excerpt, page or section, SORP paragraph, reasoning and confidence. Later user input must not rewrite this historical result.</p>
+          <h3>LAYER 1: HISTORICAL TAR</h3><p>This assesses what the latest validated published Trustees’ Annual Report actually demonstrates: <strong>HISTORICAL TAR REPORTING STRENGTH %</strong> and <strong>HISTORICAL MANDATORY SORP STATUS</strong>. Each historical finding should retain the question ID, answer, exact source excerpt, page or section, SORP paragraph, reasoning and confidence. Later user input must not rewrite this historical result.</p>
           <p>If a complete readable TAR has been properly assessed and relevant reporting is materially absent, NOT YET can be appropriate. If the document cannot reliably be assessed, use NOT SURE / NOT ASSESSABLE rather than inventing failure. A website or separate Impact Report cannot retrospectively make the historic TAR compliant.</p>
           <h3>CORRECTING A HISTORICAL FINDING</h3><p>{assessmentProtocol.historicalCorrection.distinction} {assessmentProtocol.historicalCorrection.rule}</p>
-          <h3>LAYER 2 — CURRENT POSITION</h3><p>This combines the historical assessment with explicit current information supplied or confirmed by the charity. Every one of the 19 questions must be explicitly reviewed or updated by the user. It can explain what has changed since the TAR, evidence now collected, new measures, new systems and improvements in progress. The results are <strong>CURRENT REPORTING STRENGTH %</strong> and <strong>CURRENT SORP READINESS STATUS</strong>.</p>
+          <h3>LAYER 2: CURRENT POSITION</h3><p>This combines the historical assessment with explicit current information supplied or confirmed by the charity. Every one of the 19 questions must be explicitly reviewed or updated by the user. It can explain what has changed since the TAR, evidence now collected, new measures, new systems and improvements in progress. The results are <strong>CURRENT REPORTING STRENGTH %</strong> and <strong>CURRENT SORP READINESS STATUS</strong>.</p>
           <p>The current position may include information supplied by the charity that MSI has not independently verified. It is therefore a readiness assessment, not an audit or assurance opinion.</p>
           <p>An old historical answer must not silently become the current answer because the user clicked through. The user should explicitly confirm or update the current position. Comments form part of the current evidence trail.</p>
-          <h3>LAYER 3 — WIDER EVIDENCE POSITION</h3><p>This is not a third percentage. It records where relevant evidence already exists outside the historical TAR: an Impact Report, website, another published report, internal measurement or evidence, or other relevant current material.</p>
+          <h3>LAYER 3: WIDER EVIDENCE POSITION</h3><p>This is not a third percentage. It records where relevant evidence already exists outside the historical TAR: an Impact Report, website, another published report, internal measurement or evidence, or other relevant current material.</p>
           <p>Wider evidence may help establish current readiness and identify material that should inform the next TAR. It does not retrospectively change the historical TAR. It does not automatically satisfy a SORP requirement simply because the material exists elsewhere.</p>
-          <h3>THE FOUR-STAGE EVIDENCE JOURNEY</h3><p><strong>YOUR LAST TAR</strong> — What did the published report demonstrate? → <strong>YOUR POSITION NOW</strong> — What is true today? → <strong>EVIDENCE ELSEWHERE</strong> — Do you already evidence this in an Impact Report, website, another report or internally? → <strong>FOR YOUR NEXT TAR</strong> — What should be brought through, strengthened or appropriately referenced?</p>
+          <h3>THE FOUR-STAGE EVIDENCE JOURNEY</h3><p><strong>YOUR LAST TAR</strong>: What did the published report demonstrate? → <strong>YOUR POSITION NOW</strong>: What is true today? → <strong>EVIDENCE ELSEWHERE</strong>: Do you already evidence this in an Impact Report, website, another report or internally? → <strong>FOR YOUR NEXT TAR</strong>: What should be brought through, strengthened or appropriately referenced?</p>
           <p>A charity may already be doing strong impact work that was not adequately reflected in its last TAR. Asking about wider evidence identifies what already exists and what may need to be incorporated, strengthened or appropriately referenced in the next reporting cycle. Having an Impact Report or website does not automatically satisfy SORP.</p>
         </section>
 

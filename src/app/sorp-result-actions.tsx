@@ -52,7 +52,7 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
   const chosenBand = reviewBands.find((item) => item.id === band)!;
   const tier = band === "small" ? "Tier 1" : band === "medium" ? "Tier 2" : "Tier 3";
   const finalSupportMinor = supportPence(supportChoice, customSupport);
-  const contactHref = `mailto:marcus@marcuswarry.com?subject=${encodeURIComponent(`SORP readiness conversation — ${organisation || "your organisation"}`)}`;
+  const contactHref = `mailto:marcus@marcuswarry.com?subject=${encodeURIComponent(`SORP readiness conversation: ${organisation || "your organisation"}`)}`;
   function trackResult(eventType: string, extras: { paymentType?: string; band?: string; amountMinor?: number; currency?: string } = {}, once = true) {
     return trackSorpEvent(sessionId, eventType, { organisation, charityTier: tier, readinessScore: result.score, evidenceConfidence: result.confidence, currentStage: 8, ...extras }, once);
   }
@@ -103,7 +103,7 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
 
   async function checkout(paymentType: "human_review" | "voluntary_support") {
     const amountMinor = paymentType === "human_review" ? chosenBand.amount * 100 : finalSupportMinor;
-    if (amountMinor === null) { setError("Sorry — please enter a GBP amount between £1 and £1,000, with no more than two decimal places."); return; }
+    if (amountMinor === null) { setError("Sorry. Please enter a GBP amount between £1 and £1,000, with no more than two decimal places."); return; }
     setBusy(true); setError("");
     const key = idempotencyKey || crypto.randomUUID();
     setIdempotencyKey(key);
@@ -119,7 +119,7 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
       window.location.assign(data.url);
     } catch (caught) {
       const detail = caught instanceof Error ? caught.message : "We could not open secure checkout just now.";
-      setError(`Sorry — ${detail} No payment was taken. Please try again shortly.`);
+      setError(`Sorry. ${detail} No payment was taken. Please try again shortly.`);
       setBusy(false);
     }
   }
@@ -145,7 +145,7 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
     <div><span>Human review · £{chosenBand.amount}</span><h4>SORP 2026 Impact Readiness Review</h4><p>We review your assessment and relevant reporting before the meeting, discuss the important gaps and judgement areas, and provide short written priorities afterwards.</p><ul><li>Assessment review</li><li>Latest Trustees’ Annual Report</li><li>Impact Report or Annual Review, if supplied</li><li>60-minute discussion</li><li>Strengths, gaps and judgement areas</li><li>Three priority actions</li><li>Short written summary</li></ul></div>
     <fieldset><legend>Charity size</legend>{reviewBands.map((item) => <label key={item.id} className={band === item.id ? "is-selected" : ""}><input type="radio" name="review-band" checked={band === item.id} onChange={() => { setBand(item.id); setIdempotencyKey(""); }} /><span><b>{item.label}</b><small>{item.income}</small></span><strong>£{item.amount}</strong></label>)}</fieldset>
     <p className="readiness-review-credit">If we subsequently work together on a My Social Impact project, we’ll credit the cost of your review against that work. There is no obligation to buy anything afterwards.</p>
-    <button className="readiness-pay-button" type="button" disabled={busy} onClick={() => void checkout("human_review")}>{busy ? "OPENING SECURE CHECKOUT…" : `BOOK MY HUMAN REVIEW — £${chosenBand.amount}`} <span>→</span></button>
+    <button className="readiness-pay-button" type="button" disabled={busy} onClick={() => void checkout("human_review")}>{busy ? "OPENING SECURE CHECKOUT…" : `BOOK MY HUMAN REVIEW: £${chosenBand.amount}`} <span>→</span></button>
     {error && <p className="readiness-payment-error" role="alert">{error}</p>}
     <p className="readiness-payment-note">One-off payment through Stripe. Your email is collected securely in checkout. Cost genuinely a barrier? Email <a href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org</a>.</p>
   </div>;
@@ -162,7 +162,7 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
     <header><span>Optional next steps</span><h2 id="sorp-next-actions-title">What would you like to do next?</h2><p>Your report is yours. If you’d like human judgement or want to help keep this tool free, those options are here when you need them.</p></header>
     <div className="sorp-value-choice-grid is-post-report">
       <article>
-        <span>Human review</span><h3>Talk it through — £{chosenBand.amount}</h3>
+        <span>Human review</span><h3>Talk it through: £{chosenBand.amount}</h3>
         <p className="sorp-choice-tier">{tier} charity</p>
         <p className="sorp-choice-price-note">£{chosenBand.amount} because your charity falls within SORP {tier}.</p>
         <p>60 minutes with Marcus Warry, Chartered Accountant and social impact consultant.</p>
@@ -172,7 +172,7 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
         <div className="sorp-choice-actions"><button type="button" onClick={showReview}>Book my review <b>→</b></button></div>
       </article>
       <article>
-        <span>Voluntary contribution</span><h3>Support the free tool — £5</h3>
+        <span>Voluntary contribution</span><h3>Support the free tool: £5</h3>
         <p>If this has been useful, £5 genuinely helps us keep improving it and building more free tools for charities.</p>
         <div className="sorp-choice-actions"><button className="is-text" type="button" onClick={() => showSupport(true)}>Choose another amount</button><button type="button" onClick={() => showSupport(false)}>Chuck in £5 <b>→</b></button></div>
       </article>
@@ -195,15 +195,15 @@ export function SorpResultActions({ sessionId, organisation, income, result, imp
         <div className="sorp-report-hero-result"><strong>{result.score}<small> / 100</small></strong><b>{result.band}</b><span>Confidence: {result.confidence}</span><button type="button" onClick={() => window.print()}>Print / save PDF ↗</button></div>
       </header>
       <div className="sorp-full-report">{children}</div>
-      <section className="sorp-report-email" aria-labelledby="sorp-report-email-title"><div><span>Keep your report</span><h2 id="sorp-report-email-title">Keep your report</h2><p>Want the full report as a PDF in your inbox?</p><small>Your full report is already open and free. Email is optional.</small></div>{emailState === "sent" ? <p className="sorp-report-email-success" role="status">✓ Your full report PDF ({emailedFile}) has been emailed to {email}.</p> : <form onSubmit={sendReport}><label htmlFor="sorp-report-email">Email address<input id="sorp-report-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.org" /></label><label htmlFor="sorp-report-role">Your role — optional<select id="sorp-report-role" value={role} onChange={(event) => setRole(event.target.value as Role)}><option value="">Prefer not to say</option><option>Trustee</option><option>CEO</option><option>Employee</option><option>Adviser</option><option>Other</option></select></label><button type="submit" disabled={emailState === "sending"}>{emailState === "sending" ? "Sending full PDF…" : "Email my report"} <span>→</span></button>{emailError && <p role="alert"><strong>Sorry — we couldn’t email your full PDF report just now.</strong> {emailError} Your report is still available here; please try again.</p>}</form>}</section>
-      <section className="sorp-report-beyond"><span>The next opportunity</span><h2>SORP is the requirement.<br />Better impact is the opportunity.</h2><div><p>My Social Impact would love to help you go beyond compliance — strengthening how impact is measured, managed, evidenced and communicated.</p><a href={contactHref} onClick={() => { void trackResult("book_conversation_clicked"); }}>Book a conversation <span>→</span></a><small><a href={contactHref} onClick={() => { void trackResult("contact_email_clicked"); }}>marcus@marcuswarry.com</a></small></div></section>
+      <section className="sorp-report-email" aria-labelledby="sorp-report-email-title"><div><span>Keep your report</span><h2 id="sorp-report-email-title">Keep your report</h2><p>Want the full report as a PDF in your inbox?</p><small>Your full report is already open and free. Email is optional.</small></div>{emailState === "sent" ? <p className="sorp-report-email-success" role="status">✓ Your full report PDF ({emailedFile}) has been emailed to {email}.</p> : <form onSubmit={sendReport}><label htmlFor="sorp-report-email">Email address<input id="sorp-report-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.org" /></label><label htmlFor="sorp-report-role">Your role: optional<select id="sorp-report-role" value={role} onChange={(event) => setRole(event.target.value as Role)}><option value="">Prefer not to say</option><option>Trustee</option><option>CEO</option><option>Employee</option><option>Adviser</option><option>Other</option></select></label><button type="submit" disabled={emailState === "sending"}>{emailState === "sending" ? "Sending full PDF…" : "Email my report"} <span>→</span></button>{emailError && <p role="alert"><strong>Sorry. We couldn’t email your full PDF report just now.</strong> {emailError} Your report is still available here; please try again.</p>}</form>}</section>
+      <section className="sorp-report-beyond"><span>The next opportunity</span><h2>SORP is the requirement.<br />Better impact is the opportunity.</h2><div><p>My Social Impact would love to help you go beyond compliance: strengthening how impact is measured, managed, evidenced and communicated.</p><a href={contactHref} onClick={() => { void trackResult("book_conversation_clicked"); }}>Book a conversation <span>→</span></a><small><a href={contactHref} onClick={() => { void trackResult("contact_email_clicked"); }}>marcus@marcuswarry.com</a></small></div></section>
       {postReportChoices}
       {choice === "review" && reviewPanel}{choice === "support" && supportPanel}
       <div className="sorp-report-action-bar" role="region" aria-label="Your report actions"><div className="sorp-report-action-inner">
         <div className="sorp-report-action is-email"><span>Keep this</span><button type="button" aria-expanded={emailPanelOpen} aria-controls="sorp-action-email-panel" disabled={emailState === "sent"} onClick={() => { setEmailError(""); setEmailPanelOpen((open) => !open); }}>{emailState === "sent" ? "Sent ✓" : "Email my PDF"}<b aria-hidden="true">{emailState === "sent" ? "" : "→"}</b></button></div>
-        <div className="sorp-report-action is-human"><span>Want help with it?</span><button type="button" onClick={showReview}>Book a human review — £{chosenBand.amount}<b aria-hidden="true">→</b></button></div>
-        <div className="sorp-report-action is-support"><span>Want to support us?</span><button type="button" onClick={() => showSupport(false)}>Support the free tool — £5+<b aria-hidden="true">→</b></button></div>
-        {emailPanelOpen && emailState !== "sent" && <form id="sorp-action-email-panel" className="sorp-action-email-panel" onSubmit={sendReport}><label htmlFor="sorp-action-email">Where should we send your full PDF?<input ref={actionEmailRef} id="sorp-action-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.org" /></label><button type="submit" disabled={emailState === "sending"}>{emailState === "sending" ? "Sending full PDF…" : "Send my PDF →"}</button>{emailError && <p role="alert">Sorry — {emailError} Please try again.</p>}</form>}
+        <div className="sorp-report-action is-human"><span>Want help with it?</span><button type="button" onClick={showReview}>Book a human review: £{chosenBand.amount}<b aria-hidden="true">→</b></button></div>
+        <div className="sorp-report-action is-support"><span>Want to support us?</span><button type="button" onClick={() => showSupport(false)}>Support the free tool: £5+<b aria-hidden="true">→</b></button></div>
+        {emailPanelOpen && emailState !== "sent" && <form id="sorp-action-email-panel" className="sorp-action-email-panel" onSubmit={sendReport}><label htmlFor="sorp-action-email">Where should we send your full PDF?<input ref={actionEmailRef} id="sorp-action-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.org" /></label><button type="submit" disabled={emailState === "sending"}>{emailState === "sending" ? "Sending full PDF…" : "Send my PDF →"}</button>{emailError && <p role="alert">Sorry. {emailError} Please try again.</p>}</form>}
         {emailState === "sent" && <span className="sorp-action-email-sent" role="status">Your full PDF is on its way to {email}.</span>}
       </div></div>
     </section>}

@@ -47,11 +47,11 @@ export async function POST(request: Request) {
         organisationName: "SORP2026 website visitor",
         organisationId: "",
         email,
-        message: message || "Hello — no additional message supplied.",
+        message: message || "Hello: no additional message supplied.",
         diagnostic: [
           `Source: SORP2026 ${source}`,
           `Audience: ${audience}`,
-          `Newsletter consent: ${newsletter ? "YES — explicitly selected" : "NO"}`,
+          `Newsletter consent: ${newsletter ? "YES: explicitly selected" : "NO"}`,
           newsletter ? `Consent timestamp: ${new Date().toISOString()}` : "",
           `Submission: ${submissionId}`,
         ].filter(Boolean).join(" · "),

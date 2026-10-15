@@ -265,7 +265,7 @@ export function AskSorpLive({ mode = "workspace", initialQuestion = "", onBusyCh
             />
             <button type="submit" disabled={busy || draft.trim().length < 3}>{busy ? "Checking the source…" : "Ask SORP →"}</button>
           </div>
-          <p>{mode === "launcher" ? "Your question opens in a focused Ask SORP workspace." : "Evidence-backed guidance to support—not replace—the judgement of trustees, accountants and professional advisers."}</p>
+          <p>{mode === "launcher" ? "Your question opens in a focused Ask SORP workspace." : "Evidence-backed guidance to support, not replace, the judgement of trustees, accountants and professional advisers."}</p>
         </form>
       </div>
     </section>

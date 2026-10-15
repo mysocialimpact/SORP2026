@@ -212,7 +212,7 @@ function Mission() {
                   <>
                     <strong className="rc-baseline-number">12,000+</strong>
                     <p>
-                      ICAEW firms: published directory figure — UK-only unique
+                      ICAEW firms: published directory figure: UK-only unique
                       total not yet verified.
                     </p>
                     <Source
@@ -403,7 +403,7 @@ function Mission() {
               />
               <span>
                 {data.counts.approved
-                  ? `${data.counts.approved} approved — carefully chosen.`
+                  ? `${data.counts.approved} approved: carefully chosen.`
                   : "Your first approval is ahead."}
               </span>
             </div>
@@ -606,7 +606,7 @@ function CheckAccountant() {
           ))}
           {!newFirm && (
             <button className="rc-text-button" onClick={() => setNewFirm(true)}>
-              This is a different firm — add a confirmed identity
+              This is a different firm: add a confirmed identity
             </button>
           )}
         </div>
@@ -724,7 +724,7 @@ function Database({ queue }: { queue: boolean }) {
         </h1>
         <p>
           {queue
-            ? "Research candidates, evidence gaps, reviews and due rechecks — in your priority order."
+            ? "Research candidates, evidence gaps, reviews and due rechecks in your priority order."
             : "Search the population. Follow the sources. Build a clearer picture."}
         </p>
       </div>
@@ -1080,7 +1080,7 @@ function MethodologyPage() {
       </section>
       <section id="baseline" className="rc-panel rc-section">
         <h2>The whole UK. Counted carefully.</h2>
-        <p>UK ICAEW firms — awaiting verified baseline.</p>
+        <p>UK ICAEW firms: awaiting verified baseline.</p>
         <p>
           The retained import covers 110 charity-specialism listings plus a
           separately researched firm. It does not establish all unique UK ICAEW
@@ -1319,7 +1319,7 @@ function FeatureStatus() {
         ? "Encrypted snapshots are stored privately in the existing Neon project. Each backup is downloaded and checked; recovery tests use an isolated environment. See backup history below."
         : data?.backup.configured
           ? "Storage is connected; a complete backup/recovery check must succeed before this is marked working."
-          : "Off-site backups — awaiting storage configuration. " +
+          : "Off-site backups: awaiting storage configuration. " +
             (data?.backup.missing.join(", ") || "Checking configuration…"),
     ],
     [

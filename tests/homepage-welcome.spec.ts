@@ -151,6 +151,6 @@ test("shared Talk to us puts a clear copy-email action and offices beneath the m
   expect(await page.evaluate(() => (window as typeof window & { copiedEmail?: string }).copiedEmail)).toBe("marcus@mysocialimpact.org");
   await expect(talk.locator(".shared-hello-details")).toContainText("10 Market Place, Shepton Mallet");
   await expect(talk.locator(".shared-hello-details")).toContainText("POPHub, Whitcomb Street, London");
-  const order = await talk.locator(".shared-hello-field, .shared-hello-details").evaluateAll(elements => elements.map(element => element.className));
-  expect(order).toEqual(["shared-hello-field", "shared-hello-field", "shared-hello-details"]);
+  const order = await talk.locator(".shared-hello-field, .shared-hello-consent, .shared-hello-submit, .shared-hello-details").evaluateAll(elements => elements.map(element => element.className));
+  expect(order).toEqual(["shared-hello-field", "shared-hello-field", "shared-hello-consent", "shared-hello-submit", "shared-hello-details"]);
 });

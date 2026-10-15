@@ -12,7 +12,7 @@ const route = readFileSync(new URL("../../src/app/api/growth-event/route.ts", im
 
 test("conversation CTA uses the requested address, organisation subject, and distinct Grow events", () => {
   assert.match(actions, /mailto:marcus@marcuswarry\.com\?subject=/);
-  assert.match(actions, /SORP readiness conversation — \$\{organisation/);
+  assert.match(actions, /SORP readiness conversation: \$\{organisation/);
   assert.match(actions, />marcus@marcuswarry\.com<\/a>/);
   assert.match(actions, /returnOrigin: window\.location\.origin/);
   for (const event of ["book_conversation_clicked", "contact_email_clicked", "report_emailed", "free_report_selected", "human_review_selected", "support_selected"])

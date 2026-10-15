@@ -19,7 +19,7 @@ export default function Readiness() {
         financial accounting compliance assessment.
       </p>
       {site.readiness ? (
-        <Button href={site.readiness}>Check your readiness — free</Button>
+        <Button href={site.readiness}>Check your readiness: free</Button>
       ) : (
         <>
           <div className="notice">

@@ -66,6 +66,6 @@ export async function POST(request: Request) {
     });
   } catch (cause) {
     console.error("Ask SORP upstream request failed", cause instanceof Error ? cause.message : "unknown error");
-    return jsonError("Ask SORP is temporarily unavailable. Your question is still here—please try again.", 502);
+    return jsonError("Ask SORP is temporarily unavailable. Your question is still here, please try again.", 502);
   }
 }

@@ -62,12 +62,12 @@ export function CalibrationPage() {
                     <tr key={c.id}>
                       <td>{c.name}</td>
                       <td>{f.historical_scores[c.id]}</td>
-                      <td>{f.provisional_scores?.[c.id] ?? "—"}</td>
+                      <td>{f.provisional_scores?.[c.id] ?? "N/A"}</td>
                       <td>
                         {f.provisional_scores
                           ? f.provisional_scores[c.id] -
                             f.historical_scores[c.id]
-                          : "—"}
+                          : "N/A"}
                       </td>
                     </tr>
                   ))}
