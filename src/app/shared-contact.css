@@ -46,41 +46,41 @@
   letter-spacing: -.055em;
 }
 
-.page-feedback-heading > p:last-child {
+.page-feedback-heading > p:not(.page-feedback-kicker) {
   margin: 14px 0 0;
   color: #4f5f53;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.5;
 }
+
+.page-feedback-signoff { margin-top: 18px; padding-top: 15px; border-top: 1px solid #a9b9aa; }
+.page-feedback-signoff p { margin: 0 0 8px; color: #4f5f53; font-size: 13px; }
+.page-feedback-signoff strong, .page-feedback-signoff span { display: block; }
+.page-feedback-signoff strong { font-size: 14px; }
+.page-feedback-signoff span { margin-top: 2px; color: #59675c; font-size: 11px; }
 
 .page-feedback-form {
   display: grid;
-  grid-template-columns: minmax(220px, auto) minmax(220px, 1fr);
-  gap: 10px 18px;
-  align-items: end;
+  grid-template-columns: minmax(220px, auto) minmax(240px, 1fr);
+  gap: 12px 20px;
+  align-items: start;
 }
 
 .page-feedback-form fieldset {
-  grid-row: 1 / 3;
+  grid-row: 1 / 5;
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
 }
-.page-feedback-form > label:not(.page-feedback-honeypot),
-.page-feedback-form > textarea,
-.page-feedback-form > .page-feedback-submit { grid-column: 2; }
-.page-feedback-form > label:not(.page-feedback-honeypot) { grid-row: 1; }
-.page-feedback-form > textarea { grid-row: 2; }
-.page-feedback-form > .page-feedback-submit { grid-row: 3; justify-self: start; }
+.page-feedback-comment, .page-feedback-contact, .page-feedback-form > .page-feedback-submit { grid-column: 2; }
+.page-feedback-form > .page-feedback-submit { justify-self: start; }
 
 .page-feedback-rating legend {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 750;
 }
 
 .page-feedback-rating > div { display: flex; }
@@ -101,15 +101,17 @@
 .page-feedback-rating button.is-filled { color: #355747; transform: translateY(-2px) scale(1.06); }
 .page-feedback-rating > span { display: block; margin-top: 3px; color: #59675c; font-size: 11px; font-weight: 700; }
 
-.page-feedback-form > label:not(.page-feedback-honeypot) {
+.page-feedback-comment label, .page-feedback-contact label {
+  display: block;
+  margin-bottom: 6px;
   font-size: 12px;
   font-weight: 750;
+  line-height: 1.4;
 }
 .page-feedback-form > label span { color: #59675c; font-weight: 400; }
-.page-feedback-form textarea {
+.page-feedback-form textarea, .page-feedback-form input[type="email"] {
   width: 100%;
   min-width: 0;
-  min-height: 70px;
   padding: 11px 13px;
   border: 1px solid #758478;
   border-radius: 3px;
@@ -117,6 +119,9 @@
   color: #242329;
   font: inherit;
   font-size: 15px;
+}
+.page-feedback-form textarea {
+  min-height: 86px;
   resize: vertical;
 }
 
@@ -138,13 +143,14 @@
 .page-feedback-error { grid-column: 2 / -1; margin: 0; color: #7e2619; font-size: 12px; }
 .page-feedback-honeypot { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.page-feedback-success { display: grid; grid-template-columns: auto 1fr auto; gap: 3px 20px; align-items: center; }
-.page-feedback-success > div { grid-row: 1 / 3; color: #879589; font-size: 25px; letter-spacing: -2px; }
+.page-feedback-success { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 20px; align-items: start; }
+.page-feedback-success > div { grid-row: 1 / 4; color: #879589; font-size: 25px; letter-spacing: -2px; }
 .page-feedback-success > div .is-filled { color: #355747; }
-.page-feedback-success strong { font-size: 18px; }
-.page-feedback-success p { color: #59675c; font-size: 13px; }
-.page-feedback-success button { grid-row: 1 / 3; grid-column: 3; }
+.page-feedback-success strong { font-size: 20px; }
+.page-feedback-success p { max-width: 620px; color: #59675c; font-size: 14px; line-height: 1.5; }
+.page-feedback-success button { grid-column: 2; justify-self: start; margin-top: 6px; }
 
+.page-feedback input:focus-visible,
 .page-feedback textarea:focus-visible,
 .page-feedback button:focus-visible { outline: 3px solid #355747; outline-offset: 3px; }
 
@@ -380,8 +386,8 @@
   .page-feedback-heading h2 { font-size: clamp(38px, 11vw, 50px); }
   .page-feedback-form { grid-template-columns: 1fr; gap: 8px; }
   .page-feedback-form fieldset { grid-row: auto; }
-  .page-feedback-form > label:not(.page-feedback-honeypot),
-  .page-feedback-form > textarea,
+  .page-feedback-comment,
+  .page-feedback-contact,
   .page-feedback-form > .page-feedback-submit { grid-column: 1; grid-row: auto; }
   .page-feedback-rating button { width: 52px; height: 50px; font-size: 40px; }
   .page-feedback-submit { width: 100%; margin-top: 4px; }

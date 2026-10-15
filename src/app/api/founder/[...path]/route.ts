@@ -265,9 +265,9 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
         const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit")) || 50));
         const offset = Math.max(0, Number(url.searchParams.get("offset")) || 0);
         const params = [status, category, sourceType, search ? `%${search}%` : "", limit, offset];
-        const where = `($1='' OR status=$1) AND ($2='' OR category=$2) AND ($3='' OR source_type=$3) AND ($4='' OR user_name ILIKE $4 OR email ILIKE $4 OR organisation_name ILIKE $4 OR comment ILIKE $4 OR page_path ILIKE $4 OR theme ILIKE $4)`;
+        const where = `($1='' OR status=$1) AND ($2='' OR category=$2) AND ($3='' OR source_type=$3) AND ($4='' OR user_name ILIKE $4 OR email ILIKE $4 OR organisation_name ILIKE $4 OR comment ILIKE $4 OR page_path ILIKE $4 OR theme ILIKE $4 OR technical_context->>'contactEmail' ILIKE $4)`;
         const [rows, count] = await Promise.all([
-          founderQuery(`SELECT * FROM research_console.founder_feedback WHERE ${where} ORDER BY created_at DESC LIMIT $5 OFFSET $6`, params),
+          founderQuery(`SELECT *, account_id LIKE 'anonymous:%' AS anonymous, nullif(technical_context->>'contactEmail','') AS contact_email FROM research_console.founder_feedback WHERE ${where} ORDER BY created_at DESC LIMIT $5 OFFSET $6`, params),
           founderQuery<{ count: string }>(`SELECT count(*) FROM research_console.founder_feedback WHERE ${where}`, params.slice(0, 4)),
         ]);
         return json({ rows, total: Number(count[0]?.count || 0), limit, offset });

@@ -7,7 +7,8 @@ test("homepage presents the social enterprise mission and agreed vision", async 
   await expect(page.getByRole("heading", { name: "Imagine a world where social impact was taken as seriously as financial performance." })).toBeVisible();
   await expect(page.getByText("We’ve built this for")).toBeVisible();
   await expect(page.locator("#ambition-title")).toBeVisible();
-  await expect(page.locator("#contribution-title")).toContainText("Found this useful?");
+  await expect(page.locator("#contribution-title")).toContainText("Help the next charity find this useful.");
+  await expect(page.getByRole("link", { name: "New here? Discover our mission →" })).toBeVisible();
   await expect(page.locator(".gateway-contribution-copy")).toContainText("helps us keep them free and reach more charities, especially smaller ones");
   const footer = page.getByRole("contentinfo");
   await expect(footer.getByRole("link", { name: "See what else is in the Shed", exact: false })).toHaveAttribute("href", "https://www.theideasshed.com/");

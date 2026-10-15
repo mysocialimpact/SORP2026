@@ -90,6 +90,7 @@ export function HomepagePricing() {
   const track = useRef<HTMLOListElement>(null);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(true);
+  const [plansExpanded, setPlansExpanded] = useState(false);
 
   const updateControls = useCallback(() => {
     const element = track.current;
@@ -135,8 +136,14 @@ export function HomepagePricing() {
             <p className="homepage-plan-price">{plan.price}{"suffix" in plan && <small>{plan.suffix}</small>}</p>
             <p className="homepage-plan-intro">{plan.intro}</p>
             <ul className="homepage-plan-highlights">{plan.highlights.map(item => <li key={item}>{item}</li>)}</ul>
-            <details>
-              <summary>See everything included</summary>
+            <details open={plansExpanded}>
+              <summary
+                aria-expanded={plansExpanded}
+                onClick={event => {
+                  event.preventDefault();
+                  setPlansExpanded(expanded => !expanded);
+                }}
+              >{plansExpanded ? "Hide everything included" : "See everything included"}</summary>
               <ul>{plan.details.map(item => <li key={item}>{item}</li>)}</ul>
             </details>
           </li>
@@ -146,12 +153,12 @@ export function HomepagePricing() {
       <div className="gateway-width">
         <div className="homepage-beta-invitation">
           <div>
-            <p className="gateway-kicker">Early beta</p>
-            <h3>We’re offering complimentary access to our early beta users.</h3>
+            <p className="gateway-kicker">Free early beta access</p>
+            <h3>We’re testing Plus and Advisor with a small group of charities, accountants and advisers. We’d love to hear from you if you’d like to get involved and help us make these tools better.</h3>
           </div>
           <a
             href="#say-hello"
-            onClick={() => window.dispatchEvent(new CustomEvent("sorp2026:contact-intent", { detail: { message: "I’d like to request complimentary early beta access." } }))}
+            onClick={() => window.dispatchEvent(new CustomEvent("sorp2026:contact-intent", { detail: { message: "I’d like to request free early beta access." } }))}
           >
             Request free beta access →
           </a>
@@ -159,17 +166,17 @@ export function HomepagePricing() {
       </div>
 
       <div className="gateway-width homepage-pricing-foot">
-        <p>Proposed monthly prices are per organisation and exclude VAT where applicable. Plus and Adviser are planned products and are not yet available to purchase.</p>
         <div className="homepage-human-support">
           <div><p className="gateway-kicker">Software first. Humans when useful.</p><h3>Core technology stays as accessible as we can make it.</h3></div>
           <div>
             <p>Use the software independently, then bring in human expertise only when it would genuinely help.</p>
             <ul>
-              <li><strong>£0</strong> Self-service tools made as useful as possible, so charities can achieve more without our direct involvement.</li>
-              <li><Link href="/are-you-sorp-ready/review/booking?session=30"><strong>£50</strong> A 30-minute conversation when expert help would be useful.</Link></li>
-              <li><Link href="/are-you-sorp-ready/review/booking?session=60"><strong>£100</strong> A 60-minute consultation when you need more time and advice.</Link></li>
-              <li><strong>Bespoke</strong> Ongoing advice, report development and Impact Director support</li>
+              <li><strong>£0 — Self-service</strong><span>Free tools and guidance.</span></li>
+              <li><Link href="/are-you-sorp-ready/review/booking?session=60"><strong>£100/hour — Expert support</strong><span>Professional support when useful.</span></Link></li>
+              <li><strong>Bespoke — Projects and partnerships</strong><span>Tailored support for more substantial engagements.</span></li>
             </ul>
+            <p className="homepage-smaller-charity">Smaller charity? We may be able to offer reduced rates. Just ask!</p>
+            <p className="homepage-tier-note">Under SORP 2026, Tier 1 covers charities preparing accruals accounts with annual gross income up to £500,000.</p>
             <Link className="homepage-directory-link" href="/accountants-advisers/">Need specialist SORP or accounting advice? Find Accountants &amp; Advisers ↗</Link>
           </div>
         </div>

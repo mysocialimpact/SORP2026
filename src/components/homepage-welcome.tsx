@@ -5,6 +5,24 @@ import { Arrow } from "@/components/ui";
 
 const audienceKey = "sorp2026.homepage-audience";
 type Audience = "charity" | "adviser";
+const audienceCopy = {
+  charity: {
+    heading: "To the charities making a difference, every day.",
+    paragraphs: [
+      "We know how hard it can be to find the time, resources and specialist advice you need — whether that’s understanding SORP, managing your finances or demonstrating your impact.",
+      "We’re building practical, accessible tools to make that easier for charities of every size. SORP 2026 is just the beginning.",
+      "And we’d love to hear what else would make your life easier.",
+    ],
+  },
+  adviser: {
+    heading: "To the accountants and advisers supporting our charities.",
+    paragraphs: [
+      "We know how much expertise, care and hard work goes into helping charities succeed.",
+      "Co-founded by a chartered accountant, we’re building tools with professionals like you in mind — to make your work easier and help you deliver even more value to your clients.",
+      "We’d be honoured if you used them. And if you have ideas for making them better, we’d love to hear them. We’re all ears.",
+    ],
+  },
+} as const;
 let memoryAudience: Audience | null = null;
 function readAudience(): Audience | null {
   try {
@@ -48,11 +66,15 @@ export function HomepageAudience() {
           ["charity", "CHARITIES", "Trustees · CEOs · Finance teams · Staff · Volunteers"],
           ["adviser", "ACCOUNTANTS & ADVISERS", "Accountants · Auditors · Lawyers · Consultants · Funders"],
         ] as const).map(([value, title, description]) => (
-          <button key={value} type="button" aria-pressed={audience === value} onClick={() => select(value)}>
+          <button key={value} type="button" aria-pressed={audience === value} aria-expanded={audience === value} aria-controls="homepage-audience-detail" onClick={() => select(value)}>
             <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>
           </button>
         ))}
       </div>
+      {audience && <div key={audience} className={`homepage-audience-detail is-${audience}`} id="homepage-audience-detail" role="region" aria-live="polite">
+        <h2>{audienceCopy[audience].heading}</h2>
+        <div>{audienceCopy[audience].paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
+      </div>}
     </section>
   );
 }

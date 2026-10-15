@@ -18,6 +18,7 @@ type Input = {
   rating?: unknown;
   category?: unknown;
   comment?: unknown;
+  contactEmail?: unknown;
   enquiryType?: unknown;
   message?: unknown;
   website?: unknown;
@@ -104,13 +105,15 @@ export async function POST(request: Request) {
       const rating = Number.isInteger(input.rating) && Number(input.rating) >= 1 && Number(input.rating) <= 5 ? Number(input.rating) : null;
       const category = ["general", "suggestion", "problem"].includes(String(input.category)) ? String(input.category) : "general";
       const comment = typeof input.comment === "string" ? input.comment.trim() : "";
+      const contactEmail = typeof input.contactEmail === "string" ? input.contactEmail.trim().toLowerCase() : "";
       if (!rating && !comment) return json({ error: "Choose a star rating, write a comment, or both." }, 400);
       if (comment.length > 3_000) return json({ error: "Please keep feedback under 3,000 characters." }, 400);
+      if (contactEmail.length > 254 || (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail))) return json({ error: "Enter a valid contact email address, or leave it blank." }, 400);
       const row = (await founderQuery<{ id: string }>(
         `INSERT INTO research_console.founder_feedback
-          (submission_id,account_id,user_name,email,organisation_id,organisation_name,account_type,page_path,category,rating,comment)
-         VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id`,
-        [id, person.accountId, person.name, person.email, person.organisationId, person.organisationName, person.accountType, source, category, rating, comment || null],
+          (submission_id,account_id,user_name,email,organisation_id,organisation_name,account_type,page_path,category,rating,comment,technical_context)
+         VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb) RETURNING id`,
+        [id, person.accountId, person.name, person.email, person.organisationId, person.organisationName, person.accountType, source, category, rating, comment || null, JSON.stringify(contactEmail ? { contactEmail } : {})],
       ))[0];
       return json({ accepted: true, id: row.id }, 201);
     }

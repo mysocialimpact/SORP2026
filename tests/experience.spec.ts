@@ -27,6 +27,8 @@ test("experience can be paused, explored and expanded without losing organisatio
   await expect.poll(() => lane.evaluate(el => el.scrollLeft)).toBeGreaterThan(stopped);
   const images = section.locator("img");
   for (const img of await images.all()) expect(await img.evaluate(el => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0)).toBe(true);
+  const ordinaryNames = section.locator(".experience-tile:not(.is-featured) .experience-tile-name");
+  expect(await ordinaryNames.first().evaluate(el => Number.parseFloat(getComputedStyle(el.parentElement!).fontSize))).toBeGreaterThanOrEqual(info.project.name === "mobile" ? 20 : 26);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect((await section.boundingBox())!.height).toBeLessThan(info.project.name === "mobile" ? 800 : 900);
   await section.screenshot({ path: info.outputPath("experience.png") });

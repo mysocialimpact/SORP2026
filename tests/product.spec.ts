@@ -164,7 +164,7 @@ test("readiness feedback controls do not overlap at desktop, tablet or mobile wi
   await section.getByRole("radio", { name: "5 stars" }).click();
   await section.getByLabel("Anything you’d like to add? Optional").fill("Clear and easy to use.");
   await section.getByRole("button", { name: "Submit feedback →" }).click();
-  await expect(section.getByText("Your feedback has been received.")).toBeVisible();
+  await expect(section.getByText("Brilliant! Thank you so much.")).toBeVisible();
 });
 
 test("destination APIs fail safely without production credentials", async ({ request }) => {
