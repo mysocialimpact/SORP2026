@@ -14,6 +14,15 @@ export const serviceLabels = {
 export type Service = keyof typeof serviceLabels;
 export type Point = { lat: number; lng: number };
 export type Bounds = { north: number; south: number; east: number; west: number };
+export type ExternalRecognition = {
+  publisher: string;
+  survey: string;
+  year: number;
+  category: string;
+  result: string;
+  sourceUrl: string;
+  verified: boolean;
+};
 export type Firm = {
   slug: string;
   name: string;
@@ -42,6 +51,7 @@ export type Firm = {
   offices?: { address: string; postcode: string; source: string; phone?: string }[];
   email?: string;
   researchSources?: { title: string; url: string }[];
+  externalRecognitions?: ExternalRecognition[];
 };
 export const firms: Firm[] = [...(sourceFirms as Firm[]).map(firm => firm.slug === "tittensor-and-co-limited" ? {
   ...firm, coordinates: { lat: 51.88065, lng: 0.143985 },
