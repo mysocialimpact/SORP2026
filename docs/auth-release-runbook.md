@@ -14,8 +14,12 @@ No Brainstrust email has been sent by this work.
 - Brainstrust verification, recovery and invitation email is blocked in code.
   Only a reviewed change after Marcus's explicit approval can release it.
 - `SORP_AUTH_EMAIL_DELIVERY_ENABLED=false` (or absent) blocks all SORP account
-  mail even if a Resend key is present. Migration tests additionally require
-  exact addresses in `SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS`; no domain wildcards.
+  mail even if a Resend key is present. Synthetic tests use
+  `SORP_AUTH_EMAIL_RECIPIENT_POLICY=allowlist` and exact addresses in
+  `SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS`; no domain wildcards. Public delivery
+  requires the explicit `public` policy, live cutover, the canonical production
+  auth origin and staging off. Brainstrust domains remain blocked in either mode;
+  add any known personal addresses to `SORP_AUTH_EMAIL_BLOCKED_RECIPIENTS`.
 
 ## Code-only production deployment with cutover off
 
@@ -37,35 +41,38 @@ usable. The production project currently has no `SORP_AUTH_DATABASE_URL`,
 
 ## Independent staging and data protection
 
-1. Preserve the existing Cow service and D1 records. Obtain a complete export
-   of Brainstrust's assessment or a verified, owner-authorised recovery path
-   before disabling any old service. The Sites row reader truncates the
-   assessment and is not a backup. Do not migrate old passwords or sessions.
+1. Preserve the existing Cow service and D1 records. Verify a complete D1
+   export and restore or an owner-authorised recovery path for Brainstrust's
+   assessment before any change that could make the old records inaccessible.
+   The Sites row reader truncates the assessment and is not a backup. Defer the
+   account and assessment migration; do not migrate old passwords or sessions.
 2. Back up the target Neon database through a direct connection and restore it
    to an isolated branch. Verify row counts, auth IDs, permissions and report
    bytes. Neon history observed was six hours, so retain a separate backup.
-3. Apply `008_sorp_auth_provider.sql`, `009_sorp_auth_application.sql`, then
-   `010_sorp_report_ownership.sql` to
+3. Apply `008_sorp_auth_provider.sql`, `009_sorp_auth_application.sql`,
+   `010_sorp_report_ownership.sql`, then `011_sorp_auth_audit_integrity.sql` to
    a fresh isolated staging database. These migrations passed from scratch in
-   local PostgreSQL; no production migration has run. Use a direct connection
-   for migrations and a scoped, pooled role for application traffic.
+   local PostgreSQL; no production migration has run. Create a distinct
+   `sorp_auth_runtime` login, apply `scripts/provision-sorp-auth-runtime.sql`
+   with a direct owner connection, and verify it cannot read `research_console`
+   or modify audit history. Use only its pooled URL for application traffic.
 4. Set the SORP auth database URL, a new secret of at least 32 characters,
    `SORP_AUTH_BASE_URL`, and the SORP-only Resend key in protected staging
    settings. Explicitly enable account mail for a finite allowlist of approved
    synthetic addresses. Test verification, recovery, invitations, expired and
-   reused links, delivery failures, forwarding and replies. Do not expose
-   credentials in logs or artifacts.
+   reused links, delivery failures, forwarding and replies. Confirm Resend
+   domain verification, SPF, DKIM and DMARC. Review known Brainstrust addresses
+   outside its domain for the blocklist. Do not expose credentials in logs or artifacts.
 5. Confirm the founder's intended original account ID/email, verify ownership,
    set a new credential, enroll TOTP, and run `grant-sorp-founder.ts` first as a
    dry run. Apply the grant only after the exact ID, email and new MFA session
    are verified. Do not merge with the separate `public.users` identity by email.
 6. Reconcile the founder identity and FLUID membership from current records.
    The private local manifests in `/workspace/sorp-migration-private/` are
-   working evidence, not a full production backup. Revalidate the live source.
-   Keep Brainstrust's legacy account quarantined. Marcus will coordinate its
-   new login separately; attach the preserved assessment only after ownership
-   is verified. Do not expose its old account or grant an adviser access by
-   matching an email or organisation name.
+   working evidence, not a full production backup. Keep Brainstrust's legacy
+   account and assessment in the old system for a separate later transition;
+   do not create its new account or assign an adviser grant now. Record how the
+   owner can later recover the work without an unverified email/name match.
 7. Inventory existing MSI Charity Impact Report objects and any account-linked
    product records; migrate by immutable owner ID with count and digest checks.
    Test a 15 MB PDF, owner listing, founder download, denial to another account,
@@ -75,17 +82,25 @@ usable. The production project currently has no `SORP_AUTH_DATABASE_URL`,
 ## Cutover gate and rollback
 
 Enable the switch only when Resend works, backups restore, Brainstrust's
-assessment remains recoverable, its legacy account remains quarantined,
+assessment has a verified recovery route in the retained old infrastructure,
+its legacy account remains quarantined,
 founder and adviser permissions are reconciled, all critical integration and
 browser checks pass, and the current Cow account path is still available for
 rollback. Do not contact Brainstrust until Marcus explicitly approves it.
+
+At the approved cutover, change the recipient policy from `allowlist` to
+`public` in the same controlled production revision as the auth switch. Verify
+that a new non-Brainstrust user can receive verification and recovery mail;
+the explicit Brainstrust block must continue to reject its domain and any
+known external contact addresses.
 
 Cutover is a production environment revision followed by a deployment. Capture
 the prior environment revision and deployment ID first. After enabling, verify
 new login, save/reload, recovery, founder MFA, cross-tenant denial, charity
 approval/revocation, team confidentiality and report upload/list/download.
-Compare the imported assessment digest and linked IDs. If any identity, data
-or permission mismatch appears, restore `SORP_AUTH_CUTOVER_ENABLED=false`,
+Do not claim Brainstrust's legacy assessment is available in the new account.
+If any identity, data or permission mismatch appears, restore
+`SORP_AUTH_CUTOVER_ENABLED=false`,
 redeploy the known-good revision and direct users back to the existing path.
 Retain Cow D1 and its service credentials for recovery until genuine users can
 access all preserved work independently.

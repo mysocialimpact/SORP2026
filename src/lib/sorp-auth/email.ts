@@ -5,16 +5,36 @@ const REPLY_TO = "marcus@mysocialimpact.org";
 
 function assertRecipientReleased(to: string) {
   const recipient = to.trim().toLowerCase();
-  // Delivery stays off until the founder explicitly enables a finite test list.
-  const approved = (process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS || "")
-    .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
-  if (process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED !== "true" ||
-      !approved.includes(recipient) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
-    throw new Error("SORP account email is disabled for this recipient.");
+  const domain = recipient.split("@")[1];
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+    throw new Error("SORP account email has an invalid recipient.");
   }
-  if (recipient.endsWith("@brainstrust.org.uk")) {
+  // Keep this block in both test and public delivery modes. Additional known
+  // addresses outside Brainstrust's domain can be blocked without a code release.
+  const blocked = (process.env.SORP_AUTH_EMAIL_BLOCKED_RECIPIENTS || "")
+    .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
+  if (domain === "brainstrust.org.uk" || domain.endsWith(".brainstrust.org.uk") ||
+      blocked.includes(recipient)) {
     throw new Error("Brainstrust account email requires Marcus's explicit approval and a code review.");
   }
+  if (process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED !== "true") {
+    throw new Error("SORP account email is disabled for this recipient.");
+  }
+  const policy = process.env.SORP_AUTH_EMAIL_RECIPIENT_POLICY || "allowlist";
+  const approved = (process.env.SORP_AUTH_EMAIL_ALLOWED_RECIPIENTS || "")
+    .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
+  if (policy === "allowlist") {
+    if (!approved.includes(recipient)) {
+      throw new Error("SORP account email is disabled for this recipient.");
+    }
+    return;
+  }
+  if (policy === "public" && process.env.SORP_AUTH_CUTOVER_ENABLED === "true" &&
+      process.env.SORP_AUTH_STAGING_ENABLED !== "true" &&
+      process.env.SORP_AUTH_BASE_URL === "https://sorp2026.org") {
+    return;
+  }
+  throw new Error("SORP account email is disabled for this recipient.");
 }
 
 export function authMailConfigured() {

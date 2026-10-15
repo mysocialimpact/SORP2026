@@ -175,35 +175,18 @@ This path remains disabled while cutover is off. Existing MSI report objects
 must still be inventoried and preserved; the isolated tests do not establish
 production database capacity or backups for customer PDFs.
 
-## Brainstrust data transfer
+## Brainstrust preservation (migration deferred)
 
-The existing Cow rows remain the recovery source. Team organisation,
-membership, round, invitation and completed response can be copied with
-`prepare-sorp-customer.ts` and `import-sorp-team.ts` after verifying source
-IDs and ownership. Exact Cow team rows were assembled into a private local
-manifest at `/workspace/sorp-migration-private/brainstrust-team.json`,
-validated without applying them, and excluded from the repository. The
-founder ledger and Cow client-access record were similarly captured in
-`/workspace/sorp-migration-private/founder-reconciliation.json`.
-`reconcile-sorp-organisations.ts` maps the founder Brainstrust alias to the
-original team ID and the FLUID alias to its adviser organisation; it does not
-assign adviser membership or activate the existing Cow client grant. It passed
-an isolated integration test. The existing assessment progress is too large for the
-read-only table view and **has not yet been copied**. A gated download route
-(`SORP_AUTH_LEGACY_EXPORT_ENABLED`, off by default) can use the customer's
-existing session to return the full JSON and a SHA-256 digest. The isolated
-`import-sorp-assessment.ts` command requires that digest, the original account
-ID and a verified matching new email; it refuses to overwrite different
-newer work. Neither route nor script has run against the real account.
-
-When customer contact is authorised, the simplest path is for the authorised
-owner to sign in to the old site once, download the assessment export and
-transfer it to Marcus through a secure channel, then establish a fresh SORP
-password and check the restored assessment and team work. If old sign-in is
-unavailable or the old broker cannot return the complete progress, obtain a
-complete Cow D1 export. Do not infer the missing bytes from the truncated row,
-and do not delete or disconnect the original records before the work is
-verified in the new account.
+The existing Cow D1 rows remain the recovery source. Private local manifests
+contain the visible organisation and team records, but they are **not a backup**.
+The account's assessment progress is too large for the read-only Sites table
+view and has not been completely exported or restored. Earlier gated export
+and import utilities remain disabled and have not run against the real account.
+Do not create a new Brainstrust account, move its work or contact its staff now.
+Before any action that could make the old account or records inaccessible,
+verify a complete Cow D1 export and restore, or a secure owner-authorised
+recovery route. Keep Cow operational until that evidence exists. A separate
+customer transition can be arranged later with Marcus's explicit approval.
 
 ## Exact remaining gates before disconnecting Cow account infrastructure
 
@@ -219,10 +202,11 @@ verified in the new account.
    the active Cow adviser-client grant must not be assigned to an unverified
    adviser identity. Reconcile Marcus's chosen founder account ID and TOTP
    grant, then confirm FLUID ownership and the client grant separately.
-   Import the complete Brainstrust assessment and team work, plus any other
-   genuine customer product records. Avoid duplicate organisations. Confirm the
-   customer can see the original work in a fresh SORP login before switching
-   them; resolve any Cow writes made during transfer.
+   Preserve Brainstrust's Cow records and verify a complete recovery method;
+   transferring its assessment and account is a separate later task and is not
+   a prerequisite for independent authentication. Do not expose the old account
+   through an unverified new identity. Inventory any other genuine customer
+   product records and avoid duplicate organisations.
 3. **Account-linked report files.** The new PDF upload, listing and private
    download pass local integration and browser tests. Inventory any reports
    already stored by MSI and transfer them with owner IDs before cutover.
@@ -238,7 +222,7 @@ verified in the new account.
    production configuration. The published Cow source remains
    unavailable, so test the promised SORP policy directly rather than
    assuming exact behavioural equivalence.
-5. **Deployment and rollback.** Apply the two migrations with a restricted DB
+5. **Deployment and rollback.** Apply migrations 008-011 with a restricted DB
    role in a staging environment, configure SORP auth secrets and sender,
    test full workflows and verify database backups. Deploy with cutover off;
    only then enable the reversible switch in a controlled window. Monitor

@@ -45,7 +45,7 @@ function approveSyntheticRecipient(email: string) {
     .filter(Boolean).join(",");
 }
 
-before(async () => { await db.query('TRUNCATE sorp_auth."rateLimit"'); });
+before(async () => { await db.query('DELETE FROM sorp_auth."rateLimit"'); });
 
 async function post(action: string, body: Record<string, unknown>, cookie = "", ip = "192.0.2.10") {
   return independentAccountPOST(new Request("http://localhost:3000/api/sorp-auth-compat", {
