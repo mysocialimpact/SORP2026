@@ -302,12 +302,17 @@ export async function readClientAssessment(userId: string, input: Input) {
       JOIN sorp_auth."user" u ON u.id=m.user_id
       LEFT JOIN sorp_auth.profile profile ON profile.user_id=u.id
       WHERE m.organisation_id=$1 AND m.status='active' ORDER BY p.last_saved_at DESC`, [charityId]);
+    const reports = granted.rows[0].permissions.reports === true
+      ? await client.query<{ id: string; filename: string; status: string; size_bytes: number }>(`
+        SELECT id::text,filename,status,size_bytes FROM sorp_auth.report_review
+        WHERE organisation_id=$1 AND status<>'uploading' ORDER BY created_at DESC LIMIT 100`, [charityId])
+      : null;
     await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id)
       VALUES($1,$2,'organisation',$3)`, [userId,
       view === "answers" ? "client_answers_read" : "client_progress_read", charityId]);
     await client.query("COMMIT");
     return { organisationId: charityId, organisationName: granted.rows[0].charity_name,
-      view, assessments: assessment.rows.map(row => ({ accountId: row.user_id,
+      view, reports: reports?.rows || [], assessments: assessment.rows.map(row => ({ accountId: row.user_id,
         name: row.name, position: row.position, organisation: row.organisation,
         status: row.completed_stages.length === 7 ? "complete" : "in_progress",
         currentStage: row.current_stage, completedStages: row.completed_stages,

@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-type Permissions={progress:boolean;answers:boolean;edit:boolean;invitations:boolean};
+type Permissions={progress:boolean;answers:boolean;reports?:boolean;edit:boolean;invitations:boolean};
 type Membership={organisationId:string;name:string;type:"Charity"|"Adviser"|"Other";role:"owner"|"admin"|"member";entitlement?:{plan?:string;status?:string;publishedPrice?:number;payablePrice?:number;complimentaryEnd?:string|null}};
 type Access={id:string;adviserName:string;charityName:string;charityOrganisationId?:string;permissions:Permissions};
 type AdviserClient={organisationId:string;name:string;status:string;permissions:Permissions};
 type SettingsData={signedIn?:boolean;authProvider?:string;account?:{name:string;email:string;position?:string;organisation?:string};platformAccess?:{memberships?:Membership[];approvalRequests?:Access[];activeClientAccess?:Access[]};error?:string};
 
-function permissionSummary(value:Permissions){return [value.progress&&"Progress",value.answers&&"Individual answers",value.edit&&"Editing",value.invitations&&"Invitations"].filter(Boolean).join(" · ")||"No data permissions";}
+function permissionSummary(value:Permissions){return [value.progress&&"Progress",value.answers&&"Individual answers",value.reports&&"Charity reports",value.edit&&"Editing",value.invitations&&"Invitations"].filter(Boolean).join(" · ")||"No data permissions";}
 function money(pence?:number){return typeof pence==="number"?`£${(pence/100).toLocaleString("en-GB")}/month`:"Not recorded";}
 
 export function AccountSettings(){

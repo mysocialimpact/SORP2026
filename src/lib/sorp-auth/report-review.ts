@@ -23,7 +23,7 @@ export async function listReportReviews(userId: string) {
     FROM sorp_auth.report_review r WHERE r.status<>'uploading' AND (
       (r.user_id=$1 AND r.organisation_id IS NULL) OR (r.organisation_id IS NOT NULL AND EXISTS (
         SELECT 1 FROM sorp_auth.membership m WHERE m.organisation_id=r.organisation_id
-          AND m.user_id=$1 AND m.status='active')) OR (r.organisation_id IS NOT NULL AND EXISTS (
+          AND m.user_id=$1 AND m.status='active' AND m.role IN ('owner','admin'))) OR (r.organisation_id IS NOT NULL AND EXISTS (
         SELECT 1 FROM sorp_auth.adviser_client_access a
         JOIN sorp_auth.membership m ON m.organisation_id=a.adviser_organisation_id
         JOIN sorp_auth.entitlement e ON e.organisation_id=a.adviser_organisation_id
@@ -59,6 +59,7 @@ export async function prepareReportUpload(request: Request, userId: string, prog
       const owned = await client.query(`SELECT o.id FROM sorp_auth.organisation o
         JOIN sorp_auth.membership m ON m.organisation_id=o.id
         WHERE o.id=$1 AND o.type='Charity' AND m.user_id=$2 AND m.status='active'
+          AND m.role IN ('owner','admin')
         FOR UPDATE OF o,m`, [organisationId, userId]);
       if (!owned.rowCount) throw new Error("The charity organisation is unavailable.");
     }
@@ -128,7 +129,7 @@ export async function uploadReportChunk(request: Request) {
     const review = found.rows[0];
     if (!review) { await client.query("ROLLBACK"); return response({ error: "The upload is expired or unavailable." }, 403); }
     if (review.organisation_id && !(await client.query(`SELECT 1 FROM sorp_auth.membership
-      WHERE organisation_id=$1 AND user_id=$2 AND status='active' FOR SHARE`,
+      WHERE organisation_id=$1 AND user_id=$2 AND status='active' AND role IN ('owner','admin') FOR SHARE`,
     [review.organisation_id, identity.account.id])).rowCount) {
       await client.query("ROLLBACK"); return response({ error: "Organisation access was revoked." }, 403);
     }

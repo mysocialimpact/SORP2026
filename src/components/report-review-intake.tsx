@@ -25,7 +25,7 @@ export function ReportReviewIntake() {
       .then(async response => {
         const data = await response.json().catch(() => ({}));
         if (response.ok && data.signedIn && data.account) { setAccount({ loading: false, signedIn: true, independent: data.authProvider === "sorp", readinessComplete: isReadinessComplete(data.progress as ReadinessProgress), name: data.account.name || "", email: data.account.email || "", organisation: data.account.organisation || "", error: "" }); setOrganisation(data.account.organisation || "");
-          const charities = (data.authProvider === "sorp" ? data.platformAccess?.memberships || [] : []).filter((member: { type: string }) => member.type === "Charity");
+          const charities = (data.authProvider === "sorp" ? data.platformAccess?.memberships || [] : []).filter((member: { type: string; role: string }) => member.type === "Charity" && ["owner", "admin"].includes(member.role));
           setCharityOrganisations(charities); if (charities.length === 1) setOrganisationId(charities[0].organisationId);
         }
         else setAccount({ loading: false, signedIn: false, independent: false, readinessComplete: false, name: "", email: "", organisation: "", error: "" });

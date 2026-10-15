@@ -17,7 +17,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       AND ($3::boolean OR (r.user_id=$2 AND r.organisation_id IS NULL)
         OR (r.organisation_id IS NOT NULL AND EXISTS (
           SELECT 1 FROM sorp_auth.membership m WHERE m.organisation_id=r.organisation_id
-            AND m.user_id=$2 AND m.status='active'))
+            AND m.user_id=$2 AND m.status='active' AND m.role IN ('owner','admin')))
         OR (r.organisation_id IS NOT NULL AND EXISTS (
           SELECT 1 FROM sorp_auth.adviser_client_access a
           JOIN sorp_auth.membership m ON m.organisation_id=a.adviser_organisation_id

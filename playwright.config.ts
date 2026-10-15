@@ -3,8 +3,8 @@ import { existsSync } from "node:fs";
 export default defineConfig({
   testDir: "./tests",
   testIgnore: process.env.TEST_STATIC === 'true'
-    ? ['**/site.spec.ts', '**/product-unit/**']
-    : ['**/static.spec.ts', '**/product-unit/**'],
+    ? ['**/site.spec.ts', '**/product-unit/**', '**/*.integration.test.ts', '**/sorp-auth-*.test.ts']
+    : ['**/static.spec.ts', '**/product-unit/**', '**/*.integration.test.ts', '**/sorp-auth-*.test.ts'],
   fullyParallel: true,
   workers: 2,
   reporter: process.env.CI

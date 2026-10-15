@@ -172,7 +172,7 @@ export function FounderControlCentre() {
     if (!selectedOrganisation) return;
     const form = new FormData(event.currentTarget);
     await perform(async () => {
-      await founderCall("clients/link", { method: "POST", body: JSON.stringify({ adviserOrganisationId:selectedOrganisation.id, charityOrganisationId:form.get("charity"), permissions:{ progress:true, answers:form.get("answers") === "on", edit:form.get("edit") === "on", invitations:form.get("invitations") === "on" } }) });
+      await founderCall("clients/link", { method: "POST", body: JSON.stringify({ adviserOrganisationId:selectedOrganisation.id, charityOrganisationId:form.get("charity"), permissions:{ progress:true, answers:form.get("answers") === "on", reports:form.get("reports") === "on", edit:form.get("edit") === "on", invitations:form.get("invitations") === "on" } }) });
       await loadDashboard();
       setOrganisationDetail(await founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`));
       setNotice("Client access requested. Confidential records remain closed until the charity owner approves.");

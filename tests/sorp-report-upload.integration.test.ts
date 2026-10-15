@@ -7,6 +7,7 @@ import { sorpAuth } from "../src/lib/sorp-auth/auth";
 import { independentAccountPOST } from "../src/lib/sorp-auth/compat";
 import { uploadReportChunk } from "../src/lib/sorp-auth/report-review";
 import { GET as downloadReport } from "../src/app/api/sorp-report-download/[id]/route";
+import { readClientAssessment } from "../src/lib/sorp-auth/admin";
 
 const url = process.env.SORP_AUTH_DATABASE_URL || "";
 if (!/^postgres(?:ql)?:\/\/[^@]+@127\.0\.0\.1:55432\/sorp_test$/.test(url))
@@ -72,7 +73,8 @@ test("report upload is readiness-gated, session-bound, private and validates com
   await db.query(`INSERT INTO sorp_auth.entitlement(organisation_id,plan) VALUES($1,'Free'),($2,'Adviser')`,
     [charityOrganisationId, adviserOrganisationId]);
   await db.query(`INSERT INTO sorp_auth.membership(organisation_id,user_id,role) VALUES
-    ($1,$2,'owner'),($3,$4,'owner')`, [charityOrganisationId, ownerId, adviserOrganisationId, adviserId]);
+    ($1,$2,'owner'),($1,$5,'member'),($3,$4,'owner')`,
+  [charityOrganisationId, ownerId, adviserOrganisationId, adviserId, otherId]);
   assert.equal((await account("save", other, { progress: { step: "done", sessionId: "synthetic-other" } })).status, 200);
   const pdf = Buffer.alloc(3 * 1024 * 1024 + 100, 32);
   pdf.write("%PDF-1.7\n", 0);
@@ -81,6 +83,8 @@ test("report upload is readiness-gated, session-bound, private and validates com
     organisation: "Synthetic charity", organisationId: charityOrganisationId, customerContext: "Synthetic only" };
   assert.equal((await account("create-report-upload", owner, meta)).status, 403);
   assert.equal((await account("save", owner, { progress: { step: "done", sessionId: "synthetic" } })).status, 200);
+  assert.equal((await account("create-report-upload", other, meta)).status, 403,
+    "ordinary charity members cannot store reports in the shared workspace");
   const prepared = await account("create-report-upload", owner, meta);
   assert.equal(prepared.status, 201, await prepared.clone().text());
   const upload = (await prepared.json() as { upload: { token: string; mode: string; chunks: number } }).upload;
@@ -112,16 +116,21 @@ test("report upload is readiness-gated, session-bound, private and validates com
     const reportContext = { params: Promise.resolve({ id: listing.reviews[0].id }) };
     await db.query(`INSERT INTO sorp_auth.adviser_client_access
       (adviser_organisation_id,charity_organisation_id,permissions,status,requested_by)
-      VALUES($1,$2,'{"reports":true}'::jsonb,'requested',$3)`,
+      VALUES($1,$2,'{"progress":true,"reports":true}'::jsonb,'requested',$3)`,
     [adviserOrganisationId, charityOrganisationId, adviserId]);
     assert.equal((await downloadReport(new Request(reportUrl, { headers: { cookie: adviser } }), reportContext)).status, 404);
     await db.query(`UPDATE sorp_auth.adviser_client_access SET status='active',approved_by=$2
       WHERE charity_organisation_id=$1`, [charityOrganisationId, ownerId]);
     assert.equal((await downloadReport(new Request(reportUrl, { headers: { cookie: adviser } }), reportContext)).status, 200);
+    const clientView = await readClientAssessment(adviserId, { adviserOrganisationId,
+      charityOrganisationId, view: "progress" });
+    assert.equal(clientView.reports[0].id, listing.reviews[0].id);
     assert.equal((await (await account("list-report-reviews", adviser)).json() as { reviews: unknown[] }).reviews.length, 1);
     await db.query(`UPDATE sorp_auth.adviser_client_access SET status='revoked'
       WHERE charity_organisation_id=$1`, [charityOrganisationId]);
     assert.equal((await downloadReport(new Request(reportUrl, { headers: { cookie: adviser } }), reportContext)).status, 404);
+    await assert.rejects(readClientAssessment(adviserId, { adviserOrganisationId,
+      charityOrganisationId, view: "progress" }), /no approved access/);
     assert.deepEqual((await (await account("list-report-reviews", adviser)).json() as { reviews: unknown[] }).reviews, []);
   } finally {
     if (previousCutover === undefined) delete process.env.SORP_AUTH_CUTOVER_ENABLED;
@@ -154,6 +163,14 @@ test("report upload is readiness-gated, session-bound, private and validates com
   }
   assert.equal((await account("create-report-upload", owner, { ...meta, sizeBytes: 15 * 1024 * 1024 })).status, 403);
   await db.query("DELETE FROM sorp_auth.report_review WHERE user_id=$1 AND filename LIKE 'quota-%'", [ownerId]);
+  for (let index = 0; index < 9; index += 1) {
+    await db.query(`INSERT INTO sorp_auth.report_review(user_id,organisation_id,filename,size_bytes,status,file_bytes)
+      VALUES($1,$2,$3,$4,'closed',$5)`,
+    [otherId, charityOrganisationId, `organisation-quota-${index}.pdf`, 15 * 1024 * 1024, Buffer.from("%PDF-%%EOF")]);
+  }
+  assert.equal((await account("create-report-upload", owner, { ...meta, sizeBytes: 15 * 1024 * 1024 })).status, 403,
+    "shared charity storage is capped across accounts");
+  await db.query("DELETE FROM sorp_auth.report_review WHERE user_id=$1 AND filename LIKE 'organisation-quota-%'", [otherId]);
   await db.query("UPDATE sorp_auth.membership SET status='revoked' WHERE organisation_id=$1 AND user_id=$2", [charityOrganisationId, ownerId]);
   assert.deepEqual((await (await account("list-report-reviews", owner)).json() as { reviews: unknown[] }).reviews, []);
   assert.equal((await account("create-report-upload", owner, meta)).status, 403);

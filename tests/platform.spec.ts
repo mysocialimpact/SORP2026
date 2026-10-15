@@ -46,7 +46,7 @@ test("global login uses the existing account service and keeps Google hidden", a
     return route.fulfill({ status: 201, json: { account: { name: "QA Person", email: "qa@example.invalid" } } });
   });
   await page.goto("/login/?mode=signup&return=/dashboard/");
-  await expect(page.getByText(/Google sign-in remains unavailable/)).toBeVisible();
+  await expect(page.getByText(/Google sign-in is currently unavailable/)).toBeVisible();
   await expect(page.getByRole("link", { name: /Google/i })).toHaveCount(0);
   await page.getByLabel("Your name").fill("QA Person");
   await page.getByLabel("Your role").selectOption("TRUSTEE / CHAIR");
