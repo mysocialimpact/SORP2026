@@ -63,9 +63,9 @@ test("report email waits for the completed report, then sends once before option
       body: JSON.stringify({ deliveryStage: "report-complete", sessionId: "review-session-123", email: "nobody@example.test", result: { score: 50 } }),
     }));
     assert.equal(response.status, 200);
-    assert.equal(forwarded.commercialJourney.reviews[0].label, "30-minute SORP Review — £50");
+    assert.equal(forwarded.commercialJourney.reviews[0].label, "30-minute SORP Review: £50");
     assert.equal(forwarded.commercialJourney.reviews[0].cta, "BOOK 30 MINUTES");
-    assert.equal(forwarded.commercialJourney.reviews[1].label, "60-minute SORP Review — £100");
+    assert.equal(forwarded.commercialJourney.reviews[1].label, "60-minute SORP Review: £100");
     assert.equal(forwarded.commercialJourney.reviews[1].cta, "BOOK 60 MINUTES");
     assert.match(forwarded.commercialJourney.implementationSupport, /starts from £250/);
     assert.match(forwarded.commercialJourney.implementationSupport, /year-round approach/);

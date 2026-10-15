@@ -12,7 +12,7 @@ export default function About() {
     <Article
       title="Purpose behind the platform."
       eyebrow="BROUGHT TO YOU BY MY SOCIAL IMPACT"
-      lead="A shared ambition to help charities meet their reporting obligations — and think more deeply about the difference they make."
+      lead="A shared ambition to help charities meet their reporting obligations and think more deeply about the difference they make."
     >
       <section>
         <h2>My Social Impact</h2>

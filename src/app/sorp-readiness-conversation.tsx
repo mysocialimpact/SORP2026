@@ -443,7 +443,7 @@ function DeepDiveIntroduction() {
     <p>We’ve suggested answers wherever the evidence gives us a reasonable starting point, so you’re not starting from scratch.</p>
     <p>For each question, you can:</p>
     <ul><li>✓ Keep our suggested answer</li><li>↔ Change it</li><li>💬 Explain or qualify your answer</li><li>❓ Ask us about the requirement</li></ul>
-    <p>Use this however suits you — part questionnaire, part conversation. We’ll explain what SORP is looking for, help identify gaps and flag where judgement may be needed.</p>
+    <p>Use this however suits you: part questionnaire, part conversation. We’ll explain what SORP is looking for, help identify gaps and flag where judgement may be needed.</p>
     <small>If human judgement could genuinely help, we’ll flag that too.</small>
   </section>;
 }
@@ -459,7 +459,7 @@ function ProvisionalReadinessView({ review, impactReportConfirmed = false, impac
   return <section className="sorp-provisional-view" aria-label="Provisional SORP readiness starting point">
     <header><div><h3>ARE YOU SORP READY?</h3><span className="sorp-quick-review-subtitle">Quick Readiness Review · based on your latest published reporting</span></div></header>
     <h4 className="sorp-tar-label">Trustees’ Annual Report readiness</h4>
-    <div className="sorp-quick-score"><strong>{tarScore === null ? "—" : tarScore}<small>/100</small></strong><div><b>{quickReviewBand(review.readinessStatus)}</b><span>How ready the existing statutory reporting looks.</span></div></div>
+    <div className="sorp-quick-score"><strong>{tarScore === null ? "N/A" : tarScore}<small>/100</small></strong><div><b>{quickReviewBand(review.readinessStatus)}</b><span>How ready the existing statutory reporting looks.</span></div></div>
     <p className="sorp-evidence-confidence">Evidence confidence: <strong>{review.overallConfidence}</strong><span>How strongly the available evidence supports this first view.</span></p>
     {findings.length > 0 && <ul className="sorp-quick-findings">{findings.map((finding) => <li className={`is-${finding.suggestedAnswer === "yes" || finding.suggestedAnswer === "mostly" ? "strong" : "attention"}`} key={finding.fieldId}><span aria-hidden="true">{finding.suggestedAnswer === "yes" || finding.suggestedAnswer === "mostly" ? "✓" : "△"}</span><div><p>{finding.reason}</p><small>{finding.trusteesReportEvidence}</small></div></li>)}</ul>}
     {widerScore !== null && <section className="sorp-wider-score" aria-label="Wider impact evidence view"><p><strong>Wider evidence view</strong><span>{review.widerEvidenceReason || "The Impact Report and website add materially useful evidence beyond the Trustees’ Annual Report."}</span></p><strong>{widerScore}<small>/100</small></strong></section>}
@@ -472,7 +472,7 @@ function PublicSearchCheckpoint({ workflow, impactReportMissing, uploadedReport 
   const accountsFound = Boolean(workflow.known.find((item) => item.id === "accounts")?.established);
   const trusteesReportFound = Boolean(workflow.known.find((item) => item.id === "trusteesReport")?.established);
   return <section className="sorp-public-search-checkpoint" aria-label="Public information checkpoint">
-    <p className="sorp-impact-report-kicker">{accountsFound && trusteesReportFound ? "Great — we found what we need." : "Great — we found enough to get started."}</p>
+    <p className="sorp-impact-report-kicker">{accountsFound && trusteesReportFound ? "Great. We found what we need." : "Great. We found enough to get started."}</p>
     <h3>Your Quick Readiness Review is ready.</h3>
     <p className="sorp-public-search-note">{accountsFound && trusteesReportFound ? "We found your latest accounts, reporting context and Trustees’ Annual Report, so we can give you a first readiness view based on your latest published reporting." : "We can give you a first readiness view using the public information we could review. We’ll make clear where published reporting was unavailable."}</p>
     <p className="sorp-quick-review-ready">✓ SORP 2026 appears to apply to you</p>
@@ -480,7 +480,7 @@ function PublicSearchCheckpoint({ workflow, impactReportMissing, uploadedReport 
     {impactReportMissing && <section className="sorp-stage-one-impact-offer" aria-label="Optional Impact Report">
       <h4>We couldn’t find a separate Impact Report or Annual Review online.</h4>
       <p>You do not need one for your Quick Readiness Review.</p>
-      <p>If you have one, adding it before the deeper assessment can give us richer evidence about your impact, outcomes and learning — and help us see whether your current practice is stronger than your latest Trustees’ Annual Report alone suggests.</p>
+      <p>If you have one, adding it before the deeper assessment can give us richer evidence about your impact, outcomes and learning, and help us see whether your current practice is stronger than your latest Trustees’ Annual Report alone suggests.</p>
     </section>}
   </section>;
 }
@@ -537,7 +537,7 @@ function DeepDiveStageRail({ workflow, state }: { workflow: ReadinessWorkflow; s
   return <section className="sorp-stage-coach" aria-label={`${workflow.stageTitle} progress`}>
     <span>Your progress</span><h2>{workflow.stageTitle}</h2>
     {checks.length > 0 && <><p className="sorp-stage-coach-count">{complete} of {checks.length} checks complete</p><ol>{checks.map((check) => <li key={check.id} className={check.complete ? "is-complete" : check.current ? "is-current" : undefined}><span aria-hidden="true">{check.complete ? "✓" : "○"}</span>{check.label}</li>)}</ol></>}
-    <p className="sorp-stage-coach-note">{workflow.currentStage === 7 ? "Nearly there. These final checks help us make sure we haven’t missed any additional SORP requirements relevant to your charity." : complete > 0 ? "Good progress — keep confirming what still reflects your current practice." : "Your published reporting gives us a starting point. You can confirm or correct it as we go."}</p>
+    <p className="sorp-stage-coach-note">{workflow.currentStage === 7 ? "Nearly there. These final checks help us make sure we haven’t missed any additional SORP requirements relevant to your charity." : complete > 0 ? "Good progress. Keep confirming what still reflects your current practice." : "Your published reporting gives us a starting point. You can confirm or correct it as we go."}</p>
   </section>;
 }
 
@@ -657,7 +657,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
           setState(snapshot.state);
           setResult(snapshot.result);
           setStarted(true);
-          setMessages([{ role: "assistant", content: `I’ve got your Snapshot, so we don’t need to start again.\n\nYour initial score is ${snapshot.result?.score}/100. I’ll use those answers and focus on the areas where richer context would genuinely improve the result.\n\nTell me what feels least certain—or ask me about any part of your result.` }]);
+          setMessages([{ role: "assistant", content: `I’ve got your Snapshot, so we don’t need to start again.\n\nYour initial score is ${snapshot.result?.score}/100. I’ll use those answers and focus on the areas where richer context would genuinely improve the result.\n\nTell me what feels least certain, or ask me about any part of your result.` }]);
         } else {
           const saved = window.localStorage.getItem(storageKey);
           if (saved) {
@@ -917,11 +917,11 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
     if (busy || quickAdvancing || !workflow) return;
     const supported = file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || /\.(pdf|doc|docx)$/i.test(file.name);
     if (!supported) {
-      setError("Sorry — that file type is not supported. Please choose a PDF or Word document.");
+      setError("Sorry. That file type is not supported. Please choose a PDF or Word document.");
       return;
     }
     if (file.size > 4_000_000) {
-      setError("Sorry — that report is larger than 4 MB. Please choose a smaller PDF or Word document.");
+      setError("Sorry. That report is larger than 4 MB. Please choose a smaller PDF or Word document.");
       return;
     }
     const userMessage: Message = { role: "user", content: `Added report: ${file.name}` };
@@ -1099,7 +1099,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
     setComposer("");
     if (deterministicSetupReply) setQuickAdvancing(true);
     else {
-      setWorkingStatus(interaction === "conversation_first" ? workflow?.next.id === "organisation" && !looksLikeQuestion(value) ? "Searching for your charity — hang on a sec…" : "Listening to what you mean and answering before we move on…" : workingStatusFor(value, state, workflow));
+      setWorkingStatus(interaction === "conversation_first" ? workflow?.next.id === "organisation" && !looksLikeQuestion(value) ? "Searching for your charity: hang on a sec…" : "Listening to what you mean and answering before we move on…" : workingStatusFor(value, state, workflow));
       setBusy(true);
     }
     setError("");
@@ -1145,7 +1145,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
       if (setupOnly && data.workflow.completedStages.includes(2)) onSetupComplete?.(data.state, data.workflow);
       const newlyKnown = data.workflow.known.filter(item => item.established && !workflow?.known.find(previous => previous.id === item.id)?.established);
       const newlyCompleted = data.workflow.completedStages.filter(stage => !workflow?.completedStages.includes(stage));
-      setCompletionNotice(newlyCompleted.includes(1) ? "✓ YOUR CHARITY & SORP CONTEXT COMPLETE · SORP 2026 APPEARS TO APPLY TO YOU" : newlyCompleted.length ? `✓ ${newlyCompleted.map(stage => `Stage ${stage}`).join(" & ")} complete. ${data.workflow.currentStage === 3 ? "Your Quick Readiness Review is complete." : data.workflow.currentStage === 8 ? "Seven stages complete. Your Full Readiness Review is ready." : "One more part of your readiness picture established."}` : !workflow?.known.find(item => item.id === "charityName")?.established && data.workflow.known.find(item => item.id === "charityName")?.established ? "✓ Organisation confirmed. Here’s what we’ve found so far." : newlyKnown.length ? `✓ ${newlyKnown.map(item => item.label).join(" · ")} established. Good — that’s one more thing sorted.` : "");
+      setCompletionNotice(newlyCompleted.includes(1) ? "✓ YOUR CHARITY & SORP CONTEXT COMPLETE · SORP 2026 APPEARS TO APPLY TO YOU" : newlyCompleted.length ? `✓ ${newlyCompleted.map(stage => `Stage ${stage}`).join(" & ")} complete. ${data.workflow.currentStage === 3 ? "Your Quick Readiness Review is complete." : data.workflow.currentStage === 8 ? "Seven stages complete. Your Full Readiness Review is ready." : "One more part of your readiness picture established."}` : !workflow?.known.find(item => item.id === "charityName")?.established && data.workflow.known.find(item => item.id === "charityName")?.established ? "✓ Organisation confirmed. Here’s what we’ve found so far." : newlyKnown.length ? `✓ ${newlyKnown.map(item => item.label).join(" · ")} established. Good: that’s one more thing sorted.` : "");
       if (data.intelligence) setIntelligence(data.intelligence);
       setSessionId(data.sessionId || sessionId || newSessionId());
       setMessages((current) => [...current, {
@@ -1341,7 +1341,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
       <p className="sorp-save-security">Your password is protected server-side. Your account lets you return to this assessment without relying on this browser.</p>
       <button type="button" className="sorp-account-switch" onClick={() => { setAccountMode((current) => current === "signup" ? "login" : "signup"); setSaveError(""); }}>{accountMode === "signup" ? "Already have an account? Sign in" : "Need an account? Create one"}</button>
       </>}
-      {saveError && <div className="sorp-save-error" role="alert" aria-live="assertive"><strong>Sorry — we couldn’t save your account.</strong><span>{saveError}</span><span>You can correct anything above and try again without losing your place.</span></div>}
+      {saveError && <div className="sorp-save-error" role="alert" aria-live="assertive"><strong>Sorry. We couldn’t save your account.</strong><span>{saveError}</span><span>You can correct anything above and try again without losing your place.</span></div>}
       {saveStatus === "saved" ? <p className="sorp-save-success" role="status">✓ {accountMode === "login" && !account ? "Signed in." : "Saved to your account. You can finish another time."}</p> : <button type="submit" disabled={saveStatus === "saving"}>{saveStatus === "saving" ? "Saving…" : account ? "Save and finish another time" : accountMode === "signup" ? "Create account and save" : "Sign in and continue"} <span>→</span></button>}
     </form>
   </section></div>;
@@ -1362,14 +1362,14 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
           <main><p className="sorp-full-review-building-kicker">✓ Assessment complete</p><h1>{fullReviewEntry === "ready" ? "✓ Your Full Readiness Review is ready." : "Building your Full Readiness Review…"}</h1><ol aria-label="How your review was assembled"><li>Bringing together your answers</li><li>Checking the public evidence</li><li>Comparing your reporting with the relevant SORP requirements</li><li>Identifying strengths and gaps</li><li>Prioritising what matters next</li></ol></main>
           <aside><h2>SORP is the requirement.<br /><em>Better impact is the opportunity.</em></h2><p>For My Social Impact, this isn’t just about compliance.</p><p>Better impact information should help charities understand what is working, learn what isn’t, make better decisions and ultimately create more impact.</p></aside>
         </div>
-        <footer><div><strong>Thank you for using Are You SORP Ready?</strong><p>If this has been useful, please share it with another charity. We want to help as many organisations as possible get ready for SORP 2026 — and strengthen their impact practice too.</p></div><div><strong>Built with The Ideas Shed</strong><p>The Ideas Shed creates useful digital tools that help charities and purpose-led organisations do better work. More tools are coming.</p></div></footer>
+        <footer><div><strong>Thank you for using Are You SORP Ready?</strong><p>If this has been useful, please share it with another charity. We want to help as many organisations as possible get ready for SORP 2026 and strengthen their impact practice too.</p></div><div><strong>Built with The Ideas Shed</strong><p>The Ideas Shed creates useful digital tools that help charities and purpose-led organisations do better work. More tools are coming.</p></div></footer>
       </div>
     </div>;
     if (fullReviewEntry === "completion") return <div className="readiness-chat is-full-review-handoff">
       <SorpJourneyProgress current={7} completed={[1, 2, 3, 4, 5, 6]} />
       <div className="sorp-journey-body">
         <aside className="sorp-full-review-handoff-rail"><span>Additional SORP checks</span><strong>6 of 6 complete</strong><p>You’ve worked through the final checks. Your answers and the public evidence are ready for the Full Readiness Review.</p></aside>
-        <main className="sorp-full-review-handoff-main" aria-live="polite"><p className="sorp-full-review-handoff-tick">✓ You’ve completed the assessment</p><h1>Brilliant — thank you.</h1><p>We’ve now got your answers, the public evidence we found, and the relevant SORP checks.</p><p>Your Full Readiness Review is nearly ready.</p></main>
+        <main className="sorp-full-review-handoff-main" aria-live="polite"><p className="sorp-full-review-handoff-tick">✓ You’ve completed the assessment</p><h1>Brilliant. thank you.</h1><p>We’ve now got your answers, the public evidence we found, and the relevant SORP checks.</p><p>Your Full Readiness Review is nearly ready.</p></main>
       </div>
       <div className="readiness-composer sorp-full-review-handoff-response">
         <div className="sorp-response-utility"><nav className="sorp-bottom-navigation" aria-label="Assessment navigation"><span className="sorp-bottom-utility"><button type="button" className="is-back" onClick={goBack} disabled={!checkpoints.length}>← Back</button><button type="button" className="is-save" onClick={() => { setSaveStatus("idle"); setSaveError(""); setSaveDialogOpen(true); }}>Save &amp; exit</button></span><small className="sorp-save-hint">Save to an account anytime and pick up where you left off.</small></nav></div>
@@ -1382,7 +1382,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         <FinalReadinessReport result={result} impactMode={impactMode} />
         {intelligence && <details className="readiness-intelligence" aria-label="Effective intelligence provenance">
           <summary>{intelligence.layers.filter((layer) => layer.id === "msi-core" || layer.id === "sorp-readiness-intelligence").map((layer) => `${intelligenceLayerLabel(layer)} · ${layer.label}`).join(" · ")}</summary>
-          <div><p><strong>{intelligence.registry} · {intelligence.effectiveVersion}</strong><span>Published intelligence only · {intelligence.mode === "CURRENT" ? "latest for this new session" : intelligence.mode === "PINNED" ? "pinned for this conversation" : "last known published — Cow Console was temporarily unavailable"}</span></p>{intelligence.layers.map((layer) => <p key={`${layer.id}-${layer.version}`}><strong>{intelligenceLayerLabel(layer)} · {layer.label}</strong><span>{layer.relationship.toLowerCase()} · {layer.status.toLowerCase()} · published {layer.publishedAt ? new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(layer.publishedAt)) : "date unavailable"}</span></p>)}{intelligence.runtimeControls.map((control) => <p key={`${control.name}-${control.type}`}><strong>{control.name} · {control.type}</strong><span>Represented by {control.representedBy}</span></p>)}</div>
+          <div><p><strong>{intelligence.registry} · {intelligence.effectiveVersion}</strong><span>Published intelligence only · {intelligence.mode === "CURRENT" ? "latest for this new session" : intelligence.mode === "PINNED" ? "pinned for this conversation" : "last known published: Cow Console was temporarily unavailable"}</span></p>{intelligence.layers.map((layer) => <p key={`${layer.id}-${layer.version}`}><strong>{intelligenceLayerLabel(layer)} · {layer.label}</strong><span>{layer.relationship.toLowerCase()} · {layer.status.toLowerCase()} · published {layer.publishedAt ? new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(layer.publishedAt)) : "date unavailable"}</span></p>)}{intelligence.runtimeControls.map((control) => <p key={`${control.name}-${control.type}`}><strong>{control.name} · {control.type}</strong><span>Represented by {control.representedBy}</span></p>)}</div>
         </details>}
       </SorpResultActions>
       <div className="sorp-report-conversation">{reviewConversation}<div className="readiness-composer"><div className="sorp-response-utility"><button type="button" onClick={() => { setStageEightReportMode(false); setFullReviewFeedbackStep(false); }}>← Back to assessment</button><button type="button" onClick={() => setSaveDialogOpen(true)}>Save &amp; exit</button><small className="sorp-save-hint">Save to an account anytime and pick up where you left off.</small></div><section className="sorp-response-fields">{reviewChatInput}</section></div></div>
@@ -1404,7 +1404,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
       <SorpJourneyProgress current={readinessStages.length} completed={Array.from({ length: readinessStages.length - 1 }, (_, index) => index + 1)} result />
       <SorpMobilePanes>
         <FullReviewRail />
-        <main className="sorp-stage-eight-main"><header className="sorp-stage-eight-heading"><span>Your Full Readiness Review</span><h1>So — where do you now stand?</h1><p className="sorp-stage-eight-verdict"><strong>{result.score} / 100</strong> · {result.band} <span>Confidence: {result.confidence}</span></p></header><HeadlineReadinessReview result={result} impactMode={impactMode} />{reviewConversation}</main>
+        <main className="sorp-stage-eight-main"><header className="sorp-stage-eight-heading"><span>Your Full Readiness Review</span><h1>So: where do you now stand?</h1><p className="sorp-stage-eight-verdict"><strong>{result.score} / 100</strong> · {result.band} <span>Confidence: {result.confidence}</span></p></header><HeadlineReadinessReview result={result} impactMode={impactMode} />{reviewConversation}</main>
       </SorpMobilePanes>
       <div className="readiness-composer sorp-stage-eight-response">
         <div className="sorp-response-utility"><nav className="sorp-bottom-navigation" aria-label="Assessment navigation"><span className="sorp-bottom-utility"><button type="button" className="is-back" onClick={goBack} disabled={!checkpoints.length}>← Back</button><button type="button" className="is-save" onClick={() => { setSaveStatus("idle"); setSaveError(""); setSaveDialogOpen(true); }}>Save &amp; exit</button></span><small className="sorp-save-hint">Save to an account anytime and pick up where you left off.</small></nav></div>
@@ -1427,17 +1427,17 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         <main className="sorp-welcome-story">
           <p className="sorp-welcome-eyebrow">My Social Impact Intelligence · SORP 2026</p>
           <h1>Know where you stand.<br /><em>See what comes next.</em></h1>
-          <p className="sorp-welcome-lead">We’ll find and read the public reporting you already have, then talk through what SORP 2026 asks of your charity. You get a useful first view quickly—and a full personalised review when you’re done.</p>
+          <p className="sorp-welcome-lead">We’ll find and read the public reporting you already have, then talk through what SORP 2026 asks of your charity. You get a useful first view quickly, and a full personalised review when you’re done.</p>
           <p className="sorp-welcome-promise"><strong>Your full assessment and personalised report are free.</strong> No card. No paywall at the end.</p>
           <div className="sorp-welcome-journey" aria-label="How your readiness check works">
-            <section><span>01</span><div><h2>We do the homework</h2><p>Your charity record, latest accounts and Trustees’ Annual Report—plus wider impact evidence where available.</p></div></section>
+            <section><span>01</span><div><h2>We do the homework</h2><p>Your charity record, latest accounts and Trustees’ Annual Report, plus wider impact evidence where available.</p></div></section>
             <section><span>02</span><div><h2>We talk it through</h2><p>A short, intelligent conversation about what the public evidence cannot tell us. Answer quickly, explain in your own words or ask why.</p></div></section>
             <section><span>03</span><div><h2>You get a clear way forward</h2><p>Your SORP readiness review shows what looks strong, what needs attention and what to do next.</p></div></section>
           </div>
         </main>
         <aside className="sorp-welcome-outcome" aria-label="Illustrative preview of your readiness review">
           <div className="sorp-welcome-report">
-            <header><span>What you’ll receive</span><small>Illustrative preview — not your result</small></header>
+            <header><span>What you’ll receive</span><small>Illustrative preview: not your result</small></header>
             <div className="sorp-welcome-report-title"><p>My Social Impact</p><h2>Your SORP<br />readiness review.</h2><span>Evidence-led · Personal to your charity</span></div>
             <dl><div className="is-score"><dt>Readiness score</dt><dd>68 <small>/ 100</small></dd><p>Getting there</p></div><div><dt>Evidence confidence</dt><dd>High</dd><p>How strongly the available reporting supports this view</p></div></dl>
             <div className="sorp-welcome-report-findings"><p><span>✓</span><strong>What’s already working</strong><small>Clear purpose and activity reporting</small></p><p><span>△</span><strong>What needs attention</strong><small>Stronger outcome evidence</small></p><p><span>→</span><strong>Top priority</strong><small>Make the link between activities, outcomes and achievements clearer</small></p></div>
@@ -1445,7 +1445,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
           </div>
         </aside>
       </div>
-      <section className="sorp-welcome-choices" aria-label="What happens after your free report"><header><span>Yes, it really is free</span><h2>Your report is yours. What comes after is your choice.</h2></header><div className="sorp-welcome-choice-grid"><article><strong>£0</strong><h3>Your full report</h3><p>Complete the assessment and receive your personalised SORP readiness report. No card or paywall.</p></article><article><strong>£50–£200</strong><h3>Optional human review</h3><p>Book a 60-minute SORP 2026 Impact Readiness Review with My Social Impact. Our fee reflects your charity’s income, so smaller charities pay less. If the fee would be difficult, <a href="mailto:marcus@mysocialimpact.org">email us</a> and we’ll talk it through.</p></article><article><strong>£5</strong><h3>Support the free tool</h3><p>If it was useful, you can make a voluntary contribution—or choose another amount—to help us keep improving it for charities.</p></article></div><p>Neither payment option is required to receive your report.</p></section>
+      <section className="sorp-welcome-choices" aria-label="What happens after your free report"><header><span>Yes, it really is free</span><h2>Your report is yours. What comes after is your choice.</h2></header><div className="sorp-welcome-choice-grid"><article><strong>£0</strong><h3>Your full report</h3><p>Complete the assessment and receive your personalised SORP readiness report. No card or paywall.</p></article><article><strong>£50–£200</strong><h3>Optional human review</h3><p>Book a 60-minute SORP 2026 Impact Readiness Review with My Social Impact. Our fee reflects your charity’s income, so smaller charities pay less. If the fee would be difficult, <a href="mailto:marcus@mysocialimpact.org">email us</a> and we’ll talk it through.</p></article><article><strong>£5</strong><h3>Support the free tool</h3><p>If it was useful, you can make a voluntary contribution, or choose another amount, to help us keep improving it for charities.</p></article></div><p>Neither payment option is required to receive your report.</p></section>
     </div>
     <form className="readiness-composer sorp-welcome-composer" onSubmit={(event) => { event.preventDefault(); if (composer.trim()) { setWelcomeQuestionOpen(true); void sendMessage(composer, composer, false, "conversation_first"); } }}>
       <div className="sorp-response-utility"><p>Quick answers + conversation</p><button type="button" className="readiness-sign-in-link" onClick={() => { setAccountMode("login"); setSaveStatus("idle"); setSaveError(""); setSaveDialogOpen(true); }}>Already have an account? Sign in</button></div>
@@ -1483,7 +1483,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
     </aside>
 
     <div className="readiness-thread" aria-live="polite">
-      {setupOnly && workflow?.completedStages.includes(2) && <button type="button" className="sorp-setup-continue" onClick={() => onSetupComplete?.(state, workflow)}>✓ Context established — continue to the 15 questions →</button>}
+      {setupOnly && workflow?.completedStages.includes(2) && <button type="button" className="sorp-setup-continue" onClick={() => onSetupComplete?.(state, workflow)}>✓ Context established: continue to the 15 questions →</button>}
       {reviewCheckpoint && <section className="sorp-reviewing-answer" aria-live="polite"><span>Reviewing saved question {reviewIndex! + 1} of {checkpoints.length}</span><strong>{reviewCheckpoint.answerText || "Saved answer"}</strong>{reviewCheckpoint.note && <p>{reviewCheckpoint.note}</p>}<small>{activeWorkflow?.next.id.match(/^(?:field:\d+|check:)/) ? "Choose another quick answer below to change this. Your later answers will be kept." : "This answer and its conversation are preserved exactly as supplied."}</small></section>}
       {activeMessages.length > 1 && <details className="sorp-conversation-history"><summary>Our conversation up to this question <span>{activeMessages.filter(message => message.role === "user").length} replies</span></summary>{activeMessages.slice(0, -1).map((message, index) => <article key={index}><small>{message.role === "user" ? "You" : "My Social Impact Intelligence"}</small><MessageContent text={message.content} />{message.organisation && <strong>{message.organisation.name} · {message.organisation.locality}</strong>}</article>)}</details>}
       {completionNotice && !isStageOnePayoff && <p className="sorp-completion-notice" role="status">{completionNotice}</p>}
@@ -1491,7 +1491,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         <span>{message.role === "user" ? "You" : "My Social Impact Intelligence"}</span>
         {message.label && (message.conversation || message.responseKind === "detour") && <strong className={`readiness-label is-${message.label.toLowerCase().replace(" ", "-")}`}>{message.label === "JUDGEMENT" ? "MSI JUDGEMENT" : message.label}</strong>}
         {(message.conversation || message.responseKind === "detour") ? <div><MessageContent text={message.content} /></div> : deepDiveIntroOpen && responseQuestionId === "publicReview" ? <DeepDiveIntroduction /> : message.workflow?.next.id !== "publicSearchCheckpoint" && (message.workflow?.next.id === "publicReview" && message.workflow.next.provisional?.trusteesReport.reviewed
-          ? <QuickReviewExplanation review={message.workflow.next.provisional} onReplaceImpactReport={() => selectStructuredAnswer("No — I have a newer Impact Report")} />
+          ? <QuickReviewExplanation review={message.workflow.next.provisional} onReplaceImpactReport={() => selectStructuredAnswer("No: I have a newer Impact Report")} />
           : <div><MessageContent text={message.organisation ? "I think I’ve found you." : message.content} /></div>)}
         {message.role === "assistant" && !(message.conversation || message.responseKind === "detour") && message.workflow && (/^field:\d+/.test(message.workflow.next.id) || message.workflow.next.id.startsWith("check:") && message.workflow.currentStage !== 7) && <DeepDiveQuestionContext workflow={message.workflow} />}
         {message.role === "assistant" && !(message.conversation || message.responseKind === "detour") && message.workflow?.currentStage === 7 && /^(?:screen:|check:)/.test(message.workflow.next.id) && <section className="sorp-stage-seven-context"><p>{message.workflow.next.why}</p><SorpBasisDrawer basis={message.workflow.next.basis} /></section>}
@@ -1506,7 +1506,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
       {intelligence && <details className="readiness-intelligence" aria-label="Effective intelligence provenance">
         <summary>{intelligence.layers.filter((layer) => layer.id === "msi-core" || layer.id === "sorp-readiness-intelligence").map((layer) => `${intelligenceLayerLabel(layer)} · ${layer.label}`).join(" · ")}</summary>
         <div>
-          <p><strong>{intelligence.registry} · {intelligence.effectiveVersion}</strong><span>Published intelligence only · {intelligence.mode === "CURRENT" ? "latest for this new session" : intelligence.mode === "PINNED" ? "pinned for this conversation" : "last known published — Cow Console was temporarily unavailable"}</span></p>
+          <p><strong>{intelligence.registry} · {intelligence.effectiveVersion}</strong><span>Published intelligence only · {intelligence.mode === "CURRENT" ? "latest for this new session" : intelligence.mode === "PINNED" ? "pinned for this conversation" : "last known published: Cow Console was temporarily unavailable"}</span></p>
           {intelligence.layers.map((layer) => <p key={`${layer.id}-${layer.version}`}><strong>{intelligenceLayerLabel(layer)} · {layer.label}</strong><span>{layer.relationship.toLowerCase()} · {layer.status.toLowerCase()} · published {layer.publishedAt ? new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(layer.publishedAt)) : "date unavailable"}</span></p>)}
           {intelligence.runtimeControls.map((control) => <p key={`${control.name}-${control.type}`}><strong>{control.name} · {control.type}</strong><span>Represented by {control.representedBy}</span></p>)}
         </div>
@@ -1531,12 +1531,12 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         const saved = !activeQuickAction && reviewCheckpoint?.answerText?.toUpperCase().startsWith(action.label.toUpperCase().replace(/^KEEP\s+/, ""));
         const label = displayedAnswerLabel(action.label);
         const suggested = Boolean(suggestedAnswer && label.toUpperCase() === answerLabels[suggestedAnswer]);
-        return <button aria-pressed={responseQuestionId === "activities" || isReadinessScale ? Boolean(selected || saved) : saved || undefined} aria-label={suggested ? `${label} — MSI suggested answer` : undefined} className={[label === "SKIP FOR NOW" ? "is-skip" : "", suggested ? "is-suggested" : "", selected || saved ? "is-selected" : ""].filter(Boolean).join(" ") || undefined} key={`${action.label}-${action.value}`} type="button" disabled={busy || quickAdvancing} onClick={() => selectStructuredAnswer(action.value, action.label)}><span className="sorp-action-label">{label}{suggested && <small>OUR VIEW</small>}</span><span aria-hidden="true">{selected || saved ? "✓" : "→"}</span></button>;
+        return <button aria-pressed={responseQuestionId === "activities" || isReadinessScale ? Boolean(selected || saved) : saved || undefined} aria-label={suggested ? `${label}: MSI suggested answer` : undefined} className={[label === "SKIP FOR NOW" ? "is-skip" : "", suggested ? "is-suggested" : "", selected || saved ? "is-selected" : ""].filter(Boolean).join(" ") || undefined} key={`${action.label}-${action.value}`} type="button" disabled={busy || quickAdvancing} onClick={() => selectStructuredAnswer(action.value, action.label)}><span className="sorp-action-label">{label}{suggested && <small>OUR VIEW</small>}</span><span aria-hidden="true">{selected || saved ? "✓" : "→"}</span></button>;
       })}</nav>}
       {responseQuestionId === "impactReportLink" && <ImpactReportUploader onChoose={chooseReportFile} dragging={reportDragging} onDragEnter={(event) => { event.preventDefault(); setReportDragging(true); }} onDragLeave={(event) => { event.preventDefault(); setReportDragging(false); }} onDragOver={(event) => { event.preventDefault(); setReportDragging(true); }} onDrop={dropReport} busy={busy} />}
       {responseQuestionId === "activities" && <p className="sorp-multi-select-help"><strong>Choose all that apply.</strong><span>Select more than one if needed, then add a little detail below if it would help.</span></p>}
-      <label htmlFor="readiness-answer" aria-live="polite">{isQuickReviewResponse ? "ANYTHING YOU’D LIKE TO ADD OR ASK BEFORE YOU GO DEEPER?" : isStageOnePayoff ? "ANYTHING YOU’D LIKE TO ADD, CLARIFY OR ASK BEFORE YOU SEE YOUR QUICK REVIEW?" : isReadinessScale ? "WANT TO ADD ANYTHING, OR FANCY A QUICK CHAT BEFORE YOU SUBMIT THIS ANSWER?" : `Or tell us in your own words — or ask ${impactMode ? "an impact" : "a SORP"} question.`}</label>
-      <textarea ref={composerRef} id="readiness-answer" rows={2} value={composer} onChange={(event) => setComposer(event.target.value)} placeholder={activityQuestion ? "Add detail—or ask us why this matters…" : pendingStructuredAnswer ? "Add an optional note…" : "Type or say what you know…"} maxLength={4000} />
+      <label htmlFor="readiness-answer" aria-live="polite">{isQuickReviewResponse ? "ANYTHING YOU’D LIKE TO ADD OR ASK BEFORE YOU GO DEEPER?" : isStageOnePayoff ? "ANYTHING YOU’D LIKE TO ADD, CLARIFY OR ASK BEFORE YOU SEE YOUR QUICK REVIEW?" : isReadinessScale ? "WANT TO ADD ANYTHING, OR FANCY A QUICK CHAT BEFORE YOU SUBMIT THIS ANSWER?" : `Tell us in your own words, or ask ${impactMode ? "an impact" : "a SORP"} question.`}</label>
+      <textarea ref={composerRef} id="readiness-answer" rows={2} value={composer} onChange={(event) => setComposer(event.target.value)} placeholder={activityQuestion ? "Add detail, or ask us why this matters…" : pendingStructuredAnswer ? "Add an optional note…" : "Type or say what you know…"} maxLength={4000} />
       <div className="readiness-submit-row"><button type="button" className="readiness-mic" onClick={recordingState === "recording" ? stopRecording : () => void startRecording()} disabled={busy || quickAdvancing || recordingState === "transcribing"}>{recordingState === "recording" ? `Stop · ${recordingTime(recordingSeconds)}` : recordingState === "transcribing" ? "Transcribing…" : "Use microphone"}</button>{(!(isStageOnePayoff || isQuickReviewResponse) || composer.trim().length >= 2) && <button type="submit" className={isQuickReviewResponse ? "sorp-quick-review-chat-send" : busy || quickAdvancing ? "is-working" : undefined} disabled={busy || quickAdvancing || (!isReadinessScale && !pendingStructuredAnswer && !(activityQuestion && activitySelections.length) && composer.trim().length < 2) || isReadinessScale && !activeQuickAction && !suggestedQuickAction && !composer.trim() || recordingState !== "idle"}>{busy ? "Understanding…" : quickAdvancing ? "Saving…" : isStageOnePayoff || isQuickReviewResponse ? "Send message" : isReadinessScale ? "Continue" : reviewIndex !== null ? "Save revised answer" : conversationFirstMessage ? "Send message" : activityQuestion && activitySelections.length ? "Continue with choices" : result ? "Keep talking" : "Continue"} <span>→</span></button>}{isQuickReviewResponse && <button type="button" disabled={busy || quickAdvancing || recordingState !== "idle" || reviewIndex !== null} onClick={() => setQuickReviewFeedbackStep(true)}>Continue <span>→</span></button>}</div>
       </section>
     </form>

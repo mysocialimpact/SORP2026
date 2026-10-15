@@ -163,7 +163,7 @@ function InvitationRecord({ invitation, busy, users, onOpenUser, onResend, onRev
     { key:"delivered", label:"Delivered", complete:["delivered", "accepted"].includes(status) && Boolean(deliveredAt) },
     { key:"accepted", label:"Accepted", complete:accepted },
   ];
-  const statusNote = status === "pending" && sentAt ? "Submitted — provider confirmation unavailable" : status === "preparing" ? "Preparing email" : label(status);
+  const statusNote = status === "pending" && sentAt ? "Submitted: provider confirmation unavailable" : status === "preparing" ? "Preparing email" : label(status);
   return <article className={`founder-invitation founder-invitation--${status}`}>
     <header><div><strong>{invitation.email}</strong><span>Role: {label(invitation.role)}</span></div><b className={`founder-invitation-status is-${status}`}>{statusNote}</b></header>
     {!failed && !terminal && <ol className="founder-invitation-progress" aria-label={`Invitation progress: ${statusNote}`}>

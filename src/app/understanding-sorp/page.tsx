@@ -13,7 +13,7 @@ export default function Understanding() {
     <Article
       title="A new SORP. A clearer picture."
       eyebrow="UNDERSTANDING SORP 2026"
-      lead="A practical starting point for understanding the framework — and what it means for your charity’s next reporting cycle."
+      lead="A practical starting point for understanding the framework and what it means for your charity’s next reporting cycle."
     >
       <p>
         The Charities Statement of Recommended Practice (SORP) explains how
@@ -135,7 +135,7 @@ export default function Understanding() {
         <h2>Official foundations</h2>
         <p>
           <a href={site.official}>
-            Charities SORP — the official standard and supporting resources
+            Charities SORP: the official standard and supporting resources
           </a>{" "}
           is the authoritative reference. You can also access the{" "}
           <a href="https://www.charitysorp.org/documents/d/guest/charities-sorp-2026-1">

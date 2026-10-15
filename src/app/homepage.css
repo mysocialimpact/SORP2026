@@ -1,4 +1,4 @@
-/* Homepage refinements only — no assessment or product theme overrides. */
+/* Homepage refinements only; no assessment or product theme overrides. */
 .homepage-story .gateway-opening { grid-template-columns: 1.5fr 1fr; padding-block: 50px; gap: 55px; }
 .homepage-story #gateway-title { font-size: clamp(48px, 5vw, 72px); line-height: 1; letter-spacing: -.055em; }
 .homepage-story .gateway-intro h1 > span { color: #355747; }

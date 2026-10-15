@@ -36,7 +36,7 @@ export function SorpReadyPage() {
         <section id="sr-audiences" className="sr-audiences" aria-labelledby="sr-audiences-title">
           <div className="sr-section-heading">
             <p className="sr-eyebrow">Who is it for?</p>
-            <h2 id="sr-audiences-title">For charities—and the people who help them.</h2>
+            <h2 id="sr-audiences-title">For charities, and the people who help them.</h2>
           </div>
           <div className="sr-audience-grid">
             <article>

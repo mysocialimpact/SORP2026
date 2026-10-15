@@ -58,7 +58,7 @@ export function SayHello() {
       const result = await response.json() as { accepted?: boolean; emailSent?: boolean; queued?: boolean; logged?: boolean; error?: string };
       if (!response.ok || !result.accepted) throw new Error(result.error || "Your message was not accepted.");
       setStatus("sent");
-      setFeedback(result.emailSent ? "Thank you — your hello is on its way." : result.queued ? "Thank you — your hello is safely queued." : "Thank you — your hello has been safely received.");
+      setFeedback(result.emailSent ? "Thank you. Your hello is on its way." : result.queued ? "Thank you. Your hello is safely queued." : "Thank you. Your hello has been safely received.");
     } catch (cause) {
       setStatus("error");
       setFeedback(cause instanceof Error ? cause.message : "We could not send your message. Please try again.");
@@ -105,9 +105,14 @@ export function SayHello() {
           <label htmlFor="shared-hello-message">Message <span>Optional</span></label>
           <textarea id="shared-hello-message" name="message" rows={3} maxLength={3000} value={message} onChange={event => setMessage(event.target.value)} placeholder="Request a demo, ask a question, share an idea, give feedback, or just say hello…" />
         </div>
+        <label className="shared-hello-consent"><input type="checkbox" checked={newsletter} onChange={event => setNewsletter(event.target.checked)} /><span>I’d also like occasional updates about SORP 2026 and the free tools.</span></label>
+        <label className="shared-hello-honeypot" htmlFor="shared-hello-website" aria-hidden="true">Website<input id="shared-hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
+        <button className="shared-hello-submit" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Message sent ✓" : "Send message"} <Arrow /></button>
+        {feedback && <p className={`shared-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
+        {status === "error" && <p className="shared-hello-fallback">Or email <a href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org</a>.</p>}
         <div className="shared-hello-details" aria-label="My Social Impact contact details">
           <button className={`shared-hello-copy is-${copyStatus}`} type="button" onClick={() => void copyFounderEmail()} aria-label="Copy marcus@mysocialimpact.org to clipboard">
-            <span>{copyStatus === "copied" ? "Email copied" : copyStatus === "error" ? "Couldn’t copy — tap the address" : "Copy email address"}</span>
+            <span>{copyStatus === "copied" ? "Email copied" : copyStatus === "error" ? "Copy unavailable" : "Copy email address"}</span>
             <strong>marcus@mysocialimpact.org</strong>
             <b aria-hidden="true">{copyStatus === "copied" ? "✓" : "Copy"}</b>
           </button>
@@ -117,11 +122,6 @@ export function SayHello() {
           </div>
           <p className="shared-hello-copy-status" aria-live="polite">{copyStatus === "copied" ? "Marcus’s email address has been copied to your clipboard." : copyStatus === "error" ? <><a href="mailto:marcus@mysocialimpact.org">Email Marcus directly</a> if copying is unavailable.</> : ""}</p>
         </div>
-        <label className="shared-hello-consent"><input type="checkbox" checked={newsletter} onChange={event => setNewsletter(event.target.checked)} /><span>I’d also like occasional updates about SORP 2026 and the free tools.</span></label>
-        <label className="shared-hello-honeypot" htmlFor="shared-hello-website" aria-hidden="true">Website<input id="shared-hello-website" name="website" tabIndex={-1} autoComplete="off" /></label>
-        <button className="shared-hello-submit" type="submit" disabled={status === "sending" || status === "sent"}>{status === "sending" ? "Sending…" : status === "sent" ? "Message sent ✓" : "Send message"} <Arrow /></button>
-        {feedback && <p className={`shared-hello-feedback is-${status}`} role={status === "error" ? "alert" : "status"}>{feedback}</p>}
-        {status === "error" && <p className="shared-hello-fallback">Or email <a href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org</a>.</p>}
       </form>
     </div>
   </section>;

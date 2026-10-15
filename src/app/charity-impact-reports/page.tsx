@@ -35,7 +35,7 @@ export default function CharityImpactReportsPage() {
         <div className="reports-hero-copy">
           <p className="gateway-kicker">Charity Impact Reports</p>
           <h1>Go beyond SORP.<br/><span>Tell the full story of your impact.</span></h1>
-          <p className="reports-hero-lead">SORP 2026 asks charities to explain the difference they make. Your impact report gives you room to go further — with powerful stories, compelling pictures, stronger evidence and the methodology behind your results.</p>
+          <p className="reports-hero-lead">SORP 2026 asks charities to explain the difference they make. Your impact report gives you room to go further, with powerful stories, compelling pictures, stronger evidence and the methodology behind your results.</p>
           <div className="reports-hero-actions">
             <Link className="gateway-action" href="/are-you-sorp-ready/review/?entry=intro">Start with Are You SORP Ready? <Arrow /></Link>
             <Link className="reports-login-link" href="/login/?return=/charity-impact-reports/review/">Already registered? Log in</Link>
@@ -48,7 +48,7 @@ export default function CharityImpactReportsPage() {
     <section id="reports-connection" className="reports-connection gateway-width">
       <div><p className="gateway-kicker">The SORP connection</p><h2>SORP establishes the reporting framework. <span>Your impact report brings the fuller story to life.</span></h2></div>
       <div className="reports-connection-note">
-        <p>The published Charities SORP 2026 allows relevant additional material—including an impact assessment—to sit within or accompany the accounts. It also makes clear that information outside the statutory framework is not a substitute for good statutory reporting.</p>
+        <p>The published Charities SORP 2026 allows relevant additional material, including an impact assessment, to sit within or accompany the accounts. It also makes clear that information outside the statutory framework is not a substitute for good statutory reporting.</p>
         <a href="https://www.charitysorp.org/download-a-full-sorp" target="_blank" rel="noreferrer">Read the official SORP · Module 1, paragraphs 1.5 and 1.33 <Arrow diagonal /></a>
       </div>
     </section>

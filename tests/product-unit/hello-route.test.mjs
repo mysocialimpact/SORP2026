@@ -9,7 +9,7 @@ test("hello forwards contact and separate consent to the established message ser
     assert.equal(body.email, "person@example.org");
     assert.equal(body.message, "An idea for you");
     assert.match(body.diagnostic, /Audience: charity/);
-    assert.match(body.diagnostic, /Newsletter consent: YES — explicitly selected/);
+    assert.match(body.diagnostic, /Newsletter consent: YES: explicitly selected/);
     assert.match(body.diagnostic, /Consent timestamp:/);
     return Response.json({ accepted: true, queued: true, emailSent: true, cowLogged: true });
   });
@@ -34,7 +34,7 @@ test("hello rejects invalid addresses before making a backend request", async t 
 
 test("hello allows an optional message and sends an explicit hello downstream", async t => {
   const backend = t.mock.method(globalThis, "fetch", async (_url, options) => {
-    assert.equal(JSON.parse(options.body).message, "Hello — no additional message supplied.");
+    assert.equal(JSON.parse(options.body).message, "Hello: no additional message supplied.");
     return Response.json({ accepted: true });
   });
   const response = await POST(new Request("https://sorp2026.org/api/hello", {

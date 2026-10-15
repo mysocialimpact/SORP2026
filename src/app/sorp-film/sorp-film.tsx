@@ -191,7 +191,7 @@ export default function SorpFilm({
               <div className="sf-introduction">
                 <h2>Are You SORP Ready?</h2>
                 <p className="sf-lead">
-                  Find out where your charity stands —{" "}
+                  Find out where your charity stands. {" "}
                   <strong>for free.</strong>
                 </p>
               </div>
@@ -331,7 +331,7 @@ export default function SorpFilm({
                 <em>things stand now.</em>
               </h2>
               <p className="sf-lead">
-                <strong>19 focused questions</strong> — with space for your
+                <strong>19 focused questions</strong>, with space for your
                 comments and context.
               </p>
               <ForwardLine

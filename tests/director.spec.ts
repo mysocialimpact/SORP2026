@@ -32,7 +32,7 @@ for (const mode of ["login", "signup"] as const) {
   test(`${mode} is inline and returns directly to the assessment without a SORP review`, async ({ page }) => {
     await mockAccount(page, false);
     await page.goto(path);
-    await expect(page.getByRole("radio")).toHaveCount(0);
+    await expect(page.locator("#assessment").getByRole("radio")).toHaveCount(0);
     await page.getByRole("button", { name: "Start your free assessment" }).click();
     const portal = page.locator("#assessment .account-portal");
     await expect(portal).toBeVisible();
