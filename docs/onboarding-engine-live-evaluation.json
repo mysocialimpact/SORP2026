@@ -1,0 +1,335 @@
+{
+  "commit": "baa088af69fd73e902bff1d523829150dc026d28",
+  "deployment": "dpl_7BP2pfgrHCpfVByp5pteVoshotp5",
+  "scope": "Real model and production engine; synthetic official-record confirmation; not live regulator or email verification",
+  "summary": {
+    "model": "gpt-5.4-mini-2026-03-17",
+    "startedAt": "2026-10-16T09:20:35.730Z",
+    "calls": 35,
+    "inputTokens": 94062,
+    "outputTokens": 18657,
+    "estimatedUsd": 0.15450299999999997,
+    "generatedQuestions": 6,
+    "passed": 22,
+    "failed": 0,
+    "completedAt": "2026-10-16T09:22:23.237Z"
+  },
+  "journeys": [
+    {
+      "id": "trustee-complete",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "complete",
+          "question": "A lovely place to start, Alex. We’ll keep Interim Spaces in view as you explore. Your details are ready to review."
+        }
+      ]
+    },
+    {
+      "id": "trustee-incomplete",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "registration",
+          "question": "You mentioned being a trustee at Interim Spaces. What’s your name and email address?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        }
+      ]
+    },
+    {
+      "id": "accountant-one-client",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Brainstrust. Shall we use that as your starting charity?"
+        }
+      ]
+    },
+    {
+      "id": "accountant-portfolio",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "Which charity would you like to start with? One name or charity number is enough to help us prepare a more personal experience."
+        }
+      ]
+    },
+    {
+      "id": "former-client-blue-cross",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "registration",
+          "question": "You mentioned working with The Blue Cross previously. What’s your current role?"
+        },
+        {
+          "objective": "registration",
+          "question": "You mentioned working with The Blue Cross previously. What’s your current role?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned The Blue Cross previously. Would you like to start with that charity, or another one?"
+        },
+        {
+          "objective": "complete",
+          "question": "A lovely place to start, Marcus. We’ll keep Blue Cross in view as you explore. Your details are ready to review."
+        }
+      ]
+    },
+    {
+      "id": "current-charity",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Mind. Shall we use that as your starting charity?"
+        }
+      ]
+    },
+    {
+      "id": "several-charities",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Shelter, Mind, Brainstrust. Which one would you like to start with?"
+        },
+        {
+          "objective": "clarification",
+          "question": "Which did you mean: Shelter, Mind, Brainstrust? I’ll wait for your choice."
+        }
+      ]
+    },
+    {
+      "id": "identity-only",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "registration",
+          "question": "What do you do professionally?"
+        }
+      ]
+    },
+    {
+      "id": "professional-history",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Shelter previously. Would you like to start with that charity, or another one?"
+        }
+      ]
+    },
+    {
+      "id": "early-referral",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "responsibilities",
+          "question": "Are you mainly involved in governance, financial oversight or something else?"
+        },
+        {
+          "objective": "concerns",
+          "question": "What keeps you up at night?"
+        }
+      ]
+    },
+    {
+      "id": "early-concerns",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "complete",
+          "question": "A lovely place to start, Alex. We’ll keep Interim Spaces in view as you explore. Your details are ready to review."
+        }
+      ]
+    },
+    {
+      "id": "change-selected-charity",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "responsibilities",
+          "question": "Are you mainly involved in governance, financial oversight or something else?"
+        },
+        {
+          "objective": "charity",
+          "question": "Let’s find the official record for Brainstrust. You can check it before confirming."
+        }
+      ]
+    },
+    {
+      "id": "manual-name-authority",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        }
+      ]
+    },
+    {
+      "id": "email-transcription-correction",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        }
+      ]
+    },
+    {
+      "id": "correct-misunderstanding",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "Which charity would you like to start with? One name or charity number is enough to help us prepare a more personal experience."
+        },
+        {
+          "objective": "charity",
+          "question": "Let’s find the official record for Brainstrust. You can check it before confirming."
+        }
+      ]
+    },
+    {
+      "id": "reminder-reference",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "You’re right — Interim Spaces. Shall we use that as your starting charity?"
+        }
+      ]
+    },
+    {
+      "id": "voice-error-then-typed",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Mind. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Mind. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Mind. Shall we use that as your starting charity?"
+        }
+      ]
+    },
+    {
+      "id": "many-facts-one-answer",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Brainstrust. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "complete",
+          "question": "A lovely place to start, Sarah. We’ll keep Brainstrust in view as you explore. Your details are ready to review."
+        }
+      ]
+    },
+    {
+      "id": "finish-early",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "charity",
+          "question": "You mentioned Interim Spaces. Shall we use that as your starting charity?"
+        },
+        {
+          "objective": "complete",
+          "question": "A lovely place to start, Alex. Your details are ready to review."
+        }
+      ]
+    },
+    {
+      "id": "resume-incomplete",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "registration",
+          "question": "You mentioned working with Shelter previously. What’s your email address and your current role?"
+        },
+        {
+          "objective": "registration",
+          "question": "You mentioned working with Shelter previously. What’s your email address and your current role?"
+        },
+        {
+          "objective": "charity",
+          "question": "You mentioned Shelter previously. Would you like to start with that charity, or another one?"
+        }
+      ]
+    },
+    {
+      "id": "historical-employer-not-current",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "registration",
+          "question": "You mentioned working at Shelter previously. What’s your current role and organisation?"
+        }
+      ]
+    },
+    {
+      "id": "unrelated-person-role",
+      "passed": true,
+      "questions": [
+        {
+          "objective": "registration",
+          "question": "What do you do, and who do you work for?"
+        }
+      ]
+    }
+  ]
+}

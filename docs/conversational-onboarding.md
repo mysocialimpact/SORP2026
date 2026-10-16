@@ -377,10 +377,46 @@ Medium reasoning was also evaluated but rejected after repeatedly exhausting bou
 output limits; the final low-reasoning contract explicitly defines facts and intent. There is still one request per submitted answer,
 no growing message history, `store:false`, no model tools, and a $0.03
 request reservation with the existing $1 daily / $10 monthly defaults. No new paid service, account
-system or object store was added. Existing isolated PostgreSQL draft/profile storage,
+system or object store was added. Existing PostgreSQL draft/profile storage,
 24-hour draft expiry, charity jobs and disabled public PDF downloads are unchanged.
 
 The reusable live suite and preview-only browser harness are documented in
 `tests/onboarding-evals/README.md`. CI runs deterministic engine tests automatically;
 billable live runs remain explicitly enabled. Final verification results and release
 status are recorded below when completed.
+
+
+Verified engine evaluation (16 October 2026): all 22 journeys passed with 35 genuine
+model calls using the same `processTurn`, request schema and decoder as production.
+The record in `docs/onboarding-engine-live-evaluation.json` includes every journey
+and its actual next questions. It used 94,062 input and 18,657 output tokens: estimated
+$0.154503 at $0.75/M input and $4.50/M output, or about $0.022 for five average answers.
+Allow roughly $0.02–$0.04 per typical typed onboarding, excluding voice, retries and
+provider price changes. This is an estimate, not a billing statement.
+
+204 product unit tests (62 onboarding), nine isolated real PostgreSQL integration
+tests and 31 desktop/mobile browser regressions passed. One duplicate mobile audio
+case is deliberately skipped; desktop MediaRecorder uses generated audio. Build,
+TypeScript and lint passed; lint retains two existing unrelated warnings. Review
+included the actual mobile completion layout and profile/question visibility checks.
+The public charity worker still uses deterministic retrieval, not new background AI.
+
+The final real-model browser run passed both desktop (1440×1000) and touch-mobile
+(390×844) journeys with four genuine model calls. It exercised the actual built
+Next application/API and a fresh isolated PostgreSQL database. Desktop recording
+used real MediaRecorder/audio analysis with generated input and a fixture transcript;
+mobile used typing. Both confirmed historical Blue Cross context, corrected Marcus
+Warry in the form, reloaded, supplied current work/referral/concerns, explicitly
+confirmed a returned charity record, created a fixture account, navigated to Ask
+SORP and verified the corrected name and historical relationship in the saved
+account profile. See `docs/onboarding-engine-live-browser.json`.
+
+Account, regulator and transcription providers were fixtures. No real email, payment,
+physical microphone, iPhone hardware or Safari verification is claimed. The main
+application/model code was verified; this is not a claim that every upstream service
+was exercised on the public production domain. Public-document downloads remain
+disabled under the existing production storage configuration.
+
+Release 19 retains the existing auth cutover flags, subscriptions and product routes.
+No database migration or new production service is required. Deployment status is
+confirmed separately against the resulting Vercel production deployment.

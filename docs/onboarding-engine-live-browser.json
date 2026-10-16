@@ -1,0 +1,35 @@
+{
+  "commit": "1fe84707c86930a3bb5ffa001522d6fed3f2e1fc",
+  "deployment": "dpl_EFELTBgwstfhcBk71M4K6fbVagoZ",
+  "scope": "Real Chromium, Next application/API, isolated PostgreSQL and live model; synthetic account, regulator and transcription providers; generated desktop audio",
+  "passed": 2,
+  "modelCalls": 4,
+  "journeys": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "passed": true,
+      "voice": true,
+      "questions": [
+        "You mentioned working with Blue Cross previously. What’s your current role?",
+        "You mentioned Blue Cross previously. Would you like to start with that charity, or another one?"
+      ],
+      "accountHandoff": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "passed": true,
+      "voice": false,
+      "questions": [
+        "You mentioned working with Blue Cross previously. What’s your current role and organisation?",
+        "You mentioned Blue Cross previously. Would you like to start with that charity, or another one?"
+      ],
+      "accountHandoff": true
+    }
+  ]
+}
