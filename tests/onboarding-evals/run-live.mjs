@@ -46,9 +46,16 @@ async function bounded(text, state) {
   report.calls++;
   lastInterpretation = undefined;
   let result;
-  try { result = await interpretWithModel(text, state, p => { lastInterpretation = p; }); }
-  catch (e) {
-    if (e.usage) { report.inputTokens += e.usage.input; report.outputTokens += e.usage.output; report.estimatedUsd += e.usage.estimatedUsd; }
+  try {
+    result = await interpretWithModel(text, state, (p) => {
+      lastInterpretation = p;
+    });
+  } catch (e) {
+    if (e.usage) {
+      report.inputTokens += e.usage.input;
+      report.outputTokens += e.usage.output;
+      report.estimatedUsd += e.usage.estimatedUsd;
+    }
     throw e;
   }
   report.inputTokens += result.usage.input;

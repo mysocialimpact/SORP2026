@@ -1,5 +1,12 @@
 import { spawn } from "node:child_process";
-import { mkdtemp, readFile, mkdir, writeFile, cp, chmod } from "node:fs/promises";
+import {
+  mkdtemp,
+  readFile,
+  mkdir,
+  writeFile,
+  cp,
+  chmod,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import assert from "node:assert/strict";
@@ -16,8 +23,12 @@ const dir = await mkdtemp(path.join(tmpdir(), "sorp-live-eval-"));
 // The database service user cannot traverse Vercel's private checkout directory.
 // Only public test dependencies are copied; credentials/application files stay put.
 await chmod(dir, 0o755);
-await cp("tests/live-runtime/node_modules", path.join(dir, "runtime"), { recursive: true });
-const { default: EmbeddedPostgres } = await import(path.join(dir, "runtime/embedded-postgres/dist/index.js"));
+await cp("tests/live-runtime/node_modules", path.join(dir, "node_modules"), {
+  recursive: true,
+});
+const { default: EmbeddedPostgres } = await import(
+  path.join(dir, "node_modules/embedded-postgres/dist/index.js")
+);
 const pg = new EmbeddedPostgres({
   databaseDir: path.join(dir, "pg"),
   user: "postgres",

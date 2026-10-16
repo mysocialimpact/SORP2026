@@ -432,10 +432,10 @@ export function Onboarding() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           action: "signup",
-          name: state.facts.name.trim(),
-          email: state.facts.email.trim().toLowerCase(),
-          position: state.facts.role.trim(),
-          organisation: state.facts.organisation.trim(),
+          name: currentState.current.facts.name.trim(),
+          email: currentState.current.facts.email.trim().toLowerCase(),
+          position: currentState.current.facts.role.trim(),
+          organisation: currentState.current.facts.organisation.trim(),
           password,
           progress: {
             sessionId: crypto.randomUUID(),

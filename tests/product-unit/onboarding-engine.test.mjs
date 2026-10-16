@@ -454,3 +454,17 @@ test("resumption preserves relationship recency rather than making every mention
     [1, 2],
   );
 });
+
+test("generated wording cannot retain a manually corrected first name", () => {
+  const s = advance(initialConversation(), {
+    name: "Marcus Worrey",
+    questionProposal: {
+      objective: "registration",
+      fields: ["email", "role"],
+      question: "Marcus, what is your email address and role?",
+    },
+  });
+  assert.equal(s.response, null);
+  const edited = applyFacts(s, { name: "Emma Lee" }, "form");
+  assert.doesNotMatch(nextQuestion(edited), /Marcus|Worrey/);
+});

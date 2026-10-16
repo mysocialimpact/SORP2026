@@ -17,6 +17,11 @@ for (const [cmd, args, extra] of [
     { SORP_LIVE_EVAL: "true" },
   ],
 ]) {
+  if (
+    process.env.SORP_EVAL_BROWSER_ONLY === "true" &&
+    args.includes("tests/onboarding-evals/run-live.mjs")
+  )
+    continue;
   const result = spawnSync(cmd, args, {
     stdio: "inherit",
     env: { ...process.env, ...extra },

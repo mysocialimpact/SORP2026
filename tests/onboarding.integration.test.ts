@@ -239,6 +239,8 @@ test("model extraction sends bounded facts, no tools/history; evidence and globa
       initialConversation(),
       id,
     );
+    const reservation = await db.query("SELECT reserved_usd::float amount FROM research_console.onboarding_usage WHERE session_id=$1", [id]);
+    assert.equal(reservation.rows[0].amount, 0.03);
     assert.equal(patch.name, "Sarah Jones");
     assert.equal(patch.role, "Trustee");
     assert.equal(patch.email, undefined);

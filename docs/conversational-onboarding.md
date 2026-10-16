@@ -371,9 +371,10 @@ fields are valid; six information turns limit optional questions and ten total
 turns bound conversation. An outstanding charity confirmation is not represented
 as completed merely because the optional budget is exhausted.
 
-Model remains `gpt-5.4-mini-2026-03-17`, now with medium reasoning, a 4,000-output-token
-cap and 35-second timeout. Lower-reasoning live runs repeatedly missed context, so
-that configuration was rejected. There is still one request per submitted answer,
+Model remains `gpt-5.4-mini-2026-03-17`, with low reasoning, a 4,000-output-token
+cap and 35-second timeout. Open-ended fact lists and underspecified field semantics missed context in live tests.
+Medium reasoning was also evaluated but rejected after repeatedly exhausting bounded
+output limits; the final low-reasoning contract explicitly defines facts and intent. There is still one request per submitted answer,
 no growing message history, `store:false`, no model tools, and a $0.03
 request reservation with the existing $1 daily / $10 monthly defaults. No new paid service, account
 system or object store was added. Existing isolated PostgreSQL draft/profile storage,

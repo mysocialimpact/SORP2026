@@ -1189,10 +1189,20 @@ export function suitableQuestion(
     )
   )
     return false;
-  // Names are rendered from state, not copied from an earlier transcript.
+  // Only placeholders may carry personal names, so later edits cannot leave stale wording.
+  const names = [
+    s.facts.name,
+    ...s.corrections
+      .filter((c) => c.field === "name")
+      .flatMap((c) => [c.previous, c.value]),
+  ].filter(Boolean);
   if (
-    s.facts.name &&
-    p.question.toLowerCase().includes(s.facts.name.toLowerCase())
+    names.some((name) =>
+      p.question
+        .toLowerCase()
+        .split(/[^\p{L}'’-]+/u)
+        .includes(name.split(/\s+/)[0].toLowerCase()),
+    )
   )
     return false;
   return (p.question.match(/\?/g) || []).length === 1;

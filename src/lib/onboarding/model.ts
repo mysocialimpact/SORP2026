@@ -91,9 +91,17 @@ const factMeaning: Record<string, string> = {
     "An entity referred to in a correction/reminder, resolved only when unambiguous from known state.",
 };
 export const interpretationSchema = object({
-  intent: { ...enumeration(intents), description: "Classify the speech act in context: inform supplies new facts; confirm explicitly accepts a proposal; remind refers to information already supplied without necessarily accepting a proposal; correct changes a prior fact; clarify resolves meaning; question asks for information; disagree rejects an interpretation." },
+  intent: {
+    ...enumeration(intents),
+    description:
+      "Classify the speech act in context: inform supplies new facts; confirm explicitly accepts a proposal; remind refers to information already supplied without necessarily accepting a proposal; correct changes a prior fact; clarify resolves meaning; question asks for information; disagree rejects an interpretation.",
+  },
   target: enumeration([...factFields, "charities", "unknown"]),
-  charityDecision: { ...enumeration(["accept", "reject", "none"]), description: "Accept only an explicit request to START WITH or USE a charity, or agreement with that proposal. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means the user does not want that charity as their starting selection." },
+  charityDecision: {
+    ...enumeration(["accept", "reject", "none"]),
+    description:
+      "Accept only an explicit request to START WITH or USE a charity, or agreement with that proposal. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means the user does not want that charity as their starting selection.",
+  },
   finishRequested: { type: "boolean" },
   // Every objective is considered explicitly. Null means no supporting information;
   // an open-ended array previously silently omitted volunteered context.
@@ -438,12 +446,21 @@ export async function interpretWithModel(
   const data = await response.json();
   const input = Number(data.usage?.input_tokens || 0),
     outputTokens = Number(data.usage?.output_tokens || 0);
-  const usage = { input, output: outputTokens, estimatedUsd: (input * 0.75 + outputTokens * 4.5) / 1e6 };
+  const usage = {
+    input,
+    output: outputTokens,
+    estimatedUsd: (input * 0.75 + outputTokens * 4.5) / 1e6,
+  };
   if (data.status !== "completed")
-    throw Object.assign(new Error("We could not finish understanding that answer. Please retry or edit your profile."), {
-      providerReason: data.incomplete_details?.reason || data.status,
-      usage,
-    });
+    throw Object.assign(
+      new Error(
+        "We could not finish understanding that answer. Please retry or edit your profile.",
+      ),
+      {
+        providerReason: data.incomplete_details?.reason || data.status,
+        usage,
+      },
+    );
   const output = data.output
     ?.flatMap((o: { content?: { text?: string }[] }) => o.content || [])
     .map((c: { text?: string }) => c.text || "")

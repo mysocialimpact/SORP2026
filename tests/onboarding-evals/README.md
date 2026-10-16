@@ -33,3 +33,6 @@ autosave/reload, current work, early referral/concerns, explicit official-record
 confirmation and account handoff. Reports remain in private build output; summaries
 contain only synthetic test data. Do not claim physical microphone, Safari,
 regulator, email or payment-provider verification from this harness.
+
+After an unchanged model pipeline has passed the full suite, `SORP_EVAL_BROWSER_ONLY=true`
+can rerun the preview browser/build harness without repeating billable engine evaluations.
