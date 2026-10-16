@@ -24,5 +24,5 @@ export async function processTurn(
   };
 }
 /** Clearly signalled service-outage behaviour, not a substitute for semantic evaluation. */
-export const fallbackTurn = (state: Conversation, text: string) =>
-  advance(state, extractImmediate(text, state));
+export const fallbackTurn = (state: Conversation, text: string, skip = false) =>
+  advance(state, skip ? { utterance: text } : extractImmediate(text, state), skip);

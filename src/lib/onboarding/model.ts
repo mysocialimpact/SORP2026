@@ -14,7 +14,7 @@ import {
   type Objective,
 } from "./state.ts";
 export const ONBOARDING_MODEL = "gpt-5.4-mini-2026-03-17";
-export const DIALOGUE_MODEL = "gpt-5.4";
+export const DIALOGUE_MODEL = "gpt-6.1-sol";
 export const MAX_OUTPUT_TOKENS = 4000;
 export const MODEL_RESERVATION_USD = 0.10;
 import { dialogueRequest, decodeDialogue } from "./dialogue.ts";
@@ -425,7 +425,9 @@ async function callModel(request: { model: string }) {
   const data = await response.json();
   const input = Number(data.usage?.input_tokens || 0), output = Number(data.usage?.output_tokens || 0);
   const full = request.model === DIALOGUE_MODEL;
-  const usage = { input, output, estimatedUsd: (input * (full ? 2.5 : 0.75) + output * (full ? 15 : 4.5)) / 1e6 };
+  // Standard rates checked against OpenAI's published pricing on 2026-10-16.
+  // Ignore cache discounts conservatively; no fast-mode or tools are requested.
+  const usage = { input, output, estimatedUsd: (input * (full ? 2 : 0.75) + output * (full ? 10 : 4.5)) / 1e6 };
   if (data.status !== "completed") throw Object.assign(new Error("We could not finish understanding that answer. Please retry or edit your profile."), { providerReason: data.incomplete_details?.reason || data.status, usage });
   const text = data.output?.flatMap((o: { content?: { text?: string }[] }) => o.content || []).map((c: { text?: string }) => c.text || "").join("");
   return { parsed: JSON.parse(text || "{}"), usage };

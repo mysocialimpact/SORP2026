@@ -295,7 +295,7 @@ export async function POST(
         next = processed.state;
         notice = processed.extraction.notice || "";
       } catch (e) {
-        next = fallbackTurn(before, body.message);
+        next = fallbackTurn(before, body.message, body.skip === true);
         notice =
           e instanceof Error
             ? e.message
