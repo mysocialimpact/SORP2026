@@ -61,13 +61,14 @@ createServer(async (req, res) => {
       return send({ error: "Synthetic lookup failure" });
     }
     const interim = /interim/i.test(b.query);
-    const number = interim ? "1234569" : "1234568";
+    const blue = /blue cross/i.test(b.query);
+    const number = interim ? "1234569" : blue ? "1234570" : "1234568";
     return send({
       research: {
         status: "found",
         candidates: [
           {
-            name: `${interim ? "Interim Spaces" : "Brainstrust"} (synthetic fixture)`,
+            name: `${interim ? "Interim Spaces" : blue ? "Blue Cross" : "Brainstrust"} (synthetic fixture)`,
             registrationNumber: number,
             jurisdiction: "England and Wales",
             entityType: "registered_charity",
@@ -86,6 +87,7 @@ createServer(async (req, res) => {
   if (req.url === "/api/transcribe")
     return send({
       transcript:
+        process.env.ONBOARDING_FIXTURE_TRANSCRIPT ||
         "I’m Sarah Jones, a chartered accountant at Burton Sweet. My email is sarah@example.com.",
     });
   res.statusCode = 404;

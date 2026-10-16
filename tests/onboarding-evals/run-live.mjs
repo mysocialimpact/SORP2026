@@ -70,7 +70,7 @@ for (const journey of selected) {
           officialUrl:
             "https://register-of-charities.charitycommission.gov.uk/charity-search/-/charity-details/1234567",
         });
-      if (state.response?.generated) report.generatedQuestions++;
+      if (step.text && state.response?.generated) report.generatedQuestions++;
       // Every journey evaluates synchronized state, progression, no premature confirmation and turn bounds.
       assert.ok(state.turns <= 10);
       assert.ok(

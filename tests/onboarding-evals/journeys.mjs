@@ -197,9 +197,11 @@ export const journeys = [
   {
     id: "early-referral",
     steps: [
-      message(intro + " A colleague sent me your website.", (s) =>
-        has(s, "discovery", "colleague"),
-      ),
+      message(intro + " A colleague sent me your website.", (s) => {
+        has(s, "discovery", "colleague");
+        candidate(s, "Interim Spaces");
+        asks(s, /Interim Spaces/);
+      }),
       { confirm: "Interim Spaces" },
       message("I oversee governance and financial reporting.", (s) => {
         assert.notEqual(nextObjective(s), "discovery");

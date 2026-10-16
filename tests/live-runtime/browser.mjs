@@ -5,7 +5,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import EmbeddedPostgres from "./node_modules/embedded-postgres/dist/index.js";
 import chromiumBinary from "./node_modules/@sparticuz/chromium/build/index.js";
-import { chromium } from "@playwright/test";
+import { chromium, expect } from "@playwright/test";
 import { Pool } from "pg";
 import { blueCross } from "../onboarding-evals/journeys.mjs";
 if (
@@ -62,7 +62,9 @@ try {
   await db.query(
     await readFile("migrations/012_conversational_onboarding.sql", "utf8"),
   );
-  start("node", ["tests/onboarding-services.fixture.mjs"]);
+  start("node", ["tests/onboarding-services.fixture.mjs"], {
+    ONBOARDING_FIXTURE_TRANSCRIPT: blueCross,
+  });
   start(
     "node",
     ["node_modules/next/dist/bin/next", "start", "--port", "3100"],
@@ -80,9 +82,34 @@ try {
     const r = await fetch("http://127.0.0.1:3100/get-started/");
     return r.ok;
   });
+  const wav = Buffer.alloc(44 + 48000 * 2);
+  wav.write("RIFF");
+  wav.writeUInt32LE(wav.length - 8, 4);
+  wav.write("WAVEfmt ", 8);
+  wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20);
+  wav.writeUInt16LE(1, 22);
+  wav.writeUInt32LE(48000, 24);
+  wav.writeUInt32LE(96000, 28);
+  wav.writeUInt16LE(2, 32);
+  wav.writeUInt16LE(16, 34);
+  wav.write("data", 36);
+  wav.writeUInt32LE(wav.length - 44, 40);
+  for (let i = 0; i < 48000; i++)
+    wav.writeInt16LE(
+      Math.sin((i * 2 * Math.PI * 440) / 48000) * 15000,
+      44 + i * 2,
+    );
+  const audioFile = path.join(dir, "audio.wav");
+  await writeFile(audioFile, wav);
   browser = await chromium.launch({
     executablePath: await chromiumBinary.executablePath(),
-    args: chromiumBinary.args,
+    args: [
+      ...chromiumBinary.args,
+      "--use-fake-device-for-media-stream",
+      "--use-fake-ui-for-media-stream",
+      `--use-file-for-fake-audio-capture=${audioFile}`,
+    ],
     headless: true,
   });
   for (const viewport of [
@@ -92,7 +119,9 @@ try {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     const questions = [];
-    await page.goto("http://127.0.0.1:3100/get-started/");
+    await page.goto(
+      "http://127.0.0.1:3100/get-started/?next=/ask-sorp/workspace/",
+    );
     await page.getByRole("button", { name: "Start a conversation" }).click();
     const input = page.getByRole("textbox", {
       name: "Your answer",
@@ -118,6 +147,22 @@ try {
       await until(async () => !(await input.isDisabled()));
       questions.push(data.question);
       return data;
+    }
+    if (viewport.width > 1000) {
+      await page.getByRole("button", { name: "Record your answer" }).click();
+      await expect(page.locator(".voice-recording")).toBeVisible();
+      await expect
+        .poll(() =>
+          page
+            .locator(".voice-wave i")
+            .evaluateAll((bars) =>
+              bars.some((b) => parseFloat(b.style.height) > 4),
+            ),
+        )
+        .toBe(true);
+      await page.getByRole("button", { name: "Stop recording" }).click();
+      await expect(page.locator(".voice-transcript")).toBeVisible();
+      await expect(input).toHaveValue(blueCross);
     }
     const first = await send(blueCross);
     assert.equal(first.state.facts.organisation, "");
@@ -159,7 +204,49 @@ try {
       await page.request.get("http://127.0.0.1:3100/api/onboarding/session/")
     ).json();
     assert.equal(state.state.facts.name, "Marcus Warry");
-    reports.push({ viewport, passed: true, questions });
+    await page
+      .getByRole("button", { name: /Find (?:The )?Blue Cross/ })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Blue Cross (synthetic fixture)" }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Yes, this is the charity" })
+      .click();
+    await expect(page.locator(".conversation-question")).toContainText(
+      "Marcus",
+    );
+    await page
+      .locator(".onboarding-finish")
+      .getByRole("button", { name: "Create my account" })
+      .click();
+    await page
+      .getByLabel("Choose a password")
+      .fill("Synthetic-Test-Password-123");
+    await page
+      .getByLabel("Confirm your password")
+      .fill("Synthetic-Test-Password-123");
+    await page
+      .locator("dialog")
+      .getByRole("button", { name: "Create my account" })
+      .click();
+    await page.waitForURL("**/ask-sorp/workspace/");
+    const stored = await db.query(
+      "SELECT facts FROM research_console.onboarding_profiles ORDER BY updated_at DESC LIMIT 1",
+    );
+    assert.equal(stored.rows[0].facts.name, "Marcus Warry");
+    assert.ok(
+      stored.rows[0].facts.professionalContext.relationships.some(
+        (r) => /Blue Cross/.test(r.entity) && r.period === "past",
+      ),
+    );
+    reports.push({
+      viewport,
+      passed: true,
+      voice: viewport.width > 1000,
+      questions,
+      accountHandoff: true,
+    });
     await context.close();
   }
   const usage = await db.query(
