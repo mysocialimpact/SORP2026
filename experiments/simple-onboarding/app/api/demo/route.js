@@ -8,7 +8,8 @@ export async function GET(){try{isolated();return json({available:true,budget:aw
 export async function POST(request){
  try{
   isolated();const url=new URL(request.url);
-  if(request.headers.get('origin')!==url.origin) return json({error:'Open this form in its Preview tab.'},403);
+  const origin=(request.headers.get('x-forwarded-proto')||url.protocol.slice(0,-1))+'://'+(request.headers.get('host')||url.host);
+  if(request.headers.get('origin')!==origin||request.headers.get('sec-fetch-site')==='cross-site') return json({error:'Open this form in its Preview tab.'},403);
   const raw=await request.text();if(Buffer.byteLength(raw)>26000)return json({error:'Answer is too long'},413);
   const b=JSON.parse(raw);
   if(b.action==='search'){const q=String(b.query||'').toLowerCase();return json({candidates:fixtures.filter(c=>c.name.toLowerCase().includes(q)||c.number===q)});}
