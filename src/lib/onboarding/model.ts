@@ -187,6 +187,7 @@ export function validateInterpretation(
   const p = parsed as Record<string, unknown>;
   if (!Array.isArray(p.facts) || !intents.includes(String(p.intent)))
     throw new Error("Invalid interpretation");
+  let unresolvedReference = false;
   const patch: Record<string, unknown> = {},
     corrected: Extraction["correctedFields"] = [];
   const known = [
@@ -230,6 +231,30 @@ export function validateInterpretation(
     )
       continue;
     if (
+      ["charityChoice", "reference"].includes(String(f.field)) &&
+      !contains(message, f.value)
+    ) {
+      const options = charityOptions(state);
+      const alternatives = /\b(?:other|different)\b/i.test(f.quote)
+        ? options.filter(
+            (v) =>
+              v !== state.charity.proposed &&
+              v !== state.charity.confirmed?.name,
+          )
+        : state.charity.phase === "suggest" && options.length > 1
+          ? options
+          : state.charity.proposed
+            ? [state.charity.proposed]
+            : options;
+      if (
+        alternatives.length !== 1 ||
+        alternatives[0].toLowerCase() !== f.value.toLowerCase()
+      ) {
+        unresolvedReference = true;
+        continue;
+      }
+    }
+    if (
       ["role", "organisation", "responsibilities"].includes(String(f.field)) &&
       f.period === "past"
     )
@@ -237,6 +262,7 @@ export function validateInterpretation(
     patch[String(f.field)] = f.value;
     if (
       f.correction === true &&
+      p.intent === "correct" &&
       fieldKeys.includes(f.field as (typeof fieldKeys)[number])
     )
       corrected.push(f.field as (typeof fieldKeys)[number]);
@@ -250,9 +276,17 @@ export function validateInterpretation(
     if (typeof patch[key] === "string" && validEntity(patch[key]))
       extracted[key] = patch[key];
   if ([...factFields, "charities", "unknown"].includes(String(p.target)))
-    extracted.target = p.target as Extraction["target"];
+    extracted.target = ["charityChoice", "reference"].includes(String(p.target))
+      ? "charities"
+      : (p.target as Extraction["target"]);
   if (p.charityDecision === "accept" || p.charityDecision === "reject")
     extracted.charityDecision = p.charityDecision;
+  if (unresolvedReference) {
+    extracted.intent = "clarify";
+    extracted.target = "charities";
+    delete extracted.charityDecision;
+    delete extracted.charityChoice;
+  }
   extracted.finishRequested = p.finishRequested === true;
   extracted.professional = [];
   for (const item of Array.isArray(p.relationships)

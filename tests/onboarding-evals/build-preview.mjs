@@ -1,9 +1,24 @@
-import {spawnSync} from 'node:child_process';
+import { spawnSync } from "node:child_process";
 // Opt-in preview build only: does not mutate production sessions or change app auth.
-if(process.env.VERCEL_ENV!=='preview')throw new Error('Live evaluation build is preview-only');
-for(const [cmd,args,extra] of [
- ['node',['--experimental-strip-types','tests/onboarding-evals/run-live.mjs'],{SORP_LIVE_EVAL:'true'}],
- ['npm',['run','build'],{}],
- ['npm',['ci','--prefix','tests/live-runtime'],{}],
- ['node',['--experimental-strip-types','tests/live-runtime/browser.mjs'],{SORP_LIVE_EVAL:'true'}],
-]){const result=spawnSync(cmd,args,{stdio:'inherit',env:{...process.env,...extra}});if(result.status!==0)process.exit(result.status||1);}
+if (process.env.VERCEL_ENV !== "preview")
+  throw new Error("Live evaluation build is preview-only");
+for (const [cmd, args, extra] of [
+  [
+    "node",
+    ["--experimental-strip-types", "tests/onboarding-evals/run-live.mjs"],
+    { SORP_LIVE_EVAL: "true" },
+  ],
+  ["npm", ["run", "build"], {}],
+  ["npm", ["ci", "--prefix", "tests/live-runtime"], {}],
+  [
+    "node",
+    ["--experimental-strip-types", "tests/live-runtime/browser.mjs"],
+    { SORP_LIVE_EVAL: "true" },
+  ],
+]) {
+  const result = spawnSync(cmd, args, {
+    stdio: "inherit",
+    env: { ...process.env, ...extra },
+  });
+  if (result.status !== 0) process.exit(result.status || 1);
+}

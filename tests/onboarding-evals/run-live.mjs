@@ -59,7 +59,6 @@ for (const journey of selected) {
       if (step.text) {
         const result = await processTurn(state, step.text, bounded);
         state = result.state;
-        if (state.response?.generated) report.generatedQuestions++;
       }
       if (step.edit) state = applyFacts(state, step.edit, "form");
       if (step.resume)
@@ -71,6 +70,7 @@ for (const journey of selected) {
           officialUrl:
             "https://register-of-charities.charitycommission.gov.uk/charity-search/-/charity-details/1234567",
         });
+      if (state.response?.generated) report.generatedQuestions++;
       // Every journey evaluates synchronized state, progression, no premature confirmation and turn bounds.
       assert.ok(state.turns <= 10);
       assert.ok(

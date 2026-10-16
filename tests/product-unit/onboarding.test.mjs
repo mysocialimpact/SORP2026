@@ -94,7 +94,14 @@ test("short completed conversations stop and optional questions can be skipped",
 });
 test("optional exchanges end at six; essential corrections end at ten", () => {
   const ready = answer(initialConversation(), introduction);
-  assert.equal(nextObjective({ ...ready, turns: 6 }), "complete");
+  assert.equal(nextObjective({ ...ready, turns: 6 }), "charity");
+  assert.equal(
+    nextObjective({
+      ...confirmCharity(ready, { name: "Brainstrust" }),
+      turns: 6,
+    }),
+    "complete",
+  );
   assert.equal(
     nextObjective({ ...initialConversation(), turns: 9 }),
     "registration",

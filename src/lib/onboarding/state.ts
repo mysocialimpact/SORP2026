@@ -420,6 +420,13 @@ export function validEntity(
     return false;
   if (/^(?:[Ii]|[Ww]e|[Yy]ou|[Mm]y|[Oo]ur|[Yy]our)\s+[a-z]/u.test(v))
     return false;
+  if (
+    (field === "charity" || field === "organisation") &&
+    /^(?:(?:my|our|the|a|an|another|some|several|many|local|small|about|around|approximately|\d+)\s+)*(?:charit(?:y|ies)|clients?|organi[sz]ations?|firms?|companies|company|employers?)$/i.test(
+      v,
+    )
+  )
+    return false;
   if (field === "name")
     return /^[\p{L}][\p{L} ’'\-]{1,79}$/u.test(v) && v.split(/\s+/).length <= 5;
   if (field === "email") return validEmail(v);
@@ -642,11 +649,33 @@ export function applyFacts(
           source,
           turn: s.turns,
         });
+  const professional = s.professional.map((r) =>
+    source === "form" &&
+    patch.organisation !== undefined &&
+    entitySame(r.entity, s.facts.organisation) &&
+    r.period === "current" &&
+    ["employer", "employee", "trustee"].includes(r.relationship)
+      ? {
+          ...r,
+          entity: facts.organisation,
+          aliases: [],
+          evidence: `Organisation corrected in profile`,
+          turn: s.turns,
+        }
+      : r,
+  );
+  const changedWork =
+    source === "form" &&
+    (["role", "organisation"] as const).some(
+      (k) => patch[k] !== undefined && !same(s.facts[k], facts[k]),
+    );
   return relationships({
     ...s,
     facts,
     knowledge,
+    professional,
     corrections: corrections.slice(-12),
+    ...(changedWork ? { response: null, afterCharity: null } : {}),
   });
 }
 export function proposeCharity(s: Conversation, value: string): Conversation {
@@ -794,9 +823,14 @@ export function applyExtraction(
           : "meaning"
         : intent === "question"
           ? "question"
-          : intent === "disagree" && !patch.charityDecision
-            ? "meaning"
-            : null,
+          : ["disagree", "correct", "clarify"].includes(intent) &&
+              patch.target === "charities" &&
+              !choice &&
+              charityOptions(next).length > 1
+            ? "charity"
+            : intent === "disagree" && !patch.charityDecision
+              ? "meaning"
+              : null,
   };
 }
 export function advance(
@@ -841,9 +875,9 @@ export function nextObjective(s: Conversation): Objective {
   // Essential resolution of an explicitly chosen/corrected entity precedes the optional cap.
   if (!s.charity.confirmed && ["lookup", "confirm"].includes(s.charity.phase))
     return "charity";
-  if (s.turns >= TOTAL_TURN_CAP || s.turns - s.repairTurns >= OPTIONAL_TURN_CAP)
-    return "complete";
+  if (s.turns >= TOTAL_TURN_CAP) return "complete";
   if (!s.charity.confirmed && !s.skipped.includes("charity")) return "charity";
+  if (s.turns - s.repairTurns >= OPTIONAL_TURN_CAP) return "complete";
   for (const key of ["responsibilities", "discovery", "concerns"] as const)
     if (!s.facts[key] && !s.skipped.includes(key)) return key;
   return "complete";
@@ -1082,6 +1116,15 @@ export function suitableQuestion(
   if (
     !p.fields.length ||
     p.fields.some((f) => !plan.fields.includes(f as FieldKey))
+  )
+    return false;
+  if (
+    plan.objective === "registration" &&
+    plan.fields.includes("role") &&
+    s.professional.some((r) => r.period === "past") &&
+    !/\b(?:now|current(?:ly)?|today|these days|at (?:the )?moment|present)\b/i.test(
+      p.question,
+    )
   )
     return false;
   // Reject text asking for known registration facts, regardless of the proposal's metadata.

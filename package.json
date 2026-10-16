@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "test:e2e": "playwright test",
     "test:product-unit": "node --experimental-strip-types --test tests/product-unit/*.test.mjs",
-    "console:verify-live": "NODE_OPTIONS=--conditions=react-server tsx scripts/console-verify-live.ts"
+    "console:verify-live": "NODE_OPTIONS=--conditions=react-server tsx scripts/console-verify-live.ts",
+    "test:onboarding": "node --experimental-strip-types --test tests/product-unit/onboarding*.test.mjs",
+    "eval:onboarding:live": "node --experimental-strip-types tests/onboarding-evals/run-live.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1150.0",

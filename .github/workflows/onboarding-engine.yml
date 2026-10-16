@@ -1,0 +1,30 @@
+name: Onboarding engine regressions
+on:
+  push:
+    paths:
+      - 'src/lib/onboarding/**'
+      - 'src/features/onboarding/**'
+      - 'src/app/api/onboarding/**'
+      - 'tests/**onboarding**'
+      - 'tests/onboarding-evals/**'
+      - '.github/workflows/onboarding-engine.yml'
+  pull_request:
+    paths:
+      - 'src/lib/onboarding/**'
+      - 'src/features/onboarding/**'
+      - 'src/app/api/onboarding/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:onboarding
