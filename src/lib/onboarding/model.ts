@@ -438,8 +438,8 @@ export async function interpretWithModel(message: string, state: Conversation, o
     result.topicResponse.status !== "declined" && !updated.finishRequested && !skip &&
     state.dialogue.followUps === 0 && updated.turns < 5 && ["discovery", "concerns", "complete"].includes(questionPlan(updated).objective)
     ? { ...updated, dialogue: { ...updated.dialogue, reflecting: true } } : null;
-  const afterConfirmation = !updated.charity.confirmed && updated.charity.proposed ? confirmCharity(updated, {
-    name: updated.charity.proposed, registrationNumber: "", officialUrl: "",
+  const afterConfirmation = !updated.charity.confirmed && (updated.charity.proposed || questionPlan(updated).objective === "charity") ? confirmCharity(updated, {
+    name: updated.charity.proposed || "{charityName}", registrationNumber: "", officialUrl: "",
     locality: "", jurisdiction: "", entityType: "", latestIncome: null,
     financialYearEnd: "", accountingBasis: "", accountingBasisConfidence: "",
     website: "", summary: "", reportUrl: "", reportTitle: "", reportPeriod: "",
