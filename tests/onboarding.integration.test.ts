@@ -201,7 +201,7 @@ test("model stages use bounded context, no tools; evidence and combined budget e
     assert.equal(body.tools, undefined);
     assert.equal(body.max_output_tokens, calls === 1 ? 4000 : 3000);
     if (calls === 2) return Response.json({ status: "completed", output: [{content:[{text:JSON.stringify({next:{objective:"registration",fields:["email"],question:"You work with Brainstrust. What email address would you like to use?"},afterCharity:null})}]}] });
-    assert.equal(JSON.parse(body.input).history, undefined);
+    if (calls === 1) assert.equal(JSON.parse(body.input).history, undefined);
     return Response.json({
       status: "completed",
       output: [

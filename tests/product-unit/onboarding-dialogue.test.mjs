@@ -51,8 +51,8 @@ test('manual name corrections change the rendered reply immediately and persist 
 test('both stages receive bounded recent dialogue while the wording stage receives updated facts',()=>{
  let s=ready();
  for(let i=0;i<8;i++) s=advance(s,{utterance:`Answer ${i}`,topicResponse:participation()});
- const request=dialogueRequest('test',s,null), input=JSON.parse(request.input);
- assert.equal(input.recentDialogue.length,8);assert.equal(input.recentDialogue.at(-1).text,'Answer 7');
+ const request=dialogueRequest('test',s,null), input=JSON.parse(request.input[0].content);
+ assert.equal(request.input.length,9);assert.equal(request.input.at(-1).content,'Answer 7');assert.equal(request.input.at(-1).role,'user');
  assert.equal(input.nextPlan.objective,'complete');assert.equal(request.store,false);assert.equal(request.tools,undefined);
  assert.equal(JSON.parse(modelRequest('Another answer',s).input).recentDialogue.length,8);
 });
