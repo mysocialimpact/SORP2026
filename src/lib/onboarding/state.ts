@@ -61,6 +61,7 @@ export type Conversation = {
     turn: number;
   }[];
   finishRequested: boolean;
+  afterCharity: QuestionProposal | null;
   response:
     (QuestionProposal & { contextKey: string; generated: boolean }) | null;
   acknowledged: string[];
@@ -107,6 +108,7 @@ export const initialConversation = (): Conversation => ({
   professional: [],
   corrections: [],
   finishRequested: false,
+  afterCharity: null,
   response: null,
   acknowledged: [],
   revision: 0,
@@ -371,6 +373,7 @@ export type Extraction = Partial<Facts> & {
   correctedFields?: FieldKey[];
   finishRequested?: boolean;
   questionProposal?: QuestionProposal;
+  afterCharity?: QuestionProposal;
   usage?: { input: number; output: number; estimatedUsd: number };
 };
 /** Successful semantic interpretation is authoritative: an incidental mention
@@ -414,6 +417,8 @@ export function validEntity(
       v,
     )
   )
+    return false;
+  if (/^(?:[Ii]|[Ww]e|[Yy]ou|[Mm]y|[Oo]ur|[Yy]our)\s+[a-z]/u.test(v))
     return false;
   if (field === "name")
     return /^[\p{L}][\p{L} ’'\-]{1,79}$/u.test(v) && v.split(/\s+/).length <= 5;
@@ -663,18 +668,21 @@ export function confirmCharity(
   s: Conversation,
   candidate: Candidate,
 ): Conversation {
-  return {
-    ...s,
-    lastIntent: "confirm",
-    clarification: null,
-    charity: {
-      ...s.charity,
-      proposed: s.charity.proposed || candidate.name,
-      confirmed: candidate,
-      candidates: [],
-      phase: "confirmed",
+  return attachQuestion(
+    {
+      ...s,
+      lastIntent: "confirm",
+      clarification: null,
+      charity: {
+        ...s.charity,
+        proposed: s.charity.proposed || candidate.name,
+        confirmed: candidate,
+        candidates: [],
+        phase: "confirmed",
+      },
     },
-  };
+    s.afterCharity || undefined,
+  );
 }
 export function applyExtraction(
   s: Conversation,
@@ -741,6 +749,7 @@ export function applyExtraction(
         next.facts[key] = (s.facts[key] + "; " + next.facts[key]).slice(0, 600);
     }
   next.finishRequested = patch.finishRequested === true || s.finishRequested;
+  next.afterCharity = patch.afterCharity || null;
   if (patch.charityDecision === "reject")
     next = relationships({
       ...next,

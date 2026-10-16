@@ -199,7 +199,7 @@ test("model extraction sends bounded facts, no tools/history; evidence and globa
     const body = JSON.parse(String(init?.body));
     assert.equal(body.store, false);
     assert.equal(body.tools, undefined);
-    assert.equal(body.max_output_tokens, 1400);
+    assert.equal(body.max_output_tokens, 2200);
     assert.equal(JSON.parse(body.input).history, undefined);
     return Response.json({
       status: "completed",
@@ -208,6 +208,10 @@ test("model extraction sends bounded facts, no tools/history; evidence and globa
           content: [
             {
               text: JSON.stringify({
+                relationships:[{entity:"Brainstrust",aliases:[],kind:"charity",relationship:"mentioned",period:"unspecified",confidence:"stated",role:"",quote:"Brainstrust"}],
+                intent: "inform",
+                target: "unknown",
+                charityDecision: "none",
                 facts: [
                   { field: "name", value: "Sarah Jones", quote: "Sarah Jones" },
                   { field: "role", value: "Trustee", quote: "trustee" },
@@ -238,7 +242,7 @@ test("model extraction sends bounded facts, no tools/history; evidence and globa
     assert.equal(patch.name, "Sarah Jones");
     assert.equal(patch.role, "Trustee");
     assert.equal(patch.email, undefined);
-    assert.deepEqual(patch.charities, ["Brainstrust"]);
+    assert.deepEqual(patch.professional?.map(r=>r.entity), ["Brainstrust"]);
     process.env.SORP_ONBOARDING_DAILY_USD = "0";
     await assert.rejects(
       () => extractWithModel("Again", initialConversation(), id),

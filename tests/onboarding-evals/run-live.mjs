@@ -33,19 +33,25 @@ const report = {
   failed: 0,
   journeys: [],
 };
-let reserved = 0;
+let reserved = 0,
+  lastInterpretation;
+const selected = process.env.SORP_EVAL_IDS
+  ? journeys.filter((j) => process.env.SORP_EVAL_IDS.split(",").includes(j.id))
+  : journeys;
 async function bounded(text, state) {
   if (report.calls >= 60 || reserved + 0.02 > 1.2)
     throw new Error("Live evaluation budget exhausted");
   reserved += 0.02;
   report.calls++;
-  const result = await interpretWithModel(text, state);
+  const result = await interpretWithModel(text, state, (p) => {
+    lastInterpretation = p;
+  });
   report.inputTokens += result.usage.input;
   report.outputTokens += result.usage.output;
   report.estimatedUsd += result.usage.estimatedUsd;
   return result;
 }
-for (const journey of journeys) {
+for (const journey of selected) {
   let state = initialConversation();
   const record = { id: journey.id, passed: true, turns: [] };
   try {
@@ -99,6 +105,7 @@ for (const journey of journeys) {
     report.passed++;
   } catch (e) {
     record.passed = false;
+    record.interpretation = lastInterpretation;
     record.error = String(e.message).replace(/[\w.+-]+@[\w.-]+/g, "[email]");
     report.failed++;
   }
@@ -115,4 +122,5 @@ console.log(
   "LIVE_EVAL_SUMMARY",
   JSON.stringify({ ...report, journeys: undefined }),
 );
-if (report.failed || report.generatedQuestions < 5) process.exitCode = 1;
+if (report.failed || report.generatedQuestions < Math.min(5, selected.length))
+  process.exitCode = 1;

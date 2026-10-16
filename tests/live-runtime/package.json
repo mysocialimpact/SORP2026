@@ -1,0 +1,1 @@
+{"name":"sorp-onboarding-live-evaluation-runtime","private":true,"version":"1.0.0","type":"module","dependencies":{"@sparticuz/chromium":"153.0.0","embedded-postgres":"18.4.0-beta.17"}}
