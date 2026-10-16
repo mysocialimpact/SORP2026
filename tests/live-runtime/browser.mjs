@@ -124,7 +124,7 @@ try {
     );
   const audioFile = path.join(dir, "audio.wav");
   await writeFile(audioFile, wav);
-  browser = await chromium.launch({
+  const launchBrowser = async () => chromium.launch({
     executablePath: await chromiumBinary.executablePath(),
     args: [
       ...chromiumBinary.args.filter((arg) => arg !== "--disable-web-security"),
@@ -138,7 +138,8 @@ try {
     { width: 1440, height: 1000 },
     { width: 390, height: 844 },
   ]) {
-    const context = await browser.newContext({ viewport });
+    browser = await launchBrowser();
+    const context = await browser.newContext({ viewport, isMobile: viewport.width < 600, hasTouch: viewport.width < 600 });
     const page = await context.newPage();
     const questions = [];
     await page.goto(
@@ -277,7 +278,10 @@ try {
       questions,
       accountHandoff: true,
     });
+    console.log("LIVE_BROWSER_JOURNEY", JSON.stringify(reports.at(-1)));
     await context.close();
+    await browser.close();
+    browser = undefined;
   }
   const usage = await db.query(
     "SELECT count(*)::int requests FROM research_console.onboarding_usage",
