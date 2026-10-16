@@ -156,18 +156,6 @@ export async function POST(
         return json({ error: "Use an answer of up to 3,000 characters." }, 400);
       if (/\bpassword\s*(?:is|:|=)/i.test(data.message))
         return json({ error: "Use the secure password fields." }, 400);
-      if (
-        (data.message.match(/[\w.+-]+@[\w.-]+\.[a-z]+/gi) || []).some(
-          (e: string) => !e.endsWith(".invalid"),
-        )
-      )
-        return json(
-          {
-            error:
-              "Use a synthetic email ending .invalid in this isolated Preview.",
-          },
-          400,
-        );
       state = applyFacts(state, data.fields || {}, "form");
       state = await respond(data.message, state);
       s = record(s, state, data.message);

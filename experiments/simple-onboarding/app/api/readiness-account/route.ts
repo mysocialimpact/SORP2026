@@ -26,7 +26,6 @@ export async function POST(r: Request) {
       );
     if (
       !validEmail(data.email) ||
-      !data.email.endsWith(".invalid") ||
       data.email !== s.state.facts.email ||
       data.name !== s.state.facts.name ||
       typeof data.password !== "string" ||
@@ -35,7 +34,7 @@ export async function POST(r: Request) {
       return json(
         {
           error:
-            "Use the reviewed synthetic profile and a test password of at least 12 characters.",
+            "Use the reviewed profile and a test password of at least 12 characters.",
         },
         400,
       );
