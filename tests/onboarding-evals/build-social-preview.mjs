@@ -5,4 +5,10 @@ const r=spawnSync('node',['--experimental-strip-types','tests/onboarding-evals/r
 // The SOCIAL_SUMMARY is the gate; a READY preview alone does not establish a pass.
 const b=spawnSync('npm',['run','build'],{stdio:'inherit'});
 console.log('SOCIAL_BUILD_STATUS',JSON.stringify({evaluationExit:r.status,buildExit:b.status}));
-process.exitCode=b.status||0;
+let browserExit=0;
+if(b.status===0 && process.env.SORP_SOCIAL_BROWSER==='true') {
+ const installed=spawnSync('npm',['ci','--prefix','tests/live-runtime'],{stdio:'inherit'});
+ if(installed.status!==0) browserExit=installed.status;
+ else browserExit=spawnSync('node',['--experimental-strip-types','tests/live-runtime/browser.mjs'],{stdio:'inherit',env:{...process.env,SORP_LIVE_EVAL:'true'}}).status;
+}
+process.exitCode=b.status||browserExit||0;

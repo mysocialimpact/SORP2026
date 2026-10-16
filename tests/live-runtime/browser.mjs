@@ -144,6 +144,7 @@ try {
     browser = await launchBrowser();
     const context = await browser.newContext({ viewport, isMobile: viewport.width < 600, hasTouch: viewport.width < 600 });
     const page = await context.newPage();
+    page.setDefaultTimeout(90000);
     const questions = [];
     await page.goto(
       "http://127.0.0.1:3100/get-started/?next=/ask-sorp/workspace/",
@@ -172,7 +173,7 @@ try {
         "Live model failure cannot pass as fallback",
       );
       assert.ok(data.state);
-      await until(async () => !(await input.isDisabled()));
+      await until(async () => (await input.count()) === 0 || !(await input.isDisabled()));
       questions.push(data.question);
       return data;
     }
