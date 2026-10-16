@@ -1,6 +1,7 @@
 # Conversational onboarding — implementation and release record
 
-16 October 2026. Additive implementation; **not a production cutover**.
+16 October 2026. Additive implementation. The deployment record below supersedes
+the original local-only verification status; no authentication cutover is included.
 
 ## What changed
 
@@ -228,3 +229,34 @@ Retained screenshots: [desktop introduction](onboarding-preview/desktop.png) and
 The visual review refined button contrast, mobile invitation order, compact pinned
 fields, real-state rewards and question positioning. Field values are always editable.
 Screenshots show synthetic test input, not a verified live charity record.
+
+## Deployment record — 16 October 2026
+
+The user subsequently authorised immediate deployment. The Git-connected Vercel
+project is `sorp2026` (`prj_6pPW0XO8T06qPecrO7YgjISNXIAt`), team
+`team_2UyzhIwaQL4ffl04aPFlZdm8`, serving `sorp2026.org`.
+The initial release preview is
+`https://sorp2026-7z7p002ch-marcuswarry.vercel.app/get-started/` (READY; HTTP 200).
+
+Migration 012 and `scripts/provision-onboarding-runtime.sql` were applied first to
+the existing Neon validation branch `br-calm-queen-aucbc1bk`, then production
+`br-dark-block-audwtcnr` in `lucky-sky-23094766/neondb`. Runtime-role queries verified
+the new tables, grants and sequences; access to `public.users` remains denied.
+The recovery-test branch `br-quiet-sunset-auboqwdc` received the same schema so the
+existing automated backup restore check can recognise the new tables.
+
+The snapshot quota was full. A fresh, compute-free preservation branch,
+`before-onboarding-2026-10-16` (`br-shiny-lab-autfd24s`), retains the pre-migration
+database. No existing snapshots or branches were deleted.
+
+Production `SORP_ONBOARDING_ENABLED=true` reuses the existing database, model key,
+transcription and legacy account service configuration. The authentication cutover
+flag remains unchanged. Build counter advances to 17. Immediate `after()` charity
+preparation remains primary; a daily 06:15 UTC cron adds bounded recovery of one
+eligible job and expired-draft cleanup, using the existing cron secret.
+
+Public document downloads remain off: no new document bucket or credential was
+provisioned. Remote live model/recording/signup journeys still need verification;
+the deployment check does not imply that the earlier provider-specific release
+gates have all passed. Existing account status was checked through the deployed
+preview and returned the expected unauthenticated response.
