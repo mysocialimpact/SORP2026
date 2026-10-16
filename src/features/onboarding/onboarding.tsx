@@ -15,6 +15,7 @@ import {
   nextObjective,
   nextQuestion,
   registrationReady,
+  accountReady,
   validEmail,
   validEntity,
   safeDestination,
@@ -83,7 +84,7 @@ export function Onboarding() {
     [editingComplete, setEditingComplete] = useState(false);
   const draftRef = useRef<HTMLTextAreaElement>(null),
     dialogRef = useRef<HTMLDialogElement>(null),
-    dirty = useRef<Partial<Record<FieldKey, string>>>({}),
+    dirty = useRef<Partial<Conversation["facts"]>>({}),
     currentState = useRef(state),
     saving = useRef<Promise<void> | null>(null),
     interacted = useRef(false),
@@ -95,11 +96,14 @@ export function Onboarding() {
     candidates = state.charity.candidates;
   const objective = nextObjective(state),
     ready = registrationReady(state.facts),
+    canCreate = accountReady(state),
     completed = objective === "complete";
   const fieldComplete = (key: FieldKey) =>
     key === "email"
       ? validEmail(state.facts.email)
-      : validEntity(state.facts[key], key);
+      : key === "organisation" && state.facts.organisationKind === "independent"
+        ? true
+        : validEntity(state.facts[key], key);
   const count = fieldKeys.filter(fieldComplete).length;
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
@@ -230,7 +234,7 @@ export function Onboarding() {
           fields,
           revision: currentState.current.revision,
         });
-        for (const key of fieldKeys)
+        for (const key of [...fieldKeys, "organisationKind"] as const)
           if (dirty.current[key] === fields[key]) delete dirty.current[key];
         accept(data);
       } catch (e) {
@@ -310,7 +314,7 @@ export function Onboarding() {
     const message = skip ? "Skip this for now" : draft.trim();
     skip =
       skip ||
-      (nextObjective(state) !== "registration" &&
+      (!["registration", "charity"].includes(nextObjective(state)) &&
         /^(skip(?: this(?: question)?)?|no thanks|not now|I[’']d rather skip(?: that)?)[.!]?$/i.test(
           message,
         ));
@@ -418,6 +422,10 @@ export function Onboarding() {
   async function createAccount(event: FormEvent) {
     event.preventDefault();
     if (lock.current) return;
+    if (!accountReady(currentState.current)) {
+      setAccountError("Please complete your name, email, role and organisation (or say you work independently), then confirm one charity.");
+      return;
+    }
     if (password !== confirmPassword) {
       setAccountError("Those passwords do not match.");
       return;
@@ -427,6 +435,8 @@ export function Onboarding() {
     setAccountError("");
     try {
       await persistEdits();
+      // Fail closed: server validates the authoritative profile and confirmed registry identity before signup.
+      await post("preflight", { revision: currentState.current.revision });
       const response = await fetch("/api/readiness-account/", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -573,8 +583,7 @@ export function Onboarding() {
                   <em>Your way.</em>
                 </h2>
                 <p>
-                  Complete your profile, then create your account. You can
-                  choose a charity and personalise your experience later.
+                  Complete your details and confirm one starting charity, then create your account. You can add more charities later.
                 </p>
                 <button
                   className="onboarding-text-button"
@@ -802,7 +811,7 @@ export function Onboarding() {
                     {notice}
                   </p>
                 )}
-                {ready && !completed && (
+                {canCreate && !completed && (
                   <button
                     className="mobile-early-exit onboarding-text-button"
                     disabled={busy}
@@ -811,7 +820,7 @@ export function Onboarding() {
                     Continue with these details →
                   </button>
                 )}
-                {!completed && objective !== "registration" && (
+                {!completed && !["registration", "charity"].includes(objective) && (
                   <button
                     className="onboarding-skip"
                     disabled={busy}
@@ -834,11 +843,11 @@ export function Onboarding() {
                     <p>
                       {selected
                         ? `Your profile and ${selected.name} will give us a useful place to begin.`
-                        : "Your introduction is ready. You can add a charity later."}
+                        : "Please confirm one starting charity before creating your account."}
                     </p>
                     <button
                       className="onboarding-primary"
-                      disabled={!ready}
+                      disabled={!canCreate}
                       onClick={() => setAccountOpen(true)}
                     >
                       Create my account <Arrow diagonal />
@@ -876,9 +885,7 @@ export function Onboarding() {
             </div>
             <p className="onboarding-eyebrow">
               Profile details
-              {ready && !selected && !state.skipped.includes("charity")
-                ? " · charity not confirmed"
-                : ""}
+              {!selected ? " · charity not confirmed" : " · charity confirmed"}
             </p>
             <div className="profile-progress" aria-hidden="true">
               <span style={{ width: `${count * 25}%` }} />
@@ -893,7 +900,7 @@ export function Onboarding() {
               id="onboarding-profile-form"
               onSubmit={(e) => {
                 e.preventDefault();
-                setAccountOpen(true);
+                if (canCreate) setAccountOpen(true);
               }}
             >
               <div className="profile-fields">
@@ -904,7 +911,6 @@ export function Onboarding() {
                   >
                     <span>
                       {labels[key]}
-                      {key === "organisation" && <small>optional</small>}
                       {fieldComplete(key) && <i aria-hidden="true">✓</i>}
                     </span>
                     <input
@@ -916,16 +922,19 @@ export function Onboarding() {
                         !validEmail(state.facts.email)
                       }
                       autoComplete={autocomplete[key]}
-                      required={key !== "organisation"}
+                      required={key !== "organisation" || state.facts.organisationKind !== "independent"}
                       minLength={key === "email" ? undefined : 2}
                       maxLength={key === "email" ? 254 : 120}
                       value={state.facts[key]}
                       placeholder={
-                        mode === "form"
-                          ? `Enter ${labels[key].toLowerCase()}`
-                          : "—"
+                        key === "organisation" && state.facts.organisationKind === "independent"
+                          ? "Working independently"
+                          : mode === "form"
+                            ? `Enter ${labels[key].toLowerCase()}`
+                            : "—"
                       }
                       onChange={(e) => {
+                        if (key === "organisation") delete dirty.current.organisationKind;
                         dirty.current[key] = e.target.value;
                         replace(
                           applyFacts(
@@ -940,6 +949,15 @@ export function Onboarding() {
                   </label>
                 ))}
               </div>
+              <button type="button" className="onboarding-text-button" aria-pressed={state.facts.organisationKind === "independent"} onClick={() => {
+                const independent = state.facts.organisationKind !== "independent";
+                dirty.current.organisation = "";
+                dirty.current.organisationKind = independent ? "independent" : "unknown";
+                replace(applyFacts(currentState.current, { organisation: "", organisationKind: independent ? "independent" : "unknown" }, "form"));
+                setEditVersion(v => v + 1);
+              }}>
+                {state.facts.organisationKind === "independent" ? "✓ Working independently (change)" : "I work independently / have no firm"}
+              </button>
               <div
                 className={`profile-reward${reward ? " is-rewarded" : ""}`}
                 role="status"
@@ -965,7 +983,7 @@ export function Onboarding() {
                       ? "onboarding-primary"
                       : "onboarding-secondary"
                   }
-                  disabled={!ready || busy}
+                  disabled={!canCreate || busy}
                 >
                   {completed || mode === "form"
                     ? "Create my account"
@@ -973,11 +991,11 @@ export function Onboarding() {
                   <span>→</span>
                 </button>
                 <p>
-                  {ready
+                  {canCreate
                     ? "You can keep talking, or start exploring."
-                    : state.facts.email && !validEmail(state.facts.email)
-                      ? "Check your email address to continue."
-                      : "Your name, email and role are all we need to begin."}
+                    : !ready
+                      ? "Please complete your name, email, role and work organisation, or tell us you work independently."
+                      : "Please confirm one starting charity before creating your account."}
                 </p>
               </div>
             </form>
