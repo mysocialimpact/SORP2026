@@ -146,6 +146,7 @@ export async function extractWithModel(
   message: string,
   state: Conversation,
   id: string,
+  skip = false,
 ): Promise<Extraction> {
   const key = process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;
   if (!key)
@@ -177,7 +178,7 @@ export async function extractWithModel(
       [id, MODEL_RESERVATION_USD],
     );
   });
-  return interpretWithModel(message, state);
+  return interpretWithModel(message, state, undefined, skip);
 }
 
 export async function claimOperation(

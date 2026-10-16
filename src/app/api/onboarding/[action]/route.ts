@@ -289,7 +289,7 @@ export async function POST(
         const processed = await processTurn(
           before,
           body.message,
-          (message, state) => extractWithModel(message, state, session.id),
+          (message, state, skip) => extractWithModel(message, state, session.id, skip),
           body.skip === true,
         );
         next = processed.state;
@@ -395,7 +395,7 @@ export async function POST(
         ...session.messages,
         {
           role: "assistant",
-          text: `Great. We’ll start preparing ${selected.name}’s information. ${nextQuestion(next)}`,
+          text: nextQuestion(next),
         },
       ].slice(-22);
       const saved = await saveSession(session, next, messages);

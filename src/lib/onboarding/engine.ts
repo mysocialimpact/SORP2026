@@ -8,6 +8,7 @@ import {
 export type Interpreter = (
   text: string,
   state: Conversation,
+  skip?: boolean,
 ) => Promise<Extraction>;
 /** One production/evaluation processing cycle; model output never writes persistence. */
 export async function processTurn(
@@ -16,11 +17,9 @@ export async function processTurn(
   interpret: Interpreter,
   skip = false,
 ) {
-  if (skip)
-    return { state: advance(state, {}, true), extraction: {} as Extraction };
-  const extraction = await interpret(text, state);
+  const extraction = await interpret(text, state, skip);
   return {
-    state: advance(state, reconcileExtraction(text, state, extraction)),
+    state: advance(state, reconcileExtraction(text, state, extraction), skip),
     extraction,
   };
 }

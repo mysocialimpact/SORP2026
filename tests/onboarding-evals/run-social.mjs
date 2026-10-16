@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { socialJourneys } from './social-journeys.mjs';
-import { interpretWithModel, ONBOARDING_MODEL, MODEL_RESERVATION_USD } from '../../src/lib/onboarding/model.ts';
+import { interpretWithModel, ONBOARDING_MODEL, DIALOGUE_MODEL, MODEL_RESERVATION_USD } from '../../src/lib/onboarding/model.ts';
 import { processTurn } from '../../src/lib/onboarding/engine.ts';
 import { initialConversation, applyFacts, normaliseConversation, nextQuestion, nextObjective, proposeCharity, confirmCharity, registrationReady } from '../../src/lib/onboarding/state.ts';
 if(process.env.SORP_LIVE_EVAL !== 'true' || !(process.env.OPEN_API_KEY || process.env.OPENAI_API_KEY)) throw new Error('Explicit live opt-in and existing credential required');
-const report = { model:ONBOARDING_MODEL, reasoning:'low', stages:2, startedAt:new Date().toISOString(), turns:0, apiCalls:0, inputTokens:0, outputTokens:0, estimatedUsd:0, passed:0, failed:0, journeys:[] };
+const report = { model:ONBOARDING_MODEL, dialogueModel:DIALOGUE_MODEL, reasoning:'low', stages:2, startedAt:new Date().toISOString(), turns:0, apiCalls:0, inputTokens:0, outputTokens:0, estimatedUsd:0, passed:0, failed:0, journeys:[] };
 const selected = process.env.SORP_SOCIAL_IDS ? socialJourneys.filter(j=>process.env.SORP_SOCIAL_IDS.split(',').includes(j.id)) : socialJourneys;
 const queue=[...selected];
 async function run(j) {
@@ -13,12 +13,14 @@ async function run(j) {
   const record={id:j.id,passed:false,transcript:[{role:'assistant',text:nextQuestion(state)}],states:[]};
   let corrected=false,reminded=false,changed=false,registered=0,clarifications=0;
   async function send(text) {
-    assert.ok(++report.turns * MODEL_RESERVATION_USD <= 8 && report.turns <=160, 'Evaluation budget exhausted');
+    assert.ok(++report.turns * MODEL_RESERVATION_USD <= 13 && report.turns <=160, 'Evaluation budget exhausted');
     record.transcript.push({role:'user',text});
     const result=await processTurn(state,text,async(t,s)=>{
       report.apiCalls+=2;
-      const result=await interpretWithModel(t,s);
+      const diagnostic=[];
+      const result=await interpretWithModel(t,s,p=>diagnostic.push(p));
       report.inputTokens+=result.usage.input; report.outputTokens+=result.usage.output; report.estimatedUsd+=result.usage.estimatedUsd;
+      if(result.notice) console.log('SOCIAL_DIAGNOSTIC',JSON.stringify({id:j.id,diagnostic}));
       assert.ok(!result.notice, result.notice);
       return result;
     });
