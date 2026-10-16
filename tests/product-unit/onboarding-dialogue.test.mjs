@@ -76,3 +76,15 @@ test('wording failure retains valid extraction and surfaces a notice; two-call c
  globalThis.fetch=async()=>++calls===1?Response.json({status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{content:[{text:JSON.stringify({intent:'inform',facts:{name:{value:'Alex Rowan',quote:'Alex Rowan',period:'current',correction:false}},relationships:[]})}]}]}):new Response('',{status:503});
  try{const result=await interpretWithModel('My name is Alex Rowan.',initialConversation());assert.equal(result.name,'Alex Rowan');assert.match(result.notice,/reply could not finish/);assert.equal(calls,2);assert.equal(MODEL_RESERVATION_USD,0.10);}finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
 });
+test('language output cannot choose field metadata or invent a permission to continue probing',()=>{
+ const state=advance(ready(),{concerns:'Deadlines',utterance:'Deadlines.'});
+ const output=decodeDialogue({move:'progress',reply:'Those deadlines are the practical concern. You can explore Interim Spaces when you are ready.',afterCharity:null},state,null);
+ assert.equal(output.next.objective,'complete');assert.deepEqual(output.next.fields,[]);
+ assert.throws(()=>decodeDialogue({move:'follow_up',reply:'Tell me more?',afterCharity:null},state,null));
+});
+test('a permitted social follow-up is chosen before progressing the information objective',()=>{
+ const state=advance(ready(),{utterance:'An unexpected nocturnal visitor.',topicResponse:participation()});
+ const reflection={...state,dialogue:{...state.dialogue,reflecting:true}};
+ const output=decodeDialogue({move:'follow_up',reply:'An unexpected visitor? Do you mean that literally?',afterCharity:null},state,null,reflection);
+ assert.equal(output.next.objective,'reflection');assert.deepEqual(output.next.fields,[]);
+});

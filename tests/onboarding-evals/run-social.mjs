@@ -8,17 +8,20 @@ if(process.env.SORP_LIVE_EVAL !== 'true' || !(process.env.OPEN_API_KEY || proces
 const report = { model:ONBOARDING_MODEL, dialogueModel:DIALOGUE_MODEL, extractionReasoning:'low',dialogueReasoning:'medium', stages:2, startedAt:new Date().toISOString(), turns:0, apiCalls:0, inputTokens:0, outputTokens:0, estimatedUsd:0, passed:0, failed:0, journeys:[] };
 const selected = process.env.SORP_SOCIAL_IDS ? socialJourneys.filter(j=>process.env.SORP_SOCIAL_IDS.split(',').includes(j.id)) : socialJourneys;
 const queue=[...selected];
+let pendingBudget=0;
 async function run(j) {
   let state=initialConversation();
   const record={id:j.id,passed:false,transcript:[{role:'assistant',text:nextQuestion(state)}],states:[]};
   let corrected=false,reminded=false,changed=false,registered=0,clarifications=0;
   async function send(text) {
-    assert.ok(++report.turns * MODEL_RESERVATION_USD <= 16 && report.turns <=160, 'Evaluation budget exhausted');
+    assert.ok(++report.turns <=160 && report.estimatedUsd + pendingBudget + MODEL_RESERVATION_USD <=8, 'Evaluation budget exhausted');
+    pendingBudget += MODEL_RESERVATION_USD;
     record.transcript.push({role:'user',text});
     const result=await processTurn(state,text,async(t,s)=>{
       report.apiCalls+=2;
       const diagnostic=[];
       const result=await interpretWithModel(t,s,p=>diagnostic.push(p));
+      pendingBudget -= MODEL_RESERVATION_USD;
       report.inputTokens+=result.usage.input; report.outputTokens+=result.usage.output; report.estimatedUsd+=result.usage.estimatedUsd;
       if(result.notice) for(const d of diagnostic.filter(d=>d.stage)) console.log('SOCIAL_DIAGNOSTIC',JSON.stringify({id:j.id,...d}));
       assert.ok(!result.notice, result.notice);

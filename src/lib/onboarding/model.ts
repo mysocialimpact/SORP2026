@@ -14,9 +14,12 @@ import {
   type Objective,
 } from "./state.ts";
 export const ONBOARDING_MODEL = "gpt-5.4-mini-2026-03-17";
-export const DIALOGUE_MODEL = "gpt-6.1-sol";
+const comparisonModel = process.env.VERCEL_ENV === "preview" && process.env.SORP_LIVE_EVAL === "true" &&
+  ["gpt-6-astra", "gpt-6-luna"].includes(process.env.SORP_DIALOGUE_EVAL_MODEL || "")
+  ? process.env.SORP_DIALOGUE_EVAL_MODEL : undefined;
+export const DIALOGUE_MODEL = comparisonModel || "gpt-6.1-sol";
 export const MAX_OUTPUT_TOKENS = 4000;
-export const MODEL_RESERVATION_USD = 0.10;
+export const MODEL_RESERVATION_USD = DIALOGUE_MODEL === "gpt-6-astra" ? 0.25 : 0.10;
 import { dialogueRequest, decodeDialogue } from "./dialogue.ts";
 const factFields = [
   ...fieldKeys,
@@ -424,10 +427,14 @@ async function callModel(request: { model: string }) {
   if (!response.ok) throw new Error(`Conversation assistance is unavailable (provider ${response.status}). Please retry or use the form.`);
   const data = await response.json();
   const input = Number(data.usage?.input_tokens || 0), output = Number(data.usage?.output_tokens || 0);
-  const full = request.model === DIALOGUE_MODEL;
+  const rates: Record<string, [number, number]> = {
+    "gpt-5.4-mini-2026-03-17": [0.75, 4.5],
+    "gpt-6.1-sol": [2, 10], "gpt-6-astra": [10, 50], "gpt-6-luna": [0.1, 0.5],
+  };
+  const [inputRate, outputRate] = rates[request.model];
   // Standard rates checked against OpenAI's published pricing on 2026-10-16.
   // Ignore cache discounts conservatively; no fast-mode or tools are requested.
-  const usage = { input, output, estimatedUsd: (input * (full ? 2 : 0.75) + output * (full ? 10 : 4.5)) / 1e6 };
+  const usage = { input, output, estimatedUsd: (input * inputRate + output * outputRate) / 1e6 };
   if (data.status !== "completed") throw Object.assign(new Error("We could not finish understanding that answer. Please retry or edit your profile."), { providerReason: data.incomplete_details?.reason || data.status, usage });
   const text = data.output?.flatMap((o: { content?: { text?: string }[] }) => o.content || []).map((c: { text?: string }) => c.text || "").join("");
   return { parsed: JSON.parse(text || "{}"), usage };
