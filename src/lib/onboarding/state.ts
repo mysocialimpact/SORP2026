@@ -20,6 +20,29 @@ export type Objective =
   | "concerns"
   | "clarification"
   | "complete";
+export type ProfessionalRelationship = {
+  entity: string;
+  aliases: string[];
+  kind: "charity" | "firm" | "organisation" | "unknown";
+  relationship:
+    | "client"
+    | "employer"
+    | "trustee"
+    | "employee"
+    | "volunteer"
+    | "adviser"
+    | "mentioned";
+  period: "past" | "current" | "unspecified";
+  confidence: "stated" | "uncertain";
+  role: string;
+  evidence: string;
+  turn: number;
+};
+export type QuestionProposal = {
+  objective: Objective;
+  fields: string[];
+  question: string;
+};
 export type Conversation = {
   facts: Facts;
   turns: number;
@@ -28,7 +51,19 @@ export type Conversation = {
   skipped: Objective[];
   lastIntent: Intent;
   clarification: "charity" | "meaning" | "question" | null;
-  version: 2;
+  version: 3;
+  professional: ProfessionalRelationship[];
+  corrections: {
+    field: FieldKey;
+    previous: string;
+    value: string;
+    source: "form" | "message";
+    turn: number;
+  }[];
+  finishRequested: boolean;
+  response:
+    (QuestionProposal & { contextKey: string; generated: boolean }) | null;
+  acknowledged: string[];
   revision: number;
   knowledge: Partial<
     Record<
@@ -68,7 +103,12 @@ export const initialConversation = (): Conversation => ({
   repairTurns: 0,
   asked: [],
   skipped: [],
-  version: 2,
+  version: 3,
+  professional: [],
+  corrections: [],
+  finishRequested: false,
+  response: null,
+  acknowledged: [],
   revision: 0,
   knowledge: {},
   lastIntent: "inform",
@@ -327,6 +367,11 @@ export type Extraction = Partial<Facts> & {
   reference?: string;
   charityChoice?: string;
   charityDecision?: "accept" | "reject";
+  professional?: ProfessionalRelationship[];
+  correctedFields?: FieldKey[];
+  finishRequested?: boolean;
+  questionProposal?: QuestionProposal;
+  usage?: { input: number; output: number; estimatedUsd: number };
 };
 /** Successful semantic interpretation is authoritative: an incidental mention
  * of someone else's role must not survive as the user's role. Lexical recognition
@@ -436,13 +481,22 @@ function interpretImmediate(text: string, s: Conversation): Extraction {
 const same = (a: string, b: string) =>
   a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 export function charityOptions(s: Conversation): string[] {
-  const values = [...s.facts.charities];
+  const values = [
+    ...s.facts.charities.map(
+      (c) =>
+        s.professional.find(
+          (r) =>
+            entitySame(r.entity, c) || r.aliases.some((a) => entitySame(a, c)),
+        )?.entity || c,
+    ),
+    ...s.professional.filter((r) => r.kind === "charity").map((r) => r.entity),
+  ];
   if (s.facts.organisation && s.facts.organisationKind === "charity")
     values.push(s.facts.organisation);
   return values.filter(
     (v, i) =>
       validEntity(v) &&
-      values.findIndex((x) => same(x, v)) === i &&
+      values.findIndex((x) => entitySame(x, v)) === i &&
       !s.charity.declined.some((x) => same(x, v)),
   );
 }
@@ -488,11 +542,18 @@ export function normaliseConversation(
   const state: Conversation = {
     ...base,
     ...raw,
-    version: 2,
+    version: 3,
     revision: Number.isInteger(raw.revision) ? raw.revision! : 0,
     facts: { ...base.facts, ...cleanFacts(raw.facts) },
     charity: { ...base.charity, ...raw.charity },
     knowledge: { ...raw.knowledge },
+    professional: mergeProfessional([], raw.professional || [], raw.turns || 0),
+    corrections: Array.isArray(raw.corrections)
+      ? raw.corrections.slice(-12)
+      : [],
+    acknowledged: Array.isArray(raw.acknowledged)
+      ? raw.acknowledged.slice(-12)
+      : [],
     asked: raw.asked || [],
     skipped: raw.skipped || [],
   };
@@ -525,8 +586,11 @@ export function applyFacts(
   patch: Partial<Facts>,
   source: "message" | "form" = "message",
 ): Conversation {
-  const cleaned = cleanFacts(patch),
-    facts = mergeFacts(s.facts, cleaned),
+  const cleaned = cleanFacts(patch);
+  if (source === "message")
+    for (const key of fieldKeys)
+      if (s.knowledge[key]?.status === "confirmed") delete cleaned[key];
+  const facts = mergeFacts(s.facts, cleaned),
     knowledge = { ...s.knowledge };
   if (source === "form")
     for (const key of fieldKeys)
@@ -558,7 +622,27 @@ export function applyFacts(
     delete knowledge.organisationKind;
     facts.organisationKind = "unknown";
   }
-  return relationships({ ...s, facts, knowledge });
+  const corrections = [...s.corrections];
+  if (source === "form")
+    for (const key of fieldKeys)
+      if (
+        patch[key] !== undefined &&
+        s.facts[key] &&
+        !same(s.facts[key], facts[key])
+      )
+        corrections.push({
+          field: key,
+          previous: s.facts[key],
+          value: facts[key],
+          source,
+          turn: s.turns,
+        });
+  return relationships({
+    ...s,
+    facts,
+    knowledge,
+    corrections: corrections.slice(-12),
+  });
 }
 export function proposeCharity(s: Conversation, value: string): Conversation {
   if (!validEntity(value)) return { ...s, clarification: "charity" };
@@ -596,7 +680,67 @@ export function applyExtraction(
   s: Conversation,
   patch: Extraction,
 ): Conversation {
-  let next = applyFacts(s, patch);
+  const supplied = { ...patch };
+  // Time is a first-class constraint: past work never fills today's employer or role.
+  const professional = mergeProfessional(
+    s.professional,
+    patch.professional || [],
+    s.turns,
+  );
+  if (
+    supplied.organisation &&
+    professional.some(
+      (r) =>
+        entitySame(r.entity, supplied.organisation!) && r.period === "past",
+    ) &&
+    !professional.some(
+      (r) =>
+        entitySame(r.entity, supplied.organisation!) && r.period === "current",
+    )
+  )
+    delete supplied.organisation;
+  // Explicit corrections are the only conversational updates that can replace a confirmed edit.
+  const knowledge = { ...s.knowledge };
+  for (const key of patch.correctedFields || []) delete knowledge[key];
+  let next = applyFacts(
+    { ...s, professional, knowledge, response: null },
+    supplied,
+  );
+  for (const key of patch.correctedFields || [])
+    if (supplied[key] && next.facts[key] !== s.facts[key]) {
+      next.knowledge[key] = {
+        status: "confirmed",
+        source: "message",
+        turn: s.turns,
+      };
+      next.corrections = [
+        ...next.corrections,
+        {
+          field: key,
+          previous: s.facts[key],
+          value: next.facts[key],
+          source: "message" as const,
+          turn: s.turns,
+        },
+      ].slice(-12);
+    }
+  // Retain additional professional insight, instead of replacing earlier context each turn.
+  if (patch.intent !== "correct")
+    for (const key of [
+      "responsibilities",
+      "interests",
+      "concerns",
+      "context",
+    ] as const) {
+      if (
+        s.facts[key] &&
+        next.facts[key] &&
+        !s.facts[key].includes(next.facts[key]) &&
+        !next.facts[key].includes(s.facts[key])
+      )
+        next.facts[key] = (s.facts[key] + "; " + next.facts[key]).slice(0, 600);
+    }
+  next.finishRequested = patch.finishRequested === true || s.finishRequested;
   if (patch.charityDecision === "reject")
     next = relationships({
       ...next,
@@ -667,19 +811,24 @@ export function advance(
     },
     patch,
   );
-  return {
-    ...next,
-    asked: [...new Set([...s.asked, objective])],
-    skipped:
-      skip && objective !== "registration"
-        ? [...new Set([...next.skipped, objective])]
-        : next.skipped,
-  };
+  return attachQuestion(
+    {
+      ...next,
+      asked: [...new Set([...s.asked, objective])],
+      skipped:
+        skip && objective !== "registration"
+          ? [...new Set([...next.skipped, objective])]
+          : next.skipped,
+    },
+    patch.questionProposal,
+  );
 }
 export function nextObjective(s: Conversation): Objective {
-  if (s.clarification && s.turns < TOTAL_TURN_CAP) return "clarification";
+  if (s.clarification && s.turns < TOTAL_TURN_CAP && !s.finishRequested)
+    return "clarification";
   if (!registrationReady(s.facts))
     return s.turns >= TOTAL_TURN_CAP ? "complete" : "registration";
+  if (s.finishRequested) return "complete";
   // Essential resolution of an explicitly chosen/corrected entity precedes the optional cap.
   if (!s.charity.confirmed && ["lookup", "confirm"].includes(s.charity.phase))
     return "charity";
@@ -691,6 +840,16 @@ export function nextObjective(s: Conversation): Objective {
   return "complete";
 }
 export function nextQuestion(s: Conversation): string {
+  const proposal = s.response;
+  if (proposal && suitableQuestion(s, proposal)) {
+    const relation = s.professional.find(
+      (r) => relationshipKey(r) === proposal.contextKey,
+    );
+    return `${relation ? relationshipLead(relation) : ""}${proposal.question.replaceAll("{firstName}", s.facts.name.split(" ")[0]).replaceAll("{name}", s.facts.name)}`;
+  }
+  return fallbackQuestion(s);
+}
+function fallbackQuestion(s: Conversation): string {
   if (s.clarification === "meaning")
     return "I may have misunderstood. Which detail should I correct? Your existing details are still here.";
   if (s.clarification === "charity") {
@@ -711,6 +870,13 @@ export function nextQuestion(s: Conversation): string {
         !validEmail(s.facts.email) && "your email address",
         !validEntity(s.facts.role, "role") && "what you do",
       ].filter(Boolean);
+      const historical = s.professional.find((r) => r.period === "past");
+      if (
+        missing.length === 1 &&
+        !validEntity(s.facts.role, "role") &&
+        historical
+      )
+        return `${relationshipLead(historical)}What sort of work are you doing now?`;
       const acknowledgement = s.charity.proposed
         ? `I’ve noted ${s.charity.proposed} as a possible starting charity. `
         : "";
@@ -730,7 +896,12 @@ export function nextQuestion(s: Conversation): string {
       return choices.length > 1
         ? `You mentioned ${choices.join(", ")}. Which one would you like to start with?`
         : s.charity.proposed
-          ? `${s.lastIntent === "remind" ? "You’re right —" : "You mentioned"} ${s.charity.proposed}. Shall we use that as your starting charity?`
+          ? s.professional.some(
+              (r) =>
+                entitySame(r.entity, s.charity.proposed) && r.period === "past",
+            )
+            ? `You mentioned ${s.charity.proposed} previously. Would you like to start with that charity, or another one?`
+            : `${s.lastIntent === "remind" ? "You’re right —" : "You mentioned"} ${s.charity.proposed}. Shall we use that as your starting charity?`
           : "Which charity would you like to start with? One name or charity number is enough to help us prepare a more personal experience.";
     }
     case "responsibilities":
@@ -776,4 +947,176 @@ function choiceFromAnswer(message: string, s: Conversation): string {
 /** Compatibility export; lookup is driven by the resulting state, not the previous stage. */
 export function charityQueryFromAnswer(message: string, state: Conversation) {
   return choiceFromAnswer(message, state);
+}
+
+/** Relationship identities are local mention identities, never regulator identities. */
+export const entitySame = (a: string, b: string) =>
+  a
+    .trim()
+    .replace(/^the\s+/i, "")
+    .toLocaleLowerCase() ===
+  b
+    .trim()
+    .replace(/^the\s+/i, "")
+    .toLocaleLowerCase();
+export const relationshipKey = (r: ProfessionalRelationship) =>
+  `${r.entity.toLocaleLowerCase()}:${r.relationship}:${r.period}`;
+export function mergeProfessional(
+  existing: ProfessionalRelationship[],
+  incoming: ProfessionalRelationship[],
+  turn: number,
+): ProfessionalRelationship[] {
+  const result = existing.map((r) => ({ ...r, aliases: [...r.aliases] }));
+  for (const raw of incoming.slice(0, 10)) {
+    if (
+      !validEntity(raw.entity) ||
+      !["past", "current", "unspecified"].includes(raw.period) ||
+      ![
+        "client",
+        "employer",
+        "trustee",
+        "employee",
+        "volunteer",
+        "adviser",
+        "mentioned",
+      ].includes(raw.relationship)
+    )
+      continue;
+    const r = {
+      ...raw,
+      aliases: (raw.aliases || []).filter((a) => validEntity(a)).slice(0, 4),
+      evidence: raw.evidence.slice(0, 600),
+      turn,
+    };
+    const entity = result.find(
+      (old) =>
+        entitySame(old.entity, r.entity) ||
+        old.aliases.some((a) => entitySame(a, r.entity)),
+    );
+    if (entity) r.entity = entity.entity;
+    const index = result.findIndex(
+      (old) => relationshipKey(old) === relationshipKey(r),
+    );
+    if (index >= 0)
+      result[index] = {
+        ...result[index],
+        ...r,
+        aliases: [...new Set([...result[index].aliases, ...r.aliases])].slice(
+          0,
+          4,
+        ),
+      };
+    else result.push(r);
+  }
+  return result.slice(-12);
+}
+export function missingRegistration(s: Conversation): FieldKey[] {
+  return fieldKeys.filter(
+    (k) => k !== "organisation" && !validEntity(s.facts[k], k),
+  );
+}
+export function questionPlan(s: Conversation) {
+  const objective = nextObjective(s);
+  const missing = missingRegistration(s);
+  const fields =
+    objective === "registration"
+      ? [
+          ...missing,
+          ...(!s.facts.organisation && missing.includes("role")
+            ? ["organisation"]
+            : []),
+        ]
+      : objective === "charity"
+        ? ["charity"]
+        : ["responsibilities", "discovery", "concerns"].includes(objective)
+          ? [objective]
+          : [];
+  const context = s.professional
+    .filter((r) => !s.acknowledged.includes(relationshipKey(r)))
+    .sort((a, b) => b.turn - a.turn)[0];
+  return {
+    objective,
+    fields,
+    context,
+    registrationComplete: registrationReady(s.facts),
+    charityConfirmed: !!s.charity.confirmed,
+    canContinue: registrationReady(s.facts),
+    remainingTurns: Math.max(0, TOTAL_TURN_CAP - s.turns),
+  };
+}
+function relationshipLead(r: ProfessionalRelationship) {
+  const activity =
+    r.relationship === "client" || r.relationship === "adviser"
+      ? "working with"
+      : r.relationship === "employer" || r.relationship === "employee"
+        ? "working at"
+        : r.relationship === "trustee"
+          ? "being a trustee at"
+          : r.relationship === "volunteer"
+            ? "volunteering with"
+            : "a connection with";
+  return `You mentioned ${activity} ${r.entity}${r.period === "past" ? " previously" : ""}. `;
+}
+export function suitableQuestion(
+  s: Conversation,
+  p: QuestionProposal,
+): boolean {
+  const plan = questionPlan(s);
+  if (p.objective !== plan.objective || !p.question || p.question.length > 320)
+    return false;
+  if (
+    ["complete", "concerns", "charity", "clarification"].includes(
+      plan.objective,
+    )
+  )
+    return false;
+  if (
+    !p.fields.length ||
+    p.fields.some((f) => !plan.fields.includes(f as FieldKey))
+  )
+    return false;
+  // Reject text asking for known registration facts, regardless of the proposal's metadata.
+  const requests: { [key: string]: RegExp } = {
+    name: /\b(?:your (?:full )?name|what.*called)\b/i,
+    email: /\b(?:your email|email address)\b/i,
+    role: /\b(?:what (?:do you do|you do)|your (?:professional )?role|what.*work.*(?:now|currently))\b/i,
+  };
+  for (const key of ["name", "email", "role"] as const)
+    if (validEntity(s.facts[key], key) && requests[key].test(p.question))
+      return false;
+  if (
+    /https?:|password|verified|I(?:’|')ve (?:found|checked)|accounts are ready/i.test(
+      p.question,
+    )
+  )
+    return false;
+  // Names are rendered from state, not copied from an earlier transcript.
+  if (
+    s.facts.name &&
+    p.question.toLowerCase().includes(s.facts.name.toLowerCase())
+  )
+    return false;
+  return (p.question.match(/\?/g) || []).length === 1;
+}
+function attachQuestion(
+  s: Conversation,
+  proposal?: QuestionProposal,
+): Conversation {
+  const plan = questionPlan(s);
+  const context = plan.context;
+  const accepted = proposal && suitableQuestion(s, proposal);
+  return {
+    ...s,
+    response: accepted
+      ? {
+          ...proposal,
+          generated: true,
+          contextKey: context ? relationshipKey(context) : "",
+        }
+      : null,
+    acknowledged:
+      context && accepted
+        ? [...new Set([...s.acknowledged, relationshipKey(context)])].slice(-12)
+        : s.acknowledged,
+  };
 }

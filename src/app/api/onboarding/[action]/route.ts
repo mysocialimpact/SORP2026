@@ -1,11 +1,10 @@
 import { after } from "next/server";
+import { processTurn, fallbackTurn } from "@/lib/onboarding/engine";
 import { query, transaction } from "@/lib/console/db";
 import { protectPlatformRequest } from "@/lib/platform/auth";
 import { AccessError } from "@/lib/access-error";
 import {
-  advance,
   cleanFacts,
-  extractImmediate,
   mergeFacts,
   nextQuestion,
   nextObjective,
@@ -15,7 +14,6 @@ import {
   confirmCharity,
   validEntity,
   emptyFacts,
-  reconcileExtraction,
 } from "@/lib/onboarding/state";
 import {
   enabled,
@@ -226,7 +224,10 @@ export async function POST(
         `INSERT INTO research_console.onboarding_profiles(account_id,facts,messages,charity_identity,attribution) VALUES($1,$2,$3,$4,$5) ON CONFLICT(account_id) DO NOTHING`,
         [
           identity.account.id,
-          JSON.stringify(facts),
+          JSON.stringify({
+            ...facts,
+            professionalContext: saved.professionalContext || {},
+          }),
           JSON.stringify(messages),
           charity,
           JSON.stringify(attributionFrom(saved.attribution)),
@@ -272,34 +273,32 @@ export async function POST(
           400,
         );
       const before = applyFacts(session.state, body.fields || {}, "form");
-      const immediate = body.skip ? {} : extractImmediate(body.message, before);
-      const provisional = advance(before, immediate, body.skip === true);
       const userMessages = [
         ...session.messages,
         { role: "user", text: body.message },
       ].slice(-21);
-      // Persist understood facts before the model request. A reload/crash never loses the answer.
-      const reserved = await saveSession(session, provisional, userMessages);
-      let next = provisional,
+      // Reserve the turn and retain input, without committing unvalidated extraction.
+      const reserved = await saveSession(
+        session,
+        { ...before, turns: before.turns + 1 },
+        userMessages,
+      );
+      let next = before,
         notice = "";
-      if (!body.skip) {
-        try {
-          const semantic = await extractWithModel(
-            body.message,
-            before,
-            session.id,
-          );
-          // Model interpretation supersedes contextual fallback guesses, not explicit facts.
-          next = advance(
-            before,
-            reconcileExtraction(body.message, before, semantic),
-          );
-        } catch (e) {
-          notice =
-            e instanceof Error
-              ? e.message
-              : "Please check your editable profile.";
-        }
+      try {
+        const processed = await processTurn(
+          before,
+          body.message,
+          (message, state) => extractWithModel(message, state, session.id),
+          body.skip === true,
+        );
+        next = processed.state;
+      } catch (e) {
+        next = fallbackTurn(before, body.message);
+        notice =
+          e instanceof Error
+            ? e.message
+            : "Please retry or use your editable profile.";
       }
       const messages = [
         ...userMessages,
@@ -438,7 +437,14 @@ export async function POST(
           `INSERT INTO research_console.onboarding_profiles(account_id,facts,messages,charity_identity,attribution) VALUES($1,$2,$3,$4,$5) ON CONFLICT(account_id) DO NOTHING`,
           [
             identity.account.id,
-            JSON.stringify(facts),
+            JSON.stringify({
+              ...facts,
+              professionalContext: {
+                relationships: session.state.professional,
+                corrections: session.state.corrections,
+                knowledge: session.state.knowledge,
+              },
+            }),
             JSON.stringify(session.messages),
             charity,
             JSON.stringify(session.attribution),

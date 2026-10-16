@@ -169,7 +169,7 @@ test("legacy draft migrates without losing facts or registry confirmation", () =
     skipped: [],
   };
   const s = normaliseConversation(old, { name: "Interim Spaces" });
-  assert.equal(s.version, 2);
+  assert.equal(s.version, 3);
   assert.equal(s.charity.confirmed.name, "Interim Spaces");
   assert.equal(nextObjective(s), "responsibilities");
 });

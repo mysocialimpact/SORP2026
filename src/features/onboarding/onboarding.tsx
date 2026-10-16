@@ -331,7 +331,7 @@ export function Onboarding() {
         skip ? {} : extractImmediate(message, before),
         skip,
       );
-      update(local, before);
+      if (!service) update(local, before);
       setDraft("");
       if (service) {
         const data = await post("turn", {
@@ -341,7 +341,7 @@ export function Onboarding() {
         });
         update(
           applyFacts(normaliseConversation(data.state), dirty.current, "form"),
-          local,
+          before,
         );
         setHistory(data.messages);
         setNotice(data.notice || "");
@@ -441,7 +441,12 @@ export function Onboarding() {
             sessionId: crypto.randomUUID(),
             step: "scope",
             onboarding: {
-              facts: state.facts,
+              facts: currentState.current.facts,
+              professionalContext: {
+                relationships: currentState.current.professional,
+                corrections: currentState.current.corrections,
+                knowledge: currentState.current.knowledge,
+              },
               selected,
               completedAt: new Date().toISOString(),
               messages: history,
