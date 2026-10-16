@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
+import { recoveredAccountReturn, rememberAccountReturn, signInHref } from "@/lib/account-navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 export function PasswordRecovery({ reset = false }: { reset?: boolean }) {
   const started = useRef(false);
+  const [destination, setDestination] = useState("/dashboard/");
   const [available, setAvailable] = useState<"checking" | "yes" | "no">("checking");
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
@@ -16,11 +18,14 @@ export function PasswordRecovery({ reset = false }: { reset?: boolean }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
+    const returnTo = recoveredAccountReturn(new URLSearchParams(window.location.search).get("return"));
+    rememberAccountReturn(returnTo);
     const link = new URLSearchParams(window.location.hash.slice(1));
     const value = link.get("token") || "";
     // Keep a reset token only in this tab's memory, never URLs/history/storage.
     if (reset) window.history.replaceState(window.history.state, "", window.location.pathname);
     queueMicrotask(() => {
+      setDestination(returnTo);
       setToken(/^[A-Za-z0-9_-]{20,128}$/.test(value) ? value : "");
       setIndependentLink(link.get("sorp-auth") === "1");
       try {
@@ -77,8 +82,8 @@ export function PasswordRecovery({ reset = false }: { reset?: boolean }) {
           </form>)}
       </>}
       <div className="gateway-recovery-links">
-        <Link href="/are-you-sorp-ready/review/?entry=login">Back to sign in</Link>
-        {reset && !complete && <Link href="/forgot-password/">Request a new reset link</Link>}
+        <Link href={signInHref(destination)}>Back to sign in</Link>
+        {reset && !complete && <Link href={`/forgot-password/?return=${encodeURIComponent(destination)}`}>Request a new reset link</Link>}
         {!reset && complete && <button type="button" onClick={() => { setComplete(false); setError(""); }}>Try another email address</button>}
       </div>
     </section>

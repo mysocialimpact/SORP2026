@@ -16,3 +16,12 @@ export const signInHref = (destination: string) => `/login/?return=${encodeURICo
 export function invitationTokenFromDestination(destination: string) {
   return new URL(safeDestination(destination), "https://sorp2026.org").pathname.match(/^\/invitation\/([a-f0-9]{64})\/?$/)?.[1];
 }
+
+const recoveryReturnKey = "sorp2026-account-return";
+export function rememberAccountReturn(destination: string) {
+  try { window.sessionStorage.setItem(recoveryReturnKey, safeDestination(destination, true)); } catch { /* URL return still works without browser storage. */ }
+}
+export function recoveredAccountReturn(value?: string | null) {
+  try { return safeDestination(value || window.sessionStorage.getItem(recoveryReturnKey), true); }
+  catch { return safeDestination(value, true); }
+}

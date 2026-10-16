@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { safeDestination } from "@/lib/onboarding/state";
-import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
+import { currentAccountDestination, registrationHref, rememberAccountReturn } from "@/lib/account-navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 export function AccountPortal({ returnTo, embedded = false }: { returnTo?: string; embedded?: boolean } = {}) {
@@ -49,7 +49,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
       <label>Email address<input required type="email" maxLength={254} autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} /></label>
       <label>Password<input required type="password" minLength={10} maxLength={200} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
       {error && <div className="account-error" role="alert"><strong>We couldn’t sign you in yet.</strong><span>{error}</span></div>}
-      <Link className="account-forgot" href="/forgot-password/">Forgotten your password?</Link>
+      <Link className="account-forgot" href={`/forgot-password/?return=${encodeURIComponent(destination)}`} onClick={() => rememberAccountReturn(destination)}>Forgotten your password?</Link>
       <button className="gateway-action account-submit" disabled={busy} type="submit">{busy ? "Please wait…" : "Log in to SORP2026 →"}</button>
     </form>}
     <p className="account-note">{embedded ? "One account for your SORP2026 tools. You’ll return straight to this assessment." : "One account for your SORP2026 tools. If you previously used Social Impact Excellence, contact support before creating a new account so your saved work can be checked. Google sign-in is currently unavailable."}</p>

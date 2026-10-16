@@ -15,6 +15,7 @@ Implementation branch: `integration/central-registration-build-bar`, based on pr
 | My Impact Director | Embedded account portal links to central registration | Guest sessionStorage recovery and existing account snapshot remain unchanged |
 | Invitations | Central registration retains invitation token in return path | Existing authenticated invitation acceptance and email-match checks unchanged |
 | `/login/?mode=signup`, `/signup`, `/sign-up`, `/register` | Redirect to `/get-started/` | Existing safe `next` / `return` parameters retained |
+| Password recovery | Central sign-in link | Safe same-tab workflow return retained; reset tokens remain memory-only; cross-device recovery falls back safely |
 | Settings / upgrades | Existing signed-in controls | No onboarding is introduced into billing; prices/providers/entitlements unchanged |
 
 **External boundary:** ongoing paid Ask SORP access at `asksorp.mysocialimpact.org` / the original service still has its own account and checkout. Its existing continuation link is preserved. There is no verified SSO bridge in this repository. This branch does **not** claim to unify that external account or change its subscription. Former independent Social Impact Excellence accounts also retain the existing support/migration warning.

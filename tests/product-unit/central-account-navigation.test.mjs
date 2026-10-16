@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { currentAccountDestination, registrationHref, signInHref, invitationTokenFromDestination } from '../../src/lib/account-navigation.ts';
+import { currentAccountDestination, registrationHref, signInHref, invitationTokenFromDestination, rememberAccountReturn, recoveredAccountReturn } from '../../src/lib/account-navigation.ts';
 import { safeDestination } from '../../src/lib/onboarding/state.ts';
 import { formatBuildTimestamp } from '../../src/lib/build-information.ts';
 import { allocateBuild } from '../../scripts/prepare-build.mjs';
@@ -40,4 +40,15 @@ test('invitation-aware signup retains only a validated invitation token', () => 
  assert.equal(invitationTokenFromDestination(`/invitation/${token}/extra`), undefined);
  assert.equal(invitationTokenFromDestination(`//evil.invalid/invitation/${token}/`), undefined);
  assert.equal(invitationTokenFromDestination('/invitation/not-a-token/'), undefined);
+});
+
+test('password recovery remembers a safe workflow address without persisting credentials', () => {
+ const data = new Map();
+ globalThis.window = { sessionStorage: { setItem: (k,v) => data.set(k,v), getItem: k => data.get(k) } };
+ const target = '/charity-impact-reports/review/?draft=synthetic#upload';
+ rememberAccountReturn(target);
+ assert.equal(recoveredAccountReturn(), target);
+ assert.equal(recoveredAccountReturn('//evil.invalid'), '/dashboard/');
+ assert.deepEqual([...data.values()], [target]);
+ delete globalThis.window;
 });
