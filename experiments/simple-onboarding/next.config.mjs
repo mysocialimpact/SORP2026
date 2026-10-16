@@ -1,0 +1,2 @@
+import path from 'node:path';
+export default {poweredByHeader:false,trailingSlash:true,turbopack:{root:path.resolve(import.meta.dirname,'../..')},typescript:{tsconfigPath:'tsconfig.json'},async headers(){return [{source:'/:path*',headers:[{key:'X-Robots-Tag',value:'noindex, nofollow'},{key:'Permissions-Policy',value:'camera=(), microphone=(self), geolocation=()'},{key:'Content-Security-Policy',value:"object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"}]}]}};

@@ -53,6 +53,7 @@ export type DialogueMemory = {
   reflecting: boolean;
 };
 export type Conversation = {
+  natural?: { reply: string; objectives: string[]; uncertainties: string[]; independent: boolean; complete: boolean };
   facts: Facts;
   dialogue: DialogueMemory;
   turns: number;
@@ -976,6 +977,11 @@ export function advance(
   return attachQuestion(patch.closeOptional ? closeOptionalConversation(progressed) || progressed : progressed, patch.questionProposal);
 }
 export function nextObjective(s: Conversation): Objective {
+  if (s.natural) {
+    if (registrationMissing(s).some(k => k !== "charity")) return "registration";
+    if (!s.charity.confirmed) return "charity";
+    return s.natural.complete ? "complete" : "reflection";
+  }
   if (s.clarification && s.turns < TOTAL_TURN_CAP && !s.finishRequested)
     return "clarification";
   if (!registrationReady(s.facts))
@@ -993,6 +999,7 @@ export function nextObjective(s: Conversation): Objective {
   return "complete";
 }
 export function nextQuestion(s: Conversation): string {
+  if (s.natural?.reply) return s.natural.reply;
   const proposal = s.response;
   if (proposal && suitableQuestion(s, proposal)) {
     if (proposal.natural) return proposal.question
@@ -1331,3 +1338,15 @@ function attachQuestion(
         : s.acknowledged,
   };
 }
+
+/** Eligibility is an application decision, never a model assertion. */
+export function registrationMissing(s: Conversation): string[] {
+  return [
+    ...(!validEntity(s.facts.name, "name") || s.facts.name.trim().split(/\s+/).length < 2 ? ["full name"] : []),
+    ...(!validEmail(s.facts.email) ? ["email"] : []),
+    ...(!validEntity(s.facts.role, "role") ? ["professional role"] : []),
+    ...(!validEntity(s.facts.organisation, "organisation") && !s.natural?.independent ? ["current organisation or explicit independent status"] : []),
+    ...(!s.charity.confirmed ? ["charity"] : []),
+  ];
+}
+export const accountReady = (s: Conversation) => registrationMissing(s).length === 0;

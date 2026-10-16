@@ -15,6 +15,7 @@ import {
   nextObjective,
   nextQuestion,
   registrationReady,
+  accountReady,
   validEmail,
   validEntity,
   safeDestination,
@@ -94,13 +95,13 @@ export function Onboarding() {
   const selected = state.charity.confirmed,
     candidates = state.charity.candidates;
   const objective = nextObjective(state),
-    ready = registrationReady(state.facts),
+    ready = accountReady(state),
     completed = objective === "complete";
   const fieldComplete = (key: FieldKey) =>
     key === "email"
       ? validEmail(state.facts.email)
       : validEntity(state.facts[key], key);
-  const count = fieldKeys.filter(fieldComplete).length;
+  const count = fieldKeys.filter(fieldComplete).length + (state.natural?.independent && !fieldComplete("organisation") ? 1 : 0) + (selected ? 1 : 0);
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
     : destination.startsWith("/are-you-sorp-ready")
@@ -304,7 +305,7 @@ export function Onboarding() {
     if (
       lock.current ||
       (!draft.trim() && !skip) ||
-      state.turns >= TOTAL_TURN_CAP
+      (!state.natural && state.turns >= TOTAL_TURN_CAP)
     )
       return;
     const message = skip ? "Skip this for now" : draft.trim();
@@ -418,6 +419,7 @@ export function Onboarding() {
   async function createAccount(event: FormEvent) {
     event.preventDefault();
     if (lock.current) return;
+    if (!accountReady(currentState.current)) { setAccountError("Complete all five registration requirements first."); return; }
     if (password !== confirmPassword) {
       setAccountError("Those passwords do not match.");
       return;
@@ -574,7 +576,7 @@ export function Onboarding() {
                 </h2>
                 <p>
                   Complete your profile, then create your account. You can
-                  choose a charity and personalise your experience later.
+                  confirm a charity to personalise your experience.
                 </p>
                 <button
                   className="onboarding-text-button"
@@ -646,7 +648,7 @@ export function Onboarding() {
                     </div>
                   </div>
                 )}
-                {objective === "charity" && !selected && (
+                {(objective === "charity" || candidates.length > 0 || state.charity.phase === "lookup") && !selected && (
                   <div className="charity-discovery">
                     <p>
                       We’ll start with one charity to personalise your
@@ -822,7 +824,7 @@ export function Onboarding() {
                 )}
                 {completed && (
                   <div className="onboarding-finish">
-                    {state.turns < TOTAL_TURN_CAP && (
+                    {(state.natural || state.turns < TOTAL_TURN_CAP) && (
                       <button
                         type="button"
                         className="onboarding-text-button"
@@ -868,10 +870,10 @@ export function Onboarding() {
               </div>
               <span
                 className="profile-count"
-                aria-label={`${count} of 4 profile details filled`}
+                aria-label={`${count} of 5 registration requirements complete`}
               >
                 {count}
-                <small>/4</small>
+                <small>/5</small>
               </span>
             </div>
             <p className="onboarding-eyebrow">
@@ -881,7 +883,7 @@ export function Onboarding() {
                 : ""}
             </p>
             <div className="profile-progress" aria-hidden="true">
-              <span style={{ width: `${count * 25}%` }} />
+              <span style={{ width: `${count * 20}%` }} />
             </div>
             <p className="profile-hint">
               {mode === "form"
@@ -977,7 +979,7 @@ export function Onboarding() {
                     ? "You can keep talking, or start exploring."
                     : state.facts.email && !validEmail(state.facts.email)
                       ? "Check your email address to continue."
-                      : "Your name, email and role are all we need to begin."}
+                      : "Add your full name, email, role, organisation or independent status, and confirm one charity."}
                 </p>
               </div>
             </form>
