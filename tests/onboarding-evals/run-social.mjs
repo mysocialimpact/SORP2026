@@ -58,7 +58,7 @@ async function run(j) {
         continue;
       }
       if(objective==='clarification'){assert.ok(clarifications++<2,'Repeated clarification');await send(j.clarification||'I mean my own role. I oversee finances at Interim Spaces.');continue;}
-      const answer=objective==='responsibilities'?j.responsibility||'I advise boards on governance.':objective==='discovery'?j.discovery||'A colleague recommended you.':objective==='concerns'?j.concern||'Keeping up with the reporting requirements.':j.reflection||'I meant that literally, but it is not a work concern.';
+      const answer=objective==='responsibilities'?j.responsibility||'I advise boards on governance.':objective==='discovery'?j.discovery||'A colleague recommended you.':objective==='concerns'?j.concern||'Keeping up with the reporting requirements.':(state.skipped.includes('concerns') || state.facts.concerns ? j.reflection : j.workReflection);
       await send(answer);
     }
     assert.ok(registrationReady(state.facts),'Account details must remain valid');

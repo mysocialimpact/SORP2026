@@ -923,8 +923,8 @@ export function advance(
     next.skipped = [...new Set([...next.skipped, topic.topic as Objective])];
     if (next.clarification === "question" || next.clarification === "meaning") next.clarification = null;
   }
-  const reflecting = !!(topic?.followUp && topic.topic === "concerns" &&
-    topic.status !== "declined" && objective === "concerns" &&
+  const reflecting = !!(topic?.followUp &&
+    topic.status !== "declined" && ["responsibilities", "discovery", "concerns"].includes(objective) &&
     s.dialogue.followUps < 1 && !next.finishRequested && next.turns < OPTIONAL_TURN_CAP);
   next.dialogue = {
     recent: patch.utterance ? [...s.dialogue.recent,

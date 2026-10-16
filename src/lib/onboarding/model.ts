@@ -434,9 +434,9 @@ export async function interpretWithModel(message: string, state: Conversation, o
   if (result.topicResponse) result.topicResponse.followUp = false;
   result.usage = understood.usage;
   const updated = advance(state, reconcileExtraction(message, state, result), skip);
-  const reflection = questionPlan(state).objective === "concerns" && result.topicResponse?.topic === "concerns" &&
+  const reflection = ["responsibilities", "discovery", "concerns"].includes(questionPlan(state).objective) && result.topicResponse &&
     result.topicResponse.status !== "declined" && !updated.finishRequested && !skip &&
-    state.dialogue.followUps === 0 && updated.turns < 6 && questionPlan(updated).objective === "complete"
+    state.dialogue.followUps === 0 && updated.turns < 5 && ["discovery", "concerns", "complete"].includes(questionPlan(updated).objective)
     ? { ...updated, dialogue: { ...updated.dialogue, reflecting: true } } : null;
   const afterConfirmation = !updated.charity.confirmed && updated.charity.proposed ? confirmCharity(updated, {
     name: updated.charity.proposed, registrationNumber: "", officialUrl: "",
