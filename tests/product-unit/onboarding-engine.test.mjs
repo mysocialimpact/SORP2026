@@ -216,6 +216,7 @@ test("next-question validation uses the updated facts, rejecting stale requests 
     name: "Alex Rowan",
     email: "alex@example.invalid",
     role: "Trustee",
+    organisation: "Interim Spaces",
     questionProposal: {
       objective: "registration",
       fields: ["role"],
@@ -269,7 +270,9 @@ test("additional professional context accumulates; explicit correction replaces 
   assert.equal(s.facts.concerns, "Reporting deadlines");
 });
 test("early exit stops optional questions but cannot invent mandatory account details", () => {
-  const complete = advance(ready(), { finishRequested: true });
+  const pending = advance(ready(), { finishRequested: true });
+  assert.equal(nextObjective(pending), "charity");
+  const complete = advance(confirmCharity(ready(), { name: "Interim Spaces" }), { finishRequested: true });
   assert.equal(nextObjective(complete), "complete");
   const missing = advance(initialConversation(), { finishRequested: true });
   assert.equal(nextObjective(missing), "registration");

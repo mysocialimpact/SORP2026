@@ -10,7 +10,7 @@ export type Facts = Record<FieldKey, string> & {
   charities: string[];
   interests: string;
   context: string;
-  organisationKind: "charity" | "firm" | "other" | "unknown";
+  organisationKind: "charity" | "firm" | "other" | "independent" | "unknown";
 };
 export type Objective =
   | "registration"
@@ -139,7 +139,10 @@ export const validEmail = (v: string) =>
 export const registrationReady = (f: Facts) =>
   validEntity(f.name, "name") &&
   validEmail(f.email) &&
-  validEntity(f.role, "role");
+  validEntity(f.role, "role") &&
+  (validEntity(f.organisation, "organisation") || f.organisationKind === "independent");
+/** One validated charity must be explicitly confirmed before creating the account. */
+export const accountReady = (s: Conversation) => registrationReady(s.facts) && !!s.charity.confirmed;
 export const OPTIONAL_TURN_CAP = 6;
 export const TOTAL_TURN_CAP = 10;
 export function safeDestination(
@@ -202,7 +205,7 @@ export function cleanFacts(input: unknown): Partial<Facts> {
     }
   }
   if (
-    ["charity", "firm", "other", "unknown"].includes(
+    ["charity", "firm", "other", "independent", "unknown"].includes(
       String(value.organisationKind),
     )
   )
@@ -261,6 +264,8 @@ export function extractImmediate(
     /(?:\b(?:accountant|auditor|trustee|director|manager|CEO)\s+(?:at|for)|\bI work (?:at|for))\s+([\p{Lu}][\p{L}\d'’&-]*(?:\s+[\p{Lu}][\p{L}\d'’&-]*){0,5})/u,
   )?.[1];
   if (organisation) result.organisation = organisation;
+  if (!organisation && /\b(?:I(?:[’\']m| am) (?:self[- ]employed|a freelancer|working independently)|I work (?:independently|for myself)|I run my own independent practice)\b/i.test(text))
+    result.organisationKind = "independent";
   const discovery = text.match(
     /(?:found you|heard about (?:you|SORP(?: 2026)?)|came across (?:you|SORP(?: 2026)?))(?:\s+(?:on|via|through|from))?\s+([^.!?]+)/i,
   )?.[1];
@@ -922,7 +927,7 @@ export function canFollowUp(before: Conversation, after: Conversation, topic: Ex
     (objective === "concerns" ? !before.dialogue.finalFollowUpUsed : before.dialogue.followUps === 0));
 }
 export function closeOptionalConversation(s: Conversation): Conversation | null {
-  if (!registrationReady(s.facts) || !s.charity.confirmed || s.clarification) return null;
+  if (!accountReady(s) || s.clarification) return null;
   return { ...s, dialogue: { ...s.dialogue, reflecting: false },
     skipped: [...new Set([...s.skipped, ...(["responsibilities", "discovery", "concerns"] as Objective[])])] };
 }
@@ -978,14 +983,10 @@ export function advance(
 export function nextObjective(s: Conversation): Objective {
   if (s.clarification && s.turns < TOTAL_TURN_CAP && !s.finishRequested)
     return "clarification";
-  if (!registrationReady(s.facts))
-    return s.turns >= TOTAL_TURN_CAP ? "complete" : "registration";
-  if (s.finishRequested) return "complete";
-  // Essential resolution of an explicitly chosen/corrected entity precedes the optional cap.
-  if (!s.charity.confirmed && ["lookup", "confirm"].includes(s.charity.phase))
-    return "charity";
-  if (s.turns >= TOTAL_TURN_CAP) return "complete";
-  if (!s.charity.confirmed && !s.skipped.includes("charity")) return "charity";
+  if (!registrationReady(s.facts)) return "registration";
+  // Mandatory charity confirmation must not be bypassed by a skip, finish request or optional turn cap.
+  if (!s.charity.confirmed) return "charity";
+  if (s.finishRequested || s.turns >= TOTAL_TURN_CAP) return "complete";
   if (s.dialogue.reflecting && s.turns < TOTAL_TURN_CAP) return "reflection";
   if (s.turns - s.repairTurns >= OPTIONAL_TURN_CAP) return "complete";
   for (const key of ["responsibilities", "discovery", "concerns"] as const)
@@ -1175,7 +1176,7 @@ export function mergeProfessional(
 }
 export function missingRegistration(s: Conversation): FieldKey[] {
   return fieldKeys.filter(
-    (k) => k !== "organisation" && !validEntity(s.facts[k], k),
+    (k) => !(k === "organisation" && s.facts.organisationKind === "independent") && !validEntity(s.facts[k], k),
   );
 }
 export function questionPlan(s: Conversation) {
@@ -1183,12 +1184,7 @@ export function questionPlan(s: Conversation) {
   const missing = missingRegistration(s);
   const fields =
     objective === "registration"
-      ? [
-          ...missing,
-          ...(!s.facts.organisation && missing.includes("role")
-            ? ["organisation"]
-            : []),
-        ]
+      ? missing
       : objective === "charity"
         ? ["charity"]
         : ["responsibilities", "discovery", "concerns"].includes(objective)
@@ -1203,7 +1199,7 @@ export function questionPlan(s: Conversation) {
     context,
     registrationComplete: registrationReady(s.facts),
     charityConfirmed: !!s.charity.confirmed,
-    canContinue: registrationReady(s.facts),
+    canContinue: accountReady(s),
     remainingTurns: Math.max(0, TOTAL_TURN_CAP - s.turns),
   };
 }
