@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   initialConversation,
+  confirmCharity,
   extractImmediate,
   advance,
   nextQuestion,
@@ -25,7 +26,7 @@ test("A: all early facts populate together and charity/discovery are remembered"
   assert.deepEqual(s.facts.charities, ["Brainstrust"]);
   assert.match(nextQuestion(s), /You mentioned Brainstrust/);
   assert.equal(registrationReady(s.facts), true);
-  const confirmed = { ...s, confirmedCharity: "Brainstrust" };
+  const confirmed = confirmCharity(s, { name: "Brainstrust" });
   assert.equal(nextObjective(confirmed), "responsibilities");
   const detail = answer(confirmed, "I prepare accounts and advise trustees");
   assert.equal(nextObjective(detail), "concerns");
@@ -65,7 +66,7 @@ test("C: three charities require a choice, not an automatic first selection", ()
     introduction.replace("Brainstrust", "Brainstrust, Shelter and Mind"),
   );
   assert.deepEqual(s.facts.charities, ["Brainstrust", "Shelter", "Mind"]);
-  assert.equal(s.confirmedCharity, "");
+  assert.equal(s.charity.confirmed, null);
   assert.match(nextQuestion(s), /Which one/);
 });
 test("D: early professional concerns are not asked again", () => {
@@ -74,7 +75,7 @@ test("D: early professional concerns are not asked again", () => {
     introduction +
       " My biggest challenge is keeping client data consistent across reporting systems.",
   );
-  s = { ...s, confirmedCharity: "Brainstrust" };
+  s = confirmCharity(s, { name: "Brainstrust" });
   s = answer(s, "I prepare accounts and advise trustees");
   assert.match(s.facts.concerns, /client data/);
   assert.equal(nextObjective(s), "complete");
@@ -85,7 +86,7 @@ test("short completed conversations stop and optional questions can be skipped",
     initialConversation(),
     introduction + " I prepare accounts. My concern is governance.",
   );
-  s = { ...s, confirmedCharity: "Brainstrust" };
+  s = confirmCharity(s, { name: "Brainstrust" });
   assert.equal(nextObjective(s), "complete");
   assert.equal(s.turns, 1);
   s = advance(initialConversation(), {}, true);

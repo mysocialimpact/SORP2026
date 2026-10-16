@@ -6,7 +6,9 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { VoiceInput, type VoiceState } from "./voice-input";
 import {
   advance,
-  charityQueryFromAnswer,
+  charityOptions,
+  applyFacts,
+  normaliseConversation,
   extractImmediate,
   fieldKeys,
   initialConversation,
@@ -14,12 +16,12 @@ import {
   nextQuestion,
   registrationReady,
   validEmail,
+  validEntity,
   safeDestination,
   TOTAL_TURN_CAP,
   type Conversation,
   type FieldKey,
 } from "@/lib/onboarding/state";
-import type { Candidate } from "@/app/sorp-public-model";
 const labels: Record<FieldKey, string> = {
   name: "Your name",
   email: "Email address",
@@ -40,8 +42,11 @@ async function post(action: string, body: unknown) {
   });
   const data = await response.json();
   if (!response.ok)
-    throw new Error(
-      data.error || "We couldn’t complete that yet. Please try again.",
+    throw Object.assign(
+      new Error(
+        data.error || "We couldn’t complete that yet. Please try again.",
+      ),
+      { snapshot: data.state ? data : undefined },
     );
   return data;
 }
@@ -67,8 +72,6 @@ export function Onboarding() {
     [service, setService] = useState(false),
     [voice, setVoice] = useState<VoiceState>("ready");
   const [query, setQuery] = useState(""),
-    [candidates, setCandidates] = useState<Candidate[]>([]),
-    [selected, setSelected] = useState<Candidate | null>(null),
     [searched, setSearched] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false),
     [password, setPassword] = useState(""),
@@ -76,20 +79,27 @@ export function Onboarding() {
     [verification, setVerification] = useState(false),
     [accountCreated, setAccountCreated] = useState(false);
   const [accountError, setAccountError] = useState("");
+  const [editVersion, setEditVersion] = useState(0),
+    [editingComplete, setEditingComplete] = useState(false);
   const draftRef = useRef<HTMLTextAreaElement>(null),
     dialogRef = useRef<HTMLDialogElement>(null),
-    revision = useRef(0),
+    dirty = useRef<Partial<Record<FieldKey, string>>>({}),
+    currentState = useRef(state),
+    saving = useRef<Promise<void> | null>(null),
+    interacted = useRef(false),
     lock = useRef(false);
   const questionRef = useRef<HTMLDivElement>(null),
     profileRef = useRef<HTMLElement>(null),
     attributionRef = useRef<Record<string, string>>({});
+  const selected = state.charity.confirmed,
+    candidates = state.charity.candidates;
   const objective = nextObjective(state),
     ready = registrationReady(state.facts),
     completed = objective === "complete";
   const fieldComplete = (key: FieldKey) =>
     key === "email"
       ? validEmail(state.facts.email)
-      : state.facts[key].trim().length >= 2;
+      : validEntity(state.facts[key], key);
   const count = fieldKeys.filter(fieldComplete).length;
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
@@ -110,14 +120,37 @@ export function Onboarding() {
     })
       .then(async (response) => {
         const account = await response.json();
-        if (!response.ok || !account.signedIn || controller.signal.aborted)
+        if (controller.signal.aborted) return;
+        if (!response.ok || !account.signedIn) {
+          const response = await fetch("/api/onboarding/session/", {
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          const saved = await response.json();
+          if (
+            !controller.signal.aborted &&
+            !interacted.current &&
+            response.ok &&
+            saved.state &&
+            (saved.state.turns ||
+              Object.values(saved.state.facts).some(
+                (v) => typeof v === "string" && v && v !== "unknown",
+              ))
+          ) {
+            accept(saved);
+            setService(true);
+            setMode(saved.state.turns ? "conversation" : "form");
+          }
           return;
+        }
         // Resume a verified registration in the same browser without forcing an existing user to repeat onboarding.
         await post("complete", { fields: {} }).catch(() => undefined);
         if (!controller.signal.aborted) window.location.replace(destination);
       })
       .catch(() => undefined);
     return () => controller.abort();
+    // Load once per destination. accept reads refs, not a captured state snapshot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [destination]);
   useEffect(() => {
     if (
@@ -143,7 +176,7 @@ export function Onboarding() {
       });
     });
     return () => cancelAnimationFrame(frame);
-  }, [mode, state.turns, state.confirmedCharity, candidates.length]);
+  }, [mode, state.turns, state.charity.confirmed, candidates.length]);
   useEffect(() => {
     if (accountOpen) dialogRef.current?.showModal();
     else dialogRef.current?.close();
@@ -153,7 +186,76 @@ export function Onboarding() {
     const timer = setTimeout(() => setChanged([]), 2200);
     return () => clearTimeout(timer);
   }, [changed]);
+  function replace(next: Conversation) {
+    currentState.current = next;
+    setState(next);
+  }
+  function accept(data: {
+    state: Conversation;
+    messages?: { role: string; text: string }[];
+  }) {
+    const next = applyFacts(
+      normaliseConversation(data.state),
+      dirty.current,
+      "form",
+    );
+    replace(next);
+    if (data.messages) setHistory(data.messages);
+  }
+  function recover(error: unknown) {
+    const data = (
+      error as {
+        snapshot?: {
+          state: Conversation;
+          messages?: { role: string; text: string }[];
+        };
+      }
+    )?.snapshot;
+    if (data) accept(data);
+    setNotice(
+      error instanceof Error
+        ? error.message
+        : "Please retry; your details are still here.",
+    );
+  }
+  async function persistEdits() {
+    if (saving.current) {
+      await saving.current;
+    }
+    if (!service || !Object.keys(dirty.current).length) return;
+    const fields = { ...dirty.current };
+    const pending = (async () => {
+      try {
+        const data = await post("edit", {
+          fields,
+          revision: currentState.current.revision,
+        });
+        for (const key of fieldKeys)
+          if (dirty.current[key] === fields[key]) delete dirty.current[key];
+        accept(data);
+      } catch (e) {
+        recover(e);
+        throw e;
+      }
+    })();
+    saving.current = pending;
+    try {
+      await pending;
+    } finally {
+      if (saving.current === pending) saving.current = null;
+    }
+  }
+  useEffect(() => {
+    if (!editVersion || !service) return;
+    const timer = setTimeout(() => {
+      if (!lock.current) void persistEdits().catch(() => undefined);
+    }, 450);
+    return () => clearTimeout(timer);
+    // The timer tracks field revisions; the promise reads the current canonical snapshot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editVersion, service]);
   async function start(next: "conversation" | "form") {
+    interacted.current = true;
     setMode(next);
     setNotice("");
     setBusy(true);
@@ -172,9 +274,7 @@ export function Onboarding() {
       const data = await post("start", { attribution });
       setService(true);
       if (data.state) {
-        setState(data.state);
-        setHistory(data.messages || []);
-        setSelected(data.selected || null);
+        accept(data);
       }
     } catch {
       setService(false);
@@ -191,7 +291,7 @@ export function Onboarding() {
     const keys = fieldKeys.filter(
       (k) => next.facts[k] && next.facts[k] !== previous.facts[k],
     );
-    setState(next);
+    replace(next);
     if (keys.length) {
       setChanged(keys);
       setReward(
@@ -223,57 +323,49 @@ export function Onboarding() {
     lock.current = true;
     setBusy(true);
     setReward("");
-    const before = state,
-      local = advance(
-        state,
-        skip ? {} : extractImmediate(message, state),
-        skip,
-      ),
-      version = revision.current;
-    update(local, before);
-    setDraft("");
-    setHistory((h) => [...h, { role: "user", text: message }]);
     try {
+      await persistEdits();
+      const before = currentState.current;
+      const local = advance(
+        before,
+        skip ? {} : extractImmediate(message, before),
+        skip,
+      );
+      update(local, before);
+      setDraft("");
       if (service) {
         const data = await post("turn", {
           message,
-          fields: before.facts,
           skip,
+          revision: before.revision,
         });
-        if (version === revision.current) update(data.state, local);
-        else
-          setState((current) => ({
-            ...data.state,
-            facts: {
-              ...data.state.facts,
-              ...Object.fromEntries(
-                fieldKeys.map((k) => [k, current.facts[k]]),
-              ),
-            },
-          }));
+        update(
+          applyFacts(normaliseConversation(data.state), dirty.current, "form"),
+          local,
+        );
+        setHistory(data.messages);
         setNotice(data.notice || "");
-        setHistory((h) => [...h, { role: "assistant", text: data.question }]);
+        if (data.lookup) {
+          setQuery(data.lookup);
+          const found = await post("search", {
+            query: data.lookup,
+            revision: currentState.current.revision,
+          });
+          accept(found);
+          setSearched(true);
+        }
       } else
         setHistory((h) => [
           ...h,
+          { role: "user", text: message },
           { role: "assistant", text: nextQuestion(local) },
         ]);
-      const charityQuery = skip ? "" : charityQueryFromAnswer(message, before);
-      if (service && charityQuery) {
-        setQuery(charityQuery);
-        const found = await post("search", { query: charityQuery });
-        setCandidates(found.candidates);
-        setSearched(true);
-      }
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : "Please check your profile.");
-      setHistory((h) => [
-        ...h,
-        { role: "assistant", text: nextQuestion(local) },
-      ]);
+      recover(e);
     } finally {
       lock.current = false;
       setBusy(false);
+      void persistEdits().catch(() => undefined);
       draftRef.current?.focus({ preventScroll: true });
     }
   }
@@ -282,18 +374,21 @@ export function Onboarding() {
     lock.current = true;
     setBusy(true);
     setNotice("");
-    setCandidates([]);
     setSearched(false);
     try {
+      await persistEdits();
       if (!service)
         throw new Error(
-          "Charity lookup is not connected in this preview. You can choose your charity later.",
+          "Charity lookup is not connected here. You can choose your charity later.",
         );
-      const data = await post("search", { query: value });
-      setCandidates(data.candidates);
+      const data = await post("search", {
+        query: value,
+        revision: currentState.current.revision,
+      });
+      accept(data);
       setSearched(true);
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : "Please try again.");
+      recover(e);
     } finally {
       lock.current = false;
       setBusy(false);
@@ -305,23 +400,16 @@ export function Onboarding() {
     setBusy(true);
     setNotice("");
     try {
-      const data = await post("confirm", { index });
-      setSelected(data.selected);
-      setState((current) => ({
-        ...current,
-        confirmedCharity: data.selected.name,
-      }));
-      setCandidates([]);
-      setReward(`${data.selected.name} confirmed`);
-      setHistory((h) => [
-        ...h,
-        {
-          role: "assistant",
-          text: `Great. We’ll start preparing ${data.selected.name}’s information.`,
-        },
-      ]);
+      await persistEdits();
+      const data = await post("confirm", {
+        index,
+        revision: currentState.current.revision,
+      });
+      accept(data);
+      setReward(`${data.state.charity.confirmed.name} confirmed`);
+      setEditingComplete(false);
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : "Please try again.");
+      recover(e);
     } finally {
       lock.current = false;
       setBusy(false);
@@ -338,6 +426,7 @@ export function Onboarding() {
     setBusy(true);
     setAccountError("");
     try {
+      await persistEdits();
       const response = await fetch("/api/readiness-account/", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -391,10 +480,9 @@ export function Onboarding() {
       setBusy(false);
     }
   }
-  const question =
-    objective === "charity" && candidates.length
-      ? "Let’s make sure we’ve found the right charity."
-      : nextQuestion(state);
+  const question = busy
+    ? "I’m updating your introduction…"
+    : nextQuestion(state);
   return (
     <main id="main" className="onboarding-page">
       <header className="onboarding-header">
@@ -555,9 +643,13 @@ export function Onboarding() {
                 )}
                 {objective === "charity" && !selected && (
                   <div className="charity-discovery">
-                    {state.facts.charities.length > 0 && (
+                    <p>
+                      We’ll start with one charity to personalise your
+                      experience. You can add others later.
+                    </p>
+                    {charityOptions(state).length > 0 && (
                       <div className="charity-mentions">
-                        {state.facts.charities.map((c) => (
+                        {charityOptions(state).map((c) => (
                           <button
                             type="button"
                             key={c}
@@ -645,7 +737,7 @@ export function Onboarding() {
                     ))}
                   </div>
                 )}
-                {!completed && (
+                {(!completed || editingComplete) && (
                   <form
                     onSubmit={(e) => void send(e)}
                     className="onboarding-composer"
@@ -725,6 +817,15 @@ export function Onboarding() {
                 )}
                 {completed && (
                   <div className="onboarding-finish">
+                    {state.turns < TOTAL_TURN_CAP && (
+                      <button
+                        type="button"
+                        className="onboarding-text-button"
+                        onClick={() => setEditingComplete(true)}
+                      >
+                        Correct a detail
+                      </button>
+                    )}
                     <p>
                       {selected
                         ? `Your profile and ${selected.name} will give us a useful place to begin.`
@@ -768,6 +869,12 @@ export function Onboarding() {
                 <small>/4</small>
               </span>
             </div>
+            <p className="onboarding-eyebrow">
+              Profile details
+              {ready && !selected && !state.skipped.includes("charity")
+                ? " · charity not confirmed"
+                : ""}
+            </p>
             <div className="profile-progress" aria-hidden="true">
               <span style={{ width: `${count * 25}%` }} />
             </div>
@@ -814,11 +921,15 @@ export function Onboarding() {
                           : "—"
                       }
                       onChange={(e) => {
-                        revision.current++;
-                        setState((s) => ({
-                          ...s,
-                          facts: { ...s.facts, [key]: e.target.value },
-                        }));
+                        dirty.current[key] = e.target.value;
+                        replace(
+                          applyFacts(
+                            currentState.current,
+                            { [key]: e.target.value },
+                            "form",
+                          ),
+                        );
+                        setEditVersion((v) => v + 1);
                       }}
                     />
                   </label>

@@ -56,18 +56,23 @@ createServer(async (req, res) => {
       res.statusCode = 400;
       return send({ error: "Fixture only performs identity lookup" });
     }
+    if (b.query === "Unavailable Charity") {
+      res.statusCode = 503;
+      return send({ error: "Synthetic lookup failure" });
+    }
+    const interim = /interim/i.test(b.query);
+    const number = interim ? "1234569" : "1234568";
     return send({
       research: {
         status: "found",
         candidates: [
           {
-            name: "Brainstrust (synthetic fixture)",
-            registrationNumber: "1234568",
+            name: `${interim ? "Interim Spaces" : "Brainstrust"} (synthetic fixture)`,
+            registrationNumber: number,
             jurisdiction: "England and Wales",
             entityType: "registered_charity",
             website: "https://charity.example",
-            officialUrl:
-              "https://register-of-charities.charitycommission.gov.uk/charity-search/-/charity-details/1234568",
+            officialUrl: `https://register-of-charities.charitycommission.gov.uk/charity-search/-/charity-details/${number}`,
             reportUrl: "",
             publicReadiness: {
               impactReport: { found: false, url: "", title: "" },

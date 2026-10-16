@@ -1,3 +1,4 @@
+import type { Candidate } from "../../app/sorp-public-model";
 /** Public, serialisable facts. No credentials, permissions or inferred identity. */
 export const fieldKeys = ["name", "email", "role", "organisation"] as const;
 export type FieldKey = (typeof fieldKeys)[number];
@@ -7,6 +8,9 @@ export type Facts = Record<FieldKey, string> & {
   concerns: string;
   portfolio: string;
   charities: string[];
+  interests: string;
+  context: string;
+  organisationKind: "charity" | "firm" | "other" | "unknown";
 };
 export type Objective =
   | "registration"
@@ -14,13 +18,35 @@ export type Objective =
   | "responsibilities"
   | "discovery"
   | "concerns"
+  | "clarification"
   | "complete";
 export type Conversation = {
   facts: Facts;
   turns: number;
+  repairTurns: number;
   asked: Objective[];
   skipped: Objective[];
-  confirmedCharity: string;
+  lastIntent: Intent;
+  clarification: "charity" | "meaning" | "question" | null;
+  version: 2;
+  revision: number;
+  knowledge: Partial<
+    Record<
+      keyof Facts,
+      {
+        status: "supplied" | "inferred" | "confirmed";
+        source: "message" | "form" | "relationship";
+        turn: number;
+      }
+    >
+  >;
+  charity: {
+    proposed: string;
+    confirmed: Candidate | null;
+    candidates: Candidate[];
+    declined: string[];
+    phase: "suggest" | "lookup" | "confirm" | "confirmed";
+  };
 };
 export const emptyFacts = (): Facts => ({
   name: "",
@@ -32,18 +58,35 @@ export const emptyFacts = (): Facts => ({
   concerns: "",
   portfolio: "",
   charities: [],
+  interests: "",
+  context: "",
+  organisationKind: "unknown",
 });
 export const initialConversation = (): Conversation => ({
   facts: emptyFacts(),
   turns: 0,
+  repairTurns: 0,
   asked: [],
   skipped: [],
-  confirmedCharity: "",
+  version: 2,
+  revision: 0,
+  knowledge: {},
+  lastIntent: "inform",
+  clarification: null,
+  charity: {
+    proposed: "",
+    confirmed: null,
+    candidates: [],
+    declined: [],
+    phase: "suggest",
+  },
 });
 export const validEmail = (v: string) =>
   v.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 export const registrationReady = (f: Facts) =>
-  f.name.trim().length >= 2 && validEmail(f.email) && f.role.trim().length >= 2;
+  validEntity(f.name, "name") &&
+  validEmail(f.email) &&
+  validEntity(f.role, "role");
 export const OPTIONAL_TURN_CAP = 6;
 export const TOTAL_TURN_CAP = 10;
 export function safeDestination(
@@ -80,28 +123,45 @@ export function cleanFacts(input: unknown): Partial<Facts> {
     "discovery",
     "concerns",
     "portfolio",
+    "interests",
+    "context",
   ] as const) {
     if (typeof value[key] === "string") {
       const text = value[key]
         .trim()
         .slice(
           0,
-          ["concerns", "responsibilities"].includes(key)
+          ["concerns", "responsibilities", "interests", "context"].includes(key)
             ? 600
             : key === "email"
               ? 254
               : 160,
         );
-      if (text && (key !== "email" || validEmail(text))) result[key] = text;
+      if (
+        text &&
+        (key === "email"
+          ? validEmail(text)
+          : fieldKeys.includes(key as FieldKey)
+            ? validEntity(text, key as FieldKey)
+            : true)
+      )
+        result[key] = text;
     }
   }
+  if (
+    ["charity", "firm", "other", "unknown"].includes(
+      String(value.organisationKind),
+    )
+  )
+    result.organisationKind =
+      value.organisationKind as Facts["organisationKind"];
   if (Array.isArray(value.charities))
     result.charities = [
       ...new Set(
         value.charities
           .filter((s): s is string => typeof s === "string")
           .map((s) => s.trim().slice(0, 160))
-          .filter(Boolean),
+          .filter((v) => validEntity(v, "charity")),
       ),
     ].slice(0, 6);
   return result;
@@ -120,8 +180,13 @@ export function mergeFacts(facts: Facts, patch: Partial<Facts>): Facts {
 export function extractImmediate(
   text: string,
   state: Conversation,
-): Partial<Facts> {
-  const result: Partial<Facts> = {};
+  contextual = true,
+): Extraction {
+  const result: Extraction = interpretImmediate(text, state);
+  if (
+    ["remind", "clarify", "question", "disagree"].includes(result.intent || "")
+  )
+    return result;
   const email = text.match(/[\w.!#$%&'*+/=?^`{|}~-]+@[\w-]+(?:\.[\w-]+)+/)?.[0];
   if (email && validEmail(email)) result.email = email.toLowerCase();
   const name = text.match(
@@ -148,17 +213,27 @@ export function extractImmediate(
   )?.[1];
   if (discovery) result.discovery = discovery;
   const portfolio = text.match(
-    /(?:work with|advise|support)\s+((?:about |around |approximately )?\d+\s+charit(?:y|ies))/i,
+    /(?:work(?:ing)? with|advise|support)\s+((?:about |around |approximately )?\d+\s+charit(?:y|ies))/i,
   )?.[1];
   if (portfolio) result.portfolio = portfolio;
-  const references = text.match(
-    /(?:including|charit(?:y|ies)(?: clients)?(?: are| is|:)|clients include)\s+([^.!?]+)/i,
-  )?.[1];
-  if (references)
+  const references = [
+    ...text.matchAll(
+      /(?:including|charit(?:y|ies)(?: clients)?(?: are| is|:)|clients include|work(?:ing)? with)\s+([^.!?]+)/gi,
+    ),
+  ];
+  if (references.length)
     result.charities = references
-      .split(/,\s*|\s+and\s+/)
+      .flatMap((match) =>
+        match[1].replace(/^.*?\bincluding\s+/i, "").split(/,\s*|\s+and\s+/),
+      )
       .map((s) => s.trim())
-      .filter((s) => /^[\p{Lu}\d]/u.test(s))
+      .filter(
+        (s) =>
+          /^[\p{Lu}\d]/u.test(s) &&
+          !/^(?:another|other|a charity|about |around |approximately |\d+ charities)/i.test(
+            s,
+          ),
+      )
       .slice(0, 6);
   const number = text.match(
     /(?:charity (?:number|no\.?|registration)\s*:?\s*)((?:SC|NIC)?\d{5,8})/i,
@@ -173,10 +248,30 @@ export function extractImmediate(
     /(?:I (?:mainly |mostly )?(?:prepare|manage|lead|oversee|advise on))\s+[^.!?]+/i,
   )?.[0];
   if (responsibilities) result.responsibilities = responsibilities;
+  const interests = text.match(
+    /(?:I(?:[’']m| am) interested in|my interests? (?:is|are))\s+([^.!?]+)/i,
+  )?.[1];
+  if (interests) result.interests = interests;
+  const choice = choiceFromAnswer(text, state);
+  if (
+    choice &&
+    !["remind", "clarify", "question", "disagree"].includes(result.intent || "")
+  )
+    result.charityChoice = choice;
+  if (
+    /^(?:no(?: thanks)?|not that (?:one|charity)|that's my employer|that’s my employer)[.!]?$/i.test(
+      text.trim(),
+    )
+  )
+    result.charityDecision = "reject";
   const objective = nextObjective(state);
   const simple = text.trim().replace(/[.!]$/, "");
   if (
+    contextual &&
     simple &&
+    !Object.keys(result).some((k) => k !== "intent" && k !== "target") &&
+    result.intent === "inform" &&
+    !/^(?:actually|instead|change|correction)\b/i.test(simple) &&
     !/\?/.test(simple) &&
     !/^(skip|no thanks|not now)$/i.test(simple)
   ) {
@@ -192,7 +287,9 @@ export function extractImmediate(
       result.responsibilities = simple;
     if (
       objective === "charity" &&
-      /^[\p{Lu}\d]/u.test(simple) &&
+      /^(?:[\p{Lu}][\p{L}’'&-]+(?:\s+[\p{Lu}][\p{L}’'&-]+){0,6}|(?:SC|NIC)?\d{5,8})$/u.test(
+        simple,
+      ) &&
       !/^(?:Let[’']s|Please|Use|Start|Choose)\b/i.test(simple) &&
       !/^(?:yes|yes please|that’s right|that's right|sure|no)$/i.test(simple) &&
       !result.charities &&
@@ -211,47 +308,433 @@ export function extractImmediate(
       !role
     )
       result.name = simple;
-    if (
-      objective === "registration" &&
-      state.facts.name &&
-      validEmail(state.facts.email) &&
-      !state.facts.role &&
-      simple.length < 100 &&
-      !email
-    )
-      result.role = simple;
   }
-  return cleanFacts(result);
+  return { ...result, ...cleanFacts(result) };
+}
+/** The reducer owns all facts, inferred relationships, proposals and confirmation.
+ * A proposal is never a registry confirmation and never starts preparation. */
+export type Intent =
+  | "inform"
+  | "confirm"
+  | "correct"
+  | "remind"
+  | "clarify"
+  | "question"
+  | "disagree";
+export type Extraction = Partial<Facts> & {
+  intent?: Intent;
+  target?: keyof Facts | "unknown";
+  reference?: string;
+  charityChoice?: string;
+  charityDecision?: "accept" | "reject";
+};
+/** Successful semantic interpretation is authoritative: an incidental mention
+ * of someone else's role must not survive as the user's role. Lexical recognition
+ * is only an optimistic preview/fallback, never a competing copy of memory. */
+export function reconcileExtraction(
+  message: string,
+  state: Conversation,
+  semantic: Extraction,
+): Extraction {
+  const explicit = extractImmediate(message, state, false);
+  const intent = semantic.intent || explicit.intent;
+  if (intent && intent !== "inform" && intent !== "confirm")
+    return {
+      ...semantic,
+      intent,
+      target: semantic.target || explicit.target,
+      reference: semantic.reference || explicit.reference,
+      charityChoice: semantic.charityChoice || explicit.charityChoice,
+      charityDecision: semantic.charityDecision || explicit.charityDecision,
+    };
+  return { ...semantic, intent };
+}
+/** Boundary validation is separate from language understanding. Sentences and
+ * unresolved pronouns are never usable entity/search candidates, even if a model returns them. */
+export function validEntity(
+  value: string,
+  field: FieldKey | "charity" = "charity",
+): boolean {
+  const v = value.trim();
+  if (v.length < 2 || v.length > 160 || /[?!\n<>]|https?:\/\//i.test(v))
+    return false;
+  if (
+    /^(?:I(?:[’']m| am| already| told| work| meant| said| found| heard| want| would| don[’']t)|you(?:[’']ve| have| already| asked)|actually\b|no[, ]|yes(?: please)?$|that(?:[’']s| is| one| charity)|the (?:other|same|first|second|last)|please\b|why\b|what\b|sorry\b|not (?:that|what)|none$|another charity$)/i.test(
+      v,
+    )
+  )
+    return false;
+  if (
+    /\b(?:told you|already (?:said|mentioned)|not what|want to (?:use|review)|shall we|would you|let[’']s|my (?:name|email|role) is)\b/i.test(
+      v,
+    )
+  )
+    return false;
+  if (field === "name")
+    return /^[\p{L}][\p{L} ’'\-]{1,79}$/u.test(v) && v.split(/\s+/).length <= 5;
+  if (field === "email") return validEmail(v);
+  return !/@/.test(v) && v.split(/\s+/).length < 16;
+}
+function interpretImmediate(text: string, s: Conversation): Extraction {
+  const t = text.trim();
+  const known = [
+    ...charityOptions(s),
+    s.charity.proposed,
+    s.charity.confirmed?.name || "",
+  ].filter(Boolean);
+  const matches = known.filter(
+    (v, i) =>
+      known.findIndex((x) => same(x, v)) === i &&
+      t.toLowerCase().includes(v.toLowerCase()),
+  );
+  if (
+    /\b(?:already (?:told|said|mentioned|gave)|I told you|as I said)\b/i.test(t)
+  )
+    return {
+      intent: "remind",
+      target: "charities",
+      reference:
+        matches.length === 1 ? matches[0] : s.charity.proposed || undefined,
+    };
+  if (/(?:not what I meant|actually,? I meant[.…]*$)/i.test(t))
+    return { intent: "clarify", target: "unknown" };
+  if (
+    /(?:work there|my employer).*(?:not|isn[’']t).*(?:charity|review)/i.test(t)
+  )
+    return {
+      intent: "correct",
+      target: "charities",
+      charityDecision: "reject",
+    };
+  if (/^(?:no[, ]*)?(?:the )?other charity[.!]?$/i.test(t)) {
+    const remaining = charityOptions(s).filter(
+      (c) =>
+        !same(c, s.charity.proposed) &&
+        !same(c, s.charity.confirmed?.name || ""),
+    );
+    return remaining.length === 1
+      ? { intent: "correct", target: "charities", charityChoice: remaining[0] }
+      : { intent: "clarify", target: "charities" };
+  }
+  if (/\?|^(?:why|what|how|can you|could you)\b/i.test(t))
+    return { intent: "question" };
+  if (/^(?:no(?: thanks)?|that's wrong|that’s wrong|I disagree)[.!]?$/i.test(t))
+    return {
+      intent: "disagree",
+      target: nextObjective(s) === "charity" ? "charities" : "unknown",
+      ...(nextObjective(s) === "charity"
+        ? { charityDecision: "reject" as const }
+        : {}),
+    };
+  if (choiceFromAnswer(t, s))
+    return {
+      intent: /^(?:actually|no|switch|change)/i.test(t) ? "correct" : "confirm",
+      target: "charities",
+    };
+  return { intent: "inform" };
+}
+const same = (a: string, b: string) =>
+  a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
+export function charityOptions(s: Conversation): string[] {
+  const values = [...s.facts.charities];
+  if (s.facts.organisation && s.facts.organisationKind === "charity")
+    values.push(s.facts.organisation);
+  return values.filter(
+    (v, i) =>
+      validEntity(v) &&
+      values.findIndex((x) => same(x, v)) === i &&
+      !s.charity.declined.some((x) => same(x, v)),
+  );
+}
+function relationships(s: Conversation): Conversation {
+  const facts = { ...s.facts },
+    knowledge = { ...s.knowledge };
+  // Cross-field interpretation applies regardless of which extractor or form supplied the fields.
+  if (
+    !knowledge.organisationKind ||
+    knowledge.organisationKind.source === "relationship"
+  ) {
+    const adviser = /accountant|auditor|advis[eo]r|consultant/i.test(
+      facts.role,
+    );
+    facts.organisationKind = adviser
+      ? "firm"
+      : /trustee|treasurer|charity|nonprofit|non-profit/i.test(facts.role)
+        ? "charity"
+        : facts.organisationKind === "charity"
+          ? "charity"
+          : "unknown";
+    knowledge.organisationKind = {
+      status: "inferred",
+      source: "relationship",
+      turn: s.turns,
+    };
+  }
+  const next = { ...s, facts, knowledge, charity: { ...s.charity } };
+  if (!next.charity.confirmed && next.charity.phase === "suggest") {
+    const choices = charityOptions(next);
+    next.charity.proposed = choices.length === 1 ? choices[0] : "";
+  }
+  return next;
+}
+export function normaliseConversation(
+  input: unknown,
+  legacySelected: Candidate | null = null,
+): Conversation {
+  const raw = (
+    input && typeof input === "object" ? input : {}
+  ) as Partial<Conversation>;
+  const base = initialConversation();
+  const state: Conversation = {
+    ...base,
+    ...raw,
+    version: 2,
+    revision: Number.isInteger(raw.revision) ? raw.revision! : 0,
+    facts: { ...base.facts, ...cleanFacts(raw.facts) },
+    charity: { ...base.charity, ...raw.charity },
+    knowledge: { ...raw.knowledge },
+    asked: raw.asked || [],
+    skipped: raw.skipped || [],
+  };
+  // Preserve unfinished human edits as drafts; they do not satisfy validation.
+  for (const key of fieldKeys)
+    if (
+      raw.knowledge?.[key]?.source === "form" &&
+      typeof raw.facts?.[key] === "string"
+    )
+      state.facts[key] = raw.facts[key].slice(0, key === "email" ? 254 : 120);
+  if (!raw.charity && legacySelected)
+    state.charity = {
+      ...base.charity,
+      confirmed: legacySelected,
+      proposed: legacySelected.name,
+      phase: "confirmed",
+    };
+  for (const key of Object.keys(state.facts) as (keyof Facts)[])
+    if (state.facts[key]?.length && !state.knowledge[key])
+      state.knowledge[key] = {
+        status: "supplied",
+        source: "message",
+        turn: state.turns,
+      };
+  if (!raw.version) delete state.knowledge.organisationKind;
+  return relationships(state);
+}
+export function applyFacts(
+  s: Conversation,
+  patch: Partial<Facts>,
+  source: "message" | "form" = "message",
+): Conversation {
+  const cleaned = cleanFacts(patch),
+    facts = mergeFacts(s.facts, cleaned),
+    knowledge = { ...s.knowledge };
+  if (source === "form")
+    for (const key of fieldKeys)
+      if (typeof patch[key] === "string")
+        facts[key] = patch[key]!.slice(0, key === "email" ? 254 : 120);
+  for (const key of Object.keys(cleaned) as (keyof Facts)[])
+    knowledge[key] = {
+      status: source === "form" ? "confirmed" : "supplied",
+      source,
+      turn: s.turns,
+    };
+  if (source === "form")
+    for (const key of fieldKeys)
+      if (patch[key] !== undefined) {
+        if (facts[key])
+          knowledge[key] = {
+            status: validEntity(facts[key], key) ? "confirmed" : "supplied",
+            source,
+            turn: s.turns,
+          };
+        else delete knowledge[key];
+      }
+  // An explicitly revised employer invalidates a prior classification, not a confirmed charity.
+  if (
+    patch.organisation !== undefined &&
+    !same(patch.organisation, s.facts.organisation) &&
+    !patch.organisationKind
+  ) {
+    delete knowledge.organisationKind;
+    facts.organisationKind = "unknown";
+  }
+  return relationships({ ...s, facts, knowledge });
+}
+export function proposeCharity(s: Conversation, value: string): Conversation {
+  if (!validEntity(value)) return { ...s, clarification: "charity" };
+  const proposed = value.trim().slice(0, 160);
+  return {
+    ...s,
+    skipped: s.skipped.filter((x) => x !== "charity"),
+    charity: {
+      ...s.charity,
+      proposed,
+      confirmed: null,
+      candidates: [],
+      phase: "lookup",
+    },
+  };
+}
+export function confirmCharity(
+  s: Conversation,
+  candidate: Candidate,
+): Conversation {
+  return {
+    ...s,
+    lastIntent: "confirm",
+    clarification: null,
+    charity: {
+      ...s.charity,
+      proposed: s.charity.proposed || candidate.name,
+      confirmed: candidate,
+      candidates: [],
+      phase: "confirmed",
+    },
+  };
+}
+export function applyExtraction(
+  s: Conversation,
+  patch: Extraction,
+): Conversation {
+  let next = applyFacts(s, patch);
+  if (patch.charityDecision === "reject")
+    next = relationships({
+      ...next,
+      charity: {
+        ...next.charity,
+        declined: [
+          ...new Set(
+            [...next.charity.declined, next.charity.proposed].filter(Boolean),
+          ),
+        ],
+        confirmed: null,
+        proposed: "",
+        candidates: [],
+        phase: "suggest",
+      },
+    });
+  const intent = patch.intent || "inform";
+  const choice = ["remind", "clarify", "question"].includes(intent)
+    ? ""
+    : patch.charityChoice ||
+      (patch.charityDecision === "accept" ? next.charity.proposed : "");
+  if (choice && validEntity(choice)) next = proposeCharity(next, choice);
+  const reference =
+    patch.reference &&
+    charityOptions(next).find((v) => same(v, patch.reference!));
+  if (intent === "remind" && reference)
+    next = {
+      ...next,
+      charity: {
+        ...next.charity,
+        proposed: reference,
+        phase: next.charity.confirmed ? "confirmed" : "suggest",
+      },
+    };
+  return {
+    ...next,
+    lastIntent: intent,
+    clarification:
+      intent === "clarify"
+        ? patch.target === "charities"
+          ? "charity"
+          : "meaning"
+        : intent === "question"
+          ? "question"
+          : intent === "disagree" && !patch.charityDecision
+            ? "meaning"
+            : null,
+  };
+}
+export function advance(
+  s: Conversation,
+  patch: Extraction,
+  skip = false,
+): Conversation {
+  const objective = nextObjective(s);
+  const repair = [
+    "correct",
+    "remind",
+    "clarify",
+    "question",
+    "disagree",
+  ].includes(patch.intent || "");
+  const next = applyExtraction(
+    {
+      ...s,
+      turns: Math.min(TOTAL_TURN_CAP, s.turns + 1),
+      repairTurns: s.repairTurns + (repair ? 1 : 0),
+    },
+    patch,
+  );
+  return {
+    ...next,
+    asked: [...new Set([...s.asked, objective])],
+    skipped:
+      skip && objective !== "registration"
+        ? [...new Set([...next.skipped, objective])]
+        : next.skipped,
+  };
 }
 export function nextObjective(s: Conversation): Objective {
+  if (s.clarification && s.turns < TOTAL_TURN_CAP) return "clarification";
   if (!registrationReady(s.facts))
     return s.turns >= TOTAL_TURN_CAP ? "complete" : "registration";
-  if (s.turns >= OPTIONAL_TURN_CAP) return "complete";
-  if (!s.confirmedCharity && !s.skipped.includes("charity")) return "charity";
+  // Essential resolution of an explicitly chosen/corrected entity precedes the optional cap.
+  if (!s.charity.confirmed && ["lookup", "confirm"].includes(s.charity.phase))
+    return "charity";
+  if (s.turns >= TOTAL_TURN_CAP || s.turns - s.repairTurns >= OPTIONAL_TURN_CAP)
+    return "complete";
+  if (!s.charity.confirmed && !s.skipped.includes("charity")) return "charity";
   for (const key of ["responsibilities", "discovery", "concerns"] as const)
     if (!s.facts[key] && !s.skipped.includes(key)) return key;
   return "complete";
 }
 export function nextQuestion(s: Conversation): string {
+  if (s.clarification === "meaning")
+    return "I may have misunderstood. Which detail should I correct? Your existing details are still here.";
+  if (s.clarification === "charity") {
+    const choices = charityOptions(s);
+    return choices.length
+      ? `Which did you mean: ${choices.join(", ")}? I’ll wait for your choice.`
+      : "Which charity did you mean? I’ve kept your existing details.";
+  }
+  if (s.clarification === "question")
+    return (
+      "Your details personalise the five SORP tools. We’ll ask you to check an official record before selecting a charity, and optional questions can be skipped. You can correct anything in your profile. " +
+      nextQuestion({ ...s, clarification: null })
+    );
   switch (nextObjective(s)) {
     case "registration": {
       const missing = [
-        s.facts.name.trim().length < 2 && "your name",
+        !validEntity(s.facts.name, "name") && "your name",
         !validEmail(s.facts.email) && "your email address",
-        s.facts.role.trim().length < 2 && "what you do",
+        !validEntity(s.facts.role, "role") && "what you do",
       ].filter(Boolean);
-      return !s.turns
+      const acknowledgement = s.charity.proposed
+        ? `I’ve noted ${s.charity.proposed} as a possible starting charity. `
+        : "";
+      return !s.turns &&
+        !Object.values(s.facts).some(
+          (v) => typeof v === "string" && v && v !== "unknown",
+        )
         ? "Let’s start with you. What’s your name, email address and what do you do?"
-        : `Thank you${s.facts.name ? `, ${s.facts.name.split(" ")[0]}` : ""}. Could you tell me ${missing.join(" and ")}?`;
+        : `${acknowledgement}Thank you${s.facts.name ? `, ${s.facts.name.split(" ")[0]}` : ""}. Could you tell me ${missing.join(" and ")}?`;
     }
-    case "charity":
-      return s.facts.charities.length > 1
-        ? `You mentioned ${s.facts.charities.join(", ")}. Which one would you like to start with?`
-        : s.facts.charities.length === 1
-          ? `You mentioned ${s.facts.charities[0]}. Shall we use that charity to get you started?`
+    case "charity": {
+      if (s.charity.candidates.length)
+        return "Let’s make sure we’ve found the right charity.";
+      if (s.charity.phase === "lookup")
+        return `Let’s find the official record for ${s.charity.proposed}. You can check it before confirming.`;
+      const choices = charityOptions(s);
+      return choices.length > 1
+        ? `You mentioned ${choices.join(", ")}. Which one would you like to start with?`
+        : s.charity.proposed
+          ? `${s.lastIntent === "remind" ? "You’re right —" : "You mentioned"} ${s.charity.proposed}. Shall we use that as your starting charity?`
           : "Which charity would you like to start with? One name or charity number is enough to help us prepare a more personal experience.";
+    }
     case "responsibilities":
-      return /accountant|auditor|adviser/i.test(s.facts.role)
+      return /accountant|auditor|advis[eo]r/i.test(s.facts.role)
         ? "Do you mainly prepare accounts for charities, advise them more broadly, or a bit of both?"
         : /trustee|chair/i.test(s.facts.role)
           ? "Are you mainly involved in governance, financial oversight or something else?"
@@ -262,45 +745,35 @@ export function nextQuestion(s: Conversation): string {
       return "What keeps you up at night?";
     default:
       return registrationReady(s.facts)
-        ? `A lovely place to start, ${s.facts.name.split(" ")[0]}.${s.confirmedCharity ? ` We’ll keep ${s.confirmedCharity} in view as you explore.` : ""} Your details are ready to review.`
+        ? `A lovely place to start, ${s.facts.name.split(" ")[0]}.${s.charity.confirmed ? ` We’ll keep ${s.charity.confirmed.name} in view as you explore.` : ""} Your details are ready to review.`
         : "Let’s finish the remaining account details in your editable profile.";
   }
 }
-export function advance(
-  s: Conversation,
-  patch: Partial<Facts>,
-  skip = false,
-): Conversation {
-  const objective = nextObjective(s);
-  return {
-    ...s,
-    facts: mergeFacts(s.facts, patch),
-    turns: Math.min(TOTAL_TURN_CAP, s.turns + 1),
-    asked: [...new Set([...s.asked, objective])],
-    skipped:
-      skip && objective !== "registration"
-        ? [...new Set([...s.skipped, objective])]
-        : s.skipped,
-  };
-}
-export function charityQueryFromAnswer(message: string, state: Conversation) {
-  if (nextObjective(state) !== "charity") return "";
+function choiceFromAnswer(message: string, s: Conversation): string {
   const text = message.trim().replace(/[.!]$/, "");
+  const named = text.match(
+    /^(?:actually[, ]*|no[, ]*)?(?:let[’']s (?:start with|use)|please use|use|start with|choose|switch to|change (?:it|that) to)\s+(.{2,120}?)(?:\s+instead)?$/i,
+  )?.[1];
+  if (named && validEntity(named)) return named;
+  if (nextObjective(s) !== "charity") return "";
   if (
-    state.facts.charities.length === 1 &&
+    !(s.charity.phase === "suggest" && charityOptions(s).length > 1) &&
+    s.charity.proposed &&
     /^(yes|yes please|sure|that’s right|that's right|please do)$/i.test(text)
   )
-    return state.facts.charities[0];
-  const matches = state.facts.charities.filter((c) =>
+    return s.charity.proposed;
+  const matches = charityOptions(s).filter((c) =>
     text.toLowerCase().includes(c.toLowerCase()),
   );
-  if (matches.length === 1) return matches[0];
-  const named = text.match(
-    /^(?:let[’']s start with|please use|use|start with|choose)\s+(.{2,120})$/i,
-  )?.[1];
-  if (named) return named;
-  return state.facts.charities.length === 0 &&
-    /^(?:[\p{Lu}][\p{L}'’ &-]{1,100}|(?:SC|NIC)?\d{5,8})$/u.test(text)
-    ? text
-    : "";
+  if (
+    matches.length === 1 &&
+    text.length < 180 &&
+    !/\b(?:work with|including|clients|trustee|accountant)\b/i.test(text)
+  )
+    return matches[0];
+  return "";
+}
+/** Compatibility export; lookup is driven by the resulting state, not the previous stage. */
+export function charityQueryFromAnswer(message: string, state: Conversation) {
+  return choiceFromAnswer(message, state);
 }

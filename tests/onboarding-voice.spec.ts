@@ -88,6 +88,21 @@ test("E: real MediaRecorder and audio-level rendering, retry, editable transcrip
     await expect(
       page.locator(".onboarding-profile input[name=email]"),
     ).toHaveValue("sarah@example.com");
+    await expect(answer).toBeEnabled();
+    await answer.fill(
+      "I work with Interim Spaces. I found you through LinkedIn.",
+    );
+    await page.getByRole("button", { name: "Send", exact: false }).click();
+    await expect(page.locator(".conversation-question")).toContainText(
+      "Interim Spaces. Shall we",
+    );
+    await page.reload();
+    await expect(page.locator(".conversation-question")).toContainText(
+      "Interim Spaces. Shall we",
+    );
+    await expect(
+      page.locator(".onboarding-profile input[name=name]"),
+    ).toHaveValue("Sarah Jones");
     expect(attempts).toBe(2);
   } finally {
     await browser.close();

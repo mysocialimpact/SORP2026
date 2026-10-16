@@ -210,6 +210,7 @@ test("model extraction sends bounded facts, no tools/history; evidence and globa
               text: JSON.stringify({
                 facts: [
                   { field: "name", value: "Sarah Jones", quote: "Sarah Jones" },
+                  { field: "role", value: "Trustee", quote: "trustee" },
                   {
                     field: "email",
                     value: "invented@example.com",
@@ -230,11 +231,12 @@ test("model extraction sends bounded facts, no tools/history; evidence and globa
   };
   try {
     const patch = await extractWithModel(
-      "Sarah Jones works with Brainstrust",
+      "Sarah Jones, a trustee, works with Brainstrust",
       initialConversation(),
       id,
     );
     assert.equal(patch.name, "Sarah Jones");
+    assert.equal(patch.role, "Trustee");
     assert.equal(patch.email, undefined);
     assert.deepEqual(patch.charities, ["Brainstrust"]);
     process.env.SORP_ONBOARDING_DAILY_USD = "0";
@@ -302,5 +304,182 @@ test("cached PDF access is account-scoped and validates stored checksums", async
       "CHARITY_DOCUMENT_SECRET_ACCESS_KEY",
     ])
       delete process.env[key];
+  }
+});
+
+test("state snapshots reject concurrent overwrites and restore unified memory", async () => {
+  const { saveSession, StaleConversation } =
+    await import("../src/lib/onboarding/server");
+  const { applyFacts, nextQuestion } =
+    await import("../src/lib/onboarding/state");
+  const id = await createSession({});
+  const request = new Request("https://sorp2026.org", {
+    headers: { cookie: `sorp_onboarding=${id}` },
+  });
+  const original = (await getSession(request))!;
+  const saved = await saveSession(
+    original,
+    applyFacts(
+      original.state,
+      {
+        name: "Alex Jones",
+        email: "alex@example.com",
+        role: "Trustee",
+        organisation: "Interim Spaces",
+      },
+      "form",
+    ),
+  );
+  await assert.rejects(
+    () => saveSession(original, initialConversation()),
+    StaleConversation,
+  );
+  const reloaded = (await getSession(request))!;
+  assert.equal(reloaded.state.revision, saved.state.revision);
+  assert.equal(reloaded.state.facts.organisation, "Interim Spaces");
+  assert.match(nextQuestion(reloaded.state), /Interim Spaces.*Shall we/);
+});
+test("semantic intent and evidence flow through the reducer without poisoning known entities", async () => {
+  const {
+    advance,
+    extractImmediate,
+    nextQuestion,
+    reconcileExtraction,
+    confirmCharity,
+  } = await import("../src/lib/onboarding/state");
+  const initial = advance(
+    initialConversation(),
+    extractImmediate(
+      "I’m Alex Jones, a trustee at Interim Spaces. My email is alex@example.com.",
+      initialConversation(),
+    ),
+  );
+  const original = globalThis.fetch;
+  process.env.OPENAI_API_KEY = "synthetic-test-not-a-real-key";
+  const id = await createSession({});
+  const cases = [
+    {
+      message: "I already told you Interim Spaces.",
+      intent: "remind",
+      target: "charities",
+      facts: [
+        {
+          field: "reference",
+          value: "Interim Spaces",
+          quote: "Interim Spaces",
+        },
+        {
+          field: "organisation",
+          value: "I already told you Interim Spaces.",
+          quote: "I already told you Interim Spaces.",
+        },
+      ],
+      check: (s: typeof initial) => {
+        assert.equal(s.charity.proposed, "Interim Spaces");
+        assert.equal(s.facts.organisation, "Interim Spaces");
+        assert.match(nextQuestion(s), /You’re right — Interim Spaces/);
+      },
+    },
+    {
+      message: "No, the other charity.",
+      intent: "clarify",
+      target: "charities",
+      facts: [],
+      check: (s: typeof initial) => {
+        assert.equal(s.charity.phase, "suggest");
+        assert.equal(s.clarification, "charity");
+        assert.equal(s.facts.organisation, "Interim Spaces");
+      },
+    },
+    {
+      message:
+        "I found you through LinkedIn. I’m worried about getting our accounts ready.",
+      intent: "inform",
+      target: "unknown",
+      facts: [
+        { field: "discovery", value: "LinkedIn", quote: "LinkedIn" },
+        {
+          field: "concerns",
+          value: "getting our accounts ready",
+          quote: "getting our accounts ready",
+        },
+      ],
+      check: (s: typeof initial) => {
+        assert.equal(s.facts.discovery, "LinkedIn");
+        assert.equal(s.facts.concerns, "getting our accounts ready");
+      },
+    },
+    {
+      message: "Actually, let’s use Brainstrust instead.",
+      intent: "correct",
+      target: "charities",
+      facts: [
+        { field: "charityChoice", value: "Brainstrust", quote: "Brainstrust" },
+      ],
+      check: (s: typeof initial) => {
+        assert.equal(s.charity.proposed, "Brainstrust");
+        assert.equal(s.charity.confirmed, null);
+        assert.equal(s.charity.phase, "lookup");
+      },
+    },
+    {
+      message: "I’m not a trustee. I’m a community organiser.",
+      intent: "correct",
+      target: "role",
+      facts: [
+        {
+          field: "role",
+          value: "community organiser",
+          quote: "community organiser",
+        },
+      ],
+      check: (s: typeof initial) => {
+        assert.equal(s.facts.role, "community organiser");
+        assert.equal(s.facts.organisation, "Interim Spaces");
+      },
+    },
+  ];
+  try {
+    for (const scenario of cases) {
+      globalThis.fetch = async (_url, init) => {
+        const body = JSON.parse(String(init?.body)),
+          input = JSON.parse(body.input);
+        assert.equal(input.known.organisation, "Interim Spaces");
+        assert.ok(input.question);
+        assert.ok(input.knowledge.role);
+        assert.equal(input.history, undefined);
+        return Response.json({
+          status: "completed",
+          output: [
+            {
+              content: [
+                {
+                  text: JSON.stringify({
+                    intent: scenario.intent,
+                    target: scenario.target,
+                    charityDecision: "none",
+                    facts: scenario.facts,
+                  }),
+                },
+              ],
+            },
+          ],
+        });
+      };
+      const state =
+        scenario.intent === "correct" && scenario.target === "charities"
+          ? confirmCharity(initial, { ...candidate, name: "Interim Spaces" })
+          : initial;
+      const extraction = await extractWithModel(scenario.message, state, id);
+      scenario.check(
+        advance(
+          state,
+          reconcileExtraction(scenario.message, state, extraction),
+        ),
+      );
+    }
+  } finally {
+    globalThis.fetch = original;
+    delete process.env.OPENAI_API_KEY;
   }
 });

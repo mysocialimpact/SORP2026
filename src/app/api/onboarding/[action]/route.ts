@@ -10,8 +10,12 @@ import {
   nextQuestion,
   nextObjective,
   TOTAL_TURN_CAP,
-  fieldKeys,
+  applyFacts,
+  proposeCharity,
+  confirmCharity,
+  validEntity,
   emptyFacts,
+  reconcileExtraction,
 } from "@/lib/onboarding/state";
 import {
   enabled,
@@ -24,6 +28,8 @@ import {
   extractWithModel,
   sessionCookie,
   boundedBody,
+  saveSession,
+  StaleConversation,
 } from "@/lib/onboarding/server";
 import {
   charityIdentity,
@@ -34,6 +40,15 @@ import {
 import type { Candidate } from "@/app/sorp-public-model";
 export const runtime = "nodejs";
 export const maxDuration = 180;
+const snapshot = (session: Awaited<ReturnType<typeof getSession>>) =>
+  session
+    ? {
+        state: session.state,
+        messages: session.messages,
+        question: nextQuestion(session.state),
+        selected: session.state.charity.confirmed,
+      }
+    : {};
 const json = (data: unknown, status = 200) =>
   Response.json(data, { status, headers: { "cache-control": "no-store" } });
 export async function GET(
@@ -102,8 +117,14 @@ export async function GET(
       selected: session.selected,
     });
   } catch (error) {
+    if (error instanceof StaleConversation)
+      return json(
+        { ...snapshot(await getSession(request)), error: error.message },
+        409,
+      );
     return json(
       {
+        ...snapshot(await getSession(request).catch(() => undefined)),
         error:
           error instanceof AccessError
             ? error.message
@@ -160,9 +181,8 @@ export async function POST(
       // Verification may happen on a different device or after the 24-hour draft
       // expires. Recover only from this verified account's own saved signup data.
       const identity = await protectPlatformRequest(request);
-      const { GET: existingAccount } = await import(
-        "@/app/api/readiness-account/route"
-      );
+      const { GET: existingAccount } =
+        await import("@/app/api/readiness-account/route");
       const response = await existingAccount(
         new Request(new URL("/api/readiness-account/", request.url), {
           headers: request.headers,
@@ -216,7 +236,24 @@ export async function POST(
     }
     if (!session)
       return json({ error: "Please reopen your introduction." }, 401);
+    if (
+      typeof body.revision === "number" &&
+      body.revision !== session.state.revision
+    )
+      return json(
+        {
+          ...snapshot(session),
+          error:
+            "Your introduction changed. We’ve restored your latest saved details; please review and retry.",
+        },
+        409,
+      );
     await claimRequest(session.id, action === "search");
+    if (action === "edit") {
+      const next = applyFacts(session.state, body.fields || {}, "form");
+      const saved = await saveSession(session, next);
+      return json(snapshot(saved));
+    }
     if (action === "turn") {
       if (
         typeof body.message !== "string" ||
@@ -224,17 +261,9 @@ export async function POST(
         body.message.length > 3000
       )
         return json({ error: "Use an answer of up to 3,000 characters." }, 400);
-      // Reserve the turn atomically. Parallel/replayed replies cannot spend twice.
-      const [reserved] = await query(
-        `UPDATE research_console.onboarding_sessions SET state=jsonb_set(state,'{turns}',to_jsonb((state->>'turns')::int+1)) WHERE id=$1 AND (state->>'turns')::int=$2 AND (state->>'turns')::int<$3 RETURNING id`,
-        [session.id, session.state.turns, TOTAL_TURN_CAP],
-      );
-      if (!reserved)
+      if (session.state.turns >= TOTAL_TURN_CAP)
         return json(
-          {
-            error:
-              "That answer is already being processed, or the conversation is complete. Please use your editable profile.",
-          },
+          { error: "Please finish with your editable profile." },
           409,
         );
       if (/\b(?:my )?password\s*(?:is|:|=)/i.test(body.message))
@@ -242,20 +271,28 @@ export async function POST(
           { error: "Keep passwords in the secure account fields." },
           400,
         );
-      const edited = mergeFacts(session.state.facts, cleanFacts(body.fields));
-      for (const key of fieldKeys)
-        if (typeof body.fields?.[key] === "string")
-          edited[key] = body.fields[key]
-            .trim()
-            .slice(0, key === "email" ? 254 : 120);
-      const state = { ...session.state, facts: edited };
-      let patch = extractImmediate(body.message, state),
+      const before = applyFacts(session.state, body.fields || {}, "form");
+      const immediate = body.skip ? {} : extractImmediate(body.message, before);
+      const provisional = advance(before, immediate, body.skip === true);
+      const userMessages = [
+        ...session.messages,
+        { role: "user", text: body.message },
+      ].slice(-21);
+      // Persist understood facts before the model request. A reload/crash never loses the answer.
+      const reserved = await saveSession(session, provisional, userMessages);
+      let next = provisional,
         notice = "";
       if (!body.skip) {
         try {
-          patch = mergeFacts(
-            { ...edited, ...patch },
-            await extractWithModel(body.message, state, session.id),
+          const semantic = await extractWithModel(
+            body.message,
+            before,
+            session.id,
+          );
+          // Model interpretation supersedes contextual fallback guesses, not explicit facts.
+          next = advance(
+            before,
+            reconcileExtraction(body.message, before, semantic),
           );
         } catch (e) {
           notice =
@@ -264,31 +301,32 @@ export async function POST(
               : "Please check your editable profile.";
         }
       }
-      const next = advance(state, patch, body.skip === true);
-      const question = nextQuestion(next);
       const messages = [
-        ...session.messages,
-        { role: "user", text: body.message },
-        { role: "assistant", text: question },
+        ...userMessages,
+        { role: "assistant", text: nextQuestion(next) },
       ].slice(-22);
-      await query(
-        "UPDATE research_console.onboarding_sessions SET state=$2,messages=$3 WHERE id=$1",
-        [session.id, JSON.stringify(next), JSON.stringify(messages)],
-      );
+      const saved = await saveSession(reserved, next, messages);
       return json({
-        state: next,
-        question,
+        ...snapshot(saved),
         notice,
-        objective: nextObjective(next),
+        objective: nextObjective(saved.state),
+        lookup:
+          saved.state.charity.phase === "lookup"
+            ? saved.state.charity.proposed
+            : "",
       });
     }
     if (action === "search") {
       if (
         typeof body.query !== "string" ||
         body.query.trim().length < 2 ||
-        body.query.length > 160
+        !validEntity(body.query)
       )
         return json({ error: "Add a charity name or number." }, 400);
+      const searching = await saveSession(
+        session,
+        proposeCharity(session.state, body.query),
+      );
       await claimOperation(session.id, "search");
       const base =
         process.env.SORP_READINESS_API_URL ||
@@ -322,38 +360,56 @@ export async function POST(
             return false;
           }
         });
-      await query(
-        "UPDATE research_console.onboarding_sessions SET candidates=$2 WHERE id=$1",
-        [session.id, JSON.stringify(candidates)],
+      const next = {
+        ...searching.state,
+        charity: {
+          ...searching.state.charity,
+          candidates,
+          phase: "confirm" as const,
+        },
+      };
+      const saved = await saveSession(
+        searching,
+        next,
+        [
+          ...searching.messages,
+          { role: "assistant", text: nextQuestion(next) },
+        ].slice(-22),
       );
-      return json({ candidates });
+      return json({ ...snapshot(saved), candidates });
     }
     if (action === "confirm") {
+      const candidates = session.state.charity.candidates;
       if (
         !Number.isInteger(body.index) ||
         body.index < 0 ||
-        body.index >= session.candidates.length
+        body.index >= candidates.length
       )
         return json(
           { error: "Search again to confirm an official match." },
           400,
         );
-      const selected = session.candidates[body.index];
-      const identity = await queueCharity(selected);
-      const state = { ...session.state, confirmedCharity: selected.name };
-      await query(
-        "UPDATE research_console.onboarding_sessions SET selected=$2,state=$3 WHERE id=$1",
-        [session.id, JSON.stringify(selected), JSON.stringify(state)],
-      );
+      const selected = candidates[body.index];
+      const next = confirmCharity(session.state, selected);
+      const messages = [
+        ...session.messages,
+        {
+          role: "assistant",
+          text: `Great. We’ll start preparing ${selected.name}’s information. ${nextQuestion(next)}`,
+        },
+      ].slice(-22);
+      const saved = await saveSession(session, next, messages);
+      // No lookup or inferred entity can enqueue public research. Only this explicit confirmation does.
       after(async () => {
+        const current = await getSession(request);
+        if (
+          current?.state.charity.confirmed?.officialUrl !== selected.officialUrl
+        )
+          return;
+        const identity = await queueCharity(selected);
         await prepareCharity(identity).catch(() => undefined);
       });
-      return json({
-        selected,
-        state,
-        question: nextQuestion(state),
-        preparation: "queued",
-      });
+      return json({ ...snapshot(saved), preparation: "queued" });
     }
     if (action === "complete") {
       const identity = await protectPlatformRequest(request);
@@ -361,9 +417,11 @@ export async function POST(
       const facts = mergeFacts(session.state.facts, cleanFacts(body.fields));
       facts.name = identity.account.name;
       facts.email = identity.account.email;
-      const charity = session.selected
-        ? charityIdentity(session.selected)
+      const charity = session.state.charity.confirmed
+        ? charityIdentity(session.state.charity.confirmed)
         : null;
+      if (session.state.charity.confirmed)
+        await queueCharity(session.state.charity.confirmed);
       await transaction(async (c) => {
         const {
           rows: [locked],
@@ -395,8 +453,14 @@ export async function POST(
     }
     return json({ error: "Unknown onboarding action." }, 404);
   } catch (error) {
+    if (error instanceof StaleConversation)
+      return json(
+        { ...snapshot(await getSession(request)), error: error.message },
+        409,
+      );
     return json(
       {
+        ...snapshot(await getSession(request).catch(() => undefined)),
         error:
           error instanceof AccessError
             ? error.message

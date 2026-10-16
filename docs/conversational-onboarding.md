@@ -260,3 +260,73 @@ provisioned. Remote live model/recording/signup journeys still need verification
 the deployment check does not imply that the earlier provider-specific release
 gates have all passed. Existing account status was checked through the deployed
 preview and returned the expected unauthenticated response.
+
+## Conversational understanding correction — release 18
+
+The defects came from three connected behaviours: the extracted employer was not
+interpreted as a possible charity, question/lookup decisions used the prior stage,
+and a short-answer fallback treated arbitrary reply text as an entity. Separate
+client selection and form snapshots also failed to persist direct edits reliably.
+
+A versioned conversation snapshot now owns facts, provenance, inferred employer
+relationships, intent, clarification, proposed charity, registry candidates and
+confirmed charity. The form and next-question selector read this same snapshot.
+Existing drafts migrate on read; no database or authentication migration is needed.
+Human edits are debounced and saved independently of turns. Atomic revision checks
+prevent slower requests or another tab overwriting newer information. Failure
+responses restore the latest saved snapshot, including a cleared old selection.
+
+The bounded model extraction now classifies information, confirmation, correction,
+reminder, clarification, question and disagreement. It receives current structured
+facts, provenance and question instead of growing history. Evidence must occur in
+the answer; contextual entity references must resolve to known entities. Successful
+semantic interpretation supersedes provisional lexical recognition. Boundary checks
+reject conversational sentences as entities/search candidates. The conservative
+fallback remains explicitly identified when model service is unavailable.
+
+Trustee/employer relationships suggest a charity without confirming it; adviser
+firms remain distinct from clients. Multiple references require a choice. Reminders
+acknowledge the existing entity, ambiguous corrections preserve it, and explicit
+changes clear prior registry matches and confirmation. Only explicit confirmation
+of a returned registry candidate can queue intelligence. The existing canonical
+identity and idempotent worker/storage architecture are unchanged.
+
+Six information exchanges remain the optional budget; corrections, clarification,
+questions and reminders do not consume it. Ten total submitted exchanges remain the
+hard bound. Direct editing and account creation remain available. The progress bar
+is explicitly labelled as profile details, with outstanding charity confirmation
+shown separately. Existing layout, animations and voice component remain intact;
+voice transcripts and typed answers use the same turn handler.
+
+Model remains `gpt-5.4-mini-2026-03-17`, one extraction request per non-skipped turn,
+1,400 output tokens, 18-second timeout, existing request limits and USD budget
+reservations. No additional paid service or storage is introduced. Drafts retain
+the existing private HttpOnly cookie and 24-hour expiry. Document downloads remain
+disabled in production until dedicated object-storage credentials are configured.
+
+Validation for this correction:
+
+- 172 product unit tests passed, including 30 onboarding state regressions.
+- Nine real PostgreSQL/service integration tests passed, including semantic output
+  validation, intent-to-reducer behaviour, draft access/expiry, concurrent revisions,
+  canonical charity deduplication, bounded retries and document cache isolation.
+- 31 desktop/mobile Chromium browser checks passed; one mobile audio-device check
+  was deliberately skipped. The actual application/API/database journeys cover the
+  exact Interim Spaces reminder, all details early, partial details, early charity,
+  multiple clients, early referral/concern, ambiguous corrections, employer rejection,
+  changing a confirmed charity, failed replacement lookup, manual edits/resume,
+  stale requests, voice-to-typing/resume, conventional signup/verification handoff,
+  returning accounts, early exits, CSRF and targeted axe/reduced-motion checks.
+- Two final desktop/mobile keyboard-editing and reload checks passed after ensuring
+  autosave preserves spaces while a person types.
+- Production build passed. Changed application files pass ESLint. Repository lint
+  has two pre-existing warnings outside this feature. Mobile completion screenshot
+  was inspected; automated viewport checks retain the visible live profile/question.
+
+Browser journeys use isolated synthetic charity/account/transcription providers and
+no live model key. Model protocol/grounding tests use synthetic responses. Real
+Chromium MediaRecorder/audio analysis was exercised using generated input, not a
+physical microphone. Live provider accuracy, real regulator results, actual email,
+Safari and live payments are not claimed as verified by these tests. The execution
+network blocks direct production browser/API POST access; deployed GET checks use
+the authenticated Vercel connector.
