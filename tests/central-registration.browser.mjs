@@ -100,6 +100,17 @@ async function run(viewport) {
   assert.equal(checkout.headers()['x-sorp-isolation'], 'synthetic');
   record({ viewport: viewport.width, test: 'Billing settings bypass onboarding; Preview checkout cannot charge', passed: true });
   await context.clearCookies();
+  await page.goto(base + '/login/?return=' + encodeURIComponent(returnTo), { waitUntil: 'domcontentloaded' });
+  await page.getByRole('link', { name: 'Forgotten your password?' }).click();
+  await expect(page.getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/login/?return=' + encodeURIComponent(returnTo));
+  const resetToken = 'synthetic-only-reset-token';
+  await page.goto(base + '/reset-password/#token=' + resetToken, { waitUntil: 'domcontentloaded' });
+  await expect.poll(() => new URL(page.url()).hash).toBe('');
+  await expect(page.getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/login/?return=' + encodeURIComponent(returnTo));
+  assert.equal(await page.evaluate(token => JSON.stringify(sessionStorage).includes(token) || JSON.stringify(localStorage).includes(token), resetToken), false);
+  await page.getByRole('link', { name: 'Back to sign in' }).click();
+  await expect(page.getByRole('button', { name: /Log in to SORP2026/ })).toBeVisible();
+  record({ viewport: viewport.width, test: 'Password recovery retains workflow; reset token is removed from URL and never stored', passed: true });
   for (const old of ['/login/?mode=signup&next=', '/register/?next=', '/signup/?next=', '/sign-up/?next=']) {
    await page.goto(base + old + encodeURIComponent(returnTo), { waitUntil: 'domcontentloaded' });
    await page.waitForURL('**/get-started/**');
