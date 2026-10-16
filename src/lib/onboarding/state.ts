@@ -983,8 +983,7 @@ export function advance(
 export function nextObjective(s: Conversation): Objective {
   if (s.clarification && s.turns < TOTAL_TURN_CAP && !s.finishRequested)
     return "clarification";
-  if (!registrationReady(s.facts))
-    return s.turns >= TOTAL_TURN_CAP ? "complete" : "registration";
+  if (!registrationReady(s.facts)) return "registration";
   // Mandatory charity confirmation must not be bypassed by a skip, finish request or optional turn cap.
   if (!s.charity.confirmed) return "charity";
   if (s.finishRequested || s.turns >= TOTAL_TURN_CAP) return "complete";
