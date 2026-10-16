@@ -5,7 +5,7 @@ export const runtime='nodejs';
 export const maxDuration=180;
 import {canonicalCharityRecord} from '../../../../../../src/lib/onboarding/charity-record.ts';
 const official=(c:unknown)=>!!canonicalCharityRecord(c);
-export async function GET(r:Request,{params}:{params:Promise<{action:string}>}){try{if((await params).action==='health')return json({available:true,model:'gpt-6.1-sol',reasoning:'medium',isolated:true,usage:await usage()});const row=await load(r);return json(row?snapshot(row.payload):{available:true});}catch{return json({available:false},503);}}
+export async function GET(r:Request,{params}:{params:Promise<{action:string}>}){try{if((await params).action==='health'){const connection=new URL(r.url).searchParams.get('verify')==='1'? (await respond('Hello. This is a synthetic runtime connection check.',(await import('../../../../../../src/lib/onboarding/state.ts')).initialConversation())).natural?.reply:undefined;return json({available:true,connection,model:'gpt-6.1-sol',reasoning:'medium',isolated:true,usage:await usage()});}const row=await load(r);return json(row?snapshot(row.payload):{available:true});}catch{return json({available:false},503);}}
 export async function POST(r:Request,{params}:{params:Promise<{action:string}>}){
  try{
   sameOrigin(r);const {action}=await params;
