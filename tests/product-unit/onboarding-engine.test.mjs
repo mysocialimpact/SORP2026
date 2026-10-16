@@ -365,3 +365,41 @@ test("changing professional fields invalidates an earlier tailored question", ()
   s = applyFacts(s, { role: "Accountant" }, "form");
   assert.equal(s.afterCharity, null);
 });
+
+test("explicit fact-map schema retains separate volunteered context and null unknowns", () => {
+  const text =
+    "I advise 20 charities. I am interested in impact reporting and worried about funding.";
+  const result = validateInterpretation(
+    output({
+      name: null,
+      portfolio: {
+        value: "20",
+        quote: "I advise 20 charities.",
+        period: "current",
+        correction: false,
+      },
+      interests: {
+        value: "impact reporting",
+        quote: text,
+        period: "current",
+        correction: false,
+      },
+      concerns: {
+        value: "funding",
+        quote: text,
+        period: "current",
+        correction: false,
+      },
+    }),
+    text,
+    initialConversation(),
+  );
+  assert.equal(result.name, undefined);
+  assert.equal(result.portfolio, "20");
+  assert.equal(result.interests, "impact reporting");
+  assert.equal(result.concerns, "funding");
+  const schema = modelRequest(text, initialConversation()).text.format.schema
+    .properties.facts;
+  assert.ok(schema.required.includes("interests"));
+  assert.ok(schema.required.includes("portfolio"));
+});

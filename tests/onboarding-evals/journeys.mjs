@@ -215,7 +215,11 @@ export const journeys = [
       message(
         intro +
           " I'm worried about our accounts being ready for SORP 2026. I oversee governance. I found you on LinkedIn.",
-        (s) => has(s, "concerns", "SORP"),
+        (s) => {
+          has(s, "concerns", "SORP");
+          candidate(s, "Interim Spaces");
+          asks(s, /Interim Spaces/);
+        },
       ),
       {
         confirm: "Interim Spaces",

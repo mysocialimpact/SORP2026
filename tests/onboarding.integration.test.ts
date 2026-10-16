@@ -199,7 +199,7 @@ test("model extraction sends bounded facts, no tools/history; evidence and globa
     const body = JSON.parse(String(init?.body));
     assert.equal(body.store, false);
     assert.equal(body.tools, undefined);
-    assert.equal(body.max_output_tokens, 2200);
+    assert.equal(body.max_output_tokens, 3000);
     assert.equal(JSON.parse(body.input).history, undefined);
     return Response.json({
       status: "completed",

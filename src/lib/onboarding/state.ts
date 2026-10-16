@@ -501,7 +501,13 @@ export function charityOptions(s: Conversation): string[] {
             entitySame(r.entity, c) || r.aliases.some((a) => entitySame(a, c)),
         )?.entity || c,
     ),
-    ...s.professional.filter((r) => r.kind === "charity").map((r) => r.entity),
+    ...s.professional
+      .filter(
+        (r) =>
+          r.kind === "charity" ||
+          (r.relationship === "trustee" && r.kind !== "firm"),
+      )
+      .map((r) => r.entity),
   ];
   if (s.facts.organisation && s.facts.organisationKind === "charity")
     values.push(s.facts.organisation);
