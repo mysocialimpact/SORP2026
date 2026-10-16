@@ -1,5 +1,5 @@
 import "server-only";
-import { interpretWithModel } from "./model";
+import { interpretWithModel, MODEL_RESERVATION_USD } from "./model";
 import { randomBytes } from "node:crypto";
 import { query, transaction } from "@/lib/console/db";
 import {
@@ -166,15 +166,15 @@ export async function extractWithModel(
     if (
       !Number.isFinite(daily) ||
       !Number.isFinite(monthly) ||
-      usage.daily + 0.02 > Math.min(daily, 5) ||
-      usage.monthly + 0.02 > Math.min(monthly, 50)
+      usage.daily + MODEL_RESERVATION_USD > Math.min(daily, 5) ||
+      usage.monthly + MODEL_RESERVATION_USD > Math.min(monthly, 50)
     )
       throw new Error(
         "Conversation assistance has reached its budget. Your editable form still works.",
       );
     await c.query(
-      "INSERT INTO research_console.onboarding_usage(session_id) VALUES($1)",
-      [id],
+      "INSERT INTO research_console.onboarding_usage(session_id,reserved_usd) VALUES($1,$2)",
+      [id, MODEL_RESERVATION_USD],
     );
   });
   return interpretWithModel(message, state);

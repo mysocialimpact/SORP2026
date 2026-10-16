@@ -12,7 +12,7 @@ confirmation boundaries, resumption and completion. Registry confirmation fixtur
 are synthetic: this suite does not certify a regulator match. Reports are written
 to `test-results/onboarding-live-eval.json`; do not publish conversations from real users.
 
-Runs are bounded to 60 model requests and $1.20 in conservative reservations.
+Runs are bounded to 40 model requests and $1.20 in conservative reservations.
 Token-based estimated cost is recorded separately. Set `SORP_EVAL_IDS` to comma-separated
 journey IDs for targeted investigation. Live evaluation is deliberately opt-in, so
 ordinary PR builds do not silently incur model costs. A passing run is evidence for

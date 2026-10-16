@@ -42,6 +42,7 @@ export const journeys = [
           " I oversee governance. I found you on LinkedIn. I'm worried about funding.",
         (s) => {
           has(s, "name", "Alex Rowan");
+          has(s, "organisation", "Interim Spaces");
           has(s, "role", "trustee");
           candidate(s, "Interim Spaces");
           asks(s, /Interim Spaces/);

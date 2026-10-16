@@ -232,7 +232,7 @@ export function extractImmediate(
   const email = text.match(/[\w.!#$%&'*+/=?^`{|}~-]+@[\w-]+(?:\.[\w-]+)+/)?.[0];
   if (email && validEmail(email)) result.email = email.toLowerCase();
   const name = text.match(
-    /(?:my name is|I[’']m|I am|name\s*:)\s+([\p{Lu}][\p{L}'’\-]+(?:\s+[\p{Lu}][\p{L}'’\-]+){0,3})(?=[,.!\s]|$)/u,
+    /(?:[Mm]y name is|I[’']m|I am|name\s*:)\s+([\p{Lu}][\p{L}'’\-]+(?:\s+[\p{Lu}][\p{L}'’\-]+){0,3})(?=[,.!\s]|$)/u,
   )?.[1];
   if (
     name &&
@@ -350,6 +350,19 @@ export function extractImmediate(
       !role
     )
       result.name = simple;
+  }
+  // Lexical outage handling cannot resolve temporal or third-person work context.
+  // Preserve safe identity only rather than guess a current affiliation.
+  if (
+    /\b(?:used to|previously|former|in the past|I was|my (?:partner|wife|husband|colleague))\b/i.test(
+      text,
+    )
+  ) {
+    delete result.role;
+    delete result.organisation;
+    delete result.organisationKind;
+    delete result.responsibilities;
+    delete result.charities;
   }
   return { ...result, ...cleanFacts(result) };
 }
@@ -565,7 +578,12 @@ export function normaliseConversation(
     facts: { ...base.facts, ...cleanFacts(raw.facts) },
     charity: { ...base.charity, ...raw.charity },
     knowledge: { ...raw.knowledge },
-    professional: mergeProfessional([], raw.professional || [], raw.turns || 0),
+    professional: mergeProfessional(
+      [],
+      raw.professional || [],
+      raw.turns || 0,
+      true,
+    ),
     corrections: Array.isArray(raw.corrections)
       ? raw.corrections.slice(-12)
       : [],
@@ -730,6 +748,25 @@ export function applyExtraction(
     patch.professional || [],
     s.turns,
   );
+  // The form is a projection of typed memory. A single explicit current affiliation
+  // can supply its organisation; historical/client/mentioned entities cannot.
+  if (!supplied.organisation && !s.facts.organisation) {
+    const affiliations = [
+      ...new Set(
+        (patch.professional || [])
+          .filter(
+            (r) =>
+              r.period === "current" &&
+              r.confidence === "stated" &&
+              ["trustee", "employee", "employer", "volunteer"].includes(
+                r.relationship,
+              ),
+          )
+          .map((r) => r.entity),
+      ),
+    ];
+    if (affiliations.length === 1) supplied.organisation = affiliations[0];
+  }
   if (
     supplied.organisation &&
     professional.some(
@@ -894,7 +931,7 @@ export function nextQuestion(s: Conversation): string {
     const relation = s.professional.find(
       (r) => relationshipKey(r) === proposal.contextKey,
     );
-    return `${relation ? relationshipLead(relation) : ""}${proposal.question.replaceAll("{firstName}", s.facts.name.split(" ")[0]).replaceAll("{name}", s.facts.name)}`;
+    return `${relation && !proposal.question.toLowerCase().includes(relation.entity.toLowerCase()) ? relationshipLead(relation) : ""}${proposal.question.replaceAll("{firstName}", s.facts.name.split(" ")[0]).replaceAll("{name}", s.facts.name)}`;
   }
   return fallbackQuestion(s);
 }
@@ -1014,6 +1051,7 @@ export function mergeProfessional(
   existing: ProfessionalRelationship[],
   incoming: ProfessionalRelationship[],
   turn: number,
+  preserveTurn = false,
 ): ProfessionalRelationship[] {
   const result = existing.map((r) => ({ ...r, aliases: [...r.aliases] }));
   for (const raw of incoming.slice(0, 10)) {
@@ -1035,7 +1073,10 @@ export function mergeProfessional(
       ...raw,
       aliases: (raw.aliases || []).filter((a) => validEntity(a)).slice(0, 4),
       evidence: raw.evidence.slice(0, 600),
-      turn,
+      turn:
+        preserveTurn && Number.isInteger(raw.turn)
+          ? Math.max(0, Math.min(turn, raw.turn))
+          : turn,
     };
     const entity = result.find(
       (old) =>

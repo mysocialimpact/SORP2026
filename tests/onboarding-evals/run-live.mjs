@@ -4,6 +4,7 @@ import { journeys } from "./journeys.mjs";
 import {
   interpretWithModel,
   ONBOARDING_MODEL,
+  MODEL_RESERVATION_USD,
 } from "../../src/lib/onboarding/model.ts";
 import { processTurn } from "../../src/lib/onboarding/engine.ts";
 import {
@@ -39,9 +40,9 @@ const selected = process.env.SORP_EVAL_IDS
   ? journeys.filter((j) => process.env.SORP_EVAL_IDS.split(",").includes(j.id))
   : journeys;
 async function bounded(text, state) {
-  if (report.calls >= 60 || reserved + 0.02 > 1.2)
+  if (report.calls >= 40 || reserved + MODEL_RESERVATION_USD > 1.2)
     throw new Error("Live evaluation budget exhausted");
-  reserved += 0.02;
+  reserved += MODEL_RESERVATION_USD;
   report.calls++;
   const result = await interpretWithModel(text, state, (p) => {
     lastInterpretation = p;

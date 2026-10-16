@@ -330,3 +330,56 @@ physical microphone. Live provider accuracy, real regulator results, actual emai
 Safari and live payments are not claimed as verified by these tests. The execution
 network blocks direct production browser/API POST access; deployed GET checks use
 the authenticated Vercel connector.
+
+## Conversational engine v3 — architectural correction (release candidate)
+
+This section supersedes the release 18 engine description. The previous engine
+had a shared snapshot but flattened professional context into strings, selected
+mostly fixed question text and allowed later extraction to overwrite manual edits.
+Its literal grounding check also discarded supported paraphrases. Mocked model
+responses did not expose missing facts, misclassified relationships or poor question
+selection. Live evaluations during this correction reproduced those classes of error.
+
+The new `processTurn` is shared by the production API and live evaluation runner:
+interpret once → validate evidence → update typed state → evaluate objectives →
+validate a proposed next question → render the form and question from that state.
+Successful semantic extraction no longer competes with provisional lexical facts.
+The UI animates validated updates when the answer returns. Input is durably reserved
+before the model call; revision checks still reject stale writes.
+
+State v3 adds current/past/unspecified professional relationships, entity aliases,
+relationship type, confidence, evidence, correction provenance and a bounded
+question proposal. Historical clients remain potential charities, not current
+employers. Trustee relationships can suggest charities, never verify registration.
+Only confirmation of a server-returned official-record candidate queues preparation.
+Manual edits are authoritative; subsequent conversational replacement requires an
+explicit correction of that particular field. Saved signup/account context retains
+these relationships and corrections. Existing drafts are upgraded on read without
+an authentication or database migration; legacy flat data is retained, not silently
+reinterpreted as a verified historical relationship.
+
+The structured model contract explicitly considers each fact, with null for unknown
+values, plus typed relationships, intent and bounded next-question proposals.
+Field-level definitions distinguish referral, responsibilities, portfolio, interests
+and concerns. Application logic validates grounding and entity boundaries, resolves
+references conservatively, rejects questions for known details and requires a
+present-focused work question after historical work. A proposed question after
+charity confirmation is validated against the then-current state; it needs no extra
+model call. Confirmation, ambiguous choices, completion and the exact final concern
+question remain application-controlled. The person can leave once required account
+fields are valid; six information turns limit optional questions and ten total
+turns bound conversation. An outstanding charity confirmation is not represented
+as completed merely because the optional budget is exhausted.
+
+Model remains `gpt-5.4-mini-2026-03-17`, now with medium reasoning, a 4,000-output-token
+cap and 35-second timeout. Lower-reasoning live runs repeatedly missed context, so
+that configuration was rejected. There is still one request per submitted answer,
+no growing message history, `store:false`, no model tools, and a $0.03
+request reservation with the existing $1 daily / $10 monthly defaults. No new paid service, account
+system or object store was added. Existing isolated PostgreSQL draft/profile storage,
+24-hour draft expiry, charity jobs and disabled public PDF downloads are unchanged.
+
+The reusable live suite and preview-only browser harness are documented in
+`tests/onboarding-evals/README.md`. CI runs deterministic engine tests automatically;
+billable live runs remain explicitly enabled. Final verification results and release
+status are recorded below when completed.

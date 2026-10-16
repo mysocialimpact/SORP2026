@@ -11,7 +11,8 @@ import {
   type Objective,
 } from "./state.ts";
 export const ONBOARDING_MODEL = "gpt-5.4-mini-2026-03-17";
-export const MAX_OUTPUT_TOKENS = 3000;
+export const MAX_OUTPUT_TOKENS = 4000;
+export const MODEL_RESERVATION_USD = 0.03;
 const factFields = [
   ...fieldKeys,
   "responsibilities",
@@ -69,7 +70,7 @@ const factMeaning: Record<string, string> = {
   email: "The speaker's email address, exactly as supplied.",
   role: "The speaker's CURRENT professional role, not a past role or someone else's role.",
   organisation:
-    "CURRENT employer or firm, only if explicitly connected to the speaker's present work.",
+    "Organisation of the speaker's CURRENT employment, trusteeship or volunteering, or their firm. Include the charity where a trustee currently serves. Historical clients and employers do not belong here.",
   responsibilities:
     "What the speaker does professionally, their duties and services; preserve meaningful detail.",
   discovery:
@@ -426,7 +427,7 @@ export async function interpretWithModel(
       "content-type": "application/json",
     },
     body: JSON.stringify(modelRequest(message, state)),
-    signal: AbortSignal.timeout(25000),
+    signal: AbortSignal.timeout(35000),
     cache: "no-store",
     redirect: "error",
   });

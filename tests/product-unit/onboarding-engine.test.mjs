@@ -11,6 +11,7 @@ import {
   confirmCharity,
   questionPlan,
   validEntity,
+  extractImmediate,
 } from "../../src/lib/onboarding/state.ts";
 import {
   validateInterpretation,
@@ -402,4 +403,54 @@ test("explicit fact-map schema retains separate volunteered context and null unk
     .properties.facts;
   assert.ok(schema.required.includes("interests"));
   assert.ok(schema.required.includes("portfolio"));
+});
+
+test("typed current affiliations project into the form without promoting historical clients", () => {
+  const current = {
+    ...relationship("Interim Spaces", "current", "trustee"),
+    confidence: "stated",
+  };
+  const s = advance(initialConversation(), { professional: [current] });
+  assert.equal(s.facts.organisation, "Interim Spaces");
+  const past = advance(initialConversation(), {
+    professional: [relationship("Blue Cross")],
+  });
+  assert.equal(past.facts.organisation, "");
+  const multiple = advance(initialConversation(), {
+    professional: [current, { ...current, entity: "Mind" }],
+  });
+  assert.equal(multiple.facts.organisation, "");
+  const edited = applyFacts(
+    initialConversation(),
+    { organisation: "Chosen firm" },
+    "form",
+  );
+  assert.equal(
+    advance(edited, { professional: [current] }).facts.organisation,
+    "Chosen firm",
+  );
+});
+
+test("outage extraction does not turn historical or third-person work into current employment", () => {
+  for (const text of [
+    "My name is Nina Patel. I used to be a finance manager at Shelter.",
+    "My name is Emma Lee. My partner is a trustee at Mind.",
+  ]) {
+    const p = extractImmediate(text, initialConversation());
+    assert.ok(p.name);
+    assert.equal(p.role, undefined);
+    assert.equal(p.organisation, undefined);
+  }
+});
+test("resumption preserves relationship recency rather than making every mention new", () => {
+  let s = advance(initialConversation(), {
+    professional: [relationship("Mind")],
+  });
+  s = advance(s, { professional: [relationship("Shelter")] });
+  assert.deepEqual(
+    normaliseConversation(JSON.parse(JSON.stringify(s))).professional.map(
+      (r) => r.turn,
+    ),
+    [1, 2],
+  );
 });
