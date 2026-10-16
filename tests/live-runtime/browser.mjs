@@ -257,7 +257,8 @@ try {
       .click();
     const completion = await completed;
     assert.equal(completion.status(), 200);
-    assert.equal((await completion.json()).saved, true);
+    // Navigation can evict the HTTP response body; the database assertion below
+    // verifies durable completion directly, rather than relying on that body.
     // A glob could accidentally match ?next=/ask-sorp/workspace/ on the old page.
     await page.waitForURL(url => url.pathname === "/ask-sorp/workspace/");
     const stored = await db.query(
