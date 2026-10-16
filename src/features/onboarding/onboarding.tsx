@@ -895,7 +895,7 @@ export function Onboarding() {
               id="onboarding-profile-form"
               onSubmit={(e) => {
                 e.preventDefault();
-                setAccountOpen(true);
+                if (accountReady(currentState.current)) setAccountOpen(true);
               }}
             >
               <div className="profile-fields">
@@ -906,7 +906,7 @@ export function Onboarding() {
                   >
                     <span>
                       {labels[key]}
-                      {key === "organisation" && <small>optional</small>}
+                      {key === "organisation" && <small>or independent</small>}
                       {fieldComplete(key) && <i aria-hidden="true">✓</i>}
                     </span>
                     <input
@@ -941,6 +941,12 @@ export function Onboarding() {
                     />
                   </label>
                 ))}
+                {state.natural && <label style={{fontSize:13,display:'flex',gap:8,alignItems:'center'}}>
+                  <input type="checkbox" checked={state.natural.independent} disabled={busy} onChange={async e => {
+                    try { await persistEdits(); accept(await post('edit', {independent:e.target.checked,revision:currentState.current.revision})); }
+                    catch(error){recover(error);}
+                  }} /> I work independently
+                </label>}
               </div>
               <div
                 className={`profile-reward${reward ? " is-rewarded" : ""}`}

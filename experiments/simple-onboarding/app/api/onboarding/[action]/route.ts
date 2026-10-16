@@ -20,7 +20,7 @@ export async function POST(r:Request,{params}:{params:Promise<{action:string}>})
   const row=await load(r);if(!row)return json({error:'Please reopen your introduction.'},401);
   if(data.revision!==undefined&&data.revision!==row.revision)return json({...snapshot(row.payload),error:'Your details changed. Please retry.'},409);
   await claim(row);let s=row.payload,state=s.state;
-  if(action==='edit'){state=applyFacts(state,data.fields||{},'form');if(typeof data.fields?.organisation==='string'&&data.fields.organisation)state.natural.independent=false;s={...s,state};}
+  if(action==='edit'){state=applyFacts(state,data.fields||{},'form');if(typeof data.independent==='boolean'){state.natural.independent=data.independent;if(data.independent)state=applyFacts(state,{organisation:''},'form');}if(typeof data.fields?.organisation==='string'&&data.fields.organisation)state.natural.independent=false;s={...s,state};}
   else if(action==='turn'){
    if(typeof data.message!=='string'||!data.message.trim()||data.message.length>3000)return json({error:'Use an answer of up to 3,000 characters.'},400);
    if(/\bpassword\s*(?:is|:|=)/i.test(data.message))return json({error:'Use the secure password fields.'},400);

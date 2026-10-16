@@ -42,7 +42,7 @@ export function acceptConversation(parsed: any, message: string, state: Conversa
     natural:{reply:parsed.reply.trim(),objectives,independent,uncertainties:(parsed.uncertainties||[]).filter((v:unknown)=>typeof v==='string').slice(0,4),complete:false},
     dialogue:{...state.dialogue,recent:[...state.dialogue.recent,{role:'assistant' as const,text:nextQuestion(state)},{role:'user' as const,text:message}].slice(-18)},
   };
-  next.natural!.complete = accountReady(next) && (parsed.complete === true || next.finishRequested);
+  next.natural!.complete = accountReady(next) && (next.finishRequested || (parsed.complete === true && ['professional context','referral','challenge'].every(v=>objectives.includes(v))));
   return next;
 }
 export async function converse(message:string,state:Conversation,event=false, transport:typeof fetch=fetch) {

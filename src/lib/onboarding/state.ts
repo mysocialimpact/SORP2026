@@ -596,7 +596,7 @@ export function normaliseConversation(
     dialogue: {
       ...base.dialogue,
       ...raw.dialogue,
-      recent: (raw.dialogue?.recent || []).slice(-8).map((m) => ({ role: m.role, text: m.text.slice(0, 1600) })),
+      recent: (raw.dialogue?.recent || []).slice(raw.natural ? -18 : -8).map((m) => ({ role: m.role, text: m.text.slice(0, 1600) })),
     },
     charity: { ...base.charity, ...raw.charity },
     knowledge: { ...raw.knowledge },

@@ -5,5 +5,5 @@ const response=await budgeted(.02,async()=>{const r=await fetch('https://api.ope
 console.log('FINISH_CONNECTION',JSON.stringify(response));
 const r=await fetch('https://sorp2026.mysocialimpact.org/api/published-review',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({operation:'find',query:'Interim Spaces',sessionId:'synthetic-preview-connection-check'}),signal:AbortSignal.timeout(45000)});
 const lookup={status:r.status,data:await r.json()};
-console.log('FINISH_LOOKUP',JSON.stringify(lookup).slice(0,6500));
+console.log('FINISH_LOOKUP',JSON.stringify({status:lookup.status,candidates:lookup.data.research?.candidates}));
 await mkdir('public',{recursive:true});await writeFile('public/connection.json',JSON.stringify({response,lookup},null,2));
