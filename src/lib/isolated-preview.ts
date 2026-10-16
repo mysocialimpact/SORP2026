@@ -63,7 +63,7 @@ export async function isolatedPreviewResponse(request: NextRequest) {
     }
     const payload = Buffer.from(JSON.stringify(state)).toString('base64url');
     if (payload.length > 3700) return json({ error: 'Synthetic draft limit reached. Start a fresh Preview session.' }, 413);
-    return json({ state, selected: state.charity.confirmed, messages: [], question: nextQuestion(state), synthetic: true }, 200, `sorp_preview_draft=${payload}.${sign(payload)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600${request.nextUrl.protocol === 'https:' ? '; Secure' : ''}`);
+    return json({ state, selected: state.charity.confirmed, messages: [], question: nextQuestion(state), notice: 'Isolated routing Preview: these are deterministic test responses, not the live conversational AI.', synthetic: true }, 200, `sorp_preview_draft=${payload}.${sign(payload)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600${request.nextUrl.protocol === 'https:' ? '; Secure' : ''}`);
   }
   if (path === '/api/impact-director') return json(stored ? { signedIn: true, account: stored.account, progress: null, revision: 0 } : { signedIn: false }, stored ? 200 : 401);
   if (path === '/api/published-review' && body.operation === 'find') {
