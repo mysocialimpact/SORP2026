@@ -96,8 +96,8 @@ try {
       SORP_BACKEND_ORIGIN: "http://127.0.0.1:4311",
       SORP_READINESS_API_URL: "http://127.0.0.1:4311/api/readiness",
       SORP_TRANSCRIBE_API_URL: "http://127.0.0.1:4311/api/transcribe",
-      SORP_ONBOARDING_DAILY_USD: "0.50",
-      SORP_ONBOARDING_MONTHLY_USD: "0.50",
+      SORP_ONBOARDING_DAILY_USD: "2",
+      SORP_ONBOARDING_MONTHLY_USD: "2",
     },
   );
   await until(async () => {
@@ -135,9 +135,12 @@ try {
     headless: true,
   });
   for (const viewport of [
-    { width: 1440, height: 1000 },
-    { width: 390, height: 844 },
+    { width: 1440, height: 1000, journey: "historical" },
+    { width: 390, height: 844, journey: "historical" },
+    { width: 1440, height: 1000, journey: "social" },
+    { width: 390, height: 844, journey: "social" },
   ]) {
+    const social = viewport.journey === "social";
     browser = await launchBrowser();
     const context = await browser.newContext({ viewport, isMobile: viewport.width < 600, hasTouch: viewport.width < 600 });
     const page = await context.newPage();
@@ -173,7 +176,7 @@ try {
       questions.push(data.question);
       return data;
     }
-    if (viewport.width > 1000) {
+    if (viewport.width > 1000 || social) {
       await page.getByRole("button", { name: "Record your answer" }).click();
       await expect(page.locator(".voice-recording")).toBeVisible();
       await expect
@@ -189,6 +192,7 @@ try {
       await expect(page.locator(".voice-transcript")).toBeVisible();
       await expect(input).toHaveValue(blueCross);
     }
+    if (!social) {
     const first = await send(blueCross);
     assert.equal(first.state.facts.organisation, "");
     assert.ok(
@@ -238,9 +242,31 @@ try {
     await page
       .getByRole("button", { name: "Yes, this is the charity" })
       .click();
-    await expect(page.locator(".conversation-question")).toContainText(
-      "Marcus",
-    );
+    await expect(page.locator(".onboarding-finish")).toBeVisible();
+    } else {
+      const first = await send("I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.social@example.invalid.");
+      assert.equal(first.state.facts.organisation, "Interim Spaces");
+      assert.equal(first.state.charity.confirmed, null);
+      await page.getByRole("button", {name: /Find Interim Spaces/}).click();
+      await expect(page.getByRole("heading", {name: "Interim Spaces (synthetic fixture)"})).toBeVisible();
+      const confirmed = page.waitForResponse(r=>r.url().includes("/api/onboarding/confirm/")&&r.request().method()==="POST");
+      await page.getByRole("button", {name:"Yes, this is the charity"}).click();
+      assert.equal((await confirmed).status(),200);
+      await until(async()=>!(await input.isDisabled()));
+      await send("Finance.");
+      const referral = await send("My pal told me.");
+      assert.match(referral.question,/What keeps you up at night\?/);
+      assert.ok(referral.question.length > "What keeps you up at night?".length + 20, "Final question needs a genuine transition");
+      const final = await send("Frogs.");
+      assert.match(final.question,/frog|amphib|croak|pond/i,"Latest answer must influence displayed reply");
+      assert.equal(final.state.facts.concerns, "", "Do not store a joke as a professional concern");
+      await expect(page.locator(".conversation-question")).toHaveText(final.question);
+      if(final.objective === "reflection") await send("The real ones in the pond next door. Nothing to do with work!");
+      await expect(page.locator(".onboarding-finish")).toBeVisible();
+      await page.reload();
+      await expect(page.locator(".onboarding-finish")).toBeVisible();
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    }
     await page
       .locator(".onboarding-finish")
       .getByRole("button", { name: "Create my account" })
@@ -266,7 +292,7 @@ try {
       "SELECT facts FROM research_console.onboarding_profiles ORDER BY updated_at DESC LIMIT 1",
     );
     assert.equal(stored.rows[0].facts.name, "Marcus Warry");
-    assert.ok(
+    if (!social) assert.ok(
       stored.rows[0].facts.professionalContext.relationships.some(
         (r) => /Blue Cross/.test(r.entity) && r.period === "past",
       ),
@@ -274,7 +300,7 @@ try {
     reports.push({
       viewport,
       passed: true,
-      voice: viewport.width > 1000,
+      voice: viewport.width > 1000 || social,
       questions,
       accountHandoff: true,
     });
@@ -290,7 +316,8 @@ try {
     "LIVE_BROWSER_SUMMARY",
     JSON.stringify({
       passed: reports.length,
-      modelCalls: usage.rows[0].requests,
+      turns: usage.rows[0].requests,
+      modelCalls: usage.rows[0].requests * 2,
       journeys: reports,
     }),
   );

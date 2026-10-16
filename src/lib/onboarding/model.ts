@@ -16,7 +16,7 @@ import {
 export const ONBOARDING_MODEL = "gpt-5.4-mini-2026-03-17";
 export const DIALOGUE_MODEL = "gpt-5.4";
 export const MAX_OUTPUT_TOKENS = 4000;
-export const MODEL_RESERVATION_USD = 0.08;
+export const MODEL_RESERVATION_USD = 0.10;
 import { dialogueRequest, decodeDialogue } from "./dialogue.ts";
 const factFields = [
   ...fieldKeys,

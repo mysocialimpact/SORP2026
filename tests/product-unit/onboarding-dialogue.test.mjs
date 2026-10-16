@@ -68,5 +68,5 @@ test('wording failure retains valid extraction and surfaces a notice; two-call c
  const fetch=globalThis.fetch,key=process.env.OPENAI_API_KEY;
  process.env.OPENAI_API_KEY='synthetic-test';let calls=0;
  globalThis.fetch=async()=>++calls===1?Response.json({status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{content:[{text:JSON.stringify({intent:'inform',facts:{name:{value:'Alex Rowan',quote:'Alex Rowan',period:'current',correction:false}},relationships:[]})}]}]}):new Response('',{status:503});
- try{const result=await interpretWithModel('My name is Alex Rowan.',initialConversation());assert.equal(result.name,'Alex Rowan');assert.match(result.notice,/reply could not finish/);assert.equal(calls,2);assert.equal(MODEL_RESERVATION_USD,0.08);}finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
+ try{const result=await interpretWithModel('My name is Alex Rowan.',initialConversation());assert.equal(result.name,'Alex Rowan');assert.match(result.notice,/reply could not finish/);assert.equal(calls,2);assert.equal(MODEL_RESERVATION_USD,0.10);}finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
 });
