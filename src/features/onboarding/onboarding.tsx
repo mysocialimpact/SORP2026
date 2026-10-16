@@ -628,7 +628,7 @@ export function Onboarding() {
                   <div>
                     <p className="onboarding-eyebrow">
                       {completed
-                        ? "YOUR NEXT CHAPTER"
+                        ? "READY WHEN YOU ARE"
                         : "LET’S MAKE THIS YOURS"}
                     </p>
                     <h2>{question}</h2>

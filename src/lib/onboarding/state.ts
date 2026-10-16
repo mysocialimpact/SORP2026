@@ -19,6 +19,7 @@ export type Objective =
   | "discovery"
   | "concerns"
   | "clarification"
+  | "reflection"
   | "complete";
 export type ProfessionalRelationship = {
   entity: string;
@@ -42,9 +43,16 @@ export type QuestionProposal = {
   objective: Objective;
   fields: string[];
   question: string;
+  natural?: boolean;
+};
+export type DialogueMemory = {
+  recent: { role: "user" | "assistant"; text: string }[];
+  followUps: number;
+  reflecting: boolean;
 };
 export type Conversation = {
   facts: Facts;
+  dialogue: DialogueMemory;
   turns: number;
   repairTurns: number;
   asked: Objective[];
@@ -100,6 +108,7 @@ export const emptyFacts = (): Facts => ({
 });
 export const initialConversation = (): Conversation => ({
   facts: emptyFacts(),
+  dialogue: { recent: [], followUps: 0, reflecting: false },
   turns: 0,
   repairTurns: 0,
   asked: [],
@@ -387,6 +396,9 @@ export type Extraction = Partial<Facts> & {
   finishRequested?: boolean;
   questionProposal?: QuestionProposal;
   afterCharity?: QuestionProposal;
+  utterance?: string;
+  topicResponse?: { topic: "responsibilities" | "discovery" | "concerns" | "none"; status: "answered" | "declined" | "uncertain" | "not_answered"; followUp: boolean };
+  notice?: string;
   usage?: { input: number; output: number; estimatedUsd: number };
 };
 /** Successful semantic interpretation is authoritative: an incidental mention
@@ -576,6 +588,11 @@ export function normaliseConversation(
     version: 3,
     revision: Number.isInteger(raw.revision) ? raw.revision! : 0,
     facts: { ...base.facts, ...cleanFacts(raw.facts) },
+    dialogue: {
+      ...base.dialogue,
+      ...raw.dialogue,
+      recent: (raw.dialogue?.recent || []).slice(-8).map((m) => ({ role: m.role, text: m.text.slice(0, 1600) })),
+    },
     charity: { ...base.charity, ...raw.charity },
     knowledge: { ...raw.knowledge },
     professional: mergeProfessional(
@@ -897,6 +914,25 @@ export function advance(
     },
     patch,
   );
+  // Topic participation is distinct from a professional fact. A joke, refusal,
+  // uncertainty or personal answer can close an optional topic without becoming CRM data.
+  const topic = patch.topicResponse;
+  if (topic && ["responsibilities", "discovery", "concerns"].includes(topic.topic) &&
+      (objective === topic.topic || (objective === "reflection" && topic.topic === "concerns")) &&
+      topic.status !== "not_answered") {
+    next.skipped = [...new Set([...next.skipped, topic.topic as Objective])];
+    if (next.clarification === "question" || next.clarification === "meaning") next.clarification = null;
+  }
+  const reflecting = !!(topic?.followUp && topic.topic === "concerns" &&
+    topic.status !== "declined" && objective === "concerns" &&
+    s.dialogue.followUps < 1 && !next.finishRequested && next.turns < OPTIONAL_TURN_CAP);
+  next.dialogue = {
+    recent: patch.utterance ? [...s.dialogue.recent,
+      { role: "assistant" as const, text: nextQuestion(s).slice(0, 1600) },
+      { role: "user" as const, text: patch.utterance.slice(0, 1600) }].slice(-8) : s.dialogue.recent,
+    followUps: s.dialogue.followUps + (reflecting ? 1 : 0),
+    reflecting,
+  };
   return attachQuestion(
     {
       ...next,
@@ -920,6 +956,7 @@ export function nextObjective(s: Conversation): Objective {
     return "charity";
   if (s.turns >= TOTAL_TURN_CAP) return "complete";
   if (!s.charity.confirmed && !s.skipped.includes("charity")) return "charity";
+  if (s.dialogue.reflecting && s.turns < TOTAL_TURN_CAP) return "reflection";
   if (s.turns - s.repairTurns >= OPTIONAL_TURN_CAP) return "complete";
   for (const key of ["responsibilities", "discovery", "concerns"] as const)
     if (!s.facts[key] && !s.skipped.includes(key)) return key;
@@ -928,6 +965,10 @@ export function nextObjective(s: Conversation): Objective {
 export function nextQuestion(s: Conversation): string {
   const proposal = s.response;
   if (proposal && suitableQuestion(s, proposal)) {
+    if (proposal.natural) return proposal.question
+      .replaceAll("{firstName}", s.facts.name.split(" ")[0])
+      .replaceAll("{name}", s.facts.name)
+      .replaceAll("{charityName}", s.charity.confirmed?.name || s.charity.proposed);
     const relation = s.professional.find(
       (r) => relationshipKey(r) === proposal.contextKey,
     );
@@ -1152,6 +1193,7 @@ export function suitableQuestion(
   p: QuestionProposal,
 ): boolean {
   const plan = questionPlan(s);
+  if (p.natural) return suitableDialogue(s, p);
   if (p.objective !== plan.objective || !p.question || p.question.length > 320)
     return false;
   if (
@@ -1206,6 +1248,25 @@ export function suitableQuestion(
   )
     return false;
   return (p.question.match(/\?/g) || []).length === 1;
+}
+/** Language may react freely, but cannot change the controller's objective or claim actions. */
+export function suitableDialogue(s: Conversation, p: QuestionProposal): boolean {
+  const plan = questionPlan(s);
+  if (p.objective !== plan.objective || !p.question || p.question.length > 900 ||
+      p.fields.some((f) => !plan.fields.includes(f as FieldKey))) return false;
+  if (plan.objective === "registration" && !p.fields.some((f) => missingRegistration(s).includes(f as FieldKey))) return false;
+  if (["responsibilities", "discovery", "concerns", "charity"].includes(plan.objective) && !p.fields.includes(plan.fields[0])) return false;
+  const questions = p.question.match(/[^.!?]*\?/g) || [];
+  if (questions.length > 2 || (plan.objective === "complete" && questions.length)) return false;
+  if (["registration", "responsibilities", "discovery", "reflection"].includes(plan.objective) && !questions.length) return false;
+  if (plan.objective === "concerns" && !p.question.includes("What keeps you up at night?")) return false;
+  if (/https?:|(?:your|a) password|(?:I|we)(?:’|')ve (?:found|checked|verified|downloaded)|accounts are ready|(?:introduction|conversation|details) (?:is|are|has been|have been) saved/i.test(p.question)) return false;
+  // Check questions, not acknowledgements: saying “your role” is not necessarily asking it again.
+  for (const q of questions) {
+    if (s.facts.email && /(?:what|give|share|tell|provide).*(?:email address|your email)/i.test(q)) return false;
+    if (s.facts.name && /(?:what|give|share|tell|provide).*(?:full name|your name)/i.test(q)) return false;
+  }
+  return true;
 }
 function attachQuestion(
   s: Conversation,

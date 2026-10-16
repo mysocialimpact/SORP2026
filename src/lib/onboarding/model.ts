@@ -5,6 +5,9 @@ import {
   nextQuestion,
   questionPlan,
   charityOptions,
+  advance,
+  reconcileExtraction,
+  confirmCharity,
   type Conversation,
   type Extraction,
   type ProfessionalRelationship,
@@ -12,7 +15,8 @@ import {
 } from "./state.ts";
 export const ONBOARDING_MODEL = "gpt-5.4-mini-2026-03-17";
 export const MAX_OUTPUT_TOKENS = 4000;
-export const MODEL_RESERVATION_USD = 0.03;
+export const MODEL_RESERVATION_USD = 0.05;
+import { dialogueRequest, decodeDialogue } from "./dialogue.ts";
 const factFields = [
   ...fieldKeys,
   "responsibilities",
@@ -142,35 +146,10 @@ export const interpretationSchema = object({
       quote: text(800),
     }),
   },
-  next: object({
-    objective: enumeration(objectives),
-    fields: {
-      type: "array",
-      maxItems: 3,
-      items: enumeration([
-        ...fieldKeys,
-        "charity",
-        "responsibilities",
-        "discovery",
-        "concerns",
-      ]),
-    },
-    question: text(320),
-  }),
-  afterCharity: object({
-    objective: enumeration(objectives),
-    fields: {
-      type: "array",
-      maxItems: 3,
-      items: enumeration([
-        ...fieldKeys,
-        "charity",
-        "responsibilities",
-        "discovery",
-        "concerns",
-      ]),
-    },
-    question: text(320),
+  topicResponse: object({
+    topic: enumeration(["responsibilities", "discovery", "concerns", "none"]),
+    status: enumeration(["answered", "declined", "uncertain", "not_answered"]),
+    followUp: { type: "boolean" },
   }),
 });
 export function modelRequest(message: string, state: Conversation) {
@@ -183,9 +162,10 @@ export function modelRequest(message: string, state: Conversation) {
 Read all known state and the actual current question. Extract every useful new fact even if it answers a later objective. Never ask again for a known fact. Identity facts refer to the speaker, not a partner or client. name is a person; organisation is CURRENT employer/firm. Record historical employers/clients/roles as relationships with period=past, never as today's employer/role. 'Used to', 'previously', 'former', 'back then' express past; current and past may coexist. Relationship records concern the user's work only. Do not infer a profession merely because someone had a charity client. Preserve uncertainty. Merge alternate names of ONE entity as aliases, not separate clients; preserve distinct entities. A trustee's organisation is a potential charity; an accountancy firm is distinct from its charity clients. A mention (including a previous client) is not a starting-charity choice or registry confirmation.
 Identity/entity facts need a value present in the answer (case differences allowed) and a supporting quote. Professional context, concerns and referral may be concise summaries supported by an exact quote; do not lose the meaning through literal substring extraction. Exceptions: organisationKind may classify charity/firm/other/unknown; charityChoice/reference may resolve a unique entity in known memory. Each relationship needs its entity or known alias grounded in its quote. kind=charity needs explicit charity context or a clear trustee relationship; don't guess external registration. Use period=unspecified when tense is not established. Never extract credentials. Mark correction=true ONLY for explicit correction of that particular fact. Manually confirmed fields are authoritative: do not replace them with incidental or earlier transcript spellings. If a user corrects a different field, leave the rest alone.
 Intent distinguishes new information, confirmation, correction, reminder, clarification, question, disagreement. Resolve references from known entities; if 'the other charity' is not unique, clarify rather than choose. A reminder does not replace an entity with a sentence. charityChoice/accept mean explicit starting choice, not a mere mention; never select the first of several charities. Only the application confirms official records. finishRequested=true only if the person asks to finish/continue now or stop questions; keep essential missing registration fields visible.
-Propose the next question AFTER considering your new facts. Required valid name/email/role first, charity choice or official-record confirmation next, then worthwhile missing current responsibilities, discovery and concerns. Optional employer can be collected with current work but must not block account creation. Historical work should naturally inform a question about current work. Do not repeat concerns/referral/responsibilities already supplied, even early. Stop if objectives are satisfied or the user wants to continue. Aim for five meaningful answers; six information turns/ten total are bounds. Do not invent questions to reach a count.
-For next.objective registration/responsibilities/discovery: next.fields names ONLY information genuinely missing after updates; question is one concise natural question, tailored to their professional context. No greeting, acknowledgement, person name or repeated entity summary: the application supplies a grounded relationship acknowledgement where useful. Use {firstName} only if a name is essential. Do not ask for a current employer unless it is missing and relevant. For charity/clarification/concerns/complete, leave question empty: deterministic application controls those confirmations, clarification and completion. For afterCharity, propose the worthwhile next question if the user confirms their charity next: normally missing responsibilities, discovery or concerns; otherwise complete with an empty question. Do not repeat supplied background. This proposal will be validated against the actual later state before use. Use 'What keeps you up at night?' only for genuinely missing concerns. No tools, outside research or claims that information has been found/prepared.`,
+Do not write the assistant's reply. A separate dialogue step receives your validated updates and the application's next objective.
+Interpret participation in the current optional topic separately from professional facts. topicResponse.topic identifies the optional subject the answer addresses (otherwise none); answered means they responded, including humour or a personal/literal answer; declined means they prefer not to discuss it; uncertain means they don't know; not_answered means no response to that topic. Do not turn jokes, personal sleep disturbances, refusals or uncertainty into professional concerns. A question about why we ask an optional topic can close it without forcing another answer. Responsibilities can be answered tersely in context. If final concerns have been addressed, do not ask again just because there is no professional concern to save. followUp=true only for ONE genuinely useful short clarification of a surprising/ambiguous final answer from an engaged person; false for clear concerns, no concerns, refusals or impatience. A follow-up is optional, not a default. If they're making a light joke, it is often better to respond lightly and finish. Never assume a strange answer is a joke when they give a literal explanation.`,
     input: JSON.stringify({
+      recentDialogue: state.dialogue.recent,
       known: state.facts,
       professional: state.professional,
       knowledge: state.knowledge,
@@ -327,6 +307,7 @@ export function validateInterpretation(
   }
   const extracted: Extraction = {
     ...cleanFacts(patch),
+    utterance: message,
     intent: p.intent as Extraction["intent"],
     correctedFields: corrected,
   };
@@ -389,6 +370,14 @@ export function validateInterpretation(
       turn: state.turns + 1,
     });
   }
+  const participation = p.topicResponse as Record<string, unknown> | undefined;
+  if (participation && ["responsibilities", "discovery", "concerns", "none"].includes(String(participation.topic)) &&
+      ["answered", "declined", "uncertain", "not_answered"].includes(String(participation.status)))
+    extracted.topicResponse = {
+      topic: participation.topic as NonNullable<Extraction["topicResponse"]>["topic"],
+      status: participation.status as NonNullable<Extraction["topicResponse"]>["status"],
+      followUp: participation.followUp === true,
+    };
   const q = p.next as Record<string, unknown> | undefined;
   if (
     q &&
@@ -417,57 +406,55 @@ export function validateInterpretation(
   }
   return extracted;
 }
-/** The same call/decoder is used by the API and opt-in live evaluation runner. */
-export async function interpretWithModel(
-  message: string,
-  state: Conversation,
-  observe?: (parsed: unknown) => void,
-): Promise<Extraction> {
+/** Both production and evaluations use these two bounded stages: understand, then respond
+ * to the deterministically updated state. No model can write accounts or confirm a record. */
+async function callModel(request: unknown) {
   const key = process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;
-  if (!key)
-    throw new Error(
-      "Conversation assistance is unavailable. You can keep editing your profile.",
-    );
+  if (!key) throw new Error("Conversation assistance is unavailable. You can keep editing your profile.");
   const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${key}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(modelRequest(message, state)),
-    signal: AbortSignal.timeout(35000),
-    cache: "no-store",
-    redirect: "error",
+    method: "POST", headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+    body: JSON.stringify(request), signal: AbortSignal.timeout(35000), cache: "no-store", redirect: "error",
   });
-  if (!response.ok)
-    throw new Error(
-      `Conversation assistance is unavailable (provider ${response.status}). Please retry or use the form.`,
-    );
+  if (!response.ok) throw new Error(`Conversation assistance is unavailable (provider ${response.status}). Please retry or use the form.`);
   const data = await response.json();
-  const input = Number(data.usage?.input_tokens || 0),
-    outputTokens = Number(data.usage?.output_tokens || 0);
-  const usage = {
-    input,
-    output: outputTokens,
-    estimatedUsd: (input * 0.75 + outputTokens * 4.5) / 1e6,
-  };
-  if (data.status !== "completed")
-    throw Object.assign(
-      new Error(
-        "We could not finish understanding that answer. Please retry or edit your profile.",
-      ),
-      {
-        providerReason: data.incomplete_details?.reason || data.status,
-        usage,
-      },
-    );
-  const output = data.output
-    ?.flatMap((o: { content?: { text?: string }[] }) => o.content || [])
-    .map((c: { text?: string }) => c.text || "")
-    .join("");
-  const parsed = JSON.parse(output || "{}");
-  observe?.(parsed);
-  const result = validateInterpretation(parsed, message, state);
-  result.usage = usage;
+  const input = Number(data.usage?.input_tokens || 0), output = Number(data.usage?.output_tokens || 0);
+  const usage = { input, output, estimatedUsd: (input * 0.75 + output * 4.5) / 1e6 };
+  if (data.status !== "completed") throw Object.assign(new Error("We could not finish understanding that answer. Please retry or edit your profile."), { providerReason: data.incomplete_details?.reason || data.status, usage });
+  const text = data.output?.flatMap((o: { content?: { text?: string }[] }) => o.content || []).map((c: { text?: string }) => c.text || "").join("");
+  return { parsed: JSON.parse(text || "{}"), usage };
+}
+export async function interpretWithModel(message: string, state: Conversation, observe?: (parsed: unknown) => void): Promise<Extraction> {
+  const understood = await callModel(modelRequest(message, state));
+  observe?.(understood.parsed);
+  const result = validateInterpretation(understood.parsed, message, state);
+  result.usage = understood.usage;
+  const updated = advance(state, reconcileExtraction(message, state, result));
+  const afterConfirmation = !updated.charity.confirmed && updated.charity.proposed ? confirmCharity(updated, {
+    name: updated.charity.proposed, registrationNumber: "", officialUrl: "",
+    locality: "", jurisdiction: "", entityType: "", latestIncome: null,
+    financialYearEnd: "", accountingBasis: "", accountingBasisConfidence: "",
+    website: "", summary: "", reportUrl: "", reportTitle: "", reportPeriod: "",
+    publicReadiness: { impactReport: { found: false, title: "", url: "" } }, sources: [],
+  }) : null;
+  try {
+    const spoken = await callModel(dialogueRequest(ONBOARDING_MODEL, updated, afterConfirmation));
+    result.usage = {
+      input: understood.usage.input + spoken.usage.input,
+      output: understood.usage.output + spoken.usage.output,
+      estimatedUsd: understood.usage.estimatedUsd + spoken.usage.estimatedUsd,
+    };
+    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation);
+    result.questionProposal = reply.next;
+    result.afterCharity = reply.afterCharity;
+  } catch (error) {
+    // Retain successfully understood facts if wording fails. Never silently label fallback as AI success.
+    const usage = (error as { usage?: Extraction["usage"] }).usage;
+    if (usage) {
+      result.usage.input += usage.input;
+      result.usage.output += usage.output;
+      result.usage.estimatedUsd += usage.estimatedUsd;
+    }
+    result.notice = "Your details have been updated, but the conversational reply could not finish. You can retry or continue with your profile.";
+  }
   return result;
 }

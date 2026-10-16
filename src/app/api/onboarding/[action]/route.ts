@@ -293,6 +293,7 @@ export async function POST(
           body.skip === true,
         );
         next = processed.state;
+        notice = processed.extraction.notice || "";
       } catch (e) {
         next = fallbackTurn(before, body.message);
         notice =
