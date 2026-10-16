@@ -6,7 +6,7 @@ remains commit `31900e69a10c0a5f333df3ba2424ea456cceda13` (Build 20). Work is on
 
 ## What it tests
 
-One GPT-6.1 Sol Responses call, medium reasoning, returns the whole conversational
+One GPT-6.1 Sol Responses call, high reasoning, returns the whole conversational
 reply and proposed facts with supporting quotes. It receives the conversation,
 current profile, manual edits, missing registration requirements and two objectives.
 There is no question-stage planner, transition library or scripted follow-up engine.
@@ -41,7 +41,7 @@ account services. Mock charity numbers are deliberately synthetic.
   hostname, database and restricted role.
 - An atomic counter reserves cost before model calls and refuses admission above
   US$2 across cold starts and deployments. Ordinary experimental calls reserve
-  $0.08, with 24KB maximum provider request and 1,800 maximum output tokens.
+  $0.08, with 24KB maximum provider request and 2,400 maximum output tokens.
   Successful calls settle to metered token estimates; interrupted/unknown calls
   retain their entire reservation. The controlled existing-engine comparison reserves
   $0.15 per submitted answer. No provider retries are automatic.
@@ -76,8 +76,10 @@ The existing engine was generally more concise. The alternative repeated mock
 registration instructions, offered menus and prematurely questioned accepted synthetic
 emails. The current preview clarifies that accepted test emails and software validation
 are authoritative, and leaves procedural instructions to the visible controls. That
-small clarification was made after the paired comparison; the old transcripts are
-retained and are not presented as results from the updated prompt.
+The final preview further shortens the brief to its two objectives and data boundaries,
+and uses high reasoning. These changes were made after the paired medium-reasoning
+comparison; its transcripts and cost advantage are not presented as measurements of
+the updated prompt. The final mobile browser journey is checked separately.
 
 This is not a blind or statistically significant naturalness test. The same authored
 answer order sometimes conflicts with the alternative's chosen question: notably
