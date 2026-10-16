@@ -220,7 +220,8 @@ test("repairs do not consume the optional information budget; total exchanges re
   );
   assert.equal(nextObjective(s), "charity");
   assert.match(nextQuestion(s), /You’re right/);
-  assert.equal(nextObjective({ ...s, turns: 10 }), "complete");
+  // The optional conversation cap cannot bypass mandatory charity confirmation.
+  assert.equal(nextObjective({ ...s, turns: 10 }), "charity");
 });
 test("portfolio clause never masks later named clients in the same answer", () => {
   const s = answer(
