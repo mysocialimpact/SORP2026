@@ -1,1 +1,1 @@
-{"name":"sorp-simple-onboarding-experiment","private":true,"type":"module","scripts":{"build":"node probe.mjs && next build"},"dependencies":{"next":"16.4.0","react":"19.3.0","react-dom":"19.3.0"}}
+{"name":"sorp-simple-onboarding-experiment","private":true,"type":"module","scripts":{"build":"next build"},"dependencies":{"next":"16.4.0","react":"19.3.0","react-dom":"19.3.0","pg":"^8.23.1","@fontsource/dm-sans":"^5.2.0","@fontsource/instrument-serif":"^5.2.0"},"devDependencies":{"@playwright/test":"^1.58.0"}}

@@ -1,0 +1,11 @@
+import {spawnSync} from 'node:child_process';
+if(process.env.VERCEL_ENV!=='preview')throw new Error('Preview only');
+const evalRun=spawnSync('node',['--experimental-strip-types','evaluate.mjs'],{stdio:'inherit',env:{...process.env,SIMPLE_RUN_EVAL:'true'}});
+if(evalRun.status)process.exit(evalRun.status);
+const build=spawnSync('npm',['run','build'],{stdio:'inherit'});
+if(build.status)process.exit(build.status);
+console.log('SIMPLE_BUILD_COMPLETE');
+const installed=spawnSync('npm',['ci','--prefix','../../tests/live-runtime'],{stdio:'inherit'});
+if(installed.status)process.exit(installed.status);
+const browser=spawnSync('node',['browser.mjs'],{stdio:'inherit'});
+process.exitCode=browser.status||0;

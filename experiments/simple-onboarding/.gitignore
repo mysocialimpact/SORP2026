@@ -1,2 +1,4 @@
 public/
 .vercel/
+.next/
+node_modules/
