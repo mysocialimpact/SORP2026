@@ -48,6 +48,7 @@ export type QuestionProposal = {
 export type DialogueMemory = {
   recent: { role: "user" | "assistant"; text: string }[];
   followUps: number;
+  finalFollowUpUsed: boolean;
   reflecting: boolean;
 };
 export type Conversation = {
@@ -108,7 +109,7 @@ export const emptyFacts = (): Facts => ({
 });
 export const initialConversation = (): Conversation => ({
   facts: emptyFacts(),
-  dialogue: { recent: [], followUps: 0, reflecting: false },
+  dialogue: { recent: [], followUps: 0, finalFollowUpUsed: false, reflecting: false },
   turns: 0,
   repairTurns: 0,
   asked: [],
@@ -893,6 +894,16 @@ export function applyExtraction(
               : null,
   };
 }
+/** A professional detour must not consume the only chance to understand a final
+ * answer. Both opportunities still fit inside the same six-answer optional cap. */
+export function canFollowUp(before: Conversation, after: Conversation, topic: Extraction["topicResponse"], skip = false): boolean {
+  const objective = nextObjective(before);
+  return !!(topic && topic.status !== "declined" && !skip && !after.finishRequested &&
+    ["responsibilities", "discovery", "concerns"].includes(objective) &&
+    ["discovery", "concerns", "complete"].includes(nextObjective(after)) &&
+    after.turns < OPTIONAL_TURN_CAP && before.dialogue.followUps < 2 &&
+    (objective === "concerns" ? !before.dialogue.finalFollowUpUsed : before.dialogue.followUps === 0));
+}
 export function advance(
   s: Conversation,
   patch: Extraction,
@@ -923,14 +934,13 @@ export function advance(
     next.skipped = [...new Set([...next.skipped, topic.topic as Objective])];
     if (next.clarification === "question" || next.clarification === "meaning") next.clarification = null;
   }
-  const reflecting = !!(topic?.followUp &&
-    topic.status !== "declined" && ["responsibilities", "discovery", "concerns"].includes(objective) &&
-    s.dialogue.followUps < 1 && !next.finishRequested && next.turns < OPTIONAL_TURN_CAP);
+  const reflecting = !!(topic?.followUp && canFollowUp(s, next, topic, skip));
   next.dialogue = {
     recent: patch.utterance ? [...s.dialogue.recent,
       { role: "assistant" as const, text: nextQuestion(s).slice(0, 1600) },
       { role: "user" as const, text: patch.utterance.slice(0, 1600) }].slice(-8) : s.dialogue.recent,
     followUps: s.dialogue.followUps + (reflecting ? 1 : 0),
+    finalFollowUpUsed: s.dialogue.finalFollowUpUsed || (reflecting && objective === "concerns"),
     reflecting,
   };
   return attachQuestion(

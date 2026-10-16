@@ -24,6 +24,18 @@ test('reluctance and turn budgets take priority over optional curiosity',()=>{
    assert.equal(nextObjective(s),'complete');assert.equal(s.dialogue.reflecting,false);
  }
 });
+test('a professional detour leaves one bounded opportunity to understand the final answer',()=>{
+ const before={...ready(),turns:4,dialogue:{...ready().dialogue,followUps:1}};
+ const s=advance(before,{utterance:'Something unexpected.',topicResponse:participation('answered',true)});
+ assert.equal(nextObjective(s),'reflection');assert.equal(s.dialogue.followUps,2);assert.equal(s.dialogue.finalFollowUpUsed,true);
+ const end=advance(s,{utterance:'A literal explanation.',topicResponse:participation('answered',true)});
+ assert.equal(nextObjective(end),'complete');assert.equal(end.turns,6);assert.equal(end.dialogue.followUps,2);
+});
+test('the last optional turn cannot open another follow-up and resume preserves the limit',()=>{
+ const source=normaliseConversation({...ready(),turns:5,dialogue:{...ready().dialogue,followUps:1}});
+ const s=advance(source,{utterance:'An interesting answer.',topicResponse:participation('answered',true)});
+ assert.equal(nextObjective(s),'complete');assert.equal(s.dialogue.reflecting,false);
+});
 test('natural prose is permitted for concerns and completion, with exact special question and validated objectives',()=>{
  const s=ready();
  assert.ok(suitableDialogue(s,{objective:'concerns',fields:['concerns'],question:'A recommendation from someone you trust. Before we finish, a wider question: What keeps you up at night?',natural:true}));

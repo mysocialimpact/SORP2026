@@ -8,6 +8,7 @@ import {
   advance,
   reconcileExtraction,
   confirmCharity,
+  canFollowUp,
   type Conversation,
   type Extraction,
   type ProfessionalRelationship,
@@ -444,13 +445,11 @@ export async function interpretWithModel(message: string, state: Conversation, o
   observe?.(understood.parsed);
   const result = validateInterpretation(understood.parsed, message, state);
   // The dialogue model judges whether curiosity is warranted. Extraction only
-  // classifies participation; the controller grants at most one optional turn.
+  // classifies participation; the controller bounds professional/final follow-ups.
   if (result.topicResponse) result.topicResponse.followUp = false;
   result.usage = understood.usage;
   const updated = advance(state, reconcileExtraction(message, state, result), skip);
-  const reflection = ["responsibilities", "discovery", "concerns"].includes(questionPlan(state).objective) && result.topicResponse &&
-    result.topicResponse.status !== "declined" && !updated.finishRequested && !skip &&
-    state.dialogue.followUps === 0 && updated.turns < 5 && ["discovery", "concerns", "complete"].includes(questionPlan(updated).objective)
+  const reflection = canFollowUp(state, updated, result.topicResponse, skip)
     ? { ...updated, dialogue: { ...updated.dialogue, reflecting: true } } : null;
   const afterConfirmation = !updated.charity.confirmed && (updated.charity.proposed || questionPlan(updated).objective === "charity") ? confirmCharity(updated, {
     name: updated.charity.proposed || "{charityName}", registrationNumber: "", officialUrl: "",

@@ -1,0 +1,334 @@
+{
+  "records": [
+    {
+      "id": "R1",
+      "transcript": [
+        {
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "index": 2,
+          "role": "assistant",
+          "text": "Would you like to start with Interim Spaces?"
+        },
+        {
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you look after as a trustee?"
+        },
+        {
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "index": 6,
+          "role": "assistant",
+          "text": "How did you hear about the platform?"
+        },
+        {
+          "index": 7,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "index": 8,
+          "role": "assistant",
+          "text": "Before we finish, one last optional question, turning to any concerns you might have.\n\nWhat keeps you up at night?"
+        },
+        {
+          "index": 9,
+          "role": "user",
+          "text": "Frogs."
+        },
+        {
+          "index": 10,
+          "role": "assistant",
+          "text": "No promises on the frogs, but there’s help here with SORP. Create your account when you’re ready to explore Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "transcript": [
+        {
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "index": 1,
+          "role": "user",
+          "text": "I'm Helen Price, CEO of the charity Interim Spaces. My email is helen.price@example.invalid."
+        },
+        {
+          "index": 2,
+          "role": "assistant",
+          "text": "Shall we start with Interim Spaces?"
+        },
+        {
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What does your work as CEO involve day to day?"
+        },
+        {
+          "index": 5,
+          "role": "user",
+          "text": "Keeping our services going while we try to grow our team."
+        },
+        {
+          "index": 6,
+          "role": "assistant",
+          "text": "Where would a bigger team make the most difference to the work you’re doing?"
+        },
+        {
+          "index": 7,
+          "role": "user",
+          "text": "Recruitment has to wait until we know whether the next grant is coming through."
+        },
+        {
+          "index": 8,
+          "role": "assistant",
+          "text": "That makes it difficult to plan the team’s growth. How did you hear about the platform?"
+        },
+        {
+          "index": 9,
+          "role": "user",
+          "text": "A fellow chief executive sent me the link."
+        },
+        {
+          "index": 10,
+          "role": "assistant",
+          "text": "You’re ready to create your account and explore the SORP guidance and readiness support for Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "transcript": [
+        {
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "index": 1,
+          "role": "user",
+          "text": "I'm Ben Shaw, an independent professional adviser to Interim Spaces. My email is ben.shaw@example.invalid."
+        },
+        {
+          "index": 2,
+          "role": "assistant",
+          "text": "Would you like to start with Interim Spaces as the charity we focus on?"
+        },
+        {
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll focus on Interim Spaces. What does your advisory work with them involve?"
+        },
+        {
+          "index": 5,
+          "role": "user",
+          "text": "I help boards make decisions about strategy."
+        },
+        {
+          "index": 6,
+          "role": "assistant",
+          "text": "How did you come across the platform?"
+        },
+        {
+          "index": 7,
+          "role": "user",
+          "text": "Someone mentioned you at a conference."
+        },
+        {
+          "index": 8,
+          "role": "assistant",
+          "text": "Before we finish, a broader question about what’s on your mind. What keeps you up at night?"
+        },
+        {
+          "index": 9,
+          "role": "user",
+          "text": "My children."
+        },
+        {
+          "index": 10,
+          "role": "assistant",
+          "text": "Fair enough. When you’re ready, create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "transcript": [
+        {
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "index": 1,
+          "role": "user",
+          "text": "My name is Marcus Worrey, and I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was. My email is marcus.worrey@gmail.com."
+        },
+        {
+          "index": 2,
+          "role": "assistant",
+          "text": "What’s your role these days, and which organisation do you work with, if any?"
+        },
+        {
+          "index": 3,
+          "role": "action",
+          "text": "Edited profile: {\"name\":\"Marcus Warry\"}"
+        },
+        {
+          "index": 4,
+          "role": "action",
+          "text": "Reloaded and resumed the same introduction."
+        },
+        {
+          "index": 5,
+          "role": "user",
+          "text": "I'm now an independent consultant, advising charity boards."
+        },
+        {
+          "index": 6,
+          "role": "assistant",
+          "text": "Would you like to start with Blue Cross, the charity you worked with previously?"
+        },
+        {
+          "index": 7,
+          "role": "action",
+          "text": "Searched Blue Cross, inspected the displayed official-record fixture, and explicitly confirmed Blue Cross."
+        },
+        {
+          "index": 8,
+          "role": "assistant",
+          "text": "We’ll start with Blue Cross. How did you come across the platform?"
+        },
+        {
+          "index": 9,
+          "role": "user",
+          "text": "LinkedIn."
+        },
+        {
+          "index": 10,
+          "role": "assistant",
+          "text": "Turning to your work with charity boards, a broader question. What keeps you up at night?"
+        },
+        {
+          "index": 11,
+          "role": "user",
+          "text": "Helping boards make sense of their impact."
+        },
+        {
+          "index": 12,
+          "role": "assistant",
+          "text": "Where do you see the biggest gap between the impact information boards receive and what they need to make decisions?"
+        },
+        {
+          "index": 13,
+          "role": "user",
+          "text": "They collect activity numbers, but struggle to decide which outcomes really matter."
+        },
+        {
+          "index": 14,
+          "role": "assistant",
+          "text": "Activity figures can leave boards with plenty of information but little basis for decisions. You can now create your account and explore Blue Cross on the platform."
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "transcript": [
+        {
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "index": 1,
+          "role": "user",
+          "text": "I'm Leah Stone, a trustee at Interim Spaces. My email is leah.stone@example.invalid."
+        },
+        {
+          "index": 2,
+          "role": "assistant",
+          "text": "Shall we start with Interim Spaces?"
+        },
+        {
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you look after as a trustee?"
+        },
+        {
+          "index": 5,
+          "role": "user",
+          "text": "I look after the accounts, although I used to run fundraising at Blue Cross."
+        },
+        {
+          "index": 6,
+          "role": "assistant",
+          "text": "That’s quite a different remit from fundraising. How are you finding the accounts side of the trustee role?"
+        },
+        {
+          "index": 7,
+          "role": "user",
+          "text": "I spend much of my time helping the board understand the figures and agree what to do next."
+        },
+        {
+          "index": 8,
+          "role": "assistant",
+          "text": "So it’s as much about helping the board make decisions as looking after the accounts. How did you come across the platform?"
+        },
+        {
+          "index": 9,
+          "role": "user",
+          "text": "A former colleague."
+        },
+        {
+          "index": 10,
+          "role": "assistant",
+          "text": "Before we finish, let’s turn to any worries you have in your trustee role. This last question is optional.\n\nWhat keeps you up at night?"
+        },
+        {
+          "index": 11,
+          "role": "user",
+          "text": "Frogs. We run a wetland project and disease is wiping out the local population."
+        },
+        {
+          "index": 12,
+          "role": "assistant",
+          "text": "That’s a serious threat to the wetland project. When you’re ready, you can create your account and explore the SORP guidance for Interim Spaces."
+        }
+      ]
+    }
+  ]
+}
