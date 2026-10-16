@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
+import { invitationTokenFromDestination } from "@/lib/account-navigation";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { VoiceInput, type VoiceState } from "./voice-input";
@@ -437,6 +438,7 @@ export function Onboarding() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           action: "signup",
+          invitationToken: invitationTokenFromDestination(destination),
           name: currentState.current.facts.name.trim(),
           email: currentState.current.facts.email.trim().toLowerCase(),
           position: currentState.current.facts.role.trim(),

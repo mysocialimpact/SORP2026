@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { currentAccountDestination, registrationHref, signInHref } from '../../src/lib/account-navigation.ts';
+import { currentAccountDestination, registrationHref, signInHref, invitationTokenFromDestination } from '../../src/lib/account-navigation.ts';
 import { safeDestination } from '../../src/lib/onboarding/state.ts';
 import { formatBuildTimestamp } from '../../src/lib/build-information.ts';
 import { allocateBuild } from '../../scripts/prepare-build.mjs';
@@ -32,4 +32,12 @@ test('deployment ledger result is immutable and cannot reset to the old build se
  const client = { query: async (sql, args) => { assert.deepEqual(args, ['dpl_synthetic', 'preview']); assert.match(sql, /allocate\(\$1,\$2\)/); return { rows: [{ number: 21, deployed_at: '2026-10-16T17:45:00Z' }] }; } };
  assert.deepEqual(await allocateBuild(client, 'dpl_synthetic', 'preview'), { number: 21, deployedAt: '2026-10-16T17:45:00.000Z', environment: 'preview' });
  await assert.rejects(() => allocateBuild({ query: async () => ({ rows: [{ number: 20 }] }) }, 'dpl_synthetic', 'preview'));
+});
+
+test('invitation-aware signup retains only a validated invitation token', () => {
+ const token = 'a'.repeat(64);
+ assert.equal(invitationTokenFromDestination(`/invitation/${token}/?source=test#accept`), token);
+ assert.equal(invitationTokenFromDestination(`/invitation/${token}/extra`), undefined);
+ assert.equal(invitationTokenFromDestination(`//evil.invalid/invitation/${token}/`), undefined);
+ assert.equal(invitationTokenFromDestination('/invitation/not-a-token/'), undefined);
 });

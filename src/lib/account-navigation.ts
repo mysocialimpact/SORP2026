@@ -11,3 +11,8 @@ export function currentAccountDestination(fallback?: string) {
 }
 export const registrationHref = (destination: string) => `/get-started/?next=${encodeURIComponent(safeDestination(destination))}`;
 export const signInHref = (destination: string) => `/login/?return=${encodeURIComponent(safeDestination(destination, true))}`;
+
+/** Preserve the legacy invitation-aware signup contract through the gateway. */
+export function invitationTokenFromDestination(destination: string) {
+  return new URL(safeDestination(destination), "https://sorp2026.org").pathname.match(/^\/invitation\/([a-f0-9]{64})\/?$/)?.[1];
+}

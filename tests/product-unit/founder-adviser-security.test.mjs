@@ -8,6 +8,7 @@ const invitation = await readFile(new URL("../../src/components/platform/invitat
 const dashboardAccess = await readFile(new URL("../../src/components/console/founder-link.tsx", import.meta.url), "utf8");
 const accountSettings = await readFile(new URL("../../src/components/account-settings.tsx", import.meta.url), "utf8");
 const platformAuth = await readFile(new URL("../../src/lib/platform/auth.ts", import.meta.url), "utf8");
+const onboarding = await readFile(new URL("../../src/features/onboarding/onboarding.tsx", import.meta.url), "utf8");
 const accountPortal = await readFile(new URL("../../src/components/account-portal.tsx", import.meta.url), "utf8");
 const founderRoute = await readFile(new URL("../../src/app/api/founder/[...path]/route.ts", import.meta.url), "utf8");
 const consoleAuth = await readFile(new URL("../../src/lib/console/auth.ts", import.meta.url), "utf8");
@@ -53,6 +54,7 @@ test("invitation signup preserves context and acceptance still requires authenti
   assert.match(accountPortal, /params\.get\("next"\)/);
   assert.match(invitation, /get-started\/\?next=/);
   assert.doesNotMatch(accountPortal, /action: "signup"/);
+  assert.match(onboarding, /invitationToken: invitationTokenFromDestination\(destination\)/);
   assert.match(invitation, /different account/);
 });
 
