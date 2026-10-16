@@ -29,10 +29,10 @@ export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Link className="gateway-account-control" href={signedIn ? "/dashboard/" : `/get-started/?next=${encodeURIComponent(next)}`} onClick={event => {
       onNavigate?.();
-      if (!signedIn) {
+      if (!signedIn && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
         event.preventDefault();
         const current = new URLSearchParams(window.location.search);
-        const target = new URLSearchParams({ next: path === "/" ? "/dashboard/" : `${path}${window.location.search}${window.location.hash}` });
+        const target = new URLSearchParams({ next: path === "/get-started" || path === "/get-started/" ? current.get("next") || current.get("return") || "/dashboard/" : path === "/" ? "/dashboard/" : `${path}${window.location.search}${window.location.hash}` });
         for (const key of ["utm_source", "utm_medium", "utm_campaign"]) if (current.has(key)) target.set(key, current.get(key)!.slice(0,200));
         router.push(`/get-started/?${target}`);
       }

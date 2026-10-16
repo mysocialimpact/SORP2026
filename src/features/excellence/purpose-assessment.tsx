@@ -1,4 +1,5 @@
 "use client";
+import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -33,7 +34,7 @@ export function PurposeAssessment() {
   const [error, setError] = useState("");
   useEffect(() => {
     void fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "load-product", productId: "social-impact-excellence" }), cache: "no-store" })
-      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace("/login/?return=/social-impact-excellence/purpose/assessment/"); return; } if (!response.ok) throw new Error(payload.error || "Your Purpose assessment could not be loaded."); if (!payload.productProgress?.data?.result) { router.replace("/social-impact-excellence/assessment/"); return; } const next = normalisePurposeWorkspace(payload.productProgress.data.purpose, payload.account); setProductData(payload.productProgress.data); setWorkspace(next); setScreen(resumeScreen(next)); })
+      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/purpose/assessment/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Purpose assessment could not be loaded."); if (!payload.productProgress?.data?.result) { router.replace("/social-impact-excellence/assessment/"); return; } const next = normalisePurposeWorkspace(payload.productProgress.data.purpose, payload.account); setProductData(payload.productProgress.data); setWorkspace(next); setScreen(resumeScreen(next)); })
       .catch(caught => setError(caught instanceof Error ? caught.message : "Your Purpose assessment could not be loaded."));
   }, [router]);
 

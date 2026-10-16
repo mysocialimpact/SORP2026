@@ -8,3 +8,8 @@ playwright-report/
 test-results/
 .vercel/
 next-env.d.ts
+
+.sorp-build.json
+public/build-info.json
+public/preview-qa/
+public/preview-qa-remote/

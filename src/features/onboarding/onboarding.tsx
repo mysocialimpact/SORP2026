@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Arrow } from "@/components/ui";
+import { invitationTokenFromDestination } from "@/lib/account-navigation";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { VoiceInput, type VoiceState } from "./voice-input";
@@ -96,11 +97,12 @@ export function Onboarding() {
   const objective = nextObjective(state),
     ready = registrationReady(state.facts),
     completed = objective === "complete";
+  const accountReady = ready && validEntity(state.facts.organisation, "organisation") && !!selected;
   const fieldComplete = (key: FieldKey) =>
     key === "email"
       ? validEmail(state.facts.email)
       : validEntity(state.facts[key], key);
-  const count = fieldKeys.filter(fieldComplete).length;
+  const count = fieldKeys.filter(fieldComplete).length + (selected ? 1 : 0);
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
     : destination.startsWith("/are-you-sorp-ready")
@@ -418,6 +420,10 @@ export function Onboarding() {
   async function createAccount(event: FormEvent) {
     event.preventDefault();
     if (lock.current) return;
+    if (!registrationReady(currentState.current.facts) || !validEntity(currentState.current.facts.organisation, "organisation") || !currentState.current.charity.confirmed) {
+      setAccountError("Complete your profile and confirm your starting charity before creating your account.");
+      return;
+    }
     if (password !== confirmPassword) {
       setAccountError("Those passwords do not match.");
       return;
@@ -432,6 +438,7 @@ export function Onboarding() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           action: "signup",
+          invitationToken: invitationTokenFromDestination(destination),
           name: currentState.current.facts.name.trim(),
           email: currentState.current.facts.email.trim().toLowerCase(),
           position: currentState.current.facts.role.trim(),
@@ -488,165 +495,8 @@ export function Onboarding() {
   const question = busy
     ? "I’m updating your introduction…"
     : nextQuestion(state);
-  return (
-    <main id="main" className="onboarding-page">
-      <header className="onboarding-header">
-        <Link
-          href="/"
-          className="onboarding-wordmark"
-          aria-label="SORP 2026 home"
-        >
-          SORP<span>2026</span>
-          <i />
-        </Link>
-        <span className="onboarding-header-note">
-          ONE ACCOUNT. GREATER IMPACT.
-        </span>
-        <Link href={`/login/?next=${encodeURIComponent(destination)}`}>
-          Sign in <Arrow diagonal />
-        </Link>
-      </header>
-      <div className="onboarding-shell">
-        <div className="onboarding-heading">
-          <p className="onboarding-eyebrow">
-            <span /> A MORE PERSONAL BEGINNING
-          </p>
-          <h1>
-            Let’s get you <em>started.</em>
-          </h1>
-          <p>
-            To make signing up easier, you can have a conversation with us
-            instead.
-            <br className="desktop-break" /> Just talk or type, and we’ll fill
-            in the form as we go.
-          </p>
-        </div>
-        <div className={`onboarding-workspace mode-${mode}`}>
-          <section
-            className="onboarding-conversation"
-            aria-label="Your introduction"
-          >
-            <div className="conversation-topline">
-              <span>
-                <i /> YOUR CONVERSATION
-              </span>
-              <span>At your pace</span>
-            </div>
-            {mode === "intro" ? (
-              <div className="onboarding-invitation">
-                <div className="conversation-symbol" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <p className="onboarding-eyebrow">
-                  TALK NATURALLY. WATCH IT TAKE SHAPE.
-                </p>
-                <h2>
-                  A few words.
-                  <br />A head start.
-                </h2>
-                <p>
-                  Tell us a little about you and a charity you care about. We’ll
-                  turn it into a useful starting point for your work.
-                </p>
-                <button
-                  className="onboarding-primary"
-                  onClick={() => void start("conversation")}
-                >
-                  Start a conversation <Arrow diagonal />
-                </button>
-                <button
-                  className="onboarding-text-button"
-                  onClick={() => void start("form")}
-                >
-                  Fill in the form yourself <span aria-hidden="true">→</span>
-                </button>
-                <small>About two minutes · No card needed</small>
-              </div>
-            ) : mode === "form" ? (
-              <div className="onboarding-invitation manual-intro">
-                <p className="onboarding-eyebrow">MAKE YOURSELF AT HOME</p>
-                <h2>
-                  Your details.
-                  <br />
-                  <em>Your way.</em>
-                </h2>
-                <p>
-                  Complete your profile, then create your account. You can
-                  choose a charity and personalise your experience later.
-                </p>
-                <button
-                  className="onboarding-text-button"
-                  onClick={() => setMode("conversation")}
-                >
-                  Switch to a conversation →
-                </button>
-              </div>
-            ) : (
-              <div className="conversation-body">
-                {history.length > 0 && (
-                  <details className="conversation-history">
-                    <summary>
-                      Our conversation so far{" "}
-                      <span>
-                        {history.filter((h) => h.role === "user").length}{" "}
-                        replies
-                      </span>
-                    </summary>
-                    <div>
-                      {history.map((h, i) => (
-                        <p key={i} className={`history-${h.role}`}>
-                          <small>
-                            {h.role === "user" ? "YOU" : "SORP 2026"}
-                          </small>
-                          {h.text}
-                        </p>
-                      ))}
-                    </div>
-                  </details>
-                )}
-                <div
-                  ref={questionRef}
-                  className="conversation-question"
-                  aria-live="polite"
-                >
-                  <span
-                    className={`assistant-mark${busy ? " is-thinking" : ""}`}
-                    aria-hidden="true"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="19"
-                      height="19"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" />
-                    </svg>
-                  </span>
-                  <div>
-                    <p className="onboarding-eyebrow">
-                      {completed
-                        ? "READY WHEN YOU ARE"
-                        : "LET’S MAKE THIS YOURS"}
-                    </p>
-                    <h2>{question}</h2>
-                  </div>
-                </div>
-                {selected && (
-                  <div className="confirmed-charity">
-                    <span aria-hidden="true">✓</span>
-                    <div>
-                      <strong>{selected.name}</strong>
-                      <p>
-                        Confirmed. Public information preparation has been
-                        queued.
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {objective === "charity" && !selected && (
+  const charityLookup = (<>
+                {!selected && (
                   <div className="charity-discovery">
                     <p>
                       We’ll start with one charity to personalise your
@@ -742,6 +592,167 @@ export function Onboarding() {
                     ))}
                   </div>
                 )}
+  </>);
+  return (
+    <main id="main" className="onboarding-page">
+      <header className="onboarding-header">
+        <Link
+          href="/"
+          className="onboarding-wordmark"
+          aria-label="SORP 2026 home"
+        >
+          SORP<span>2026</span>
+          <i />
+        </Link>
+        <span className="onboarding-header-note">
+          ONE ACCOUNT. GREATER IMPACT.
+        </span>
+        <Link href={`/login/?next=${encodeURIComponent(destination)}`}>
+          Sign in <Arrow diagonal />
+        </Link>
+      </header>
+      <div className="onboarding-shell">
+        <div className="onboarding-heading">
+          <p className="onboarding-eyebrow">
+            <span /> A MORE PERSONAL BEGINNING
+          </p>
+          <h1>
+            Let’s get you <em>started.</em>
+          </h1>
+          <p>
+            To make signing up easier, you can have a conversation with us
+            instead.
+            <br className="desktop-break" /> Just talk or type, and we’ll fill
+            in the form as we go.
+          </p>
+        </div>
+        <div className={`onboarding-workspace mode-${mode}`}>
+          <section
+            className="onboarding-conversation"
+            aria-label="Your introduction"
+          >
+            <div className="conversation-topline">
+              <span>
+                <i /> YOUR CONVERSATION
+              </span>
+              <span>At your pace</span>
+            </div>
+            {mode === "intro" ? (
+              <div className="onboarding-invitation">
+                <div className="conversation-symbol" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <p className="onboarding-eyebrow">
+                  TALK NATURALLY. WATCH IT TAKE SHAPE.
+                </p>
+                <h2>
+                  A few words.
+                  <br />A head start.
+                </h2>
+                <p>
+                  Tell us a little about you and a charity you care about. We’ll
+                  turn it into a useful starting point for your work.
+                </p>
+                <button
+                  className="onboarding-primary"
+                  onClick={() => void start("conversation")}
+                >
+                  Start a conversation <Arrow diagonal />
+                </button>
+                <button
+                  className="onboarding-text-button"
+                  onClick={() => void start("form")}
+                >
+                  Fill in the form yourself <span aria-hidden="true">→</span>
+                </button>
+                <small>About two minutes · No card needed</small>
+              </div>
+            ) : mode === "form" ? (
+              <div className="onboarding-invitation manual-intro">
+                <p className="onboarding-eyebrow">MAKE YOURSELF AT HOME</p>
+                <h2>
+                  Your details.
+                  <br />
+                  <em>Your way.</em>
+                </h2>
+                <p>
+                  Complete your profile and confirm one charity to personalise your experience.
+                </p>
+                <button
+                  className="onboarding-text-button"
+                  onClick={() => setMode("conversation")}
+                >
+                  Switch to a conversation →
+                </button>
+                {charityLookup}
+                {notice && <p className="onboarding-notice" role="status">{notice}</p>}
+                {selected && <p className="confirmed-charity">✓ {selected.name} confirmed</p>}
+              </div>
+            ) : (
+              <div className="conversation-body">
+                {history.length > 0 && (
+                  <details className="conversation-history">
+                    <summary>
+                      Our conversation so far{" "}
+                      <span>
+                        {history.filter((h) => h.role === "user").length}{" "}
+                        replies
+                      </span>
+                    </summary>
+                    <div>
+                      {history.map((h, i) => (
+                        <p key={i} className={`history-${h.role}`}>
+                          <small>
+                            {h.role === "user" ? "YOU" : "SORP 2026"}
+                          </small>
+                          {h.text}
+                        </p>
+                      ))}
+                    </div>
+                  </details>
+                )}
+                <div
+                  ref={questionRef}
+                  className="conversation-question"
+                  aria-live="polite"
+                >
+                  <span
+                    className={`assistant-mark${busy ? " is-thinking" : ""}`}
+                    aria-hidden="true"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="19"
+                      height="19"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p className="onboarding-eyebrow">
+                      {completed
+                        ? "READY WHEN YOU ARE"
+                        : "LET’S MAKE THIS YOURS"}
+                    </p>
+                    <h2>{question}</h2>
+                  </div>
+                </div>
+                {selected && (
+                  <div className="confirmed-charity">
+                    <span aria-hidden="true">✓</span>
+                    <div>
+                      <strong>{selected.name}</strong>
+                      <p>
+                        {process.env.NEXT_PUBLIC_ISOLATED_PREVIEW === "true" ? "Synthetic confirmation. No research is started in this Preview." : "Confirmed. Public information preparation has been queued."}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {(objective === "charity" || (ready && !selected)) && charityLookup}
                 {(!completed || editingComplete) && (
                   <form
                     onSubmit={(e) => void send(e)}
@@ -802,7 +813,7 @@ export function Onboarding() {
                     {notice}
                   </p>
                 )}
-                {ready && !completed && (
+                {accountReady && !completed && (
                   <button
                     className="mobile-early-exit onboarding-text-button"
                     disabled={busy}
@@ -811,7 +822,7 @@ export function Onboarding() {
                     Continue with these details →
                   </button>
                 )}
-                {!completed && objective !== "registration" && (
+                {!completed && !["registration", "charity"].includes(objective) && (
                   <button
                     className="onboarding-skip"
                     disabled={busy}
@@ -834,11 +845,11 @@ export function Onboarding() {
                     <p>
                       {selected
                         ? `Your profile and ${selected.name} will give us a useful place to begin.`
-                        : "Your introduction is ready. You can add a charity later."}
+                        : "Confirm one starting charity before creating your account."}
                     </p>
                     <button
                       className="onboarding-primary"
-                      disabled={!ready}
+                      disabled={!accountReady}
                       onClick={() => setAccountOpen(true)}
                     >
                       Create my account <Arrow diagonal />
@@ -868,10 +879,10 @@ export function Onboarding() {
               </div>
               <span
                 className="profile-count"
-                aria-label={`${count} of 4 profile details filled`}
+                aria-label={`${count} of 5 registration requirements completed`}
               >
                 {count}
-                <small>/4</small>
+                <small>/5</small>
               </span>
             </div>
             <p className="onboarding-eyebrow">
@@ -881,7 +892,7 @@ export function Onboarding() {
                 : ""}
             </p>
             <div className="profile-progress" aria-hidden="true">
-              <span style={{ width: `${count * 25}%` }} />
+              <span style={{ width: `${count * 20}%` }} />
             </div>
             <p className="profile-hint">
               {mode === "form"
@@ -893,7 +904,7 @@ export function Onboarding() {
               id="onboarding-profile-form"
               onSubmit={(e) => {
                 e.preventDefault();
-                setAccountOpen(true);
+                if (accountReady) setAccountOpen(true);
               }}
             >
               <div className="profile-fields">
@@ -904,7 +915,7 @@ export function Onboarding() {
                   >
                     <span>
                       {labels[key]}
-                      {key === "organisation" && <small>optional</small>}
+                      {key === "organisation" && <small>or independent</small>}
                       {fieldComplete(key) && <i aria-hidden="true">✓</i>}
                     </span>
                     <input
@@ -940,6 +951,12 @@ export function Onboarding() {
                   </label>
                 ))}
               </div>
+              <label className="onboarding-independent"><input type="checkbox" checked={state.facts.organisation === "Independent"} onChange={event => {
+                const value = event.target.checked ? "Independent" : "";
+                dirty.current.organisation = value;
+                replace(applyFacts(currentState.current, { organisation: value }, "form"));
+                setEditVersion(v => v + 1);
+              }} /> I work independently</label>
               <div
                 className={`profile-reward${reward ? " is-rewarded" : ""}`}
                 role="status"
@@ -965,7 +982,7 @@ export function Onboarding() {
                       ? "onboarding-primary"
                       : "onboarding-secondary"
                   }
-                  disabled={!ready || busy}
+                  disabled={!accountReady || busy}
                 >
                   {completed || mode === "form"
                     ? "Create my account"
@@ -973,11 +990,11 @@ export function Onboarding() {
                   <span>→</span>
                 </button>
                 <p>
-                  {ready
+                  {accountReady
                     ? "You can keep talking, or start exploring."
                     : state.facts.email && !validEmail(state.facts.email)
                       ? "Check your email address to continue."
-                      : "Your name, email and role are all we need to begin."}
+                      : "Add your name, email, role and organisation (or independent status), then confirm one charity."}
                 </p>
               </div>
             </form>

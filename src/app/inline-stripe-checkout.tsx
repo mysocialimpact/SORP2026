@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { loadStripe, type StripeEmbeddedCheckout } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js/pure";
+import type { StripeEmbeddedCheckout } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe("pk_live_51TmpEHFnN1aHQF6IYpnh7DW0aYI7LTsdKZRpIGG6zJnSPyNPYiUzgfx1CuLM4hLtXHUMhjMlCXLhTUcl8nyIpOtF00BLC5lNlM");
+// Keep the existing live checkout unchanged; isolated routing previews never load the live payment SDK.
+const stripePromise = process.env.NEXT_PUBLIC_ISOLATED_PREVIEW === "true" ? Promise.resolve(null) : loadStripe("pk_live_51TmpEHFnN1aHQF6IYpnh7DW0aYI7LTsdKZRpIGG6zJnSPyNPYiUzgfx1CuLM4hLtXHUMhjMlCXLhTUcl8nyIpOtF00BLC5lNlM");
 
 export function InlineStripeCheckout({ clientSecret, onComplete }: { clientSecret: string; onComplete: () => void | Promise<void> }) {
   const mount = useRef<HTMLDivElement>(null);

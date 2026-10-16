@@ -1,6 +1,6 @@
 "use client";
+import { AccountGateway } from "@/components/account-gateway";
 
-import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Arrow } from "@/components/ui";
 import { loadSharedContext } from "@/features/onboarding/shared-context";
@@ -90,7 +90,7 @@ export function ReportReviewIntake() {
   }
   if (account.loading) return <div className="review-intake-state" role="status">Checking your SORP2026 account…</div>;
   if (account.error) return <div className="review-intake-state" role="alert">{account.error}</div>;
-  if (!account.signedIn) return <div className="review-intake-state"><p className="gateway-kicker">Your report. Your starting point.</p><h2>Let’s get you started.</h2><p>Create your shared SORP2026 account, then come straight back to your report review.</p><Link className="gateway-action" href="/get-started/?next=/charity-impact-reports/review/">Let’s Get Started <Arrow /></Link><Link className="gateway-quiet-link" href="/login/?return=/charity-impact-reports/review/">Already registered? Sign in</Link></div>;
+  if (!account.signedIn) return <div className="review-intake-state"><p className="gateway-kicker">Your report. Your starting point.</p><h2>Let’s get you started.</h2><p>Create your shared SORP2026 account, then come straight back to your report review.</p><AccountGateway returnTo="/charity-impact-reports/review/" /></div>;
   return <div className="review-intake-grid">
     <section className="review-upload" aria-labelledby="upload-title">
       <p className="gateway-kicker">Step 1 · Your report</p>

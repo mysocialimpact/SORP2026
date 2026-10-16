@@ -37,7 +37,7 @@ export default function CharityImpactReportsPage() {
           <h1>Go beyond SORP.<br/><span>Tell the full story of your impact.</span></h1>
           <p className="reports-hero-lead">SORP 2026 asks charities to explain the difference they make. Your impact report gives you room to go further, with powerful stories, compelling pictures, stronger evidence and the methodology behind your results.</p>
           <div className="reports-hero-actions">
-            <Link className="gateway-action" href="/are-you-sorp-ready/review/?entry=intro">Start with Are You SORP Ready? <Arrow /></Link>
+            <Link className="gateway-action" href="/get-started/?next=%2Fcharity-impact-reports%2Freview%2F">Get started with your report <Arrow /></Link>
             <Link className="reports-login-link" href="/login/?return=/charity-impact-reports/review/">Already registered? Log in</Link>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function CharityImpactReportsPage() {
 
     <section id="reports-review" className="reports-review gateway-width">
       <div><p className="gateway-kicker">Expert human support</p><h2>Make a good report stronger.</h2></div>
-      <div><p>My Social Impact can review your existing charity impact report and help you make it stronger.</p><p className="reports-review-gate">Complete your free SORP readiness review first. Once it is saved to your account, the report-review service unlocks as your next step.</p><Link className="gateway-action" href="/charity-impact-reports/review/">Open report review <Arrow /></Link></div>
+      <div><p>My Social Impact can review your existing charity impact report and help you make it stronger.</p><p className="reports-review-gate">Use your shared SORP2026 account to upload a report and explore the review service. Existing service eligibility and payment arrangements apply.</p><Link className="gateway-action" href="/charity-impact-reports/review/">Open report review <Arrow /></Link></div>
     </section>
 
     <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow /></Link></nav>

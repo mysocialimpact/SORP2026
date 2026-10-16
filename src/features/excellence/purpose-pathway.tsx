@@ -1,4 +1,5 @@
 "use client";
+import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,7 +15,7 @@ export function PurposePathway() {
   const [error, setError] = useState("");
   useEffect(() => {
     void fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "load-product", productId: "social-impact-excellence" }), cache: "no-store" })
-      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace("/login/?return=/social-impact-excellence/purpose/"); return; } if (!response.ok) throw new Error(payload.error || "Your Purpose pathway could not be loaded."); setHasBaseline(Boolean(payload.productProgress?.data?.result)); setWorkspace(normalisePurposeWorkspace(payload.productProgress?.data?.purpose, payload.account)); })
+      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/purpose/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Purpose pathway could not be loaded."); setHasBaseline(Boolean(payload.productProgress?.data?.result)); setWorkspace(normalisePurposeWorkspace(payload.productProgress?.data?.purpose, payload.account)); })
       .catch(caught => setError(caught instanceof Error ? caught.message : "Your Purpose pathway could not be loaded."));
   }, [router]);
   if (error) return <main className="sie-report"><section className="sie-state" role="alert"><h1>We couldn’t open Purpose.</h1><p>{error}</p><Link href="/social-impact-excellence/journey/">Return to your journey</Link></section></main>;

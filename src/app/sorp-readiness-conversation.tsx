@@ -2,6 +2,7 @@
 /* Growth tracking reads the current context at the guarded workflow milestones. */
 /* eslint-disable react-hooks/exhaustive-deps */
 
+import { AccountGateway } from "@/components/account-gateway";
 import { FormEvent, type DragEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SorpResultActions } from "./sorp-result-actions";
@@ -827,6 +828,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
 
   async function submitSave(event: FormEvent) {
     event.preventDefault();
+    if (!account) return; // Use the shared registration gateway.
     setSaveStatus("saving");
     setSaveError("");
     try {
@@ -1339,7 +1341,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
   const saveDialog = saveDialogOpen && <div className="sorp-save-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && saveStatus !== "saving") setSaveDialogOpen(false); }}><section className="sorp-save-dialog" role="dialog" aria-modal="true" aria-labelledby="sorp-save-title">
     <button type="button" className="sorp-save-close" onClick={() => setSaveDialogOpen(false)} disabled={saveStatus === "saving"} aria-label="Close finish another time form">×</button>
     <span>Finish another time</span><h2 id="sorp-save-title">{account ? "Save your assessment" : accountMode === "signup" ? "Create your account" : "Sign in to your account"}</h2><p>{account ? `You’re signed in as ${account.email}. Save now and your assessment will be available when you return.` : accountMode === "signup" ? "Create an account so your answers and conversation are saved securely and you can continue on this or another device." : "Sign in to reopen the assessment already saved to your account."}</p>
-    <form onSubmit={submitSave}>
+    {!account ? <AccountGateway returnTo="/are-you-sorp-ready/conversation/" /> : <form onSubmit={submitSave}>
       {!account && accountMode === "signup" && <><label htmlFor="save-name">Your name<input id="save-name" name="name" autoComplete="name" required maxLength={120} value={saveProfile.name} onChange={(event) => setSaveProfile((current) => ({ ...current, name: event.target.value }))} /></label>
       <label htmlFor="save-position">Position / role<input id="save-position" name="position" autoComplete="organization-title" required maxLength={120} value={saveProfile.position} onChange={(event) => setSaveProfile((current) => ({ ...current, position: event.target.value }))} /></label></>}
       {!account && <>
@@ -1351,7 +1353,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
       </>}
       {saveError && <div className="sorp-save-error" role="alert" aria-live="assertive"><strong>Sorry. We couldn’t save your account.</strong><span>{saveError}</span><span>You can correct anything above and try again without losing your place.</span></div>}
       {saveStatus === "saved" ? <p className="sorp-save-success" role="status">✓ {accountMode === "login" && !account ? "Signed in." : "Saved to your account. You can finish another time."}</p> : <button type="submit" disabled={saveStatus === "saving"}>{saveStatus === "saving" ? "Saving…" : account ? "Save and finish another time" : accountMode === "signup" ? "Create account and save" : "Sign in and continue"} <span>→</span></button>}
-    </form>
+    </form>}
   </section></div>;
 
   // Questionnaire answers remain saved, but only actual conversations belong beside the review.
