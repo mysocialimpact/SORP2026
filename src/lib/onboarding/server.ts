@@ -160,7 +160,7 @@ export async function extractWithModel(
     throw new Error(
       "Conversation assistance is unavailable. You can keep editing your profile.",
     );
-  await transaction(async (c) => {
+  const usageId = await transaction(async (c) => {
     await c.query(
       "SELECT pg_advisory_xact_lock(hashtext('onboarding-ai-budget'))",
     );
@@ -180,12 +180,19 @@ export async function extractWithModel(
       throw new Error(
         "Conversation assistance has reached its budget. Your editable form still works.",
       );
-    await c.query(
-      "INSERT INTO research_console.onboarding_usage(session_id,reserved_usd) VALUES($1,$2)",
+    const { rows: [reserved] } = await c.query(
+      "INSERT INTO research_console.onboarding_usage(session_id,reserved_usd) VALUES($1,$2) RETURNING id",
       [id, MODEL_RESERVATION_USD],
     );
+    return reserved.id;
   });
-  return interpretWithModel(message, state, undefined, skip);
+  const result = await interpretWithModel(message, state, undefined, skip);
+  const measured = result.usage?.estimatedUsd;
+  // Admission reserves both stages before either starts. Settle only successful,
+  // metered requests; uncertain provider failures retain the full reservation.
+  if (!result.notice && measured && Number.isFinite(measured) && measured < MODEL_RESERVATION_USD)
+    await query("UPDATE research_console.onboarding_usage SET reserved_usd=$1 WHERE id=$2", [measured, usageId]).catch(() => undefined);
+  return result;
 }
 
 export async function claimOperation(
