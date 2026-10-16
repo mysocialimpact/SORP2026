@@ -53,7 +53,7 @@ test('both stages receive bounded recent dialogue while the wording stage receiv
  for(let i=0;i<8;i++) s=advance(s,{utterance:`Answer ${i}`,topicResponse:participation()});
  const request=dialogueRequest('test',s,null), input=JSON.parse(request.input[0].content);
  assert.equal(request.input.length,9);assert.equal(request.input.at(-1).content,'Answer 7');assert.equal(request.input.at(-1).role,'user');
- assert.equal(input.nextPlan.objective,'complete');assert.equal(request.store,false);assert.equal(request.tools,undefined);
+ assert.equal(input.progressPlan.objective,'complete');assert.equal(request.store,false);assert.equal(request.tools,undefined);
  assert.equal(JSON.parse(modelRequest('Another answer',s).input).recentDialogue.length,8);
 });
 test('a question about an optional topic can be answered without forcing the topic again',()=>{
