@@ -64,6 +64,12 @@ test('invalid model participation values cannot enter state',()=>{
  const p=validateInterpretation({intent:'inform',facts:{},topicResponse:{topic:'password',status:'answered',followUp:true}},'Hello',initialConversation());
  assert.equal(p.topicResponse,undefined);
 });
+test('personal and unresolved answers remain conversation, not professional concerns',()=>{
+  for(const concernKind of ['personal','uncertain','none']) {
+    const p=validateInterpretation({intent:'inform',concernKind,facts:{concerns:{value:'Unexpected animals',quote:'Unexpected animals',period:'current',correction:false}}},'Unexpected animals',ready());
+    assert.equal(p.concerns,undefined);
+  }
+});
 test('wording failure retains valid extraction and surfaces a notice; two-call cost is reserved',async()=>{
  const fetch=globalThis.fetch,key=process.env.OPENAI_API_KEY;
  process.env.OPENAI_API_KEY='synthetic-test';let calls=0;

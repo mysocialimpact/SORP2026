@@ -1041,9 +1041,11 @@ function fallbackQuestion(s: Conversation): string {
       return "By the way, how did you come across us?";
     case "concerns":
       return "What keeps you up at night?";
+    case "reflection":
+      return "Would you like to say a little more about that, or continue with your profile?";
     default:
       return registrationReady(s.facts)
-        ? `A lovely place to start, ${s.facts.name.split(" ")[0]}.${s.charity.confirmed ? ` We’ll keep ${s.charity.confirmed.name} in view as you explore.` : ""} Your details are ready to review.`
+        ? `Your profile details are ready to review.${s.charity.confirmed ? ` ${s.charity.confirmed.name} is your confirmed starting charity.` : ""} You can create your account when you’re ready.`
         : "Let’s finish the remaining account details in your editable profile.";
   }
 }
@@ -1260,6 +1262,7 @@ export function suitableDialogue(s: Conversation, p: QuestionProposal): boolean 
   if (questions.length > 2 || (plan.objective === "complete" && questions.length)) return false;
   if (["registration", "responsibilities", "discovery", "reflection"].includes(plan.objective) && !questions.length) return false;
   if (plan.objective === "concerns" && !p.question.includes("What keeps you up at night?")) return false;
+  if (plan.objective !== "concerns" && /what keeps you up at night\?/i.test(p.question)) return false;
   if (!s.charity.candidates.length && /(?:official|charity) (?:record|match|card).{0,25}(?:shown|displayed)|(?:check|select|confirm).{0,35}(?:record|card) (?:shown|displayed)/i.test(p.question)) return false;
   if (/https?:|(?:your|a) password|(?:I|we)(?:’|')ve (?:found|checked|verified|downloaded)|accounts are ready|(?:introduction|conversation|details) (?:is|are|has been|have been) saved/i.test(p.question)) return false;
   // Check questions, not acknowledgements: saying “your role” is not necessarily asking it again.

@@ -108,6 +108,10 @@ export const interpretationSchema = object({
       "Accept only an explicit request to START WITH or USE a charity, or agreement with that proposal. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means the user does not want that charity as their starting selection.",
   },
   finishRequested: { type: "boolean" },
+  concernKind: {
+    ...enumeration(["professional", "personal", "uncertain", "none"]),
+    description: "Classify NEW concerns using the person's meaning. Professional relevance must be supported, not inferred merely because we asked a professional question. An unexplained surprising noun is uncertain; literal private sleep disruption is personal; explicit charity/work context makes a concern professional. No new concern is none.",
+  },
   // Every objective is considered explicitly. Null means no supporting information;
   // an open-ended array previously silently omitted volunteered context.
   facts: object(
@@ -312,6 +316,7 @@ export function validateInterpretation(
     intent: p.intent as Extraction["intent"],
     correctedFields: corrected,
   };
+  if (p.concernKind && p.concernKind !== "professional") delete extracted.concerns;
   for (const key of ["charityChoice", "reference"] as const)
     if (typeof patch[key] === "string" && validEntity(patch[key]))
       extracted[key] = patch[key];
