@@ -241,7 +241,7 @@ test("model stages use bounded context, no tools; evidence and combined budget e
       id,
     );
     const reservation = await db.query("SELECT reserved_usd::float amount FROM research_console.onboarding_usage WHERE session_id=$1", [id]);
-    assert.equal(reservation.rows[0].amount, 0.10);
+    assert.equal(reservation.rows[0].amount, 0.15);
     assert.equal(patch.questionProposal?.natural, true);
     assert.equal(patch.notice, undefined);
     assert.equal(patch.name, "Sarah Jones");

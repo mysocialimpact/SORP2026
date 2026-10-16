@@ -402,7 +402,7 @@ export type Extraction = Partial<Facts> & {
   topicResponse?: { topic: "responsibilities" | "discovery" | "concerns" | "none"; status: "answered" | "declined" | "uncertain" | "not_answered"; followUp: boolean };
   notice?: string;
   closeOptional?: boolean;
-  usage?: { input: number; output: number; estimatedUsd: number };
+  usage?: { input: number; output: number; estimatedUsd: number; calls?: number };
 };
 /** Successful semantic interpretation is authoritative: an incidental mention
  * of someone else's role must not survive as the user's role. Lexical recognition
@@ -1296,7 +1296,7 @@ export function suitableDialogue(s: Conversation, p: QuestionProposal): boolean 
   if (!s.charity.candidates.length && /(?:official|charity) (?:record|match|card).{0,25}(?:shown|displayed)|(?:check|select|confirm).{0,35}(?:record|card) (?:shown|displayed)/i.test(p.question)) return false;
   // Unverified relationship kinds must not let prose arbitrarily select one
   // organisation from several unresolved client references.
-  if (plan.objective === "charity" && s.charity.phase === "suggest") {
+  if (plan.objective === "charity" && s.charity.phase === "suggest" && !s.charity.proposed) {
     const options = charityOptions(s), spoken = p.question.toLocaleLowerCase();
     const mentioned = options.filter(name => spoken.includes(name.toLocaleLowerCase().replace(/^the /, "")));
     if (options.length > 1 && mentioned.length > 0 && mentioned.length < options.length) return false;

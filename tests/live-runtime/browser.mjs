@@ -322,7 +322,6 @@ try {
     JSON.stringify({
       passed: reports.length,
       turns: usage.rows[0].requests,
-      modelCalls: usage.rows[0].requests * 2,
       journeys: reports,
     }),
   );

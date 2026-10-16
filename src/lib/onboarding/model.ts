@@ -22,7 +22,8 @@ const comparisonModel = process.env.VERCEL_ENV === "preview" && process.env.SORP
   ? process.env.SORP_DIALOGUE_EVAL_MODEL : undefined;
 export const DIALOGUE_MODEL = comparisonModel || "gpt-6.1-sol";
 export const MAX_OUTPUT_TOKENS = 4000;
-export const MODEL_RESERVATION_USD = DIALOGUE_MODEL === "gpt-6-astra" ? 0.25 : 0.10;
+// Includes one exceptional, bounded revision of wording rejected by the validator.
+export const MODEL_RESERVATION_USD = DIALOGUE_MODEL === "gpt-6-astra" ? 0.40 : 0.15;
 import { dialogueRequest, decodeDialogue } from "./dialogue.ts";
 const factFields = [
   ...fieldKeys,
@@ -474,15 +475,32 @@ export async function interpretWithModel(message: string, state: Conversation, o
   const closure = !skip && result.topicResponse && ["uncertain", "declined"].includes(result.topicResponse.status) &&
     ["responsibilities", "discovery", "concerns"].includes(questionPlan(state).objective) && questionPlan(updated).objective !== "complete"
     ? closeOptionalConversation(updated) : null;
+  let calls = 1;
+  const request = dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection, afterReflection, closure);
+  const generate = async (input: typeof request) => {
+    calls++;
+    const spoken = await callModel(input);
+    result.usage!.input += spoken.usage.input;
+    result.usage!.output += spoken.usage.output;
+    result.usage!.estimatedUsd += spoken.usage.estimatedUsd;
+    return spoken;
+  };
   try {
-    const spoken = await callModel(dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection, afterReflection, closure));
+    let spoken = await generate(request);
+    let reply;
+    try {
+      reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection, afterReflection, closure);
+    } catch (error) {
+      // A rejected draft never reaches state or the UI. Revise language once;
+      // provider failures are not retried and no security/validation rule is relaxed.
+      observe?.({ stage: "dialogue_revision", reason: error instanceof Error ? error.message : "Invalid draft" });
+      spoken = await generate({ ...request, max_output_tokens: 2000, input: [...request.input,
+        { role: "assistant", content: JSON.stringify(spoken.parsed) },
+        { role: "developer", content: "The previous draft did not satisfy the application contract and was not displayed. Revise it once, preserving the person's meaning and the permitted move. Follow the chosen task and allowed fields. Use at most two question marks including examples, and no questions at completion. Do not ask for known identity details, invent completed actions or arbitrarily choose one of several charity candidates. Keep it concise. All original constraints still apply." },
+      ] });
+      reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection, afterReflection, closure);
+    }
     observe?.({ stage: "dialogue", parsed: spoken.parsed, plan: questionPlan(updated), participation: result.topicResponse, followUpPermitted: !!reflection });
-    result.usage = {
-      input: understood.usage.input + spoken.usage.input,
-      output: understood.usage.output + spoken.usage.output,
-      estimatedUsd: understood.usage.estimatedUsd + spoken.usage.estimatedUsd,
-    };
-    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection, afterReflection, closure);
     result.closeOptional = reply.closeOptional;
     if (result.topicResponse) result.topicResponse.followUp = reply.next.objective === "reflection";
     result.questionProposal = reply.next;
@@ -497,6 +515,8 @@ export async function interpretWithModel(message: string, state: Conversation, o
       result.usage.estimatedUsd += usage.estimatedUsd;
     }
     result.notice = "Your details have been updated, but the conversational reply could not finish. You can retry or continue with your profile.";
+  } finally {
+    result.usage.calls = calls;
   }
   return result;
 }

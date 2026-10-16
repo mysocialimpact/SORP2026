@@ -51,10 +51,12 @@ The only visual copy change is the completion eyebrow, “READY WHEN YOU ARE”.
 
 - Extraction: `gpt-5.4-mini-2026-03-17`, low reasoning, 4,000 output-token cap.
 - Dialogue: `gpt-6.1-sol`, medium reasoning, 3,000 output-token cap.
-- Two sequential Responses API calls per submitted answer, `store:false`, no tools,
-  35-second timeout per stage. Last eight dialogue messages plus bounded structured
+- Normally two sequential Responses API calls per submitted answer, `store:false`, no tools,
+  35-second timeout per call. A draft rejected by language validation receives at most
+  one revision, capped at 2,000 output tokens; provider failures are not retried.
+  Neither draft can reach the UI without passing the same validation. Last eight dialogue messages plus bounded structured
   facts, rather than an unbounded transcript. Existing credentials are reused.
-- PostgreSQL reserves $0.10 before either call. Successful metered calls settle to
+- PostgreSQL reserves $0.15 before extraction, including the possible revision. Successful metered calls settle to
   estimated standard-rate cost; uncertain failures retain the full reservation.
   Existing $1/day and $10/month defaults and hard ceilings remain unchanged.
 - Official standard rates checked on 16 October 2026: mini $0.75/$4.50 and Sol

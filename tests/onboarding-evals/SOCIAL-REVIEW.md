@@ -15,6 +15,9 @@ are mocked. Official-record confirmations are explicitly labelled service fixtur
 The runner bounds the evaluation to 160 submitted answers and $8 estimated spend,
 including outstanding worst-case reservations. It records actual token usage and
 conservatively ignores cached-token discounts. Three journeys may run concurrently.
+The two normal model stages may include one bounded wording revision after a
+validation rejection. Actual calls and revisions are metered in the report; rejected
+drafts are never treated as displayed conversation or awarded quality credit.
 `SORP_SOCIAL_IDS=C01,C07` selects a diagnostic subset; a subset cannot establish a
 release pass. The JSON report is `test-results/onboarding-social-eval.json`.
 

@@ -48,7 +48,6 @@ async function bounded(text, state) {
     throw new Error("Live evaluation budget exhausted");
   reserved += MODEL_RESERVATION_USD;
   report.calls++;
-  report.apiCalls += 2;
   lastInterpretation = undefined;
   let result;
   try {
@@ -64,6 +63,7 @@ async function bounded(text, state) {
     throw e;
   }
   reserved -= MODEL_RESERVATION_USD - result.usage.estimatedUsd;
+  report.apiCalls += result.usage.calls || 2;
   assert.ok(!result.notice, result.notice);
   report.inputTokens += result.usage.input;
   report.outputTokens += result.usage.output;

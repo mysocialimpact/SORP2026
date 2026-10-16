@@ -1,0 +1,74 @@
+{
+  "commit": "a9f44fb",
+  "deployment": "dpl_F4VuoYMEQitMFSb4BYsNf3UaMABU",
+  "passed": 4,
+  "turns": 16,
+  "modelCalls": 32,
+  "limitations": "Real built app/API and models. Synthetic regulator, account and transcription services; generated microphone audio. Chromium desktop/mobile, not physical mic or Safari. This candidate still failed social C08.",
+  "journeys": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "journey": "historical"
+      },
+      "passed": true,
+      "voice": true,
+      "questions": [
+        "You’ve worked with Blue Cross as a charity client in the past. What do you do now, and which organisation are you with, if any?",
+        "Good to hear you found us on LinkedIn. Funding can be a difficult issue to navigate when advising charity boards. Would you like to start by exploring Blue Cross, the charity you previously worked with?",
+        "That’s an important distinction: showing what difference the work makes, not just how much gets done, especially when funding is tight. You can now create your account and explore Blue Cross."
+      ],
+      "accountHandoff": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "journey": "historical"
+      },
+      "passed": true,
+      "voice": false,
+      "questions": [
+        "Thanks, Marcus — so Blue Cross was a client you worked with in the past. What do you do now, and which organisation are you with, if any?",
+        "Funding can be a difficult issue to navigate when advising charity boards. Would you like to start with Blue Cross, the charity you previously worked with?",
+        "You want boards to see the difference their charity makes, not just how busy it is — especially when funding is tight. You can now create your account and explore Blue Cross."
+      ],
+      "accountHandoff": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "journey": "social"
+      },
+      "passed": true,
+      "voice": true,
+      "questions": [
+        "Welcome, Marcus. Shall we start with Interim Spaces as the charity you’d like to explore SORP 2026 for?",
+        "So you’re coming to this from the finance side. How did you hear about the platform?",
+        "Good to hear a friend pointed you our way. I’d like to get a sense of what matters most to you.\n\nWhat keeps you up at night?",
+        "Frogs — I wasn’t expecting that. What’s the story there?",
+        "Actual noisy neighbours, then — just the pond variety! You can now create your account and explore Interim Spaces."
+      ],
+      "accountHandoff": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "journey": "social"
+      },
+      "passed": true,
+      "voice": true,
+      "questions": [
+        "Welcome, Marcus. Shall we start with Interim Spaces as the charity you’d like to use here?",
+        "The finance side, then. How did you hear about the platform?",
+        "Glad your pal pointed you our way. We’d like to understand what matters most to you, too.\n\nWhat keeps you up at night?",
+        "Frogs — I wasn’t expecting that. How are they keeping you awake?",
+        "Actual noisy neighbours, then — just with webbed feet! You can now create your account and explore Interim Spaces."
+      ],
+      "accountHandoff": true
+    }
+  ]
+}

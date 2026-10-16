@@ -87,7 +87,7 @@ test('wording failure retains valid extraction and surfaces a notice; two-call c
  const fetch=globalThis.fetch,key=process.env.OPENAI_API_KEY;
  process.env.OPENAI_API_KEY='synthetic-test';let calls=0;
  globalThis.fetch=async()=>++calls===1?Response.json({status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{content:[{text:JSON.stringify({intent:'inform',facts:{name:{value:'Alex Rowan',quote:'Alex Rowan',period:'current',correction:false}},relationships:[]})}]}]}):new Response('',{status:503});
- try{const result=await interpretWithModel('My name is Alex Rowan.',initialConversation());assert.equal(result.name,'Alex Rowan');assert.match(result.notice,/reply could not finish/);assert.equal(calls,2);assert.equal(MODEL_RESERVATION_USD,0.10);}finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
+ try{const result=await interpretWithModel('My name is Alex Rowan.',initialConversation());assert.equal(result.name,'Alex Rowan');assert.match(result.notice,/reply could not finish/);assert.equal(calls,2);assert.equal(MODEL_RESERVATION_USD,0.15);}finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
 });
 test('language output cannot choose field metadata or invent a permission to continue probing',()=>{
  const state=advance(ready(),{concerns:'Deadlines',utterance:'Deadlines.'});
@@ -153,6 +153,8 @@ test('uncertain classification cannot discard named clients or arbitrarily promo
  assert.deepEqual(charityOptions(s),['Interim Spaces','Brainstrust','Blue Cross']);
  assert.equal(suitableDialogue(s,{objective:'charity',fields:['charity'],question:'Would you like to start with Blue Cross?',natural:true}),false);
  assert.ok(suitableDialogue(s,{objective:'charity',fields:['charity'],question:'Which would you like to start with: Interim Spaces, Brainstrust or Blue Cross?',natural:true}));
+ s.charity.proposed='Interim Spaces';
+ assert.ok(suitableDialogue(s,{objective:'charity',fields:['charity'],question:'Interim Spaces — the next step is finding its official record for you to check.',natural:true}));
 });
 test('unnamed advisers and referral venues cannot become candidate organisations',()=>{
  for(const entity of ['finance adviser','conference']){
@@ -165,6 +167,36 @@ test('a working arrangement cannot populate the current organisation',()=>{
    const patch=validateInterpretation({intent:'inform',organisationNature:'working_arrangement',facts:{organisation:{value,quote:value,period:'current',correction:false}}},`I am an ${value} consultant`,initialConversation());
    assert.equal(patch.organisation,undefined);
  }
+});
+test('one bounded wording revision preserves extraction and accounts for every successful call',async()=>{
+ const original=globalThis.fetch,key=process.env.OPENAI_API_KEY;
+ process.env.OPENAI_API_KEY='synthetic-test';let calls=0;
+ globalThis.fetch=async(_url,init)=>{
+   const request=JSON.parse(init.body);calls++;
+   if(calls===3){assert.equal(request.max_output_tokens,2000);assert.match(request.input.at(-1).content,/not displayed/);}
+   const parsed=calls===1?{intent:'inform',facts:{name:{value:'Alex Rowan',quote:'Alex Rowan',period:'current',correction:false}}}:{move:'progress',reply:calls===2?'One? Two? Three?':'What is your email address, and what do you do?',afterCharity:null};
+   return Response.json({status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{content:[{text:JSON.stringify(parsed)}]}]});
+ };
+ try{
+   const result=await interpretWithModel('My name is Alex Rowan.',initialConversation());
+   assert.equal(calls,3);assert.equal(result.usage.calls,3);assert.equal(result.usage.input,300);assert.equal(result.usage.output,300);
+   assert.equal(result.name,'Alex Rowan');assert.equal(result.notice,undefined);
+   assert.doesNotMatch(nextQuestion(advance(initialConversation(),result)),/One\?/);
+ }finally{globalThis.fetch=original;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
+});
+test('a second invalid draft stops without weakening validation or losing understood facts',async()=>{
+ const original=globalThis.fetch,key=process.env.OPENAI_API_KEY;
+ process.env.OPENAI_API_KEY='synthetic-test';let calls=0;
+ globalThis.fetch=async()=>{
+   calls++;
+   const parsed=calls===1?{intent:'inform',facts:{name:{value:'Alex Rowan',quote:'Alex Rowan',period:'current',correction:false}}}:{move:'progress',reply:'One? Two? Three?',afterCharity:null};
+   return Response.json({status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{content:[{text:JSON.stringify(parsed)}]}]});
+ };
+ try{
+   const result=await interpretWithModel('My name is Alex Rowan.',initialConversation());
+   assert.equal(calls,3);assert.equal(result.usage.calls,3);assert.equal(result.name,'Alex Rowan');
+   assert.match(result.notice,/reply could not finish/);assert.equal(result.questionProposal,undefined);
+ }finally{globalThis.fetch=original;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
 });
 test('a permitted natural close can omit optional topics without changing supplied facts',()=>{
  const state=ready();state.facts.discovery='';state.skipped=[];
