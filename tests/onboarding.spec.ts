@@ -104,7 +104,7 @@ test("A/D: first answer reward, adaptive conversation, charity and completion", 
     page.getByText("Choose the PDF you want us to review."),
   ).toBeVisible();
 });
-test("B: partial details, editable fields, no invented email and early exit", async ({
+test("B: partial details remain editable; all five requirements precede early exit", async ({
   page,
 }) => {
   await page.goto("/get-started/?next=/my-impact-director/");
@@ -131,6 +131,11 @@ test("B: partial details, editable fields, no invented email and early exit", as
   await page
     .locator(".onboarding-profile input[name=name]")
     .fill("David Smith");
+  await expect(page.locator(".profile-next button")).toBeDisabled();
+  await page.getByLabel("I work independently", { exact: true }).check();
+  await page.getByLabel("Charity name or registration number").fill("Brainstrust");
+  await page.getByRole("button", { name: "Find →", exact: true }).click();
+  await page.getByRole("button", { name: "Yes, this is the charity" }).click();
   await expect(
     page
       .getByRole("button", { name: "Continue with these details" })
@@ -163,6 +168,11 @@ test("traditional form, secure validation and verification handoff", async ({
     .locator(".onboarding-profile input[name=email]")
     .fill("alex-verify@example.com");
   await page.locator(".onboarding-profile input[name=role]").fill("Trustee");
+  await expect(page.locator(".profile-next button")).toBeDisabled();
+  await page.getByLabel("I work independently", { exact: true }).check();
+  await page.getByLabel("Charity name or registration number").fill("Brainstrust");
+  await page.getByRole("button", { name: "Find →", exact: true }).click();
+  await page.getByRole("button", { name: "Yes, this is the charity" }).click();
   await page
     .locator(".profile-next")
     .getByRole("button", { name: /Create my account/ })
