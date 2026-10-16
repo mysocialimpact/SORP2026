@@ -250,11 +250,16 @@ try {
     await page
       .getByLabel("Confirm your password")
       .fill("Synthetic-Test-Password-123");
+    const completed = page.waitForResponse(r => r.url().includes("/api/onboarding/complete/") && r.request().method() === "POST");
     await page
       .locator("dialog")
       .getByRole("button", { name: "Create my account" })
       .click();
-    await page.waitForURL("**/ask-sorp/workspace/");
+    const completion = await completed;
+    assert.equal(completion.status(), 200);
+    assert.equal((await completion.json()).saved, true);
+    // A glob could accidentally match ?next=/ask-sorp/workspace/ on the old page.
+    await page.waitForURL(url => url.pathname === "/ask-sorp/workspace/");
     const stored = await db.query(
       "SELECT facts FROM research_console.onboarding_profiles ORDER BY updated_at DESC LIMIT 1",
     );
