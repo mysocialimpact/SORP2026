@@ -13,7 +13,7 @@ export function canonicalCharityRecord(value: unknown): Candidate | null {
       : ['www.charitycommissionni.org.uk','charitycommissionni.org.uk'].includes(url.hostname) ? 'ni' : '';
     if (!regulator) return null;
     const numbers = [...new Set(String(c.registrationNumber).toUpperCase().match(/\b(?:SC\d{6}|NIC\d{6}|\d{5,8})\b/g) || [])]
-      .filter(n => regulator === 'ew' ? /^\d{5,8}$/.test(n) : regulator === 'sc' ? /^SC\d{6}$/.test(n) : /^NIC\d{6}$/.test(n));
+      .filter(n => regulator === 'ew' ? /^[1-9]\d{4,6}$/.test(n) : regulator === 'sc' ? /^SC\d{6}$/.test(n) : /^NIC\d{6}$/.test(n));
     if (numbers.length !== 1) return null;
     return {...c,registrationNumber:numbers[0]};
   } catch { return null; }

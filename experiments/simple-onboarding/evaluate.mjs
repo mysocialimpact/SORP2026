@@ -62,7 +62,9 @@ try{
   'I found you at a conference. My challenge? Our spreadsheets appear to be breeding overnight.',
   'Ha, version control, mostly. I’d like to skip the rest and start exploring.'
  ]));
- await Promise.all(jobs);
+ const results=await Promise.allSettled(jobs);
+ for(const result of results)if(result.status==='rejected')console.error('FINISH_JOURNEY_FAILURE',result.reason);
+ if(results.some(r=>r.status==='rejected'))throw Error('Live journey failed; see transcript above.');
  await writeFile('public/conversations.json',JSON.stringify(transcripts,null,2));
  console.log('FINISH_JOURNEYS',JSON.stringify({passed:transcripts.length,artifact:'/conversations.json'}));
 }finally{server.kill('SIGTERM');}

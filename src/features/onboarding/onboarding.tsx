@@ -58,7 +58,7 @@ function publicLink(value: string) {
     return "";
   }
 }
-export function Onboarding() {
+export function Onboarding({ isolatedPreview = false }: { isolatedPreview?: boolean } = {}) {
   const params = useSearchParams(),
     destination = safeDestination(params.get("next") || params.get("return"));
   const [state, setState] = useState<Conversation>(initialConversation),
@@ -448,6 +448,7 @@ export function Onboarding() {
                 relationships: currentState.current.professional,
                 corrections: currentState.current.corrections,
                 knowledge: currentState.current.knowledge,
+                independent: currentState.current.natural?.independent || false,
               },
               selected,
               completedAt: new Date().toISOString(),
@@ -642,8 +643,7 @@ export function Onboarding() {
                     <div>
                       <strong>{selected.name}</strong>
                       <p>
-                        Confirmed. Public information preparation has been
-                        queued.
+                        {isolatedPreview ? 'Confirmed. Research is disabled in this isolated Preview.' : 'Confirmed. Public information preparation has been queued.'}
                       </p>
                     </div>
                   </div>

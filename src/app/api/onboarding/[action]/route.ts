@@ -1,4 +1,5 @@
 import { after } from "next/server";
+import { canonicalCharityRecord } from "@/lib/onboarding/charity-record";
 import { processTurn, fallbackTurn } from "@/lib/onboarding/engine";
 import { query, transaction } from "@/lib/console/db";
 import { protectPlatformRequest } from "@/lib/platform/auth";
@@ -352,8 +353,10 @@ export async function POST(
         Array.isArray(data.research?.candidates) ? data.research.candidates : []
       )
         .slice(0, 4)
-        .filter((c: Candidate) => {
+        .map(canonicalCharityRecord)
+        .filter((c: Candidate | null): c is Candidate => {
           try {
+            if (!c) return false;
             charityIdentity(c);
             return true;
           } catch {

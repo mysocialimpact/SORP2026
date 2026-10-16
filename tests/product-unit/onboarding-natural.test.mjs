@@ -19,3 +19,15 @@ test('multiple registrations resolve only against the actual official regulator'
  assert.equal(canonicalCharityRecord({...c,registrationNumber:'1114634; 1165694'}),null);
  assert.equal(canonicalCharityRecord({...c,officialUrl:'https://example.invalid/register'}),null);
 });
+
+test('an explicit acceptance within a reminder still triggers a validated lookup',()=>{
+ let s=applyFacts(initialConversation(),{organisation:'Interim Spaces',role:'Trustee'},'form');
+ const message='I already told you Interim Spaces. Yes, use it.';
+ s=acceptConversation(proposal({reference:{value:'Interim Spaces',quote:message,period:'current',correction:false}},{intent:'remind',target:'charities',charityDecision:'accept'}),message,s);
+ assert.equal(s.charity.proposed,'Interim Spaces');assert.equal(s.charity.phase,'lookup');assert.equal(s.charity.confirmed,null);
+});
+
+test('a company number alongside charity registrations is not a second charity identity',()=>{
+ const c={name:'Blue Cross',registrationNumber:'224392 / SC040154 / 00363197',officialUrl:'https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392'};
+ assert.equal(canonicalCharityRecord(c).registrationNumber,'224392');
+});

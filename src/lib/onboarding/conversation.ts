@@ -1,5 +1,5 @@
 import { interpretationSchema, validateInterpretation } from './model.ts';
-import { applyExtraction, nextQuestion, registrationMissing, accountReady, type Conversation } from './state.ts';
+import { applyExtraction, proposeCharity, validEntity, nextQuestion, registrationMissing, accountReady, type Conversation } from './state.ts';
 export const CONVERSATION_MODEL = 'gpt-6.1-sol';
 const schema = {
   ...interpretationSchema,
@@ -32,6 +32,11 @@ export function acceptConversation(parsed: ConversationOutput, message: string, 
   if (typeof parsed.reply !== 'string' || !parsed.reply.trim() || parsed.reply.length > 1800) throw new Error('The conversation could not be read. Please retry.');
   const extraction = event ? {} : validateInterpretation(parsed,message,state);
   let next = applyExtraction(state, extraction);
+  // A reminder can also explicitly accept a proposal. Semantic acceptance,
+  // not the legacy single-intent precedence rule, decides whether to look it up.
+  const choice = extraction.charityChoice || state.charity.proposed;
+  if (extraction.charityDecision === 'accept' && validEntity(choice) && !next.charity.confirmed)
+    next = proposeCharity(next, choice);
   let independent = state.natural?.independent || false;
   if (!event && parsed.independent && typeof parsed.independent.quote === 'string' && parsed.independent.quote.length && message.toLowerCase().includes(parsed.independent.quote.toLowerCase())) {
     independent = parsed.independent.value === true;
