@@ -41,6 +41,7 @@ const pg = new EmbeddedPostgres({
   password: "isolated-eval",
   port: 55434,
   persistent: false,
+  initdbFlags: ["--locale=C", "--encoding=UTF8"],
   createPostgresUser: process.getuid?.() === 0,
   onLog: () => {},
   onError: () => {},
