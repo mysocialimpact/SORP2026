@@ -6,7 +6,10 @@ import { currentAccountDestination, registrationHref, signInHref } from "@/lib/a
 /** Existing products keep their local draft; account creation has one home. */
 export function AccountGateway({ returnTo, onLeave }: { returnTo: string; onLeave?: () => void }) {
   const [destination, setDestination] = useState(returnTo);
-  useEffect(() => { setDestination(currentAccountDestination()); }, []);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setDestination(currentAccountDestination()));
+    return () => cancelAnimationFrame(frame);
+  }, []);
   function navigate(event: React.MouseEvent<HTMLAnchorElement>, signIn = false) {
     // Keep modified clicks and open-in-new-tab behaviour conventional.
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;

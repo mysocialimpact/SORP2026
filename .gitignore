@@ -11,3 +11,4 @@ next-env.d.ts
 
 .sorp-build.json
 public/build-info.json
+public/preview-qa/

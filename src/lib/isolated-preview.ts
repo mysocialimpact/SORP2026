@@ -7,8 +7,9 @@ export async function isolatedPreviewResponse(request: NextRequest) {
   const key = process.env.SORP_PREVIEW_COOKIE_SECRET;
   const json = (body: unknown, status = 200, cookie?: string) => Response.json(body, { status, headers: { "cache-control": "private, no-store", "x-sorp-isolation": "synthetic", ...(cookie ? { "set-cookie": cookie } : {}) } });
   if (!key) return json({ error: "Isolated Preview is not configured." }, 503);
+  const requestOrigin = `${request.headers.get('x-forwarded-proto') || request.nextUrl.protocol.replace(':', '')}://${request.headers.get('host') || request.nextUrl.host}`;
   if (!['GET', 'HEAD'].includes(request.method)) {
-    if (request.headers.get('sec-fetch-site') === 'cross-site' || (request.headers.get('origin') && request.headers.get('origin') !== request.nextUrl.origin)) return json({ error: "Use this Preview to submit test data." }, 403);
+    if (request.headers.get('sec-fetch-site') === 'cross-site' || (request.headers.get('origin') && request.headers.get('origin') !== requestOrigin)) return json({ error: "Use this Preview to submit test data." }, 403);
     if (Number(request.headers.get('content-length') || 0) > 100_000) return json({ error: "Test request is too large." }, 413);
   }
   const sign = (payload: string) => createHmac('sha256', key).update(payload).digest('base64url');

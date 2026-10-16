@@ -685,6 +685,7 @@ export function Onboarding() {
                   Switch to a conversation →
                 </button>
                 {charityLookup}
+                {notice && <p className="onboarding-notice" role="status">{notice}</p>}
                 {selected && <p className="confirmed-charity">✓ {selected.name} confirmed</p>}
               </div>
             ) : (

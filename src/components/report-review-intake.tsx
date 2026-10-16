@@ -1,7 +1,6 @@
 "use client";
 import { AccountGateway } from "@/components/account-gateway";
 
-import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Arrow } from "@/components/ui";
 import { loadSharedContext } from "@/features/onboarding/shared-context";
