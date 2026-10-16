@@ -108,7 +108,7 @@ test("optional exchanges end at six; essential corrections end at ten", () => {
   );
   assert.equal(
     nextObjective({ ...initialConversation(), turns: TOTAL_TURN_CAP }),
-    "complete",
+    "registration",
   );
 });
 test("return destinations preserve product queries/hashes and reject redirect injection", () => {
