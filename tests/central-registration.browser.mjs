@@ -61,6 +61,16 @@ async function run(viewport) {
    await expect(page.getByRole('heading', { name: 'Synthetic Test Charity', exact: true })).toBeVisible();
    await page.getByRole('button', { name: /Yes, this is the charity/ }).click();
    await expect(page.locator('.profile-next button')).toBeEnabled();
+   if (name === 'Readiness') {
+    await page.locator('.onboarding-profile input[name=email]').fill('not-an-email');
+    await expect(page.locator('.profile-next button')).toBeDisabled();
+    await page.locator('.onboarding-profile input[name=email]').fill('synthetic@example.invalid');
+    await page.locator('.onboarding-profile input[name=organisation]').fill('');
+    await expect(page.locator('.profile-next button')).toBeDisabled();
+    await page.getByLabel('I work independently', { exact: true }).check();
+    await expect(page.locator('.profile-next button')).toBeEnabled();
+    await expect(page.locator('.profile-count')).toContainText('5/5');
+   }
    await page.locator('.profile-next button').click();
    await page.getByLabel('Choose a password').fill('Synthetic-Test-Password-123');
    await page.getByLabel('Confirm your password').fill('Synthetic-Test-Password-123');
@@ -68,6 +78,7 @@ async function run(viewport) {
    await expect.poll(() => new URL(page.url()).pathname + new URL(page.url()).search + new URL(page.url()).hash).toBe(destination);
    await page.waitForLoadState('domcontentloaded');
    await expect(page.getByLabel('Your shared charity context')).toContainText('Synthetic Test Charity', { timeout: 15000 });
+   if (name === 'Readiness') assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('msi-sorp-canonical-methodology-v1')).candidate.name), 'Synthetic saved charity');
    // Known users may visit the central gateway, but it returns them immediately.
    await page.goto(base + '/get-started/?next=' + encodeURIComponent(destination), { waitUntil: 'domcontentloaded' });
    await expect.poll(() => new URL(page.url()).pathname + new URL(page.url()).search + new URL(page.url()).hash).toBe(destination);
