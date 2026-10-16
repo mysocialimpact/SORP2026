@@ -21,6 +21,8 @@ async function run(j) {
       report.apiCalls+=2;
       const diagnostic=[];
       const result=await interpretWithModel(t,s,p=>diagnostic.push(p));
+      const decision=diagnostic.find(d=>d.stage==='dialogue');
+      if(decision) console.log('SOCIAL_DECISION',JSON.stringify({id:j.id,turn:state.turns+1,objective:decision.plan.objective,participation:decision.participation,offered:decision.followUpPermitted,move:decision.parsed.move,understanding:decision.parsed.understanding}));
       pendingBudget -= MODEL_RESERVATION_USD;
       report.inputTokens+=result.usage.input; report.outputTokens+=result.usage.output; report.estimatedUsd+=result.usage.estimatedUsd;
       if(result.notice) for(const d of diagnostic.filter(d=>d.stage)) console.log('SOCIAL_DIAGNOSTIC',JSON.stringify({id:j.id,...d}));

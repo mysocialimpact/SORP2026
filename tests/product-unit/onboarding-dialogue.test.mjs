@@ -66,7 +66,8 @@ test('both stages receive bounded recent dialogue while the wording stage receiv
  const request=dialogueRequest('test',s,null), input=JSON.parse(request.input[0].content);
  assert.equal(request.input.length,9);assert.equal(request.input.at(-1).content,'Answer 7');assert.equal(request.input.at(-1).role,'user');
  assert.equal(input.progressPlan.objective,'complete');assert.equal(request.store,false);assert.equal(request.tools,undefined);
- assert.equal(JSON.parse(modelRequest('Another answer',s).input).recentDialogue.length,8);
+ const extraction = modelRequest('Another answer',s).input;
+ assert.equal(extraction.length,11);assert.equal(extraction.at(-1).role,'user');assert.equal(extraction.at(-1).content,'Another answer');assert.equal(extraction.at(-2).role,'assistant');
 });
 test('a question about an optional topic can be answered without forcing the topic again',()=>{
  const s=advance(ready(),{intent:'question',utterance:"That's a strange question.",topicResponse:participation('declined')});
@@ -99,4 +100,23 @@ test('a permitted social follow-up is chosen before progressing the information 
  const reflection={...state,dialogue:{...state.dialogue,reflecting:true}};
  const output=decodeDialogue({move:'follow_up',reply:'An unexpected visitor? Do you mean that literally?',afterCharity:null},state,null,reflection);
  assert.equal(output.next.objective,'reflection');assert.deepEqual(output.next.fields,[]);
+});
+test('the production two-stage pipeline offers and commits a social move before handoff',async()=>{
+ const fetch=globalThis.fetch,key=process.env.OPENAI_API_KEY;
+ process.env.OPENAI_API_KEY='synthetic-test';let calls=0;
+ globalThis.fetch=async(_url,init)=>{
+   const request=JSON.parse(init.body);calls++;
+   if(calls===2){
+     const context=JSON.parse(request.input[0].content);
+     assert.equal(context.followUpPermitted,true);
+     assert.deepEqual(context.permittedMoves.map(m=>m.move),['follow_up','progress']);
+   }
+   const parsed=calls===1?{intent:'inform',facts:{},concernKind:'uncertain',topicResponse:participation()}:{move:'follow_up',understanding:'An unexpected answer needs one clarification.',reply:'Do you mean that literally?',afterCharity:null};
+   return Response.json({status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{content:[{text:JSON.stringify(parsed)}]}]});
+ };
+ try{
+   const result=await interpretWithModel('An unexpected answer.',ready());
+   assert.equal(result.notice,undefined);assert.equal(result.topicResponse.followUp,true);
+   assert.equal(nextObjective(advance(ready(),result)),'reflection');assert.equal(calls,2);
+ }finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
 });

@@ -301,7 +301,7 @@ test("model input is bounded structured memory rather than increasing raw histor
   const body = modelRequest("Hello", ready());
   assert.equal(body.max_output_tokens, MAX_OUTPUT_TOKENS);
   assert.equal(body.store, false);
-  const input = JSON.parse(body.input);
+  const input = JSON.parse(body.input[0].content);
   assert.equal(input.history, undefined);
   assert.ok(input.professional);
   assert.ok(input.knowledge);

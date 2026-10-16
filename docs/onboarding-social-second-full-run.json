@@ -1,0 +1,1846 @@
+{
+  "commit": "1d78a92",
+  "deployment": "dpl_J3BwvsNLS5aE5PLkWSHWCy92n237",
+  "status": "Awaiting independent review; technical success does not establish social quality",
+  "summary": "SOCIAL_SUMMARY {\"model\":\"gpt-5.4-mini-2026-03-17\",\"dialogueModel\":\"gpt-6.1-sol\",\"extractionReasoning\":\"low\",\"dialogueReasoning\":\"medium\",\"stages\":2,\"startedAt\":\"2026-10-16T12:06:38.514Z\",\"turns\":97,\"apiCalls\":194,\"inputTokens\":400872,\"outputTokens\":54620,\"estimatedUsd\":0.8192157499999999,\"passed\":26,\"failed\":0,\"completedAt\":\"2026-10-16T12:11:38.207Z\"}",
+  "journeys": [
+    {
+      "id": "C01",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C01",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C01",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C01",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Marcus. Shall we start with Interim Spaces?"
+        },
+        {
+          "id": "C01",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C01",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces, then. What do you look after in your role as trustee?"
+        },
+        {
+          "id": "C01",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C01",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks — the financial reporting side of SORP may be particularly relevant to your role. How did you come across the platform?"
+        },
+        {
+          "id": "C01",
+          "index": 7,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C01",
+          "index": 8,
+          "role": "assistant",
+          "text": "Ah, a recommendation from a friend. Before we wrap up, here’s a slightly different question — take it however you like.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C01",
+          "index": 9,
+          "role": "user",
+          "text": "Frogs."
+        },
+        {
+          "id": "C01",
+          "index": 10,
+          "role": "assistant",
+          "text": "Frogs — I wasn’t expecting that one. When you’re ready, create your account and explore Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C02",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C02",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Helen Price, CEO of the charity Interim Spaces. My email is helen.price@example.invalid."
+        },
+        {
+          "id": "C02",
+          "index": 2,
+          "role": "assistant",
+          "text": "Lovely to meet you, Helen. Shall we start with Interim Spaces as the charity you’d like to focus on?"
+        },
+        {
+          "id": "C02",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C02",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll focus on Interim Spaces. What does your work as CEO involve day to day?"
+        },
+        {
+          "id": "C02",
+          "index": 5,
+          "role": "user",
+          "text": "Keeping our services going while we try to grow our team."
+        },
+        {
+          "id": "C02",
+          "index": 6,
+          "role": "assistant",
+          "text": "Keeping services running while growing the team is a balancing act. How did you hear about the platform?"
+        },
+        {
+          "id": "C02",
+          "index": 7,
+          "role": "user",
+          "text": "A fellow chief executive sent me the link."
+        },
+        {
+          "id": "C02",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks — glad they pointed you our way. Before we wrap up, a slightly different question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C02",
+          "index": 9,
+          "role": "user",
+          "text": "Running out of money."
+        },
+        {
+          "id": "C02",
+          "index": 10,
+          "role": "assistant",
+          "text": "That’s a serious worry when you’re trying to keep services running. When you’re ready, you can create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C03",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C03",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Priya Shah, finance director at the charity Brainstrust. My email is priya.shah@example.invalid."
+        },
+        {
+          "id": "C03",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Priya — good to meet you. Would you like to start with Brainstrust as the charity we focus on?"
+        },
+        {
+          "id": "C03",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C03",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll focus on Brainstrust. What does your work as finance director involve day to day?"
+        },
+        {
+          "id": "C03",
+          "index": 5,
+          "role": "user",
+          "text": "I lead budgeting and prepare the year-end accounts."
+        },
+        {
+          "id": "C03",
+          "index": 6,
+          "role": "assistant",
+          "text": "With year-end accounts in your remit, the SORP guidance may be particularly relevant to your work. How did you hear about the platform?"
+        },
+        {
+          "id": "C03",
+          "index": 7,
+          "role": "user",
+          "text": "An ICAEW webinar."
+        },
+        {
+          "id": "C03",
+          "index": 8,
+          "role": "assistant",
+          "text": "Ah, through ICAEW — thanks. Before we wrap up, a slightly different question, if you’re happy to share.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C03",
+          "index": 9,
+          "role": "user",
+          "text": "Our next audit."
+        },
+        {
+          "id": "C03",
+          "index": 10,
+          "role": "assistant",
+          "text": "An upcoming audit can weigh on you when you’re responsible for the year-end accounts. When you’re ready, create your account and explore the SORP guidance for Brainstrust."
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "passed": true,
+      "turns": 2,
+      "transcript": [
+        {
+          "id": "C04",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C04",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Sarah Jones, a chartered accountant at Burton Sweet working with about 30 charities, including Brainstrust. My email is sarah.jones@example.invalid. They are all worried about the new reporting requirements."
+        },
+        {
+          "id": "C04",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Sarah. With around 30 charities looking to you for support, the new reporting requirements are a concern across your portfolio. Would you like to start with Brainstrust?"
+        },
+        {
+          "id": "C04",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C04",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Brainstrust. How did you hear about the platform?"
+        },
+        {
+          "id": "C04",
+          "index": 5,
+          "role": "user",
+          "text": "LinkedIn."
+        },
+        {
+          "id": "C04",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks for letting me know. You can now create your account and explore Brainstrust, including guidance on the new reporting requirements you mentioned."
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C05",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C05",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Owen Reed, an accountant at Cedar Advisory with one charity client, Interim Spaces. My email is owen.reed@example.invalid."
+        },
+        {
+          "id": "C05",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Owen. Shall we start with Interim Spaces, your charity client?"
+        },
+        {
+          "id": "C05",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C05",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces, then. What do you handle for them as their accountant?"
+        },
+        {
+          "id": "C05",
+          "index": 5,
+          "role": "user",
+          "text": "I prepare their annual accounts."
+        },
+        {
+          "id": "C05",
+          "index": 6,
+          "role": "assistant",
+          "text": "You’re approaching SORP from the accounts preparation side, then. How did you hear about the platform?"
+        },
+        {
+          "id": "C05",
+          "index": 7,
+          "role": "user",
+          "text": "A colleague recommended you."
+        },
+        {
+          "id": "C05",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks for giving us a look on their recommendation. Before we wrap up, here’s one you can take in any direction.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C05",
+          "index": 9,
+          "role": "user",
+          "text": "Deadlines."
+        },
+        {
+          "id": "C05",
+          "index": 10,
+          "role": "assistant",
+          "text": "Deadlines can make it hard to switch off. You can now create your account and explore the SORP guidance for Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "passed": true,
+      "turns": 3,
+      "transcript": [
+        {
+          "id": "C06",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C06",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Nadia Cole, an auditor at Cedar Advisory; I audit Brainstrust. My email is nadia.cole@example.invalid."
+        },
+        {
+          "id": "C06",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Nadia. We can approach SORP 2026 from the perspective of your audit work. Would you like to start with Brainstrust?"
+        },
+        {
+          "id": "C06",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C06",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll start with Brainstrust. How did you hear about the platform?"
+        },
+        {
+          "id": "C06",
+          "index": 5,
+          "role": "user",
+          "text": "I searched for charity reporting guidance."
+        },
+        {
+          "id": "C06",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks — I hope you find the guidance useful. Before we wrap up, here’s a slightly different question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C06",
+          "index": 7,
+          "role": "user",
+          "text": "Whether we have enough evidence for the disclosures."
+        },
+        {
+          "id": "C06",
+          "index": 8,
+          "role": "assistant",
+          "text": "Having disclosures backed by evidence you can rely on is a serious audit concern. When you’re ready, create your account to explore Brainstrust and the SORP guidance."
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C07",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C07",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Ben Shaw, an independent professional adviser to Interim Spaces. My email is ben.shaw@example.invalid."
+        },
+        {
+          "id": "C07",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Ben. We can focus on an organisation you advise rather than your own practice. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C07",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C07",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll start with Interim Spaces. What does your advisory work with them involve?"
+        },
+        {
+          "id": "C07",
+          "index": 5,
+          "role": "user",
+          "text": "I help boards make decisions about strategy."
+        },
+        {
+          "id": "C07",
+          "index": 6,
+          "role": "assistant",
+          "text": "So you help boards weigh up their options and decide on a direction. How did you come across the platform?"
+        },
+        {
+          "id": "C07",
+          "index": 7,
+          "role": "user",
+          "text": "Someone mentioned you at a conference."
+        },
+        {
+          "id": "C07",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks — good to hear we came up in conversation. Before we wrap up, here’s a slightly different question, open to whatever comes to mind.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C07",
+          "index": 9,
+          "role": "user",
+          "text": "My children."
+        },
+        {
+          "id": "C07",
+          "index": 10,
+          "role": "assistant",
+          "text": "Being a parent doesn’t always stop at bedtime. When you’re ready, you can create your account and explore Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C08",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C08",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Lara West, a new trustee at Interim Spaces. My email is lara.west@example.invalid."
+        },
+        {
+          "id": "C08",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Lara. As a new trustee, you may be getting to grips with quite a bit. Shall we start with Interim Spaces as your charity?"
+        },
+        {
+          "id": "C08",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C08",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll go with Interim Spaces. What are you taking responsibility for as you settle into your trustee role?"
+        },
+        {
+          "id": "C08",
+          "index": 5,
+          "role": "user",
+          "text": "I'm very new to charity reporting and still learning what the board needs from me."
+        },
+        {
+          "id": "C08",
+          "index": 6,
+          "role": "assistant",
+          "text": "There’s plenty to get familiar with as a new trustee, and you don’t need to have it all worked out yet. How did you hear about the platform?"
+        },
+        {
+          "id": "C08",
+          "index": 7,
+          "role": "user",
+          "text": "Our treasurer pointed me here."
+        },
+        {
+          "id": "C08",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks — good to know your treasurer pointed you our way. Before we wrap up, one slightly different question, which needn’t be about work.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C08",
+          "index": 9,
+          "role": "user",
+          "text": "Knowing whether I have missed something obvious."
+        },
+        {
+          "id": "C08",
+          "index": 10,
+          "role": "assistant",
+          "text": "That worry about overlooking something can be hard to shake, especially when you’re finding your feet. When you’re ready, create your account to explore the guidance and reporting tools for Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "passed": true,
+      "turns": 1,
+      "transcript": [
+        {
+          "id": "C09",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C09",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Dan Hart, a finance trustee at Interim Spaces. My email is dan.hart@example.invalid. I handle budgets and found you on LinkedIn. I'm worried our reserves won't cover the winter."
+        },
+        {
+          "id": "C09",
+          "index": 2,
+          "role": "assistant",
+          "text": "The possibility of reserves running out over winter is a serious worry, especially when you’re overseeing the budgets. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C09",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C09",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. You can now create your account and explore the SORP guidance and reporting tools for the charity."
+        }
+      ]
+    },
+    {
+      "id": "C10",
+      "passed": true,
+      "turns": 1,
+      "transcript": [
+        {
+          "id": "C10",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C10",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Asha Patel, a trustee at Interim Spaces. My email is asha.patel@example.invalid. I oversee governance, a friend sent me your website, and I'm struggling to get reliable impact data."
+        },
+        {
+          "id": "C10",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Asha. Getting reliable impact data sounds like a real challenge, especially when you’re responsible for governance oversight. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C10",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C10",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — Interim Spaces it is. You can now create your account and explore SORP guidance and impact reporting for the charity."
+        }
+      ]
+    },
+    {
+      "id": "C11",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C11",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C11",
+          "index": 1,
+          "role": "user",
+          "text": "Hello, I'm David."
+        },
+        {
+          "id": "C11",
+          "index": 2,
+          "role": "assistant",
+          "text": "Hello David, good to meet you. What’s your email address, and what do you do? If you’re with an organisation, what’s its name?"
+        },
+        {
+          "id": "C11",
+          "index": 3,
+          "role": "user",
+          "text": "My full name is David Evans. I'm a trustee at Interim Spaces and my email is david.evans@example.invalid."
+        },
+        {
+          "id": "C11",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks, David. Shall we start with Interim Spaces as the charity you’d like to focus on?"
+        },
+        {
+          "id": "C11",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C11",
+          "index": 6,
+          "role": "assistant",
+          "text": "We’ll focus on Interim Spaces. What do you look after in your role as a trustee?"
+        },
+        {
+          "id": "C11",
+          "index": 7,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C11",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks, David — the financial reporting side of SORP is likely to be relevant to your role. How did you hear about the platform?"
+        },
+        {
+          "id": "C11",
+          "index": 9,
+          "role": "user",
+          "text": "Dunno."
+        },
+        {
+          "id": "C11",
+          "index": 10,
+          "role": "assistant",
+          "text": "No worries. Before we wrap up, here’s a slightly different question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C11",
+          "index": 11,
+          "role": "user",
+          "text": "Nothing, actually."
+        },
+        {
+          "id": "C11",
+          "index": 12,
+          "role": "assistant",
+          "text": "Fair enough — no need to go looking for worries. You’re welcome to create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C12",
+      "passed": true,
+      "turns": 7,
+      "transcript": [
+        {
+          "id": "C12",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C12",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Alex Rowan, an accountant at Cedar Advisory working with Interim Spaces. My email is alex.rowan@example.invalid."
+        },
+        {
+          "id": "C12",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Alex. You’re joining from the advisory side, working with Interim Spaces. Would you like to start with Interim Spaces as the charity we look at?"
+        },
+        {
+          "id": "C12",
+          "index": 3,
+          "role": "user",
+          "text": "Actually, I meant auditor, not accountant. I'm still at Cedar Advisory."
+        },
+        {
+          "id": "C12",
+          "index": 4,
+          "role": "assistant",
+          "text": "Auditor, not accountant — thanks for correcting that. Would you like to start with Interim Spaces as the charity we look at?"
+        },
+        {
+          "id": "C12",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C12",
+          "index": 6,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What does your audit work with them involve?"
+        },
+        {
+          "id": "C12",
+          "index": 7,
+          "role": "user",
+          "text": "Charity audits."
+        },
+        {
+          "id": "C12",
+          "index": 8,
+          "role": "assistant",
+          "text": "Understood — charity audits, and apologies for not acknowledging your correction to auditor. Which parts of the audit work do you personally handle?"
+        },
+        {
+          "id": "C12",
+          "index": 9,
+          "role": "user",
+          "text": "Charity audits."
+        },
+        {
+          "id": "C12",
+          "index": 10,
+          "role": "assistant",
+          "text": "Thanks, Alex — we can leave it at that. How did you hear about the platform?"
+        },
+        {
+          "id": "C12",
+          "index": 11,
+          "role": "user",
+          "text": "A colleague."
+        },
+        {
+          "id": "C12",
+          "index": 12,
+          "role": "assistant",
+          "text": "Thanks for letting me know. Is there anything about SORP 2026 you’re particularly looking for help with?"
+        },
+        {
+          "id": "C12",
+          "index": 13,
+          "role": "user",
+          "text": "A colleague."
+        },
+        {
+          "id": "C12",
+          "index": 14,
+          "role": "assistant",
+          "text": "Thanks — a colleague pointed you our way. Before we wrap up, here’s a slightly different question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C12",
+          "index": 15,
+          "role": "user",
+          "text": "Review deadlines."
+        },
+        {
+          "id": "C12",
+          "index": 16,
+          "role": "assistant",
+          "text": "Review deadlines can make it hard to switch off. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C13",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C13",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C13",
+          "index": 1,
+          "role": "user",
+          "text": "My name is Marcus Worrey, and I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was. My email is marcus.worrey@gmail.com."
+        },
+        {
+          "id": "C13",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Marcus. You mentioned Blue Cross as a former client—what do you do now, and which organisation are you with, if any?"
+        },
+        {
+          "id": "C13",
+          "index": 3,
+          "role": "action",
+          "text": "Edited profile: {\"name\":\"Marcus Warry\"}"
+        },
+        {
+          "id": "C13",
+          "index": 4,
+          "role": "action",
+          "text": "Reloaded and resumed the same introduction."
+        },
+        {
+          "id": "C13",
+          "index": 5,
+          "role": "user",
+          "text": "I'm now an independent consultant, advising charity boards."
+        },
+        {
+          "id": "C13",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks, Marcus — you’re working with charity boards in an advisory capacity now. Would you like to start with Blue Cross, the charity you worked with previously?"
+        },
+        {
+          "id": "C13",
+          "index": 7,
+          "role": "action",
+          "text": "Searched Blue Cross, inspected the displayed official-record fixture, and explicitly confirmed Blue Cross."
+        },
+        {
+          "id": "C13",
+          "index": 8,
+          "role": "assistant",
+          "text": "We’ll start with Blue Cross. How did you hear about the platform?"
+        },
+        {
+          "id": "C13",
+          "index": 9,
+          "role": "user",
+          "text": "LinkedIn."
+        },
+        {
+          "id": "C13",
+          "index": 10,
+          "role": "assistant",
+          "text": "Thanks. Before we wrap up, here’s a slightly different question—feel free to take it in any direction.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C13",
+          "index": 11,
+          "role": "user",
+          "text": "Helping boards make sense of their impact."
+        },
+        {
+          "id": "C13",
+          "index": 12,
+          "role": "assistant",
+          "text": "Helping boards understand their impact—and use that understanding in their decisions—is a real challenge. You can now create your account, explore the guidance and take a look at Blue Cross."
+        }
+      ]
+    },
+    {
+      "id": "C14",
+      "passed": true,
+      "turns": 3,
+      "transcript": [
+        {
+          "id": "C14",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C14",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Tom Lane, an accountant at Cedar Advisory working with Interim Spaces, Brainstrust and Blue Cross. My email is tom.lane@example.invalid."
+        },
+        {
+          "id": "C14",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Tom. We can start with one of your charity clients. Which would you like to focus on first: Interim Spaces, Brainstrust or Blue Cross?"
+        },
+        {
+          "id": "C14",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C14",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll start with Brainstrust. How did you find the platform?"
+        },
+        {
+          "id": "C14",
+          "index": 5,
+          "role": "user",
+          "text": "A client sent me the link."
+        },
+        {
+          "id": "C14",
+          "index": 6,
+          "role": "assistant",
+          "text": "Glad you found your way here. Before we wrap up, a slightly different question — take it however you like.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C14",
+          "index": 7,
+          "role": "user",
+          "text": "Getting good information from clients on time."
+        },
+        {
+          "id": "C14",
+          "index": 8,
+          "role": "assistant",
+          "text": "Waiting on client information can leave you with very little time to do the work properly. You can now create your account and explore Brainstrust on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C15",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C15",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C15",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C15",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Marcus. Shall we start with Interim Spaces as the charity you’d like to focus on?"
+        },
+        {
+          "id": "C15",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C15",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll focus on Interim Spaces. What do you look after in your role as trustee?"
+        },
+        {
+          "id": "C15",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C15",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks, Marcus. How did you hear about the platform?"
+        },
+        {
+          "id": "C15",
+          "index": 7,
+          "role": "user",
+          "text": "A friend recommended you over a pint."
+        },
+        {
+          "id": "C15",
+          "index": 8,
+          "role": "assistant",
+          "text": "Nice to hear a friend put in a word for us. Before we wrap up, here’s a slightly different question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C15",
+          "index": 9,
+          "role": "user",
+          "text": "The spreadsheet has developed a personality and refuses to cooperate."
+        },
+        {
+          "id": "C15",
+          "index": 10,
+          "role": "assistant",
+          "text": "A spreadsheet with opinions sounds like one trustee too many. When you’re ready, create your account to explore Interim Spaces and the SORP guidance available."
+        }
+      ]
+    },
+    {
+      "id": "C16",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C16",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C16",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Ruth Bell, a trustee at Interim Spaces. My email is ruth.bell@example.invalid."
+        },
+        {
+          "id": "C16",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Ruth. Would you like to start with Interim Spaces as the charity we focus on?"
+        },
+        {
+          "id": "C16",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C16",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll focus on Interim Spaces. What do you look after in your work as a trustee?"
+        },
+        {
+          "id": "C16",
+          "index": 5,
+          "role": "user",
+          "text": "Finance and fundraising."
+        },
+        {
+          "id": "C16",
+          "index": 6,
+          "role": "assistant",
+          "text": "That’s a broad remit, covering both raising funds and financial oversight. How did you hear about the platform?"
+        },
+        {
+          "id": "C16",
+          "index": 7,
+          "role": "user",
+          "text": "Through our charity network."
+        },
+        {
+          "id": "C16",
+          "index": 8,
+          "role": "assistant",
+          "text": "Good to hear the word’s reaching you through your charity network. Before we wrap up, one slightly different question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C16",
+          "index": 9,
+          "role": "user",
+          "text": "I'd rather not say."
+        },
+        {
+          "id": "C16",
+          "index": 10,
+          "role": "assistant",
+          "text": "Of course — no need to share. You can now create your account and explore the platform for Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "C17",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C17",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C17",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Sam Green, a trustee at Interim Spaces. My email is sam.green@example.invalid."
+        },
+        {
+          "id": "C17",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Sam. We can focus on your work as a trustee. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C17",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C17",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll start with Interim Spaces. What do you tend to look after as a trustee?"
+        },
+        {
+          "id": "C17",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C17",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks, Sam. How did you hear about the platform?"
+        },
+        {
+          "id": "C17",
+          "index": 7,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C17",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks — word of mouth, then. One slightly different question before we wrap up:\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C17",
+          "index": 9,
+          "role": "user",
+          "text": "That's a strange question."
+        },
+        {
+          "id": "C17",
+          "index": 10,
+          "role": "assistant",
+          "text": "Fair point — that was a bit out of the blue, and you don’t need to answer it. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C18",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C18",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C18",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Eva Fox, a trustee at Interim Spaces. My email is eva.fox@example.invalid."
+        },
+        {
+          "id": "C18",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Eva. Would you like to start with Interim Spaces as the charity we focus on?"
+        },
+        {
+          "id": "C18",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C18",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces, then. What do you look after in your role as a trustee?"
+        },
+        {
+          "id": "C18",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C18",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks, Eva. How did you hear about the platform?"
+        },
+        {
+          "id": "C18",
+          "index": 7,
+          "role": "user",
+          "text": "A search engine."
+        },
+        {
+          "id": "C18",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks, Eva. Before we wrap up, here’s a slightly different question — take it however you like.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C18",
+          "index": 9,
+          "role": "user",
+          "text": "Nothing, actually."
+        },
+        {
+          "id": "C18",
+          "index": 10,
+          "role": "assistant",
+          "text": "That’s good to hear, Eva. When you’re ready, create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C19",
+      "passed": true,
+      "turns": 2,
+      "transcript": [
+        {
+          "id": "C19",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C19",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C19",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Marcus. We can focus on your work as a trustee. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C19",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C19",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks for confirming Interim Spaces. What do you mainly look after as a trustee?"
+        },
+        {
+          "id": "C19",
+          "index": 5,
+          "role": "user",
+          "text": "I'm in a hurry. Can I just get into the platform now?"
+        },
+        {
+          "id": "C19",
+          "index": 6,
+          "role": "assistant",
+          "text": "Of course — no more questions. Create your account to get started and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C20",
+      "passed": true,
+      "turns": 2,
+      "transcript": [
+        {
+          "id": "C20",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C20",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Jon King, a trustee at Interim Spaces. My email is jon.king@example.invalid."
+        },
+        {
+          "id": "C20",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Jon. Shall we start with Interim Spaces as the charity you’d like to focus on?"
+        },
+        {
+          "id": "C20",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C20",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll focus on Interim Spaces. What do you look after in your role as a trustee?"
+        },
+        {
+          "id": "C20",
+          "index": 5,
+          "role": "user",
+          "text": "I oversee governance. Please skip the optional questions and let me continue."
+        },
+        {
+          "id": "C20",
+          "index": 6,
+          "role": "assistant",
+          "text": "Understood — we’ll leave the optional questions there. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C21",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C21",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C21",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Maya Wood, a trustee at Interim Spaces. My email is maya.wood@example.invalid."
+        },
+        {
+          "id": "C21",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Maya. Thanks for introducing yourself. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C21",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C21",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll start with Interim Spaces. What do you focus on in your work as a trustee?"
+        },
+        {
+          "id": "C21",
+          "index": 5,
+          "role": "user",
+          "text": "Finance. Does this replace our accountant?"
+        },
+        {
+          "id": "C21",
+          "index": 6,
+          "role": "assistant",
+          "text": "No — it can support your finance oversight with SORP guidance and readiness tools, but it doesn’t replace your accountant or their professional judgement. How did you hear about the platform?"
+        },
+        {
+          "id": "C21",
+          "index": 7,
+          "role": "user",
+          "text": "A fellow trustee."
+        },
+        {
+          "id": "C21",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks — good to know a fellow trustee pointed you our way. Before we wrap up, here’s a slightly different question — take it in whatever direction you like.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C21",
+          "index": 9,
+          "role": "user",
+          "text": "Keeping our reporting manageable."
+        },
+        {
+          "id": "C21",
+          "index": 10,
+          "role": "assistant",
+          "text": "Reporting should be useful without becoming a burden in its own right. When you’re ready, create your account to explore Interim Spaces and the SORP guidance and reporting tools."
+        }
+      ]
+    },
+    {
+      "id": "C22",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C22",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C22",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C22",
+          "index": 2,
+          "role": "assistant",
+          "text": "Nice to meet you, Marcus. Shall we start with Interim Spaces as the charity you’re here about?"
+        },
+        {
+          "id": "C22",
+          "index": 3,
+          "role": "user",
+          "text": "I already told you Interim Spaces."
+        },
+        {
+          "id": "C22",
+          "index": 4,
+          "role": "assistant",
+          "text": "You did — sorry for the repetition. Shall I look for Interim Spaces?"
+        },
+        {
+          "id": "C22",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C22",
+          "index": 6,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you mainly focus on in your work as a trustee?"
+        },
+        {
+          "id": "C22",
+          "index": 7,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C22",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks, Marcus. How did you first hear about the platform?"
+        },
+        {
+          "id": "C22",
+          "index": 9,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C22",
+          "index": 10,
+          "role": "assistant",
+          "text": "Ah, your pal pointed you our way. Before we leave it there, I’m curious about something a bit broader.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C22",
+          "index": 11,
+          "role": "user",
+          "text": "Deadlines."
+        },
+        {
+          "id": "C22",
+          "index": 12,
+          "role": "assistant",
+          "text": "Deadlines can make it hard to switch off. When you’re ready, create your account and explore the SORP guidance for Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "C23",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C23",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C23",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Gareth Hill, a trustee at Interim Spaces. My email is gareth.hill@example.invalid."
+        },
+        {
+          "id": "C23",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Gareth. Shall we start with Interim Spaces as the charity you’re here for?"
+        },
+        {
+          "id": "C23",
+          "index": 3,
+          "role": "user",
+          "text": "Actually, let’s use Brainstrust instead."
+        },
+        {
+          "id": "C23",
+          "index": 4,
+          "role": "assistant",
+          "text": "Of course — let’s use Brainstrust instead. Next, we’ll look for its official charity record for you to check."
+        },
+        {
+          "id": "C23",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C23",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks — we’ll use Brainstrust. Thinking about your trustee work, what responsibilities do you mainly take on?"
+        },
+        {
+          "id": "C23",
+          "index": 7,
+          "role": "user",
+          "text": "Financial oversight."
+        },
+        {
+          "id": "C23",
+          "index": 8,
+          "role": "assistant",
+          "text": "So financial reporting is particularly relevant to your trustee role. How did you first hear about the platform?"
+        },
+        {
+          "id": "C23",
+          "index": 9,
+          "role": "user",
+          "text": "A friend sent a link."
+        },
+        {
+          "id": "C23",
+          "index": 10,
+          "role": "assistant",
+          "text": "Thanks for giving it a look. Before we wrap up, one slightly different question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C23",
+          "index": 11,
+          "role": "user",
+          "text": "Knowing our reports are accurate."
+        },
+        {
+          "id": "C23",
+          "index": 12,
+          "role": "assistant",
+          "text": "Being confident that your reports are accurate matters, especially with financial oversight in your hands. You can now create your account and explore the SORP guidance and reporting support for Brainstrust."
+        }
+      ]
+    },
+    {
+      "id": "C24",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C24",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C24",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Leah Stone, a trustee at Interim Spaces. My email is leah.stone@example.invalid."
+        },
+        {
+          "id": "C24",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Leah. Shall we start with Interim Spaces as the charity you’d like to focus on?"
+        },
+        {
+          "id": "C24",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C24",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll focus on Interim Spaces. What do you mainly look after as a trustee?"
+        },
+        {
+          "id": "C24",
+          "index": 5,
+          "role": "user",
+          "text": "I look after the accounts, although I used to run fundraising at Blue Cross."
+        },
+        {
+          "id": "C24",
+          "index": 6,
+          "role": "assistant",
+          "text": "You’ve seen both sides of charity finances — raising funds and looking after the accounts. How did you come across the platform?"
+        },
+        {
+          "id": "C24",
+          "index": 7,
+          "role": "user",
+          "text": "A former colleague."
+        },
+        {
+          "id": "C24",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks — good to know. To finish on a slightly different note, this next question needn’t be about work.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C24",
+          "index": 9,
+          "role": "user",
+          "text": "Frogs. We run a wetland project and disease is wiping out the local population."
+        },
+        {
+          "id": "C24",
+          "index": 10,
+          "role": "assistant",
+          "text": "That sounds deeply worrying — losing the local frogs to disease is a serious concern for your wetland project. When you’re ready, you can create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    },
+    {
+      "id": "C25",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C25",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C25",
+          "index": 1,
+          "role": "user",
+          "text": "I’m worried our charity may have to close. I’m Kelly."
+        },
+        {
+          "id": "C25",
+          "index": 2,
+          "role": "assistant",
+          "text": "I’m sorry you’re facing that uncertainty, Kelly. We can take this a step at a time. What’s your role at the charity, what’s it called, and which email address would you like to use?"
+        },
+        {
+          "id": "C25",
+          "index": 3,
+          "role": "user",
+          "text": "My full name is Kelly White. My email is kelly.white@example.invalid. I’m the CEO of Interim Spaces."
+        },
+        {
+          "id": "C25",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thank you, Kelly. Facing possible closure as CEO is a serious responsibility. Would you like to start by looking up Interim Spaces?"
+        },
+        {
+          "id": "C25",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C25",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thank you — we’ll use Interim Spaces. What is taking up most of your time as CEO at the moment?"
+        },
+        {
+          "id": "C25",
+          "index": 7,
+          "role": "user",
+          "text": "I lead the team and funding applications."
+        },
+        {
+          "id": "C25",
+          "index": 8,
+          "role": "assistant",
+          "text": "You’re leading the team and seeking funding while the charity’s future is uncertain. What’s putting the most pressure on its ability to stay open?"
+        },
+        {
+          "id": "C25",
+          "index": 9,
+          "role": "user",
+          "text": "One major grant is ending and we have not secured a replacement."
+        },
+        {
+          "id": "C25",
+          "index": 10,
+          "role": "assistant",
+          "text": "That leaves a serious funding gap, especially with the charity’s future at stake. How did you find out about this platform?"
+        },
+        {
+          "id": "C25",
+          "index": 11,
+          "role": "user",
+          "text": "Our finance adviser sent me here."
+        },
+        {
+          "id": "C25",
+          "index": 12,
+          "role": "assistant",
+          "text": "Thanks — I’m glad your finance adviser pointed you our way. You can now create your account and explore the SORP guidance and readiness tools for Interim Spaces."
+        }
+      ]
+    },
+    {
+      "id": "C26",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C26",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C26",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Theo Wells, a trustee at Interim Spaces. My email is theo.wells@example.invalid."
+        },
+        {
+          "id": "C26",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Theo. We can focus on what SORP 2026 means for your work as a trustee. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C26",
+          "index": 3,
+          "role": "action",
+          "text": "Edited profile: {\"email\":\"theo.corrected@example.invalid\"}"
+        },
+        {
+          "id": "C26",
+          "index": 4,
+          "role": "action",
+          "text": "Reloaded and resumed the same introduction."
+        },
+        {
+          "id": "C26",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C26",
+          "index": 6,
+          "role": "assistant",
+          "text": "Interim Spaces it is. What do you mainly look after as a trustee at Interim Spaces?"
+        },
+        {
+          "id": "C26",
+          "index": 7,
+          "role": "user",
+          "text": "Budgets. Also, can I use this on my phone?"
+        },
+        {
+          "id": "C26",
+          "index": 8,
+          "role": "assistant",
+          "text": "Yes, you can use it on your phone. And thanks — budgets are your main focus as a trustee. How did you hear about the platform?"
+        },
+        {
+          "id": "C26",
+          "index": 9,
+          "role": "user",
+          "text": "An email from another trustee."
+        },
+        {
+          "id": "C26",
+          "index": 10,
+          "role": "assistant",
+          "text": "Thanks — a fellow trustee pointed you our way, then. Before we wrap up, here’s a question you can take in any direction.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C26",
+          "index": 11,
+          "role": "user",
+          "text": "My ability to persuade people to send their figures before the deadline."
+        },
+        {
+          "id": "C26",
+          "index": 12,
+          "role": "assistant",
+          "text": "Keeping budgets on track is harder when you’re still chasing the figures. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ]
+    }
+  ]
+}

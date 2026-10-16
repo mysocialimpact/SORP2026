@@ -1,5 +1,9 @@
 # Conversational intelligence evaluation
 
+For complete social-quality acceptance, use the 26-journey suite and independent
+rubric in [SOCIAL-REVIEW.md](SOCIAL-REVIEW.md). The narrower factual suite below
+cannot establish that a conversation is natural or that its ending is appropriate.
+
 `npm run test:onboarding` runs deterministic reducer, provenance, validation and
 question-planning regressions without API charges. CI runs it on engine changes.
 `npm run test:product-unit` runs the wider product checks.
@@ -12,7 +16,9 @@ confirmation boundaries, resumption and completion. Registry confirmation fixtur
 are synthetic: this suite does not certify a regulator match. Reports are written
 to `test-results/onboarding-live-eval.json`; do not publish conversations from real users.
 
-Runs are bounded to 40 model requests and $1.20 in conservative reservations.
+Runs are bounded to 40 answers (two model stages per answer) and $1.20, including
+measured spend plus conservative admission reservations. Unknown failures retain
+the full reservation.
 Token-based estimated cost is recorded separately. Set `SORP_EVAL_IDS` to comma-separated
 journey IDs for targeted investigation. Live evaluation is deliberately opt-in, so
 ordinary PR builds do not silently incur model costs. A passing run is evidence for

@@ -4,6 +4,7 @@ import { journeys } from "./journeys.mjs";
 import {
   interpretWithModel,
   ONBOARDING_MODEL,
+  DIALOGUE_MODEL,
   MODEL_RESERVATION_USD,
 } from "../../src/lib/onboarding/model.ts";
 import { processTurn } from "../../src/lib/onboarding/engine.ts";
@@ -24,6 +25,9 @@ if (!process.env.OPENAI_API_KEY && !process.env.OPEN_API_KEY)
   throw new Error("Existing model credential required; no simulated pass.");
 const report = {
   model: ONBOARDING_MODEL,
+  dialogueModel: DIALOGUE_MODEL,
+  stages: 2,
+  apiCalls: 0,
   startedAt: new Date().toISOString(),
   calls: 0,
   inputTokens: 0,
@@ -44,6 +48,7 @@ async function bounded(text, state) {
     throw new Error("Live evaluation budget exhausted");
   reserved += MODEL_RESERVATION_USD;
   report.calls++;
+  report.apiCalls += 2;
   lastInterpretation = undefined;
   let result;
   try {
@@ -58,6 +63,8 @@ async function bounded(text, state) {
     }
     throw e;
   }
+  reserved -= MODEL_RESERVATION_USD - result.usage.estimatedUsd;
+  assert.ok(!result.notice, result.notice);
   report.inputTokens += result.usage.input;
   report.outputTokens += result.usage.output;
   report.estimatedUsd += result.usage.estimatedUsd;
