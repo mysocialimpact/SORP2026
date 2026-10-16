@@ -1,4 +1,5 @@
 "use client";
+import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -71,7 +72,7 @@ export function ExcellenceAssessment() {
       cache: "no-store",
     }).then(async response => {
       const payload = await response.json().catch(() => ({})) as ProductPayload;
-      if (response.status === 401) { router.replace("/login/?return=/social-impact-excellence/assessment/"); return; }
+      if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/assessment/"))); return; }
       if (!response.ok) throw new Error(payload.error || "Your saved assessment could not be opened.");
       let local: SnapshotDraft | null = null;
       try { local = safeDraft(JSON.parse(localStorage.getItem(LOCAL_KEY) || "null")); } catch { /* account copy remains authoritative */ }

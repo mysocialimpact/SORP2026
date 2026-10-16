@@ -1,6 +1,17 @@
 {
   "crons": [
-    { "path": "/api/internal/console-backup/", "schedule": "0 6 * * *" },
-    { "path": "/api/internal/charity-preparation/", "schedule": "15 6 * * *" }
-  ]
+    {
+      "path": "/api/internal/console-backup/",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/internal/charity-preparation/",
+      "schedule": "15 6 * * *"
+    }
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "integration/central-registration-build-bar": false
+    }
+  }
 }

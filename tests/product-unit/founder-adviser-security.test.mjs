@@ -51,8 +51,9 @@ test("invitation signup preserves context and acceptance still requires authenti
   assert.match(invitation, /Sign up to accept invitation/);
   assert.match(invitation, /Already have an account\? Log in/);
   assert.match(accountPortal, /params\.get\("next"\)/);
-  assert.match(accountPortal, /invitationToken: invitationToken \|\| undefined/);
-  assert.match(accountPortal, /readOnly=\{Boolean\(invitationEmail\)\}/);
+  assert.match(invitation, /get-started\/\?next=/);
+  assert.doesNotMatch(accountPortal, /action: "signup"/);
+  assert.match(invitation, /different account/);
 });
 
 test("the organisation drawer exposes truthful invitation tracking and existing secure actions", () => {

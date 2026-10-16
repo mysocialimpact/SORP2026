@@ -1,4 +1,5 @@
 "use client";
+import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -38,7 +39,7 @@ export function TeamWorkspace() {
 
   async function load() {
     try { setWorkspace(await post({ action: "team-workspace" }) as Workspace); }
-    catch (caught) { if ((caught as { status?: number }).status === 401) router.replace("/login/?return=/social-impact-excellence/team/"); else setError(caught instanceof Error ? caught.message : "The team workspace could not be opened."); }
+    catch (caught) { if ((caught as { status?: number }).status === 401) router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/team/"))); else setError(caught instanceof Error ? caught.message : "The team workspace could not be opened."); }
   }
   useEffect(() => { const timer = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timer); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

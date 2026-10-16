@@ -1,4 +1,5 @@
 "use client";
+import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -24,7 +25,7 @@ export function PurposeEvidenceUpload() {
     const productRequest = { action: "load-product", productId: "social-impact-excellence" };
     const filesRequest = { action: "list-product-files", productId: "social-impact-excellence", purpose: "purpose-evidence" };
     void Promise.all([productRequest, filesRequest].map(body => fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), cache: "no-store" }).then(async response => ({ response, payload: await response.json() as Payload })))).then(([product, files]) => {
-      if (product.response.status === 401) { router.replace("/login/?return=/social-impact-excellence/purpose/evidence/"); return; }
+      if (product.response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/purpose/evidence/"))); return; }
       if (!product.response.ok) throw new Error(product.payload.error || "Your Purpose workspace could not be loaded.");
       if (!product.payload.productProgress?.data?.result) { router.replace("/social-impact-excellence/assessment/"); return; }
       const next = normalisePurposeWorkspace(product.payload.productProgress.data.purpose, product.payload.account);

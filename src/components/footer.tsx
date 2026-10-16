@@ -6,22 +6,11 @@ import { Arrow } from "./ui";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { buildInformation, formatBuildTimestamp } from "@/lib/build-information";
 export function Footer() {
   const pathname = usePathname();
   if (pathname === "/founder" || pathname.startsWith("/founder/")) return null;
-  const builtAt = process.env.NEXT_PUBLIC_SITE_BUILT_AT!;
-  const buildDate = new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "Europe/London",
-  }).format(new Date(builtAt));
-  const buildTime = new Intl.DateTimeFormat("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Europe/London",
-  }).format(new Date(builtAt));
+  const { number, deployedAt: builtAt } = buildInformation;
   return (
     <footer className="footer gateway-footer">
       <div className="gateway-width">
@@ -49,10 +38,10 @@ export function Footer() {
           <Link href="/privacy/">Privacy &amp; accessibility</Link>
           <p>The Ideas Shed Limited · Company 17380053</p>
           <p className="gateway-build" aria-label="Website build information">
-            <strong>Build {process.env.NEXT_PUBLIC_SITE_BUILD_NUMBER}</strong>
+            <strong>Build {number || "local"}</strong>
             {" · "}
             <time dateTime={builtAt}>
-              {buildDate} · {buildTime}
+              {formatBuildTimestamp(builtAt)}
             </time>
           </p>
         </div>

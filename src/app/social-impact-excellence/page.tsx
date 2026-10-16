@@ -72,10 +72,10 @@ export default function ExcellencePage() {
       </section>
 
       <section id="excellence-start" className="excellence-public-access gateway-width" aria-labelledby="excellence-access-title">
-        <div><p className="gateway-kicker">Your starting point on SORP2026.org</p><h2 id="excellence-access-title">Start with<br />SORP readiness.</h2></div>
+        <div><p className="gateway-kicker">Your starting point on SORP2026.org</p><h2 id="excellence-access-title">Start with<br />your organisation.</h2></div>
         <div>
-          <p>Begin with SORP readiness, create your account and discover the next steps towards Social Impact Excellence.</p>
-          <Link className="gateway-action" href="/are-you-sorp-ready/">Start with Are You SORP Ready? <Arrow /></Link>
+          <p>Create your SORP2026 account and begin your Social Impact Excellence baseline.</p>
+          <Link className="gateway-action" href="/get-started/?next=%2Fsocial-impact-excellence%2Fassessment%2F">Get started with Social Impact Excellence <Arrow /></Link>
           <p className="excellence-access-note">The Social Impact Maturity Assessment is available inside your registered SORP2026 account.</p>
           <Link className="excellence-login-link" href="/login/?return=/social-impact-excellence/">Already registered? Log in <Arrow /></Link>
         </div>

@@ -7,6 +7,8 @@ import "@fontsource/instrument-serif/400.css";
 import "@fontsource/instrument-serif/400-italic.css";
 import "@fontsource/lora/400.css";
 import "./globals.css";
+import "./build-information.css";
+import { BuildInformationBar } from "@/components/build-information-bar";
 import "./gateway.css";
 import "./platform.css";
 import "./typography.css";
@@ -65,6 +67,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
+        <BuildInformationBar />
         <PlatformNavigation><Header /><ProductFolderTabs /><FounderAdminNavigation /></PlatformNavigation>
         <SharedCharityContext />
         {children}

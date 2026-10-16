@@ -1,17 +1,18 @@
 import type { NextConfig } from "next";
 const live = process.env.SITE_LIVE === "true";
-// Next inlines these values into the compiled application. They identify the
-// build, not the visitor's clock or the time a server renders the footer.
-const builtAt = new Date(
-  process.env.SORP_BUILD_TIMESTAMP || Date.now(),
-).toISOString();
-// Keep this as a simple release counter. Increment it for each approved
-// website release; SORP_BUILD_NUMBER can override it in a release pipeline.
-const buildNumber = process.env.SORP_BUILD_NUMBER || "20";
+import { readFileSync } from "node:fs";
+// Written by prepare-build exactly once, reused by every Next process.
+const metadata = (() => {
+  try { return JSON.parse(readFileSync(".sorp-build.json", "utf8")); }
+  catch { return { number: null, deployedAt: null, environment: "development" }; }
+})();
+if (process.env.VERCEL === "1" && !metadata.number) throw new Error("Run npm run build to prepare deployment metadata first.");
 const config: NextConfig = {
   env: {
-    NEXT_PUBLIC_SITE_BUILD_NUMBER: buildNumber,
-    NEXT_PUBLIC_SITE_BUILT_AT: builtAt,
+    NEXT_PUBLIC_SITE_BUILD_NUMBER: String(metadata.number || ""),
+    NEXT_PUBLIC_SITE_BUILT_AT: metadata.deployedAt || "",
+    NEXT_PUBLIC_SITE_BUILD_ENVIRONMENT: metadata.environment,
+    NEXT_PUBLIC_ISOLATED_PREVIEW: process.env.VERCEL_ENV === "preview" && process.env.SORP_ISOLATED_PREVIEW === "true" ? "true" : "false",
   },
   poweredByHeader: false,
   trailingSlash: true,
@@ -19,8 +20,9 @@ const config: NextConfig = {
     ? { output: "export" as const, images: { unoptimized: true } }
     : {}),
   async redirects() {
+    const legacy = ["/signup", "/sign-up", "/register"].map(source => ({ source, destination: "/get-started/", permanent: false }));
     return live
-      ? [
+      ? [...legacy,
           {
             source: "/:path*",
             has: [{ type: "host", value: "(www\\.)?sorp2026\\.com" }],
@@ -34,10 +36,14 @@ const config: NextConfig = {
             permanent: true,
           },
         ]
-      : [];
+      : legacy;
   },
   async headers() {
     return [
+      {
+        source: "/build-info.json",
+        headers: [{ key: "Cache-Control", value: "no-store, max-age=0" }],
+      },
       {
         source: "/:path*",
         headers: [
