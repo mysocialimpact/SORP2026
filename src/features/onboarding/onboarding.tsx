@@ -750,7 +750,7 @@ export function Onboarding() {
                     </div>
                   </div>
                 )}
-                {objective === "charity" && charityLookup}
+                {(objective === "charity" || (ready && !selected)) && charityLookup}
                 {(!completed || editingComplete) && (
                   <form
                     onSubmit={(e) => void send(e)}
@@ -820,7 +820,7 @@ export function Onboarding() {
                     Continue with these details →
                   </button>
                 )}
-                {!completed && objective !== "registration" && (
+                {!completed && !["registration", "charity"].includes(objective) && (
                   <button
                     className="onboarding-skip"
                     disabled={busy}
@@ -843,7 +843,7 @@ export function Onboarding() {
                     <p>
                       {selected
                         ? `Your profile and ${selected.name} will give us a useful place to begin.`
-                        : "Your introduction is ready. You can add a charity later."}
+                        : "Confirm one starting charity before creating your account."}
                     </p>
                     <button
                       className="onboarding-primary"
