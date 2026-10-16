@@ -1,4 +1,5 @@
 "use client";
+import { loadSharedContext } from "@/features/onboarding/shared-context";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AccountPortal } from "@/components/account-portal";
 import {
@@ -88,6 +89,8 @@ export function DirectorAssessment() {
                 step: window.location.hash === "#assessment" ? 0 : -1,
                 organisation: data.account.organisation || "",
               };
+          const shared = !remote.organisation ? await loadSharedContext(controller.signal).catch(() => null) : null;
+          if (shared?.charity?.candidate.name) remote.organisation = shared.charity.candidate.name;
           saved.current = JSON.stringify(remote);
           setDraft(remote);
           try {

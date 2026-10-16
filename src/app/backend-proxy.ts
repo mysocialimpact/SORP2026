@@ -7,7 +7,8 @@ export async function proxyExistingSorpBackend(request: Request, pathname: strin
   const incoming = new URL(request.url);
   if (request.method !== "GET" && request.method !== "HEAD") {
     const requestOrigin = request.headers.get("origin");
-    if (requestOrigin && requestOrigin !== incoming.origin) return Response.json({ error: "Cross-site requests are not accepted." }, { status: 403 });
+    const expectedOrigin = `${request.headers.get("x-forwarded-proto") || incoming.protocol.slice(0, -1)}://${request.headers.get("host") || incoming.host}`;
+    if (requestOrigin && requestOrigin !== expectedOrigin) return Response.json({ error: "Cross-site requests are not accepted." }, { status: 403 });
     if (request.headers.get("sec-fetch-site") === "cross-site") return Response.json({ error: "Cross-site requests are not accepted." }, { status: 403 });
   }
   const target = new URL(pathname, origin);

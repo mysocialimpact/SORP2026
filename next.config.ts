@@ -54,6 +54,10 @@ const config: NextConfig = {
             : []),
         ],
       },
+      {
+        source: "/get-started/:path*",
+        headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" }],
+      },
     ];
   },
 };

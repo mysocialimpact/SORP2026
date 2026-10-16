@@ -38,24 +38,26 @@ test("all five products have distinct working destinations", async ({ page }) =>
   }
 });
 
-test("global login uses the existing account service and keeps Google hidden", async ({ page }) => {
+test("global registration uses central onboarding and the existing account service", async ({ page }) => {
   const writes: Record<string, unknown>[] = [];
   await page.route("**/api/readiness-account/**", async route => {
     if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: false } });
     writes.push(route.request().postDataJSON());
-    return route.fulfill({ status: 201, json: { account: { name: "QA Person", email: "qa@example.invalid" } } });
+    return route.fulfill({ status: 202, json: { verificationRequired: true } });
   });
+  await page.route("**/api/onboarding/start/", route => route.fulfill({status:503,json:{error:"Fixture has no conversation service"}}));
   await page.goto("/login/?mode=signup&return=/dashboard/");
-  await expect(page.getByText(/Google sign-in is currently unavailable/)).toBeVisible();
+  await expect(page).toHaveURL(/get-started/);
   await expect(page.getByRole("link", { name: /Google/i })).toHaveCount(0);
-  await page.getByLabel("Your name").fill("QA Person");
-  await page.getByLabel("Your role").selectOption("TRUSTEE / CHAIR");
-  await page.getByRole("main").getByLabel("Email address").fill("qa@example.invalid");
-  await page.getByLabel("Password", { exact: true }).fill("Safe password 123");
-  await page.getByLabel("Confirm password").fill("Safe password 123");
-  await page.getByRole("button", { name: "Create my SORP2026 account →" }).click();
+  await page.getByRole("button",{name:"Fill in the form yourself"}).click();
+  await page.locator(".onboarding-profile input[name=name]").fill("QA Person");
+  await page.locator(".onboarding-profile input[name=role]").fill("TRUSTEE / CHAIR");
+  await page.locator(".onboarding-profile input[name=email]").fill("qa@example.invalid");
+  await page.locator(".profile-next").getByRole("button",{name:/Create my account/}).click();
+  await page.getByLabel("Choose a password").fill("Safe password 123");
+  await page.getByLabel("Confirm your password").fill("Safe password 123");
+  await page.locator("dialog").getByRole("button", { name: /Create my account/ }).click();
   await expect.poll(() => writes.length).toBe(1);
-  expect(writes).toHaveLength(1);
   expect(writes[0]).toMatchObject({ action: "signup", email: "qa@example.invalid", position: "TRUSTEE / CHAIR" });
   expect((writes[0].progress as Record<string, unknown>).step).toBe("scope");
 });

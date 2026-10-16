@@ -1,5 +1,4 @@
 import { proxyExistingSorpBackend } from "../../backend-proxy.ts";
-import { isReadinessComplete } from "../../../lib/readiness-status.ts";
 import { independentAuthCutover } from "../../../lib/sorp-auth/switch.ts";
 
 export const runtime = "nodejs";
@@ -22,10 +21,10 @@ export async function POST(request: Request) {
     const accountResponse = await proxyExistingSorpBackend(accountRequest, "/api/readiness-account");
     const account = await accountResponse.clone().json().catch(() => ({}));
     if (!accountResponse.ok) return accountResponse;
-    if (account.signedIn !== true || !isReadinessComplete(account.progress)) {
+    if (account.signedIn !== true) {
       return Response.json(
-        { error: "Complete your free SORP readiness review before starting a Charity Impact Report review." },
-        { status: account.signedIn === true ? 403 : 401 },
+        { error: "Sign in before starting a Charity Impact Report review." },
+        { status: 401 },
       );
     }
   }

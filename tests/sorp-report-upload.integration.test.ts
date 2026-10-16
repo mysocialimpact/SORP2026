@@ -64,7 +64,7 @@ async function chunk(token: string, index: number, bytes: Uint8Array, cookie: st
   }));
 }
 
-test("report upload is readiness-gated, session-bound, private and validates complete PDF bytes", async () => {
+test("report upload is independent of readiness, session-bound, private and validates complete PDF bytes", async () => {
   const owner = await createUser(ownerId);
   const other = await createUser(otherId);
   const adviser = await createUser(adviserId);
@@ -81,8 +81,7 @@ test("report upload is readiness-gated, session-bound, private and validates com
   pdf.write("%%EOF\n", pdf.length - 6);
   const meta = { filename: "trust-report.pdf", contentType: "application/pdf", sizeBytes: pdf.length,
     organisation: "Synthetic charity", organisationId: charityOrganisationId, customerContext: "Synthetic only" };
-  assert.equal((await account("create-report-upload", owner, meta)).status, 403);
-  assert.equal((await account("save", owner, { progress: { step: "done", sessionId: "synthetic" } })).status, 200);
+  // New accounts can use reports directly; all ownership checks still apply.
   assert.equal((await account("create-report-upload", other, meta)).status, 403,
     "ordinary charity members cannot store reports in the shared workspace");
   const prepared = await account("create-report-upload", owner, meta);

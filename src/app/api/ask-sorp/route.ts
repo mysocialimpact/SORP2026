@@ -49,10 +49,20 @@ export async function POST(request: Request) {
   if (address) headers["x-forwarded-for"] = address;
 
   try {
+    let history = cleanHistory(input.history);
+    if (process.env.SORP_ONBOARDING_ENABLED === "true" && request.headers.get("cookie")) {
+      try {
+        const { platformIdentity } = await import("@/lib/platform/auth");
+        const { query } = await import("@/lib/console/db");
+        const identity = await platformIdentity(request.headers.get("cookie") || "");
+        const [charity] = await query<{name:string;number:string}>(`SELECT c.candidate->>'name' name,c.candidate->>'registrationNumber' number FROM research_console.onboarding_profiles p JOIN research_console.charity_intelligence c ON c.identity=p.charity_identity WHERE p.account_id=$1`,[identity.account.id]);
+        if (charity) history = [{role:"user",content:`Application context, not a previous user statement: the account selected charity ${JSON.stringify({name:charity.name,registrationNumber:charity.number})}. This identifies their charity only; it is not evidence of its accounts, income or SORP obligations. Continue to ground answers in authoritative SORP sources.`},...history.slice(-5)];
+      } catch { /* Shared context must never interrupt the original standalone product. */ }
+    }
     const response = await fetch(upstream, {
       method: "POST",
       headers,
-      body: JSON.stringify({ question, history: cleanHistory(input.history), round, sessionId, requestId }),
+      body: JSON.stringify({ question, history, round, sessionId, requestId }),
       cache: "no-store",
       signal: AbortSignal.timeout(55_000),
     });

@@ -59,6 +59,13 @@ export default function Privacy() {
         </p>
       </section>
       <section>
+        <h2>Your conversational introduction</h2>
+        <p>“Let’s Get Started” offers an optional conversation alongside an editable form. When conversation assistance is enabled, your answers and the details you provide are sent to our AI provider to organise your introduction. Passwords use separate secure account fields and are never requested by the assistant. You can use the form without AI.</p>
+        <p>A necessary, HTTP-only cookie connects your introduction during this visit. Unclaimed server drafts expire after 24 hours and are removed during maintenance or the next new introduction. When you create your account, your introduction, selected charity and voluntarily shared concerns are kept with it so authorised team members can continue a future conversation. Campaign labels and referring website origin are kept separately from how you say you found us; these labels do not prove a referral.</p>
+        <p>If you record an answer, your browser asks for microphone permission. Audio is sent to our existing transcription service. This page keeps a failed recording only in memory for retry and discards it after successful transcription or when you leave. We do not create a permanent recording in the onboarding store. The connected transcription provider’s retention arrangements still apply. Avoid sharing confidential client information or sensitive personal details.</p>
+        <p>Confirmed charities may share a cached file of public registry information, source links and permitted public documents. This public file is separate from your private conversation and does not grant access to another user’s work or change your subscription. Contact My Social Impact to request access to, correction of or deletion of your introduction.</p>
+      </section>
+      <section>
         <h2>Charity accountants directory</h2>
         <p>The directory needs no account. Your shortlist is stored only in this browser tab for this visit. A postcode you submit is sent to Postcodes.io to find its approximate location; we do not request your device’s location. OpenStreetMap supplies map tiles and receives ordinary connection information when the map loads. External firm and source links have their own privacy terms.</p>
         <p>Listing claims and professional partner enquiries send your name, email, firm, role and message through our existing SORP message service for My Social Impact to review and respond. Claims do not automatically transfer ownership or change a listing, and enquiries do not subscribe you to marketing or create a payment.</p>

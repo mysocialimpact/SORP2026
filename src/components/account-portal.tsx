@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { safeDestination } from "@/lib/onboarding/state";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 const roles = [
@@ -13,7 +14,7 @@ const roles = [
 type Mode = "login" | "signup";
 
 function safeReturn(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/dashboard/";
+  return safeDestination(value, true);
 }
 
 function signedInDestination(destination: string) {
@@ -37,6 +38,7 @@ function returnToEmbeddedProduct(destination: string) {
 
 export function AccountPortal({ returnTo, embedded = false }: { returnTo?: string; embedded?: boolean } = {}) {
   const params = useSearchParams();
+  const router = useRouter();
   const [mode, setMode] = useState<Mode>(params.get("mode") === "signup" ? "signup" : "login");
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -129,7 +131,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
   return <div className="account-portal">
     <div className="account-tabs" role="tablist" aria-label="Account action">
       <button type="button" role="tab" aria-selected={mode === "login"} onClick={() => { setMode("login"); setError(""); }}>Log in</button>
-      <button type="button" role="tab" aria-selected={mode === "signup"} onClick={() => { setMode("signup"); setError(""); }}>Create account</button>
+      <button type="button" role="tab" aria-selected={mode === "signup"} onClick={() => { if (!embedded && !invitationToken) { router.push(`/get-started/?next=${encodeURIComponent(destination)}`); return; } setMode("signup"); setError(""); }}>Create account</button>
     </div>
     {invitationName ? <p className="account-note"><strong>Invitation to join {invitationName}</strong><br/>Use {invitationEmail} to continue.</p> : null}
     {checking || invitationChecking ? <p className="account-checking" role="status">Checking your account and invitation…</p> : <form onSubmit={submit}>

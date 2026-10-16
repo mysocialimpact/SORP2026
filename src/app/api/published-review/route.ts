@@ -39,8 +39,28 @@ export async function POST(request: Request) {
         form.set("payload", JSON.stringify({ ...value, commercialPolicy: "Identify important reporting and evidence areas worth discussing. Do not prescribe, recommend or sell specific My Social Impact services. A human review determines what implementation work, if any, the charity needs." }));
       }
     }
+    // An explicit tool request can reuse an already stored public PDF. Onboarding
+    // never invokes report analysis. Missing cache/auth/storage retains the old path.
+    let useMultipart = multipart;
+    if (parsed?.operation === "prepare-tar" && request.headers.get("cookie") && process.env.SORP_ONBOARDING_ENABLED === "true") {
+      try {
+        const { platformIdentity } = await import("@/lib/platform/auth");
+        const { cachedCharityDocument, charityIdentity } = await import("@/lib/onboarding/intelligence");
+        const candidate = parsed.candidate as import("@/app/sorp-public-model").Candidate;
+        if (candidate?.reportUrl) {
+          const account = await platformIdentity(request.headers.get("cookie") || "");
+          const cached = await cachedCharityDocument(account.account.id,candidate.reportUrl,charityIdentity(candidate));
+          if (cached) {
+            const form = new FormData();
+            form.set("payload", JSON.stringify({...JSON.parse(body as string),sourceAcquisition:{kind:"cached-public-document",sourceUrl:candidate.reportUrl,sha256:cached.sha256,retrievedAt:cached.retrieved_at}}));
+            form.set("report",new Blob([new Uint8Array(cached.bytes)],{type:"application/pdf"}),"public-trustees-report.pdf");
+            body=form;useMultipart=true;
+          }
+        }
+      } catch { /* The existing public retrieval service remains available. */ }
+    }
     const base = process.env.SORP_READINESS_API_URL || "https://sorp2026.mysocialimpact.org/api/readiness";
-    const response = await fetch(new URL("/api/published-review", base), { method: "POST", headers: multipart ? undefined : { "content-type": "application/json" }, body });
+    const response = await fetch(new URL("/api/published-review", base), { method: "POST", headers: useMultipart ? undefined : { "content-type": "application/json" }, body });
     if (!response.headers.get("content-type")?.includes("json")) throw new Error("Unexpected research response");
     return new Response(await response.text(), { status: response.status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
   } catch { return Response.json({ error: "We could not reach the public research service. Your progress is saved, and no score has been produced from an unread report.", recovery: "retry", incidentId: null, diagnostic: { stage: "service-connection", source: "Public research service", validation: "not-run" } }, { status: 502 }); }

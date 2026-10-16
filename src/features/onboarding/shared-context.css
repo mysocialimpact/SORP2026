@@ -1,0 +1,46 @@
+.shared-charity-context {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 15px max(24px, calc((100vw - 1200px) / 2));
+  background: #eaf0e1;
+  border-bottom: 1px solid #d4decb;
+  color: #234330;
+  font-size: 12px;
+}
+.shared-charity-context > div > span {
+  display: block;
+  font-size: 10px;
+  color: #64735c;
+  margin-bottom: 4px;
+}
+.shared-charity-context strong {
+  font-weight: 500;
+}
+.shared-charity-context summary {
+  cursor: pointer;
+  font-size: 11px;
+}
+.shared-charity-context details > div {
+  display: grid;
+  gap: 10px;
+  max-width: 390px;
+  padding-top: 13px;
+}
+.shared-charity-context a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.shared-charity-context small {
+  font-size: 9px;
+  line-height: 1.5;
+  color: #64735c;
+}
+@media (max-width: 600px) {
+  .shared-charity-context {
+    padding: 13px 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}

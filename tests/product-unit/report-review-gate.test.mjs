@@ -10,34 +10,34 @@ function uploadRequest() {
   });
 }
 
-test("report upload remains locked until the readiness review is complete", async () => {
+test("report upload remains locked without an authenticated account", async () => {
   const previous = process.env.SORP_BACKEND_ORIGIN;
   const originalFetch = globalThis.fetch;
   process.env.SORP_BACKEND_ORIGIN = "https://mysocialimpact.example";
   let calls = 0;
   globalThis.fetch = async () => {
     calls += 1;
-    return Response.json({ signedIn: true, progress: { step: "criterion", sessionId: "active" } });
+    return Response.json({ signedIn: false, progress: { step: "criterion", sessionId: "active" } });
   };
   try {
     const response = await POST(uploadRequest());
-    assert.equal(response.status, 403);
+    assert.equal(response.status, 401);
     assert.equal(calls, 1);
-    assert.match((await response.json()).error, /complete your free SORP readiness review/i);
+    assert.match((await response.json()).error, /sign in/i);
   } finally {
     globalThis.fetch = originalFetch;
     if (previous === undefined) delete process.env.SORP_BACKEND_ORIGIN; else process.env.SORP_BACKEND_ORIGIN = previous;
   }
 });
 
-test("a completed readiness review can reach the established report workflow", async () => {
+test("an authenticated account can reach reports without a readiness review", async () => {
   const previous = process.env.SORP_BACKEND_ORIGIN;
   const originalFetch = globalThis.fetch;
   process.env.SORP_BACKEND_ORIGIN = "https://mysocialimpact.example";
   const methods = [];
   globalThis.fetch = async (_input, init) => {
     methods.push(init.method);
-    if (init.method === "GET") return Response.json({ signedIn: true, progress: { step: "report-ready", sessionId: "complete" } });
+    if (init.method === "GET") return Response.json({ signedIn: true, progress: { step: "scope", sessionId: "complete" } });
     return Response.json({ upload: { url: "https://upload.example", token: "secure" } });
   };
   try {

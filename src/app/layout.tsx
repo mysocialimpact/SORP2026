@@ -13,6 +13,7 @@ import "./typography.css";
 import "./refinement.css";
 import "./folder-continuity.css";
 import "./shared-contact.css";
+import { SharedCharityContext } from "@/features/onboarding/shared-context";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProductFolderTabs } from "@/components/product-folder-tabs";
@@ -65,6 +66,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <PlatformNavigation><Header /><ProductFolderTabs /><FounderAdminNavigation /></PlatformNavigation>
+        <SharedCharityContext />
         {children}
         <PageFeedback />
         <SayHello />

@@ -1,6 +1,5 @@
 import "server-only";
 import { createHash, randomBytes } from "node:crypto";
-import { isReadinessComplete } from "@/lib/readiness-status";
 import { sorpAuthPool } from "./auth";
 import { independentIdentity } from "./identity";
 
@@ -36,9 +35,8 @@ export async function listReportReviews(userId: string) {
 }
 
 export async function prepareReportUpload(request: Request, userId: string, progress: unknown, input: Input) {
-  if (!isReadinessComplete(progress as { step?: string })) {
-    throw new Error("Complete your free SORP readiness review before starting a Charity Impact Report review.");
-  }
+  // The existing verified identity and ownership checks authorise this product independently.
+  void progress;
   const filename = typeof input.filename === "string" ? input.filename.trim() : "";
   const organisation = typeof input.organisation === "string" ? input.organisation.trim() : "";
   const context = typeof input.customerContext === "string" ? input.customerContext.trim() : "";
@@ -107,8 +105,6 @@ export async function uploadReportChunk(request: Request) {
   if (length > CHUNK_BYTES + 16_384) return response({ error: "The file chunk is too large." }, 413);
   const identity = await independentIdentity(request.headers);
   if (!identity) return response({ error: "Sign in to upload a report." }, 401);
-  if (!isReadinessComplete(identity.progress as { step?: string }))
-    return response({ error: "Complete the free readiness review first." }, 403);
   const form = await request.formData().catch(() => null);
   const token = form?.get("token");
   const index = Number(form?.get("index"));
