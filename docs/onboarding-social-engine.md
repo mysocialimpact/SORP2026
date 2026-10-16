@@ -1,6 +1,7 @@
 # Social dialogue engine — release evidence
 
-Status: accepted for Build 20. All 26 conversations and four browser journeys passed
+Status: Build 20 deployed and production HTTP checks verified on 16 October 2026.
+All 26 conversations and four browser journeys passed
 the required checks and independent review. Earlier failed runs are retained
 in [the independent review](onboarding-independent-review.md); technical field-test
 success is not a conversational-quality pass.
@@ -117,7 +118,20 @@ transcription-provider delivery are not certified by this harness.
 ## Release
 
 Build 20 packages the accepted `ea52a28` engine; subsequent release edits are
-documentation, a server comment and the visible build number. Production promotion
-is pending. The previous working deployment, Build 19,
+documentation, a server comment and the visible build number. The initial production
+release was commit `f2e39024507c4285bba67a2deb510d8e8b26462e`, deployment
+`dpl_AeCPRZ3DLQHksecZT86gJavUyZC3`, READY on 16 October 2026. Production checks at
+13:09 UTC verified:
+
+- `https://sorp2026.org/get-started/`: HTTP 200 and visible Build 20 in the page shell.
+- `/api/onboarding/session/`: HTTP 200, `available:true`.
+- `/api/readiness-account/`: HTTP 200, `signedIn:false` for the anonymous check.
+
+These are deployment/availability checks, not a fresh production sign-up. Real-model
+interactive verification is the isolated acceptance evidence above. No real customer
+account, verification email or payment was created during release verification.
+Later documentation commits do not change the accepted engine.
+
+The previous working deployment, Build 19,
 `dpl_9cvsQzdiJwTWwy2U8HGv3tmUNtuq`, is retained as a rollback candidate. No
 authentication, payment, subscription or database migration accompanies this release.
