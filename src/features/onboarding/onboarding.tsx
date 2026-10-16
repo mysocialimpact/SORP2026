@@ -14,7 +14,6 @@ import {
   initialConversation,
   nextObjective,
   nextQuestion,
-  registrationReady,
   accountReady,
   validEmail,
   validEntity,
@@ -98,7 +97,7 @@ export function Onboarding() {
     ready = accountReady(state),
     completed = objective === "complete";
   const fieldComplete = (key: FieldKey) =>
-    key === "email"
+    key === "name" ? validEntity(state.facts.name,"name") && state.facts.name.trim().split(/\s+/).length > 1 : key === "email"
       ? validEmail(state.facts.email)
       : validEntity(state.facts[key], key);
   const count = fieldKeys.filter(fieldComplete).length + (state.natural?.independent && !fieldComplete("organisation") ? 1 : 0) + (selected ? 1 : 0);

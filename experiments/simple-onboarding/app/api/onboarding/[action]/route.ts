@@ -12,11 +12,11 @@ export async function POST(r:Request,{params}:{params:Promise<{action:string}>})
    const row=await load(r);if(!row) return json({error:'Start your introduction first.'},401);await claim(row);
    const bytes=await body(r,3600000);const form=await new Response(new Uint8Array(bytes),{headers:{'content-type':r.headers.get('content-type')||''}}).formData();const audio=form.get('audio');
    if(!(audio instanceof File)||audio.size>3500000||!/^audio\/(webm|mp4|ogg|wav|mpeg)/.test(audio.type))return json({error:'Use an audio recording under 3.5 MB.'},400);
-   const result=await budgeted(.10,async()=>{const outgoing=new FormData();outgoing.append('audio',audio,audio.name);const response=await fetch('https://sorp2026.mysocialimpact.org/api/transcribe',{method:'POST',body:outgoing,redirect:'error',signal:AbortSignal.timeout(35000)});const data=await response.json();if(!response.ok||typeof data.transcript!=='string')throw new Error('Transcription is unavailable. Please retry or type.');return {transcript:data.transcript.slice(0,3000),usage:{estimatedUsd:.10}};});
+   const result=await budgeted(.10,async()=>{const outgoing=new FormData();outgoing.append('audio',audio,audio.name);const response=await fetch('https://sorp2026.mysocialimpact.org/api/transcribe',{method:'POST',body:outgoing,redirect:'error',signal:AbortSignal.timeout(35000)});const data=await response.json();if(!response.ok||typeof data.transcript!=='string')throw new Error('Transcription is unavailable. Please retry or type.');return {transcript:data.transcript.slice(0,3000),usage:{unmetered:true}};});
    return json({transcript:result.transcript});
   }
   const data=JSON.parse((await body(r)).toString());
-  if(action==='start'){const row=await load(r);if(row)return json(snapshot(row.payload));const key=await start();const out=json({available:true});out.headers.append('set-cookie',`${cookie}=${key}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=86400`);return out;}
+  if(action==='start'){const row=await load(r);if(row)return json(snapshot(row.payload));const key=await start();const out=json(snapshot((await load(new Request(r.url,{headers:{cookie:`${cookie}=${key}`}}))).payload));out.headers.append('set-cookie',`${cookie}=${key}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=86400`);return out;}
   const row=await load(r);if(!row)return json({error:'Please reopen your introduction.'},401);
   if(data.revision!==undefined&&data.revision!==row.revision)return json({...snapshot(row.payload),error:'Your details changed. Please retry.'},409);
   await claim(row);let s=row.payload,state=s.state;

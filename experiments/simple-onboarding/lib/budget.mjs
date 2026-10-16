@@ -11,6 +11,7 @@ export async function budgeted(reserve,fn){
  const claimed=await database().query('UPDATE sorp_simple_demo_20261016.budget SET reserved_usd=reserved_usd+$1,calls=calls+1 WHERE id=1 AND reserved_usd+$1<=2 RETURNING id',[reserve]);
  if(!claimed.rowCount)throw new Error('The US$2 experiment budget has been reached. No model request was sent.');
  const result=await fn();
+ if(result.usage?.unmetered)return result;
  const cost=result.usage?.estimatedUsd;
  if(!Number.isFinite(cost)||cost<0||cost>reserve)throw new Error('Usage could not be safely settled; the reservation is retained.');
  await database().query('UPDATE sorp_simple_demo_20261016.budget SET reserved_usd=reserved_usd-$1+$2,actual_usd=actual_usd+$2 WHERE id=1',[reserve,cost]);
