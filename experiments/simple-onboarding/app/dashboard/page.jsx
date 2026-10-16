@@ -1,0 +1,3 @@
+'use client';
+import {useEffect,useState} from 'react';
+export default function Dashboard(){const [s,set]=useState(null);useEffect(()=>{fetch('/api/onboarding/session/').then(r=>r.json()).then(set);},[]);return <main className="onboarding-page" style={{maxWidth:850,margin:'auto',padding:32}}><p className="onboarding-eyebrow">ISOLATED PREVIEW · MOCK ACCOUNT</p><h1>Welcome, {s?.state?.facts?.name?.split(' ')[0]||'there'}.</h1><p>Your selected charity: <strong>{s?.selected?.name||'Not selected'}</strong></p><p>This hand-off retains the introduction in isolated test storage. Production products and accounts are not connected.</p><p>{s?.state?.facts?.responsibilities}</p><p>{s?.state?.facts?.concerns}</p><a href="/get-started/">Return to your introduction →</a></main>}

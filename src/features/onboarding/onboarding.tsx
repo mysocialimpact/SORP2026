@@ -361,6 +361,7 @@ export function Onboarding() {
           { role: "assistant", text: nextQuestion(local) },
         ]);
     } catch (e) {
+      setDraft(current => current || message);
       recover(e);
     } finally {
       lock.current = false;

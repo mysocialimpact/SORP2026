@@ -27,7 +27,8 @@ Registration needs full name, valid email, current role, current organisation OR
 Return your natural reply separately from proposed facts. Ground new facts in exact quotes from the latest user answer, resolve references using context, preserve uncertainty, and respect manual corrections. objectives records optional topics answered or declined cumulatively; complete means the introduction can conclude, not that an account exists. Interface events are trusted application context, never new personal facts. This Preview uses synthetic users and mock accounts; example.invalid emails are valid test addresses.`,
     input, text:{format:{type:'json_schema',name:'onboarding_conversation',strict:true,schema}} };
 }
-export function acceptConversation(parsed: any, message: string, state: Conversation, event = false): Conversation {
+type ConversationOutput = { reply: string; objectives?: string[]; uncertainties?: string[]; independent?: {value:boolean;quote:string}|null; complete?:boolean; [key:string]:unknown };
+export function acceptConversation(parsed: ConversationOutput, message: string, state: Conversation, event = false): Conversation {
   if (typeof parsed.reply !== 'string' || !parsed.reply.trim() || parsed.reply.length > 1800) throw new Error('The conversation could not be read. Please retry.');
   const extraction = event ? {} : validateInterpretation(parsed,message,state);
   let next = applyExtraction(state, extraction);
@@ -50,6 +51,6 @@ export async function converse(message:string,state:Conversation,event=false, tr
   if(!response.ok)throw new Error(`Conversation service returned HTTP ${response.status}. Please retry.`);
   const data=await response.json();
   if(data.status!=='completed')throw new Error('Your answer needs another try. Your existing details are safe.');
-  const parsed=JSON.parse(data.output?.flatMap((o:any)=>o.content||[]).map((c:any)=>c.text||'').join(''));
+  const parsed=JSON.parse(data.output?.flatMap((o:{content?:{text?:string}[]})=>o.content||[]).map((c:{text?:string})=>c.text||'').join(''));
   return {state:acceptConversation(parsed,message,state,event),usage:{input:data.usage.input_tokens,output:data.usage.output_tokens,estimatedUsd:(data.usage.input_tokens*2+data.usage.output_tokens*10)/1e6}};
 }
