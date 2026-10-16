@@ -3,7 +3,8 @@ import {body,sameOrigin,load,start,save,claim,snapshot,record,respond,json,cooki
 import {budgeted,usage} from '../../../../lib/budget.mjs';
 export const runtime='nodejs';
 export const maxDuration=180;
-const official=(c:any)=>{try{return /^\d{5,8}$|^SC\d{6}$|^NIC\d{6}$/.test(c.registrationNumber) && ['register-of-charities.charitycommission.gov.uk','www.oscr.org.uk','oscr.org.uk','www.charitycommissionni.org.uk'].includes(new URL(c.officialUrl).hostname);}catch{return false;}};
+import {canonicalCharityRecord} from '../../../../../../src/lib/onboarding/charity-record.ts';
+const official=(c:unknown)=>!!canonicalCharityRecord(c);
 export async function GET(r:Request,{params}:{params:Promise<{action:string}>}){try{if((await params).action==='health')return json({available:true,model:'gpt-6.1-sol',reasoning:'medium',isolated:true,usage:await usage()});const row=await load(r);return json(row?snapshot(row.payload):{available:true});}catch{return json({available:false},503);}}
 export async function POST(r:Request,{params}:{params:Promise<{action:string}>}){
  try{
@@ -31,7 +32,7 @@ export async function POST(r:Request,{params}:{params:Promise<{action:string}>})
    state=proposeCharity(state,data.query);
    const response=await fetch('https://sorp2026.mysocialimpact.org/api/published-review',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({operation:'find',query:data.query,sessionId:`preview-${row.id.slice(0,12)}`}),redirect:'error',signal:AbortSignal.timeout(30000),cache:'no-store'});
    if(!response.ok)throw new Error(`Official charity lookup returned HTTP ${response.status}.`);
-   const found=await response.json();state.charity.candidates=(found.research?.candidates||[]).filter(official).slice(0,4);state.charity.phase='confirm';s={...s,state};
+   const found=await response.json();state.charity.candidates=(found.research?.candidates||[]).map(canonicalCharityRecord).filter(Boolean).slice(0,4);state.charity.phase='confirm';s={...s,state};
   } else if(action==='confirm'){
    if(!Number.isInteger(data.index)||!state.charity.candidates[data.index]||!official(state.charity.candidates[data.index]))return json({error:'Choose a returned official record.'},400);
    const selected=state.charity.candidates[data.index];state=confirmCharity(state,selected,false);

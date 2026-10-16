@@ -10,3 +10,12 @@ test('historical client remains candidate and never current employer',()=>{const
 test('reminder cannot become an arbitrary entity',()=>{const s=acceptConversation(proposal({organisation:{value:'I already told you Interim Spaces',quote:'I already told you Interim Spaces',period:'current',correction:false}},{organisationNature:'named_organisation',intent:'remind'}),'I already told you Interim Spaces',applyFacts(initialConversation(),{organisation:'Interim Spaces'},'form'));assert.equal(s.facts.organisation,'Interim Spaces');});
 test('free response survives old stage controller and late corrections are not capped',()=>{const s=initialConversation();s.turns=12;const next=acceptConversation(proposal({}, {reply:'Thanks for correcting me. How are things at your current firm?'}),'You are ignoring me.',s);assert.equal(next.turns,13);assert.equal(nextQuestion(next),'Thanks for correcting me. How are things at your current firm?');});
 test('independent status needs a quote from this user, not the assistant',()=>{const p=proposal({}, {independent:{value:true,quote:'I work independently'}});assert.equal(acceptConversation(p,'Hello',initialConversation()).natural.independent,false);assert.equal(acceptConversation(p,'I work independently',initialConversation()).natural.independent,true);});
+
+import {canonicalCharityRecord} from '../../src/lib/onboarding/charity-record.ts';
+test('multiple registrations resolve only against the actual official regulator',()=>{
+ const c={name:'Test charity',registrationNumber:'1114634 (E&W); SC044642 (Scotland)',officialUrl:'https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4023711'};
+ assert.equal(canonicalCharityRecord(c).registrationNumber,'1114634');
+ assert.equal(canonicalCharityRecord({...c,officialUrl:'https://www.oscr.org.uk/about-charities/search-the-register/'}).registrationNumber,'SC044642');
+ assert.equal(canonicalCharityRecord({...c,registrationNumber:'1114634; 1165694'}),null);
+ assert.equal(canonicalCharityRecord({...c,officialUrl:'https://example.invalid/register'}),null);
+});

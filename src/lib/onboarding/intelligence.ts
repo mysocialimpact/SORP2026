@@ -17,7 +17,11 @@ import {
   agent,
 } from "@/lib/console/fetch-public";
 import type { Candidate } from "@/app/sorp-public-model";
+import { canonicalCharityRecord } from './charity-record.ts';
 export function charityIdentity(candidate: Candidate) {
+  const canonical = canonicalCharityRecord(candidate);
+  if (!canonical) throw new Error('A single official regulator identity is required.');
+  candidate = canonical;
   const url = safeResearchUrl(candidate.officialUrl);
   const regulator =
     url.hostname.endsWith(".charitycommission.gov.uk") ||
