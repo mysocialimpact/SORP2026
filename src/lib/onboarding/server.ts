@@ -188,7 +188,7 @@ export async function extractWithModel(
   });
   const result = await interpretWithModel(message, state, undefined, skip);
   const measured = result.usage?.estimatedUsd;
-  // Admission reserves both stages before either starts. Settle only successful,
+  // Admission reserves both stages and a possible wording revision before either starts. Settle only successful,
   // metered requests; uncertain provider failures retain the full reservation.
   if (!result.notice && measured && Number.isFinite(measured) && measured < MODEL_RESERVATION_USD)
     await query("UPDATE research_console.onboarding_usage SET reserved_usd=$1 WHERE id=$2", [measured, usageId]).catch(() => undefined);

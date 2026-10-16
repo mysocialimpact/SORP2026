@@ -1,0 +1,73 @@
+{
+  "commit": "ea52a28",
+  "deployment": "dpl_CfLQQFSjbBhb1r65zf2sa6fv9Y91",
+  "passed": 4,
+  "turns": 16,
+  "limitations": "Real built Next app/API and model calls. Isolated PostgreSQL, account, regulator and transcription services. Generated microphone audio in Chromium desktop/touch-mobile; no physical microphone, real ASR or Safari claim.",
+  "journeys": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "journey": "historical"
+      },
+      "passed": true,
+      "voice": true,
+      "questions": [
+        "You’ve worked with Blue Cross as a client in the past, then. What’s your current role, and which organisation are you with, if any?",
+        "Funding is clearly on your mind in your work advising charity boards. Would you like to start with Blue Cross, given your past work with them?",
+        "That distinction matters: helping boards see the difference their work makes, not just how much they do. You can now create your account and explore Blue Cross through the platform’s impact reporting and SORP guidance."
+      ],
+      "accountHandoff": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "journey": "historical"
+      },
+      "passed": true,
+      "voice": false,
+      "questions": [
+        "So you’ve worked with Blue Cross as a charity client in the past. What do you do now, and which organisation, if any, are you with?",
+        "I hear your concern about funding, especially given your work advising charity boards. Would you like to start with Blue Cross, the charity you previously worked with?",
+        "You want boards to see the difference their work makes, not just how busy they’ve been—especially when funding is tight. You can now create your account and explore Blue Cross."
+      ],
+      "accountHandoff": true
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "journey": "social"
+      },
+      "passed": true,
+      "voice": true,
+      "questions": [
+        "Good to meet you, Marcus. Shall we start with Interim Spaces as the charity you’d like to explore?",
+        "So your trustee remit is finance. How did you hear about the platform?",
+        "Ah, a recommendation from a friend. We’d also like to understand what matters to you.\n\nWhat keeps you up at night?",
+        "Frogs — I wasn’t expecting that. What is it about them that keeps you awake?",
+        "Ah, literal frogs next door — I was looking for a work connection where there wasn’t one! When you’re ready, create your account and explore Interim Spaces."
+      ],
+      "accountHandoff": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "journey": "social"
+      },
+      "passed": true,
+      "voice": true,
+      "questions": [
+        "Good to meet you, Marcus. Shall we start with Interim Spaces?",
+        "So you’re coming to SORP from the finance side. How did you hear about the platform?",
+        "Ah, through a friend. We’d also like to get a sense of what matters to you.\n\nWhat keeps you up at night?",
+        "Frogs — that’s an unexpected one. What is it about them that keeps you awake?",
+        "Ah, literal frogs — we’ll leave work out of that one! You can now create your account and explore Interim Spaces."
+      ],
+      "accountHandoff": true
+    }
+  ]
+}

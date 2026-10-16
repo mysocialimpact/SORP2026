@@ -1,0 +1,4506 @@
+{
+  "commit": "ea52a28",
+  "deployment": "dpl_CfLQQFSjbBhb1r65zf2sa6fv9Y91",
+  "qualityStatus": "PASS: independent review of all26 conversations; minimum83, median87, mean86.94, critical dimensions>=3, no hard-gate failures. See onboarding-social-final-review.md. Four browser reply sets also reviewed without an additional blocker.",
+  "summary": {
+    "model": "gpt-5.4-mini-2026-03-17",
+    "dialogueModel": "gpt-6.1-sol",
+    "extractionReasoning": "low",
+    "dialogueReasoning": "medium",
+    "stages": 2,
+    "wordingRevisions": 0,
+    "startedAt": "2026-10-16T12:51:13.769Z",
+    "turns": 112,
+    "apiCalls": 224,
+    "inputTokens": 540714,
+    "outputTokens": 57080,
+    "estimatedUsd": 1.0474405000000004,
+    "passed": 26,
+    "failed": 0,
+    "completedAt": "2026-10-16T12:57:05.536Z"
+  },
+  "journeys": [
+    {
+      "id": "C01",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C01",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C01",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C01",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Marcus. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C01",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C01",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What does your work as a trustee involve day to day?"
+        },
+        {
+          "id": "C01",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C01",
+          "index": 6,
+          "role": "assistant",
+          "text": "So finance is your focus as a trustee. How did you come across SORP 2026?"
+        },
+        {
+          "id": "C01",
+          "index": 7,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C01",
+          "index": 8,
+          "role": "assistant",
+          "text": "Good to hear your pal pointed you our way. I’d like to understand what’s on your mind, too.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C01",
+          "index": 9,
+          "role": "user",
+          "text": "Frogs."
+        },
+        {
+          "id": "C01",
+          "index": 10,
+          "role": "assistant",
+          "text": "Frogs are an unexpected one—how are they keeping you awake?"
+        },
+        {
+          "id": "C01",
+          "index": 11,
+          "role": "user",
+          "text": "Actual frogs in the pond next door. The charity finances are fine, thankfully."
+        },
+        {
+          "id": "C01",
+          "index": 12,
+          "role": "assistant",
+          "text": "So it’s the neighbours’ frogs making the noise, not the charity finances keeping you awake. You can now create your account and explore Interim Spaces on SORP 2026."
+        }
+      ],
+      "finalState": {
+        "id": "C01",
+        "objective": "complete",
+        "facts": {
+          "name": "Marcus Warry",
+          "email": "marcus.warry@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance",
+          "discovery": "My pal told me.",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "The charity finances are fine, thankfully.",
+          "organisationKind": "unknown"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee of Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C01",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Marcus has introduced himself and identified his current trusteeship. Acknowledge that naturally, then suggest starting with Interim Spaces without implying an official match."
+        },
+        {
+          "id": "C01",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Finance is a straightforward description of their trustee remit, not an invitation to probe. Briefly recognise that focus and move on to how they found the platform."
+        },
+        {
+          "id": "C01",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They came through a straightforward recommendation from a friend; acknowledge it briefly without probing, then warmly invite the final open question."
+        },
+        {
+          "id": "C01",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "“Frogs” is an unexpected answer to the broad question, possibly literal or playful. Stay open and briefly invite the story rather than redirecting it to finance or closing immediately."
+        },
+        {
+          "id": "C01",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "He clarifies that literal neighbouring frogs disturb his sleep and reassures us that charity finances are fine. Lightly acknowledge the distinction without assessing the finances, then close with the account invitation."
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C02",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C02",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Helen Price, CEO of the charity Interim Spaces. My email is helen.price@example.invalid."
+        },
+        {
+          "id": "C02",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Helen. Shall we start with Interim Spaces as the charity you’d like to explore?"
+        },
+        {
+          "id": "C02",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C02",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll focus on Interim Spaces. What does your work as CEO involve day to day?"
+        },
+        {
+          "id": "C02",
+          "index": 5,
+          "role": "user",
+          "text": "Keeping our services going while we try to grow our team."
+        },
+        {
+          "id": "C02",
+          "index": 6,
+          "role": "assistant",
+          "text": "You’re balancing keeping services running with building the team. Where would extra capacity make the biggest difference?"
+        },
+        {
+          "id": "C02",
+          "index": 7,
+          "role": "user",
+          "text": "Recruitment has to wait until we know whether the next grant is coming through."
+        },
+        {
+          "id": "C02",
+          "index": 8,
+          "role": "assistant",
+          "text": "So recruitment is on hold until you have an answer about the grant. How did you come across SORP 2026?"
+        },
+        {
+          "id": "C02",
+          "index": 9,
+          "role": "user",
+          "text": "A fellow chief executive sent me the link."
+        },
+        {
+          "id": "C02",
+          "index": 10,
+          "role": "assistant",
+          "text": "Good to hear a fellow chief executive passed it along. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C02",
+        "objective": "complete",
+        "facts": {
+          "name": "Helen Price",
+          "email": "helen.price@example.invalid",
+          "role": "CEO",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Keeping our services going while we try to grow our team.",
+          "discovery": "A fellow chief executive sent me the link.",
+          "concerns": "Recruitment has to wait until we know whether the next grant is coming through.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "employer",
+            "period": "current",
+            "confidence": "stated",
+            "role": "CEO",
+            "evidence": "CEO of the charity Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C02",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Helen has introduced herself and identified her current charity and leadership role. Briefly welcome her, then suggest starting with Interim Spaces without implying an official match. After explicit charity confirmation, acknowledge the selection and ask about her responsibilities as CEO."
+        },
+        {
+          "id": "C02",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Helen is balancing ongoing service delivery with growing the team. This is meaningful professional context worth a brief follow-up about where additional capacity would help, without assuming financial pressure or operational difficulty."
+        },
+        {
+          "id": "C02",
+          "turn": 3,
+          "objective": "discovery",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Helen has clarified that recruitment is held up by an outstanding grant decision, rather than identified where extra capacity would help. Acknowledge that constraint without judging the charity’s finances, then move gently to discovery as no further follow-up is permitted."
+        },
+        {
+          "id": "C02",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "She has answered the referral question plainly. A brief acknowledgement is enough before closing with an invitation to create an account and explore the confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C03",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C03",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Priya Shah, finance director at the charity Brainstrust. My email is priya.shah@example.invalid."
+        },
+        {
+          "id": "C03",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Priya. Would you like to start with Brainstrust as the charity you’ll be working on here?"
+        },
+        {
+          "id": "C03",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C03",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Brainstrust. What does your role as finance director involve day to day?"
+        },
+        {
+          "id": "C03",
+          "index": 5,
+          "role": "user",
+          "text": "I lead budgeting and prepare the year-end accounts."
+        },
+        {
+          "id": "C03",
+          "index": 6,
+          "role": "assistant",
+          "text": "Your role spans both financial planning and year-end reporting. How did you hear about the platform?"
+        },
+        {
+          "id": "C03",
+          "index": 7,
+          "role": "user",
+          "text": "An ICAEW webinar."
+        },
+        {
+          "id": "C03",
+          "index": 8,
+          "role": "assistant",
+          "text": "Ah, through ICAEW. We’d also like to get a sense of what matters most to you.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C03",
+          "index": 9,
+          "role": "user",
+          "text": "Our next audit."
+        },
+        {
+          "id": "C03",
+          "index": 10,
+          "role": "assistant",
+          "text": "Your next audit is clearly on your mind. What aspect of it is worrying you most?"
+        },
+        {
+          "id": "C03",
+          "index": 11,
+          "role": "user",
+          "text": "The audit team needs evidence for our disclosures, and I want to get that ready earlier."
+        },
+        {
+          "id": "C03",
+          "index": 12,
+          "role": "assistant",
+          "text": "You want the evidence behind your disclosures ready earlier for the audit. When you’re ready, create your account to explore SORP guidance and readiness support for Brainstrust."
+        }
+      ],
+      "finalState": {
+        "id": "C03",
+        "objective": "complete",
+        "facts": {
+          "name": "Priya Shah",
+          "email": "priya.shah@example.invalid",
+          "role": "finance director",
+          "organisation": "Brainstrust",
+          "responsibilities": "I lead budgeting and prepare the year-end accounts.",
+          "discovery": "An ICAEW webinar",
+          "concerns": "Our next audit; The audit team needs evidence for our disclosures, and I want to get that ready earlier.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Brainstrust",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "employer",
+            "period": "current",
+            "confidence": "stated",
+            "role": "finance director",
+            "evidence": "finance director at the charity Brainstrust",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Brainstrust"
+      },
+      "decisions": [
+        {
+          "id": "C03",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Priya has introduced herself and identified her current charity employer. Welcome her and offer Brainstrust as the starting charity, without implying an official match has been confirmed."
+        },
+        {
+          "id": "C03",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Priya has described responsibility for both budgeting and year-end accounts. This establishes her professional context without raising a concern that needs probing; acknowledge it and move naturally to how she found the platform."
+        },
+        {
+          "id": "C03",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They have answered the referral question plainly; a brief acknowledgement is enough before warmly inviting the open final question."
+        },
+        {
+          "id": "C03",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "They have named a genuine professional worry, not declined to engage. A brief, specific follow-up should establish what concerns them about the audit before offering completion."
+        },
+        {
+          "id": "C03",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "They want to prepare disclosure evidence earlier for the audit. Acknowledge that practical priority, then close with an invitation to create their account and explore support for the confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "passed": true,
+      "turns": 3,
+      "transcript": [
+        {
+          "id": "C04",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C04",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Sarah Jones, a chartered accountant at Burton Sweet working with about 30 charities, including Brainstrust. My email is sarah.jones@example.invalid. They are all worried about the new reporting requirements."
+        },
+        {
+          "id": "C04",
+          "index": 2,
+          "role": "assistant",
+          "text": "You’re supporting a sizeable group of charities, and it sounds as though concern about the new requirements is widespread among them. Would you like to start with Brainstrust?"
+        },
+        {
+          "id": "C04",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C04",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Brainstrust. What aspect of the new reporting requirements is causing your clients the most concern?"
+        },
+        {
+          "id": "C04",
+          "index": 5,
+          "role": "user",
+          "text": "The main difficulty is getting usable information back from all the charities on time."
+        },
+        {
+          "id": "C04",
+          "index": 6,
+          "role": "assistant",
+          "text": "With around 30 charities, getting information back in a usable form and on time is a lot to coordinate. How did you hear about the platform?"
+        },
+        {
+          "id": "C04",
+          "index": 7,
+          "role": "user",
+          "text": "LinkedIn."
+        },
+        {
+          "id": "C04",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks for letting me know. You can now create your account and explore the SORP guidance and readiness tools for your work with Brainstrust."
+        }
+      ],
+      "finalState": {
+        "id": "C04",
+        "objective": "complete",
+        "facts": {
+          "name": "Sarah Jones",
+          "email": "sarah.jones@example.invalid",
+          "role": "chartered accountant",
+          "organisation": "Burton Sweet",
+          "responsibilities": "working with about 30 charities",
+          "discovery": "LinkedIn",
+          "concerns": "they are all worried about the new reporting requirements; getting usable information back from all the charities on time",
+          "portfolio": "about 30 charities",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "firm"
+        },
+        "professional": [
+          {
+            "entity": "Burton Sweet",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "firm",
+            "relationship": "employer",
+            "period": "current",
+            "confidence": "stated",
+            "role": "chartered accountant",
+            "evidence": "a chartered accountant at Burton Sweet",
+            "turn": 1
+          },
+          {
+            "entity": "Brainstrust",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "client",
+            "period": "current",
+            "confidence": "uncertain",
+            "role": "",
+            "evidence": "including Brainstrust",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Brainstrust"
+      },
+      "decisions": [
+        {
+          "id": "C04",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Sarah has introduced her professional role and portfolio, while volunteering a concern shared by her charity clients. Acknowledge that context before suggesting Brainstrust as a starting point, without claiming an official match."
+        },
+        {
+          "id": "C04",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Sarah has identified a concrete coordination challenge across her charity clients: receiving usable information in time. Acknowledge that practical difficulty without offering unsupported solutions, then gently move to how she found the platform, as no further follow-up is permitted."
+        },
+        {
+          "id": "C04",
+          "turn": 3,
+          "objective": "complete",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Sarah has simply answered the referral question. Acknowledge it briefly, then close without further optional questions, inviting account creation and exploration of confirmed Brainstrust."
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C05",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C05",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Owen Reed, an accountant at Cedar Advisory with one charity client, Interim Spaces. My email is owen.reed@example.invalid."
+        },
+        {
+          "id": "C05",
+          "index": 2,
+          "role": "assistant",
+          "text": "With one charity client, we can keep this focused on your work with them. Shall we start with Interim Spaces?"
+        },
+        {
+          "id": "C05",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C05",
+          "index": 4,
+          "role": "assistant",
+          "text": "Interim Spaces it is. What work do you handle for them as their accountant?"
+        },
+        {
+          "id": "C05",
+          "index": 5,
+          "role": "user",
+          "text": "I prepare their annual accounts."
+        },
+        {
+          "id": "C05",
+          "index": 6,
+          "role": "assistant",
+          "text": "That gives us a clear focus on the annual accounts. How did you hear about the platform?"
+        },
+        {
+          "id": "C05",
+          "index": 7,
+          "role": "user",
+          "text": "A colleague recommended you."
+        },
+        {
+          "id": "C05",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks for giving us a look on their recommendation. We’d also like to understand what’s on your mind.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C05",
+          "index": 9,
+          "role": "user",
+          "text": "Deadlines."
+        },
+        {
+          "id": "C05",
+          "index": 10,
+          "role": "assistant",
+          "text": "Deadlines are the main worry, then. Which one is most on your mind at the moment?"
+        },
+        {
+          "id": "C05",
+          "index": 11,
+          "role": "user",
+          "text": "Our year-end timetable is tight and I am the only person preparing the accounts."
+        },
+        {
+          "id": "C05",
+          "index": 12,
+          "role": "assistant",
+          "text": "With the accounts resting on you alone, it’s understandable that the year-end deadline is on your mind. You can now create your account to explore Interim Spaces and the platform’s SORP guidance."
+        }
+      ],
+      "finalState": {
+        "id": "C05",
+        "objective": "complete",
+        "facts": {
+          "name": "Owen Reed",
+          "email": "owen.reed@example.invalid",
+          "role": "accountant",
+          "organisation": "Cedar Advisory",
+          "responsibilities": "prepare their annual accounts; preparing the accounts alone under a tight year-end timetable",
+          "discovery": "a colleague recommended you",
+          "concerns": "Deadlines; our year-end timetable is tight",
+          "portfolio": "one charity client",
+          "charities": [],
+          "interests": "",
+          "context": "I am the only person preparing the accounts",
+          "organisationKind": "firm"
+        },
+        "professional": [
+          {
+            "entity": "Cedar Advisory",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "firm",
+            "relationship": "employee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "accountant",
+            "evidence": "an accountant at Cedar Advisory",
+            "turn": 1
+          },
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "client",
+            "period": "current",
+            "confidence": "stated",
+            "role": "charity client",
+            "evidence": "one charity client, Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C05",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Owen has supplied his contact details and clear professional context, including his sole charity client. Acknowledge that context and offer to start with Interim Spaces, without implying an official match."
+        },
+        {
+          "id": "C05",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Owen has given a straightforward description of his work for the charity. Acknowledge that annual accounts are his focus, then move naturally to how he found the platform; no professional follow-up is needed here."
+        },
+        {
+          "id": "C05",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Owen gives a straightforward colleague referral, which needs a brief acknowledgement rather than probing. Move gently to the final open question, explaining that we want to understand what matters to him."
+        },
+        {
+          "id": "C05",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Deadlines names a genuine concern rather than signalling reluctance. A brief, specific follow-up can establish which deadline matters before closing."
+        },
+        {
+          "id": "C05",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "His deadline concern reflects a tight year-end timetable and sole responsibility for preparing the accounts. Acknowledge that pressure without promising a solution, then close with the account-creation invitation."
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C06",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C06",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Nadia Cole, an auditor at Cedar Advisory; I audit Brainstrust. My email is nadia.cole@example.invalid."
+        },
+        {
+          "id": "C06",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Nadia. As you audit Brainstrust, would you like to start with that charity?"
+        },
+        {
+          "id": "C06",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C06",
+          "index": 4,
+          "role": "assistant",
+          "text": "Brainstrust it is. How did you hear about the platform?"
+        },
+        {
+          "id": "C06",
+          "index": 5,
+          "role": "user",
+          "text": "I searched for charity reporting guidance."
+        },
+        {
+          "id": "C06",
+          "index": 6,
+          "role": "assistant",
+          "text": "I see—you found us while looking for reporting guidance. We’d also like to understand what matters most to you.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C06",
+          "index": 7,
+          "role": "user",
+          "text": "Whether we have enough evidence for the disclosures."
+        },
+        {
+          "id": "C06",
+          "index": 8,
+          "role": "assistant",
+          "text": "It’s the evidence behind the disclosures that’s worrying you. Which disclosures are you most unsure you have enough evidence to support?"
+        },
+        {
+          "id": "C06",
+          "index": 9,
+          "role": "user",
+          "text": "It is the connection between reported outcomes and the underlying evidence."
+        },
+        {
+          "id": "C06",
+          "index": 10,
+          "role": "assistant",
+          "text": "You want to be able to trace reported outcomes back to the evidence supporting them. When you’re ready, create your account to explore Brainstrust on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C06",
+        "objective": "complete",
+        "facts": {
+          "name": "Nadia Cole",
+          "email": "nadia.cole@example.invalid",
+          "role": "auditor",
+          "organisation": "Cedar Advisory",
+          "responsibilities": "I audit Brainstrust",
+          "discovery": "searched for charity reporting guidance",
+          "concerns": "Whether we have enough evidence for the disclosures; the connection between reported outcomes and the underlying evidence",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "firm"
+        },
+        "professional": [
+          {
+            "entity": "Cedar Advisory",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "firm",
+            "relationship": "employer",
+            "period": "current",
+            "confidence": "stated",
+            "role": "auditor",
+            "evidence": "an auditor at Cedar Advisory",
+            "turn": 1
+          },
+          {
+            "entity": "Brainstrust",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "unknown",
+            "relationship": "client",
+            "period": "current",
+            "confidence": "stated",
+            "role": "",
+            "evidence": "I audit Brainstrust",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Brainstrust"
+      },
+      "decisions": [
+        {
+          "id": "C06",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Nadia has supplied her contact details and distinguished her employer from the charity she audits. Acknowledge her professional connection and offer Brainstrust as a starting point without claiming an official match."
+        },
+        {
+          "id": "C06",
+          "turn": 2,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Nadia found the platform through a straightforward search for charity reporting guidance. A brief acknowledgement is enough before inviting her to share what is on her mind."
+        },
+        {
+          "id": "C06",
+          "turn": 3,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Nadia has named a substantive audit concern, not signalled reluctance. A brief, specific follow-up should clarify which disclosures she is worried about evidencing before closing."
+        },
+        {
+          "id": "C06",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Nadia has clarified that her concern is the traceability of reported outcomes to supporting evidence. Acknowledge that specific audit concern, then close with an invitation to create an account and explore the confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C07",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C07",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Ben Shaw, an independent professional adviser to Interim Spaces. My email is ben.shaw@example.invalid."
+        },
+        {
+          "id": "C07",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Ben. We can start with your work advising Interim Spaces. Would you like to begin with them?"
+        },
+        {
+          "id": "C07",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C07",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. How did you hear about the platform?"
+        },
+        {
+          "id": "C07",
+          "index": 5,
+          "role": "user",
+          "text": "Someone mentioned you at a conference."
+        },
+        {
+          "id": "C07",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks for following up on that mention. We’d like to understand what matters to you, as well as the work you do.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C07",
+          "index": 7,
+          "role": "user",
+          "text": "My children."
+        },
+        {
+          "id": "C07",
+          "index": 8,
+          "role": "assistant",
+          "text": "I don’t want to assume what you mean — in what way are your children keeping you up?"
+        },
+        {
+          "id": "C07",
+          "index": 9,
+          "role": "user",
+          "text": "Literally, a toddler who is not a fan of sleeping."
+        },
+        {
+          "id": "C07",
+          "index": 10,
+          "role": "assistant",
+          "text": "Ah, a toddler working the night shift — I hope you get a quieter night soon. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C07",
+        "objective": "complete",
+        "facts": {
+          "name": "Ben Shaw",
+          "email": "ben.shaw@example.invalid",
+          "role": "independent professional adviser",
+          "organisation": "",
+          "responsibilities": "advising Interim Spaces",
+          "discovery": "Someone mentioned you at a conference",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "firm"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "adviser",
+            "period": "current",
+            "confidence": "stated",
+            "role": "independent professional adviser",
+            "evidence": "an independent professional adviser to Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C07",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Ben has introduced himself as an independent adviser to Interim Spaces and supplied his contact details. Acknowledge that professional context and offer Interim Spaces as the starting organisation, without implying an official match."
+        },
+        {
+          "id": "C07",
+          "turn": 2,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Ben has answered the referral question plainly; this needs a brief acknowledgement, not further probing, before a gently introduced open question about what matters to him."
+        },
+        {
+          "id": "C07",
+          "turn": 3,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Ben’s answer is personal and ambiguous: his children may literally interrupt his sleep or be on his mind. It merits a brief, open clarification rather than a work-related interpretation or an immediate handoff."
+        },
+        {
+          "id": "C07",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Ben clarifies that his children literally interrupt his sleep: his toddler dislikes sleeping. Meet the light personal answer with gentle humour, then close and invite account creation to explore the confirmed charity without further questions."
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C08",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C08",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Lara West, a new trustee at Interim Spaces. My email is lara.west@example.invalid."
+        },
+        {
+          "id": "C08",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Lara. We can keep your new trustee role in mind as we go. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C08",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C08",
+          "index": 4,
+          "role": "assistant",
+          "text": "Interim Spaces it is. What responsibilities are you taking on as you settle into your trustee role?"
+        },
+        {
+          "id": "C08",
+          "index": 5,
+          "role": "user",
+          "text": "I'm very new to charity reporting and still learning what the board needs from me."
+        },
+        {
+          "id": "C08",
+          "index": 6,
+          "role": "assistant",
+          "text": "We can start with the basics of charity reporting, with your new trustee role in mind. How did you hear about the platform?"
+        },
+        {
+          "id": "C08",
+          "index": 7,
+          "role": "user",
+          "text": "Our treasurer pointed me here."
+        },
+        {
+          "id": "C08",
+          "index": 8,
+          "role": "assistant",
+          "text": "Good to hear your treasurer pointed you our way. It would help to know what’s most on your mind as you settle into the role.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C08",
+          "index": 9,
+          "role": "user",
+          "text": "Knowing whether I have missed something obvious."
+        },
+        {
+          "id": "C08",
+          "index": 10,
+          "role": "assistant",
+          "text": "When you’re new to charity reporting, it can be difficult to know what to look out for. Has a particular report or board discussion left you wondering whether you’ve missed something?"
+        },
+        {
+          "id": "C08",
+          "index": 11,
+          "role": "user",
+          "text": "I would like to know which questions a new trustee should be asking the finance team."
+        },
+        {
+          "id": "C08",
+          "index": 12,
+          "role": "assistant",
+          "text": "Useful starting questions for the finance team cover significant differences from budget, restrictions on funds and anything needing the board’s attention. When you’re ready, create your account to explore Interim Spaces and the SORP guidance."
+        }
+      ],
+      "finalState": {
+        "id": "C08",
+        "objective": "complete",
+        "facts": {
+          "name": "Lara West",
+          "email": "lara.west@example.invalid",
+          "role": "new trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "new to charity reporting and still learning what the board needs from me",
+          "discovery": "Our treasurer pointed me here",
+          "concerns": "Knowing whether I have missed something obvious",
+          "portfolio": "",
+          "charities": [],
+          "interests": "which questions a new trustee should be asking the finance team",
+          "context": "very new to charity reporting",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "new trustee",
+            "evidence": "a new trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C08",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Lara has introduced herself and shared that she is new to trusteeship. Welcome her in that context, then offer Interim Spaces as the starting charity without implying an official match."
+        },
+        {
+          "id": "C08",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "She is explaining her limited reporting experience, not outlining established responsibilities. Acknowledge that learning stage without pressing her for duties she is still working out, then move gently to discovery."
+        },
+        {
+          "id": "C08",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "This is an ordinary referral from their treasurer, calling for a brief acknowledgement rather than probing. Move naturally to the open final question with a human reason for asking."
+        },
+        {
+          "id": "C08",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Lara is expressing a genuine worry about overlooking something as a new trustee, not reluctance to continue. A brief, concrete follow-up could identify where that uncertainty arises before closing."
+        },
+        {
+          "id": "C08",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Lara wants practical questions to help her engage with the finance team as a new trustee. Offer a few concrete starting points, then close with the account invitation without further questioning."
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "passed": true,
+      "turns": 2,
+      "transcript": [
+        {
+          "id": "C09",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C09",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Dan Hart, a finance trustee at Interim Spaces. My email is dan.hart@example.invalid. I handle budgets and found you on LinkedIn. I'm worried our reserves won't cover the winter."
+        },
+        {
+          "id": "C09",
+          "index": 2,
+          "role": "assistant",
+          "text": "The worry about reserves lasting through winter sounds like the main thing on your mind. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C09",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C09",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What’s putting the most pressure on your winter budget?"
+        },
+        {
+          "id": "C09",
+          "index": 5,
+          "role": "user",
+          "text": "The budget shows just four months of unrestricted reserves."
+        },
+        {
+          "id": "C09",
+          "index": 6,
+          "role": "assistant",
+          "text": "Your concern is whether those four months will be enough to get through winter. You can now create your account and explore SORP guidance and readiness tools for Interim Spaces."
+        }
+      ],
+      "finalState": {
+        "id": "C09",
+        "objective": "complete",
+        "facts": {
+          "name": "Dan Hart",
+          "email": "dan.hart@example.invalid",
+          "role": "finance trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "handle budgets",
+          "discovery": "found you on LinkedIn",
+          "concerns": "our reserves won't cover the winter; the budget shows just four months of unrestricted reserves",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "unknown"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "finance trustee",
+            "evidence": "a finance trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C09",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Dan has supplied his details and volunteered a serious concern about winter reserves. Acknowledge that worry without judging financial adequacy, then offer Interim Spaces as the starting charity. After explicit confirmation, use the available follow-up to understand the budget pressure."
+        },
+        {
+          "id": "C09",
+          "turn": 2,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Dan has quantified the reserves concern raised earlier, not established that reserves are objectively inadequate. Acknowledge the winter-planning concern without assessing sufficiency, then close with the permitted account invitation."
+        }
+      ]
+    },
+    {
+      "id": "C10",
+      "passed": true,
+      "turns": 2,
+      "transcript": [
+        {
+          "id": "C10",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C10",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Asha Patel, a trustee at Interim Spaces. My email is asha.patel@example.invalid. I oversee governance, a friend sent me your website, and I'm struggling to get reliable impact data."
+        },
+        {
+          "id": "C10",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Asha — getting impact data you can trust is proving difficult in your governance role. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C10",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C10",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What’s making the impact data difficult to rely on at the moment?"
+        },
+        {
+          "id": "C10",
+          "index": 5,
+          "role": "user",
+          "text": "We have lots of activity counts but no consistent outcome measures."
+        },
+        {
+          "id": "C10",
+          "index": 6,
+          "role": "assistant",
+          "text": "You’ve got activity counts, but not a consistent way to measure the difference those activities make. You can now create your account and explore impact reporting support for Interim Spaces."
+        }
+      ],
+      "finalState": {
+        "id": "C10",
+        "objective": "complete",
+        "facts": {
+          "name": "Asha Patel",
+          "email": "asha.patel@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "I oversee governance",
+          "discovery": "a friend sent me your website",
+          "concerns": "I'm struggling to get reliable impact data; lots of activity counts but no consistent outcome measures",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C10",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Asha has supplied her details and volunteered a substantive difficulty with reliable impact data in her governance role. Acknowledge that concern before suggesting Interim Spaces; after explicit charity confirmation, usefully explore what is making the data unreliable."
+        },
+        {
+          "id": "C10",
+          "turn": 2,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Asha has clarified that the difficulty is measuring outcomes consistently rather than counting activity. Acknowledge that distinction without assessing the charity’s performance, then close with an invitation to create an account and explore the confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C11",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C11",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C11",
+          "index": 1,
+          "role": "user",
+          "text": "Hello, I'm David."
+        },
+        {
+          "id": "C11",
+          "index": 2,
+          "role": "assistant",
+          "text": "Hello David, welcome to SORP 2026. What’s your email address, and what do you do?"
+        },
+        {
+          "id": "C11",
+          "index": 3,
+          "role": "user",
+          "text": "My full name is David Evans. I'm a trustee at Interim Spaces and my email is david.evans@example.invalid."
+        },
+        {
+          "id": "C11",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks, David — good to meet you. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C11",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C11",
+          "index": 6,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you mainly look after as a trustee?"
+        },
+        {
+          "id": "C11",
+          "index": 7,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C11",
+          "index": 8,
+          "role": "assistant",
+          "text": "So you’re coming to this from the finance side of trusteeship. How did you hear about SORP 2026?"
+        },
+        {
+          "id": "C11",
+          "index": 9,
+          "role": "user",
+          "text": "Dunno."
+        },
+        {
+          "id": "C11",
+          "index": 10,
+          "role": "assistant",
+          "text": "No problem. We’d like to get a sense of what matters most to you.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C11",
+          "index": 11,
+          "role": "user",
+          "text": "Nothing, actually."
+        },
+        {
+          "id": "C11",
+          "index": 12,
+          "role": "assistant",
+          "text": "Good to hear there’s nothing keeping you up at night. You can now create your account and explore the SORP guidance for Interim Spaces."
+        }
+      ],
+      "finalState": {
+        "id": "C11",
+        "objective": "complete",
+        "facts": {
+          "name": "David Evans",
+          "email": "david.evans@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance",
+          "discovery": "Dunno",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "unknown",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "I'm a trustee at Interim Spaces",
+            "turn": 2
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C11",
+          "turn": 1,
+          "objective": "registration",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "David has offered his name as a simple greeting, so welcome him naturally and ask for the missing email and role without overwhelming him."
+        },
+        {
+          "id": "C11",
+          "turn": 2,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "David has clarified his full name and supplied his email and current trusteeship. Briefly acknowledge his introduction, then suggest starting with Interim Spaces without implying an official match. After explicit charity confirmation, ask about his practical trustee responsibilities."
+        },
+        {
+          "id": "C11",
+          "turn": 3,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "David has briefly clarified that his trustee responsibilities cover finance. Acknowledge that perspective without assuming concerns, then move naturally to how he found the platform."
+        },
+        {
+          "id": "C11",
+          "turn": 4,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "David doesn’t recall how he heard about SORP 2026. This needs a brief acceptance, not a follow-up; gently invite him to share what matters to him."
+        },
+        {
+          "id": "C11",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "He has clearly said nothing is keeping him up at night. Given his earlier brief, uncertain answers, accept that without probing and close with the account invitation."
+        }
+      ]
+    },
+    {
+      "id": "C12",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C12",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C12",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Alex Rowan, an accountant at Cedar Advisory working with Interim Spaces. My email is alex.rowan@example.invalid."
+        },
+        {
+          "id": "C12",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Alex. Would you like to start with Interim Spaces, as you’re already working with them?"
+        },
+        {
+          "id": "C12",
+          "index": 3,
+          "role": "user",
+          "text": "Actually, I meant auditor, not accountant. I'm still at Cedar Advisory."
+        },
+        {
+          "id": "C12",
+          "index": 4,
+          "role": "assistant",
+          "text": "Of course — auditor, not accountant, and still at Cedar Advisory. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C12",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C12",
+          "index": 6,
+          "role": "assistant",
+          "text": "Interim Spaces it is. How did you hear about the platform?"
+        },
+        {
+          "id": "C12",
+          "index": 7,
+          "role": "user",
+          "text": "A colleague."
+        },
+        {
+          "id": "C12",
+          "index": 8,
+          "role": "assistant",
+          "text": "A colleague pointed you our way, then. We’d also like to understand what’s on your mind.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C12",
+          "index": 9,
+          "role": "user",
+          "text": "Review deadlines."
+        },
+        {
+          "id": "C12",
+          "index": 10,
+          "role": "assistant",
+          "text": "Review deadlines are the worry, then. What’s putting the most pressure on those deadlines?"
+        },
+        {
+          "id": "C12",
+          "index": 11,
+          "role": "user",
+          "text": "The review dates bunch together and the evidence often arrives late."
+        },
+        {
+          "id": "C12",
+          "index": 12,
+          "role": "assistant",
+          "text": "Bunched-up review dates are tricky enough without the evidence arriving late too. When you’re ready, create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C12",
+        "objective": "complete",
+        "facts": {
+          "name": "Alex Rowan",
+          "email": "alex.rowan@example.invalid",
+          "role": "auditor",
+          "organisation": "Cedar Advisory",
+          "responsibilities": "working with Interim Spaces",
+          "discovery": "a colleague",
+          "concerns": "review deadlines; the review dates bunch together and the evidence often arrives late",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "firm"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "client",
+            "period": "current",
+            "confidence": "stated",
+            "role": "working with",
+            "evidence": "working with Interim Spaces",
+            "turn": 1
+          },
+          {
+            "entity": "Cedar Advisory",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "firm",
+            "relationship": "employer",
+            "period": "current",
+            "confidence": "stated",
+            "role": "",
+            "evidence": "I'm still at Cedar Advisory.",
+            "turn": 2
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C12",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Alex has introduced their accountancy role and current client relationship. Acknowledge that context and offer Interim Spaces as a starting point without implying an official match."
+        },
+        {
+          "id": "C12",
+          "turn": 2,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Alex is correcting their role, not changing employer or answering the charity suggestion. Accept the correction and return briefly to the unanswered invitation to start with Interim Spaces."
+        },
+        {
+          "id": "C12",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They heard about the platform through a colleague; this is an ordinary referral needing only a brief acknowledgement before inviting them to share what matters to them."
+        },
+        {
+          "id": "C12",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Review deadlines are a genuine professional concern, not a refusal or disengagement. A brief, specific follow-up can clarify the source of pressure before closing."
+        },
+        {
+          "id": "C12",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Alex has explained the practical pressure behind the deadline concern: reviews cluster and evidence arrives late. Acknowledge that combination without promising a solution, then close with the account invitation and confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C13",
+      "passed": true,
+      "turns": 6,
+      "transcript": [
+        {
+          "id": "C13",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C13",
+          "index": 1,
+          "role": "user",
+          "text": "My name is Marcus Worrey, and I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was. My email is marcus.worrey@gmail.com."
+        },
+        {
+          "id": "C13",
+          "index": 2,
+          "role": "assistant",
+          "text": "So you’ve worked with Blue Cross as a client before. What’s your current role, and which organisation are you with, if any?"
+        },
+        {
+          "id": "C13",
+          "index": 3,
+          "role": "action",
+          "text": "Edited profile: {\"name\":\"Marcus Warry\"}"
+        },
+        {
+          "id": "C13",
+          "index": 4,
+          "role": "action",
+          "text": "Reloaded and resumed the same introduction."
+        },
+        {
+          "id": "C13",
+          "index": 5,
+          "role": "user",
+          "text": "I'm now an independent consultant, advising charity boards."
+        },
+        {
+          "id": "C13",
+          "index": 6,
+          "role": "assistant",
+          "text": "You’re advising boards independently now, rather than working within one charity. Would you like to start with Blue Cross, given your previous work with them?"
+        },
+        {
+          "id": "C13",
+          "index": 7,
+          "role": "action",
+          "text": "Searched Blue Cross, inspected the displayed official-record fixture, and explicitly confirmed Blue Cross."
+        },
+        {
+          "id": "C13",
+          "index": 8,
+          "role": "assistant",
+          "text": "Blue Cross it is. What are the main issues boards are asking you to help with at the moment?"
+        },
+        {
+          "id": "C13",
+          "index": 9,
+          "role": "user",
+          "text": "I spend much of my time helping the board understand the figures and agree what to do next."
+        },
+        {
+          "id": "C13",
+          "index": 10,
+          "role": "assistant",
+          "text": "That’s as much about helping boards make decisions as explaining the numbers. How did you hear about the platform?"
+        },
+        {
+          "id": "C13",
+          "index": 11,
+          "role": "user",
+          "text": "LinkedIn."
+        },
+        {
+          "id": "C13",
+          "index": 12,
+          "role": "assistant",
+          "text": "Thanks — LinkedIn. I’d also like to get a sense of what matters most to you.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C13",
+          "index": 13,
+          "role": "user",
+          "text": "Helping boards make sense of their impact."
+        },
+        {
+          "id": "C13",
+          "index": 14,
+          "role": "assistant",
+          "text": "You’re helping boards understand what their charity achieves, as well as what the figures say. What do they find hardest to make sense of when looking at their impact?"
+        },
+        {
+          "id": "C13",
+          "index": 15,
+          "role": "user",
+          "text": "They collect activity numbers, but struggle to decide which outcomes really matter."
+        },
+        {
+          "id": "C13",
+          "index": 16,
+          "role": "assistant",
+          "text": "The challenge is helping boards decide what meaningful change to look for, beyond the activity counts. You can now create your account and explore Blue Cross on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C13",
+        "objective": "complete",
+        "facts": {
+          "name": "Marcus Warry",
+          "email": "marcus.worrey@gmail.com",
+          "role": "independent consultant",
+          "organisation": "",
+          "responsibilities": "advising charity boards; helping the board understand the figures and agree what to do next; helping boards understand their figures and agree what to do next; helping boards make sense of their impact",
+          "discovery": "LinkedIn",
+          "concerns": "They collect activity numbers, but struggle to decide which outcomes really matter.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "helping boards make sense of their impact",
+          "context": "used to work on a charity client called The Blue Cross, or Blue Cross, I think it was",
+          "organisationKind": "firm"
+        },
+        "professional": [
+          {
+            "entity": "The Blue Cross",
+            "entityNature": "named_organisation",
+            "aliases": [
+              "Blue Cross"
+            ],
+            "kind": "charity",
+            "relationship": "client",
+            "period": "past",
+            "confidence": "uncertain",
+            "role": "",
+            "evidence": "I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was.",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Blue Cross"
+      },
+      "decisions": [
+        {
+          "id": "C13",
+          "turn": 1,
+          "objective": "registration",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Marcus has supplied his name and email and described a past charity-client relationship, not a current employer or role. Acknowledge that experience and ask about his present work without assuming he has an organisation."
+        },
+        {
+          "id": "C13",
+          "turn": 2,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "They have clarified that they now advise charity boards independently; Blue Cross was a past client, not their current organisation. Acknowledge that distinction and offer it as a starting charity without claiming an official match."
+        },
+        {
+          "id": "C13",
+          "turn": 3,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "They describe helping boards turn financial understanding into agreed action. Acknowledge that practical advisory role, then move naturally to how they discovered the platform."
+        },
+        {
+          "id": "C13",
+          "turn": 4,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "They’ve given a straightforward referral source, so a brief acknowledgement is enough before warmly inviting the final open question about what matters to them."
+        },
+        {
+          "id": "C13",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "They have named a substantive professional concern rather than declined the broad question. A brief follow-up can clarify what boards struggle with before closing."
+        },
+        {
+          "id": "C13",
+          "turn": 6,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Their concern is the gap between counting activity and identifying meaningful outcomes. Acknowledge that distinction, then close with the account invitation and confirmed charity, without further questions."
+        }
+      ]
+    },
+    {
+      "id": "C14",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C14",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C14",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Tom Lane, an accountant at Cedar Advisory working with Interim Spaces, Brainstrust and Blue Cross. My email is tom.lane@example.invalid."
+        },
+        {
+          "id": "C14",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Tom. We can start with whichever of your charity clients is most useful to you. Which would you prefer — Interim Spaces, Brainstrust or Blue Cross?"
+        },
+        {
+          "id": "C14",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C14",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Brainstrust. How did you hear about the platform?"
+        },
+        {
+          "id": "C14",
+          "index": 5,
+          "role": "user",
+          "text": "A client sent me the link."
+        },
+        {
+          "id": "C14",
+          "index": 6,
+          "role": "assistant",
+          "text": "Good to hear a client pointed you our way. To get a sense of what matters most to you, one last question.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C14",
+          "index": 7,
+          "role": "user",
+          "text": "Getting good information from clients on time."
+        },
+        {
+          "id": "C14",
+          "index": 8,
+          "role": "assistant",
+          "text": "You need information that’s both usable and on time. What most often gets in the way of clients providing it?"
+        },
+        {
+          "id": "C14",
+          "index": 9,
+          "role": "user",
+          "text": "They all use different systems, so we spend ages reconciling information."
+        },
+        {
+          "id": "C14",
+          "index": 10,
+          "role": "assistant",
+          "text": "So a lot of your time goes into making the information fit together before you can use it. You can now create your account and explore Brainstrust on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C14",
+        "objective": "complete",
+        "facts": {
+          "name": "Tom Lane",
+          "email": "tom.lane@example.invalid",
+          "role": "accountant",
+          "organisation": "Cedar Advisory",
+          "responsibilities": "working with Interim Spaces, Brainstrust and Blue Cross",
+          "discovery": "A client sent me the link",
+          "concerns": "Getting good information from clients on time; They all use different systems, so we spend ages reconciling information.",
+          "portfolio": "3",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "firm"
+        },
+        "professional": [
+          {
+            "entity": "Cedar Advisory",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "firm",
+            "relationship": "employer",
+            "period": "current",
+            "confidence": "stated",
+            "role": "accountant",
+            "evidence": "an accountant at Cedar Advisory",
+            "turn": 1
+          },
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "client",
+            "period": "current",
+            "confidence": "stated",
+            "role": "working with",
+            "evidence": "working with Interim Spaces, Brainstrust and Blue Cross",
+            "turn": 1
+          },
+          {
+            "entity": "Brainstrust",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "client",
+            "period": "current",
+            "confidence": "stated",
+            "role": "working with",
+            "evidence": "working with Interim Spaces, Brainstrust and Blue Cross",
+            "turn": 1
+          },
+          {
+            "entity": "Blue Cross",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "client",
+            "period": "current",
+            "confidence": "stated",
+            "role": "working with",
+            "evidence": "working with Interim Spaces, Brainstrust and Blue Cross",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Brainstrust"
+      },
+      "decisions": [
+        {
+          "id": "C14",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Tom has introduced himself as an accountant supporting three charity clients. Acknowledge that professional context and let him choose which charity to start with, without implying an official match."
+        },
+        {
+          "id": "C14",
+          "turn": 2,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "This is an ordinary client referral, so it merits a brief acknowledgement rather than probing. Move naturally to the final open question with a short explanation that we want to understand what matters to him."
+        },
+        {
+          "id": "C14",
+          "turn": 3,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Tom has named a concrete professional concern, not shown reluctance. It is worth briefly understanding what prevents clients supplying timely, useful information before closing."
+        },
+        {
+          "id": "C14",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Tom has clarified that inconsistent client systems create a time-consuming reconciliation burden. Acknowledge that practical frustration without promising a solution, then close with the account invitation and confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C15",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C15",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C15",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C15",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Marcus. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C15",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C15",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you focus on in your work as a trustee?"
+        },
+        {
+          "id": "C15",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C15",
+          "index": 6,
+          "role": "assistant",
+          "text": "The finance side, then. How did you hear about SORP 2026?"
+        },
+        {
+          "id": "C15",
+          "index": 7,
+          "role": "user",
+          "text": "A friend recommended you over a pint."
+        },
+        {
+          "id": "C15",
+          "index": 8,
+          "role": "assistant",
+          "text": "A recommendation over a pint — good to know. We’d also like to understand what’s on your mind.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C15",
+          "index": 9,
+          "role": "user",
+          "text": "The spreadsheet has developed a personality and refuses to cooperate."
+        },
+        {
+          "id": "C15",
+          "index": 10,
+          "role": "assistant",
+          "text": "An uncooperative colleague, then. What’s the spreadsheet refusing to do?"
+        },
+        {
+          "id": "C15",
+          "index": 11,
+          "role": "user",
+          "text": "Mostly a joke, but reconciling three different sets of figures really is a pain."
+        },
+        {
+          "id": "C15",
+          "index": 12,
+          "role": "assistant",
+          "text": "Joking aside, reconciling three sets of figures sounds frustrating. When you’re ready, create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C15",
+        "objective": "complete",
+        "facts": {
+          "name": "Marcus Warry",
+          "email": "marcus.warry@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance",
+          "discovery": "a friend recommended you over a pint",
+          "concerns": "The spreadsheet has developed a personality and refuses to cooperate.; reconciling three different sets of figures is a pain",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee of Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C15",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Marcus has introduced himself and identified his current trusteeship. Acknowledge the introduction and offer Interim Spaces as the starting charity without implying an official match."
+        },
+        {
+          "id": "C15",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They have identified finance as their trustee focus. This straightforward answer needs a brief acknowledgement, not further probing, before asking how they found the platform."
+        },
+        {
+          "id": "C15",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They heard about us through an informal recommendation from a friend. That needs a light acknowledgement, not probing, before a purposeful invitation to share what matters to them."
+        },
+        {
+          "id": "C15",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "They’ve used humour to describe a potentially real finance frustration. Meet the humour lightly and clarify what the spreadsheet is failing to do before closing."
+        },
+        {
+          "id": "C15",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "The spreadsheet’s personality was mostly a joke, but reconciling three sets of figures is a genuine frustration. Acknowledge that distinction and close with the account invitation, without further probing or promising a solution."
+        }
+      ]
+    },
+    {
+      "id": "C16",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C16",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C16",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Ruth Bell, a trustee at Interim Spaces. My email is ruth.bell@example.invalid."
+        },
+        {
+          "id": "C16",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Ruth. Shall we start with Interim Spaces as the charity you’d like to look at?"
+        },
+        {
+          "id": "C16",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C16",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you focus on in your work as a trustee?"
+        },
+        {
+          "id": "C16",
+          "index": 5,
+          "role": "user",
+          "text": "Finance and fundraising."
+        },
+        {
+          "id": "C16",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks — that gives me a sense of your role. How did you hear about the platform?"
+        },
+        {
+          "id": "C16",
+          "index": 7,
+          "role": "user",
+          "text": "Through our charity network."
+        },
+        {
+          "id": "C16",
+          "index": 8,
+          "role": "assistant",
+          "text": "Good to hear the network pointed you our way. We’d like to understand what matters most to you.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C16",
+          "index": 9,
+          "role": "user",
+          "text": "I'd rather not say."
+        },
+        {
+          "id": "C16",
+          "index": 10,
+          "role": "assistant",
+          "text": "Of course — no need to share. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C16",
+        "objective": "complete",
+        "facts": {
+          "name": "Ruth Bell",
+          "email": "ruth.bell@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance and fundraising",
+          "discovery": "through our charity network",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C16",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Ruth has introduced herself as a trustee at Interim Spaces and supplied her contact details. Acknowledge her introduction and suggest starting with that charity, without implying an official match exists."
+        },
+        {
+          "id": "C16",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Ruth has given a straightforward answer about her trustee responsibilities, without raising a concern that needs probing. Briefly acknowledge her remit and move naturally to how she found the platform."
+        },
+        {
+          "id": "C16",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Ruth has given a straightforward referral source, which needs a brief acknowledgement rather than probing. Move on with a light invitation to share what matters to her."
+        },
+        {
+          "id": "C16",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "declined",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Ruth has declined a personal question. Respect that boundary without probing and close with a simple invitation to create her account and explore her confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C17",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C17",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C17",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Sam Green, a trustee at Interim Spaces. My email is sam.green@example.invalid."
+        },
+        {
+          "id": "C17",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Sam. Would you like to start with Interim Spaces as the charity we focus on?"
+        },
+        {
+          "id": "C17",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C17",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll focus on Interim Spaces. What do you look after as a trustee?"
+        },
+        {
+          "id": "C17",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C17",
+          "index": 6,
+          "role": "assistant",
+          "text": "The finance side, then. How did you hear about the platform?"
+        },
+        {
+          "id": "C17",
+          "index": 7,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C17",
+          "index": 8,
+          "role": "assistant",
+          "text": "Glad your pal pointed you our way. We’d also like to understand what’s on your mind.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C17",
+          "index": 9,
+          "role": "user",
+          "text": "That's a strange question."
+        },
+        {
+          "id": "C17",
+          "index": 10,
+          "role": "assistant",
+          "text": "Fair point — that was a bit out of the blue. You can now create your account and explore the SORP guidance for Interim Spaces."
+        }
+      ],
+      "finalState": {
+        "id": "C17",
+        "objective": "complete",
+        "facts": {
+          "name": "Sam Green",
+          "email": "sam.green@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance",
+          "discovery": "My pal told me",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "unknown",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C17",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Sam has introduced themselves and their current trusteeship. Acknowledge that context and suggest starting with Interim Spaces, without implying an official match has been found."
+        },
+        {
+          "id": "C17",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Sam has given a straightforward answer about their trustee responsibilities. A brief acknowledgement is enough before moving to how they found the platform; there is no concern or detail that needs probing."
+        },
+        {
+          "id": "C17",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Sam gives an ordinary referral from a friend, which needs a brief acknowledgement rather than probing. Move naturally to the open final question with a clear human purpose."
+        },
+        {
+          "id": "C17",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "declined",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Sam found the final question odd rather than answering it. Acknowledge the abruptness without probing, then close with a simple invitation to create an account."
+        }
+      ]
+    },
+    {
+      "id": "C18",
+      "passed": true,
+      "turns": 4,
+      "transcript": [
+        {
+          "id": "C18",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C18",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Eva Fox, a trustee at Interim Spaces. My email is eva.fox@example.invalid."
+        },
+        {
+          "id": "C18",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Eva. Would you like to start with Interim Spaces as the charity you’re here for?"
+        },
+        {
+          "id": "C18",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C18",
+          "index": 4,
+          "role": "assistant",
+          "text": "Interim Spaces it is. What do you focus on in your work as a trustee?"
+        },
+        {
+          "id": "C18",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C18",
+          "index": 6,
+          "role": "assistant",
+          "text": "The finance side, then. How did you hear about the platform?"
+        },
+        {
+          "id": "C18",
+          "index": 7,
+          "role": "user",
+          "text": "A search engine."
+        },
+        {
+          "id": "C18",
+          "index": 8,
+          "role": "assistant",
+          "text": "Glad you found us. We’d like to understand a little more about what matters to you.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C18",
+          "index": 9,
+          "role": "user",
+          "text": "Nothing, actually."
+        },
+        {
+          "id": "C18",
+          "index": 10,
+          "role": "assistant",
+          "text": "Glad to hear it. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C18",
+        "objective": "complete",
+        "facts": {
+          "name": "Eva Fox",
+          "email": "eva.fox@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance",
+          "discovery": "A search engine",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "unknown"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C18",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Eva has introduced herself and her current trusteeship. Welcome her briefly and suggest Interim Spaces as the starting charity, without implying an official match has been confirmed."
+        },
+        {
+          "id": "C18",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Eva has given a straightforward answer about her trustee responsibilities. Briefly acknowledge her finance focus, then move naturally to how she found the platform; there is no need to probe."
+        },
+        {
+          "id": "C18",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Eva has given a straightforward referral source, which needs only a brief acknowledgement before inviting her to share what matters to her."
+        },
+        {
+          "id": "C18",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Eva gives a clear no-concern answer, so there is nothing to probe. Acknowledge it lightly and close with the account-creation invitation."
+        }
+      ]
+    },
+    {
+      "id": "C19",
+      "passed": true,
+      "turns": 2,
+      "transcript": [
+        {
+          "id": "C19",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C19",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C19",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Marcus. Shall we start with Interim Spaces?"
+        },
+        {
+          "id": "C19",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C19",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces, then. What do you focus on in your work as a trustee?"
+        },
+        {
+          "id": "C19",
+          "index": 5,
+          "role": "user",
+          "text": "I'm in a hurry. Can I just get into the platform now?"
+        },
+        {
+          "id": "C19",
+          "index": 6,
+          "role": "assistant",
+          "text": "Of course — no more questions. Create your account to get into the platform and explore Interim Spaces."
+        }
+      ],
+      "finalState": {
+        "id": "C19",
+        "objective": "complete",
+        "facts": {
+          "name": "Marcus Warry",
+          "email": "marcus.warry@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "",
+          "discovery": "",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "unknown"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "unknown",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee of Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C19",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Marcus has introduced himself and identified his current trusteeship. Acknowledge the introduction and offer to start with Interim Spaces, without implying an official match has been found."
+        },
+        {
+          "id": "C19",
+          "turn": 2,
+          "objective": "complete",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "He is in a hurry and explicitly wants to stop the questions and access the platform. Acknowledge that directly and offer account creation as the next step, without implying an account already exists."
+        }
+      ]
+    },
+    {
+      "id": "C20",
+      "passed": true,
+      "turns": 2,
+      "transcript": [
+        {
+          "id": "C20",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C20",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Jon King, a trustee at Interim Spaces. My email is jon.king@example.invalid."
+        },
+        {
+          "id": "C20",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Jon. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C20",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C20",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you tend to focus on in your work as a trustee?"
+        },
+        {
+          "id": "C20",
+          "index": 5,
+          "role": "user",
+          "text": "I oversee governance. Please skip the optional questions and let me continue."
+        },
+        {
+          "id": "C20",
+          "index": 6,
+          "role": "assistant",
+          "text": "Of course — we’ll leave the optional questions there. You can now create your account and explore Interim Spaces."
+        }
+      ],
+      "finalState": {
+        "id": "C20",
+        "objective": "complete",
+        "facts": {
+          "name": "Jon King",
+          "email": "jon.king@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "oversee governance",
+          "discovery": "",
+          "concerns": "",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "unknown"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "unknown",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C20",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Jon has introduced himself and his current trusteeship. Acknowledge that naturally, suggest starting with Interim Spaces without implying an official match, then prepare a separate responsibilities question for after explicit confirmation."
+        },
+        {
+          "id": "C20",
+          "turn": 2,
+          "objective": "complete",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Jon has supplied his governance responsibility and explicitly asked to skip optional questions. Respect that request and close with the account-creation next step for the confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C21",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C21",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C21",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Maya Wood, a trustee at Interim Spaces. My email is maya.wood@example.invalid."
+        },
+        {
+          "id": "C21",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Maya. Shall we start with Interim Spaces?"
+        },
+        {
+          "id": "C21",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C21",
+          "index": 4,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you focus on in your work as a trustee?"
+        },
+        {
+          "id": "C21",
+          "index": 5,
+          "role": "user",
+          "text": "Finance. Does this replace our accountant?"
+        },
+        {
+          "id": "C21",
+          "index": 6,
+          "role": "assistant",
+          "text": "No — it supports your finance work with SORP guidance, readiness and impact reporting, but doesn’t replace your accountant or their professional advice. How did you hear about the platform?"
+        },
+        {
+          "id": "C21",
+          "index": 7,
+          "role": "user",
+          "text": "A fellow trustee."
+        },
+        {
+          "id": "C21",
+          "index": 8,
+          "role": "assistant",
+          "text": "Nice to hear a fellow trustee pointed you our way. We’d like to understand what matters to you, too.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C21",
+          "index": 9,
+          "role": "user",
+          "text": "Keeping our reporting manageable."
+        },
+        {
+          "id": "C21",
+          "index": 10,
+          "role": "assistant",
+          "text": "It sounds like the reporting workload is the main concern. Which part of the process is most demanding at the moment?"
+        },
+        {
+          "id": "C21",
+          "index": 11,
+          "role": "user",
+          "text": "We need our reporting to help the board understand what is happening, without too much extra admin."
+        },
+        {
+          "id": "C21",
+          "index": 12,
+          "role": "assistant",
+          "text": "You want reporting that gives the board clarity without adding to the admin burden. You can now create your account and explore Interim Spaces when you’re ready."
+        }
+      ],
+      "finalState": {
+        "id": "C21",
+        "objective": "complete",
+        "facts": {
+          "name": "Maya Wood",
+          "email": "maya.wood@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance",
+          "discovery": "a fellow trustee",
+          "concerns": "Keeping our reporting manageable; We need our reporting to help the board understand what is happening, without too much extra admin.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C21",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Maya has introduced herself and identified her current trusteeship. Welcome her and offer Interim Spaces as the starting charity, without implying an official match has been confirmed."
+        },
+        {
+          "id": "C21",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Maya handles finance and wants to understand whether the platform replaces their accountant. Answer that boundary directly before moving naturally to how she found it."
+        },
+        {
+          "id": "C21",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Maya heard about the platform through a fellow trustee. This is an ordinary referral that needs a brief acknowledgement, not probing, before inviting her to share what is on her mind."
+        },
+        {
+          "id": "C21",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Maya has named a genuine concern about reporting workload, not signalled reluctance. A brief, specific follow-up would help clarify what makes reporting difficult before closing."
+        },
+        {
+          "id": "C21",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Maya wants useful board reporting without excessive administration, rather than simply less reporting. Acknowledge that balance and close with an invitation to create an account and explore her confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C22",
+      "passed": true,
+      "turns": 6,
+      "transcript": [
+        {
+          "id": "C22",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C22",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C22",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Marcus. Shall we start with Interim Spaces as the charity you’d like to focus on?"
+        },
+        {
+          "id": "C22",
+          "index": 3,
+          "role": "user",
+          "text": "I already told you Interim Spaces."
+        },
+        {
+          "id": "C22",
+          "index": 4,
+          "role": "assistant",
+          "text": "You’re right — you already said Interim Spaces. Use the Find button to look up its official charity record so you can check it’s the right one."
+        },
+        {
+          "id": "C22",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C22",
+          "index": 6,
+          "role": "assistant",
+          "text": "That’s Interim Spaces confirmed. What do you look after as a trustee?"
+        },
+        {
+          "id": "C22",
+          "index": 7,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C22",
+          "index": 8,
+          "role": "assistant",
+          "text": "You look after the finance side, then. How did you hear about the platform?"
+        },
+        {
+          "id": "C22",
+          "index": 9,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C22",
+          "index": 10,
+          "role": "assistant",
+          "text": "Ah, word of mouth. We’d like to understand what matters to you, too.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C22",
+          "index": 11,
+          "role": "user",
+          "text": "Deadlines."
+        },
+        {
+          "id": "C22",
+          "index": 12,
+          "role": "assistant",
+          "text": "I hear you — which deadline is most on your mind at the moment?"
+        },
+        {
+          "id": "C22",
+          "index": 13,
+          "role": "user",
+          "text": "It is having several reporting dates land in the same week."
+        },
+        {
+          "id": "C22",
+          "index": 14,
+          "role": "assistant",
+          "text": "It’s the reporting dates piling up together that’s the worry. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C22",
+        "objective": "complete",
+        "facts": {
+          "name": "Marcus Warry",
+          "email": "marcus.warry@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Finance",
+          "discovery": "My pal told me",
+          "concerns": "Deadlines; several reporting dates land in the same week",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee of Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C22",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Marcus has introduced himself and his current trusteeship, giving the requested contact details. Acknowledge the introduction and suggest starting with Interim Spaces without implying an official match; after explicit charity confirmation, ask about his trustee responsibilities."
+        },
+        {
+          "id": "C22",
+          "turn": 2,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "They are reminding us that they already named their charity and are frustrated by the redundant question. Accept the correction, retain Interim Spaces and point to the Find button without asking again. After explicit confirmation, ask about their trustee responsibilities."
+        },
+        {
+          "id": "C22",
+          "turn": 3,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They have supplied their trustee responsibility plainly. A brief acknowledgement is enough; there is no particular concern or experience to probe, so move naturally to how they found the platform."
+        },
+        {
+          "id": "C22",
+          "turn": 4,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They heard about the platform through a friend; this ordinary referral needs a brief acknowledgement, not probing. Move gently to the final open question with a human reason for asking."
+        },
+        {
+          "id": "C22",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "They have named a real but broad concern, not declined to engage. A brief acknowledgement and a specific question about the deadline would help understand it before closing."
+        },
+        {
+          "id": "C22",
+          "turn": 6,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Their concern is the concentration of several reporting deadlines in the same week, not a single date. Acknowledge that specific pressure and close with the account invitation, without further questions or promises."
+        }
+      ]
+    },
+    {
+      "id": "C23",
+      "passed": true,
+      "turns": 6,
+      "transcript": [
+        {
+          "id": "C23",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C23",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Gareth Hill, a trustee at Interim Spaces. My email is gareth.hill@example.invalid."
+        },
+        {
+          "id": "C23",
+          "index": 2,
+          "role": "assistant",
+          "text": "Welcome, Gareth. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C23",
+          "index": 3,
+          "role": "user",
+          "text": "Actually, let’s use Brainstrust instead."
+        },
+        {
+          "id": "C23",
+          "index": 4,
+          "role": "assistant",
+          "text": "Of course — let’s use Brainstrust instead. Next, we’ll look for its official charity record for you to check."
+        },
+        {
+          "id": "C23",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Brainstrust, inspected the displayed official-record fixture, and explicitly confirmed Brainstrust."
+        },
+        {
+          "id": "C23",
+          "index": 6,
+          "role": "assistant",
+          "text": "That confirms Brainstrust as the charity we’ll focus on. What do you look after in your trustee role at Interim Spaces?"
+        },
+        {
+          "id": "C23",
+          "index": 7,
+          "role": "user",
+          "text": "Financial oversight."
+        },
+        {
+          "id": "C23",
+          "index": 8,
+          "role": "assistant",
+          "text": "Thanks — that gives me a sense of your trustee remit. How did you hear about the platform?"
+        },
+        {
+          "id": "C23",
+          "index": 9,
+          "role": "user",
+          "text": "A friend sent a link."
+        },
+        {
+          "id": "C23",
+          "index": 10,
+          "role": "assistant",
+          "text": "Thanks — good to know how you found us. We’d also like to understand what’s on your mind.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C23",
+          "index": 11,
+          "role": "user",
+          "text": "Knowing our reports are accurate."
+        },
+        {
+          "id": "C23",
+          "index": 12,
+          "role": "assistant",
+          "text": "You want to be able to trust what your reports are telling you. Which part of the reporting gives you most cause for doubt?"
+        },
+        {
+          "id": "C23",
+          "index": 13,
+          "role": "user",
+          "text": "We want to be clear about what we know and where there are gaps in the figures."
+        },
+        {
+          "id": "C23",
+          "index": 14,
+          "role": "assistant",
+          "text": "You want the reports to make clear what the figures support and where there’s still uncertainty. You can now create your account and explore Brainstrust on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C23",
+        "objective": "complete",
+        "facts": {
+          "name": "Gareth Hill",
+          "email": "gareth.hill@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "financial oversight",
+          "discovery": "A friend sent a link",
+          "concerns": "Knowing our reports are accurate; We want to be clear about what we know and where there are gaps in the figures.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "unknown"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "unknown",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Brainstrust"
+      },
+      "decisions": [
+        {
+          "id": "C23",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Gareth has introduced himself and identified his current trusteeship. Acknowledge that context, suggest starting with Interim Spaces without implying an official match, then prepare a distinct responsibilities question for after confirmation."
+        },
+        {
+          "id": "C23",
+          "turn": 2,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Gareth wants to focus on Brainstrust instead of Interim Spaces; this does not change his stated trustee role. Accept the switch and explain that its official record still needs to be found and checked."
+        },
+        {
+          "id": "C23",
+          "turn": 3,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "He has briefly clarified his trustee responsibilities, without signalling reluctance or raising a concern. Acknowledge that context and move naturally to how he found the platform."
+        },
+        {
+          "id": "C23",
+          "turn": 4,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "He has answered the referral question plainly; a brief acknowledgement is enough before warmly inviting the final open question."
+        },
+        {
+          "id": "C23",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "He has named a genuine concern tied to his financial oversight role, rather than signalling reluctance. A brief, specific follow-up should clarify where his uncertainty about report accuracy lies before closing."
+        },
+        {
+          "id": "C23",
+          "turn": 6,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "They want transparent reporting that distinguishes what is known from gaps in the figures. Acknowledge that aim without judging the reports, then close with the account invitation and confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C24",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C24",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C24",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Leah Stone, a trustee at Interim Spaces. My email is leah.stone@example.invalid."
+        },
+        {
+          "id": "C24",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Leah. Would you like to start with Interim Spaces as the charity we focus on?"
+        },
+        {
+          "id": "C24",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C24",
+          "index": 4,
+          "role": "assistant",
+          "text": "We'll focus on Interim Spaces. What do you spend most of your time on as a trustee?"
+        },
+        {
+          "id": "C24",
+          "index": 5,
+          "role": "user",
+          "text": "I look after the accounts, although I used to run fundraising at Blue Cross."
+        },
+        {
+          "id": "C24",
+          "index": 6,
+          "role": "assistant",
+          "text": "You’ve worked on both bringing funds in and looking after the accounts. How did you come across SORP 2026?"
+        },
+        {
+          "id": "C24",
+          "index": 7,
+          "role": "user",
+          "text": "A former colleague."
+        },
+        {
+          "id": "C24",
+          "index": 8,
+          "role": "assistant",
+          "text": "Ah, through a former colleague. We’d also like to understand what matters most to you.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C24",
+          "index": 9,
+          "role": "user",
+          "text": "Frogs. We run a wetland project and disease is wiping out the local population."
+        },
+        {
+          "id": "C24",
+          "index": 10,
+          "role": "assistant",
+          "text": "That sounds deeply worrying for your wetland project. Have you been able to get specialist help with the disease affecting the frogs?"
+        },
+        {
+          "id": "C24",
+          "index": 11,
+          "role": "user",
+          "text": "We need to understand the disease and explain the conservation work to our funders, without pretending we have answers yet."
+        },
+        {
+          "id": "C24",
+          "index": 12,
+          "role": "assistant",
+          "text": "You want funders to understand the conservation work without overstating what’s known about the disease. When you’re ready, you can create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C24",
+        "objective": "complete",
+        "facts": {
+          "name": "Leah Stone",
+          "email": "leah.stone@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "look after the accounts",
+          "discovery": "A former colleague",
+          "concerns": "Disease is wiping out the local frog population in our wetland project.; We need to understand the disease and explain the conservation work to our funders, without pretending we have answers yet.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "We run a wetland project.",
+          "organisationKind": "charity"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          },
+          {
+            "entity": "Blue Cross",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "charity",
+            "relationship": "employee",
+            "period": "past",
+            "confidence": "stated",
+            "role": "",
+            "evidence": "I used to run fundraising at Blue Cross",
+            "turn": 2
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C24",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Leah has introduced herself and identified her current trusteeship. Acknowledge that context, then offer Interim Spaces as the starting charity without implying an official match."
+        },
+        {
+          "id": "C24",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Leah has described her current accounts responsibilities alongside substantial past fundraising experience. Acknowledge that breadth without implying she needs help or inventing concerns, then move naturally to how she found the platform."
+        },
+        {
+          "id": "C24",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Leah has answered with an ordinary referral that needs a brief acknowledgement, not probing. Move naturally to the final open question, explaining that we want to understand what matters to her."
+        },
+        {
+          "id": "C24",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Leah has answered the broad question with a serious concern about wildlife loss, not an accounting issue. Stay with that concern and briefly ask about access to relevant help rather than redirecting to SORP or closing immediately."
+        },
+        {
+          "id": "C24",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Leah is emphasising honest communication with funders amid unresolved ecological harm, not asking for disease advice. Acknowledge that distinction and close with a brief account-creation invitation for the confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C25",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C25",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C25",
+          "index": 1,
+          "role": "user",
+          "text": "I’m worried our charity may have to close. I’m Kelly."
+        },
+        {
+          "id": "C25",
+          "index": 2,
+          "role": "assistant",
+          "text": "I’m sorry you’re facing that uncertainty, Kelly. What’s your role at the charity?"
+        },
+        {
+          "id": "C25",
+          "index": 3,
+          "role": "user",
+          "text": "My full name is Kelly White. My email is kelly.white@example.invalid. I’m the CEO of Interim Spaces."
+        },
+        {
+          "id": "C25",
+          "index": 4,
+          "role": "assistant",
+          "text": "You’re leading the charity through that uncertainty. Shall we start with Interim Spaces?"
+        },
+        {
+          "id": "C25",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C25",
+          "index": 6,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What’s behind your concern that the charity may have to close?"
+        },
+        {
+          "id": "C25",
+          "index": 7,
+          "role": "user",
+          "text": "One major grant is ending and we have not secured a replacement."
+        },
+        {
+          "id": "C25",
+          "index": 8,
+          "role": "assistant",
+          "text": "With that grant ending and no replacement secured, I can see why you’re concerned. What is taking up most of your time as CEO at the moment?"
+        },
+        {
+          "id": "C25",
+          "index": 9,
+          "role": "user",
+          "text": "I lead the team and funding applications."
+        },
+        {
+          "id": "C25",
+          "index": 10,
+          "role": "assistant",
+          "text": "You’re leading the team while also handling funding applications. On a different note, how did you hear about the platform?"
+        },
+        {
+          "id": "C25",
+          "index": 11,
+          "role": "user",
+          "text": "Our finance adviser sent me here."
+        },
+        {
+          "id": "C25",
+          "index": 12,
+          "role": "assistant",
+          "text": "Thanks for letting me know your finance adviser pointed you our way. When you’re ready, create your account to explore Interim Spaces and the SORP guidance available."
+        }
+      ],
+      "finalState": {
+        "id": "C25",
+        "objective": "complete",
+        "facts": {
+          "name": "Kelly White",
+          "email": "kelly.white@example.invalid",
+          "role": "CEO",
+          "organisation": "Interim Spaces",
+          "responsibilities": "I lead the team and funding applications.",
+          "discovery": "Their finance adviser sent them here.",
+          "concerns": "our charity may have to close; One major grant is ending and we have not secured a replacement.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "unknown"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "unknown",
+            "relationship": "employer",
+            "period": "current",
+            "confidence": "stated",
+            "role": "CEO",
+            "evidence": "I’m the CEO of Interim Spaces.",
+            "turn": 2
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C25",
+          "turn": 1,
+          "objective": "registration",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Kelly has shared a serious worry about the charity’s future rather than simply supplying registration details. Acknowledge that concern gently before asking for their role."
+        },
+        {
+          "id": "C25",
+          "turn": 2,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Kelly has clarified her identity and that she is the charity’s CEO, placing her earlier concern about closure in a leadership context. Acknowledge that before suggesting Interim Spaces; after explicit confirmation, explore what is behind the closure concern."
+        },
+        {
+          "id": "C25",
+          "turn": 3,
+          "objective": "responsibilities",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Kelly has explained the concrete funding gap behind her fear of closure. Acknowledge that concern without judging the charity’s viability, then gently ask about her current responsibilities as CEO."
+        },
+        {
+          "id": "C25",
+          "turn": 4,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Kelly is describing her responsibilities in the context of a threatened closure: she leads both the team and funding applications. Acknowledge that combination without assessing the charity’s position, then gently move to how she found the platform."
+        },
+        {
+          "id": "C25",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Their finance adviser referred them here; this needs a brief acknowledgement, not further probing. The conversation is complete, so invite account creation and exploration of the confirmed charity."
+        }
+      ]
+    },
+    {
+      "id": "C26",
+      "passed": true,
+      "turns": 5,
+      "transcript": [
+        {
+          "id": "C26",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C26",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Theo Wells, a trustee at Interim Spaces. My email is theo.wells@example.invalid."
+        },
+        {
+          "id": "C26",
+          "index": 2,
+          "role": "assistant",
+          "text": "Good to meet you, Theo. Would you like to start with Interim Spaces?"
+        },
+        {
+          "id": "C26",
+          "index": 3,
+          "role": "action",
+          "text": "Edited profile: {\"email\":\"theo.corrected@example.invalid\"}"
+        },
+        {
+          "id": "C26",
+          "index": 4,
+          "role": "action",
+          "text": "Reloaded and resumed the same introduction."
+        },
+        {
+          "id": "C26",
+          "index": 5,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C26",
+          "index": 6,
+          "role": "assistant",
+          "text": "We’ll start with Interim Spaces. What do you look after as a trustee?"
+        },
+        {
+          "id": "C26",
+          "index": 7,
+          "role": "user",
+          "text": "Budgets. Also, can I use this on my phone?"
+        },
+        {
+          "id": "C26",
+          "index": 8,
+          "role": "assistant",
+          "text": "Budgets — got it. Yes, you can use the platform on your phone. How did you first hear about it?"
+        },
+        {
+          "id": "C26",
+          "index": 9,
+          "role": "user",
+          "text": "An email from another trustee."
+        },
+        {
+          "id": "C26",
+          "index": 10,
+          "role": "assistant",
+          "text": "Thanks — good to know it reached you through another trustee. We’d also like to understand what’s on your mind.\n\nWhat keeps you up at night?"
+        },
+        {
+          "id": "C26",
+          "index": 11,
+          "role": "user",
+          "text": "My ability to persuade people to send their figures before the deadline."
+        },
+        {
+          "id": "C26",
+          "index": 12,
+          "role": "assistant",
+          "text": "You’re relying on others to get the figures to you in time. What tends to make it difficult to get them to respond?"
+        },
+        {
+          "id": "C26",
+          "index": 13,
+          "role": "user",
+          "text": "People send different formats and some of it arrives after the board papers are due."
+        },
+        {
+          "id": "C26",
+          "index": 14,
+          "role": "assistant",
+          "text": "You’re left trying to bring different formats together, with some figures arriving too late for the board papers. You can now create your account and explore Interim Spaces on the platform."
+        }
+      ],
+      "finalState": {
+        "id": "C26",
+        "objective": "complete",
+        "facts": {
+          "name": "Theo Wells",
+          "email": "theo.corrected@example.invalid",
+          "role": "trustee",
+          "organisation": "Interim Spaces",
+          "responsibilities": "Budgets",
+          "discovery": "an email from another trustee",
+          "concerns": "My ability to persuade people to send their figures before the deadline; People send different formats and some of it arrives after the board papers are due.",
+          "portfolio": "",
+          "charities": [],
+          "interests": "",
+          "context": "",
+          "organisationKind": "other"
+        },
+        "professional": [
+          {
+            "entity": "Interim Spaces",
+            "entityNature": "named_organisation",
+            "aliases": [],
+            "kind": "organisation",
+            "relationship": "trustee",
+            "period": "current",
+            "confidence": "stated",
+            "role": "trustee",
+            "evidence": "a trustee at Interim Spaces",
+            "turn": 1
+          }
+        ],
+        "confirmed": "Interim Spaces"
+      },
+      "decisions": [
+        {
+          "id": "C26",
+          "turn": 1,
+          "objective": "charity",
+          "participation": {
+            "topic": "none",
+            "status": "not_answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Theo has introduced himself and supplied his contact details and trustee role. Welcome him briefly and offer Interim Spaces as the starting organisation without implying an official match."
+        },
+        {
+          "id": "C26",
+          "turn": 2,
+          "objective": "discovery",
+          "participation": {
+            "topic": "responsibilities",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "Theo has identified budgets as his responsibility and asked a practical question about mobile use. Answer that directly, acknowledge his role briefly, then move to discovery."
+        },
+        {
+          "id": "C26",
+          "turn": 3,
+          "objective": "concerns",
+          "participation": {
+            "topic": "discovery",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": true,
+          "move": "progress",
+          "understanding": "They heard about the platform through another trustee’s email. This ordinary referral needs a brief acknowledgement, not probing, before a welcoming invitation to the final open question."
+        },
+        {
+          "id": "C26",
+          "turn": 4,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": true
+          },
+          "offered": true,
+          "move": "follow_up",
+          "understanding": "Their worry is about securing timely contributions from others, not technical budgeting. This is engaged and specific enough to merit a brief follow-up about what makes that difficult before closing."
+        },
+        {
+          "id": "C26",
+          "turn": 5,
+          "objective": "complete",
+          "participation": {
+            "topic": "concerns",
+            "status": "answered",
+            "followUp": false
+          },
+          "offered": false,
+          "move": "progress",
+          "understanding": "Theo has clarified that inconsistent formats and late figures make preparing board papers difficult. Acknowledge that practical frustration without promising the platform will solve it, then close with the account-creation invitation."
+        }
+      ]
+    }
+  ]
+}

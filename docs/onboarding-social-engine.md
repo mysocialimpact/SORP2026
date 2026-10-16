@@ -1,7 +1,7 @@
 # Social dialogue engine — release evidence
 
-Status: candidate under evaluation. Production remains Build 19 until the complete
-conversation review and browser checks are accepted. Earlier failed runs are retained
+Status: accepted for Build 20. All 26 conversations and four browser journeys passed
+the required checks and independent review. Earlier failed runs are retained
 in [the independent review](onboarding-independent-review.md); technical field-test
 success is not a conversational-quality pass.
 
@@ -87,6 +87,37 @@ voice transcript review, surprising final answers and account handoff. MediaReco
 and audio analysis use generated audio. Physical microphones, Safari and real
 transcription-provider delivery are not certified by this harness.
 
-Final counts, quality verdict, measured cost and deployment identity will be recorded
-after this candidate's acceptance run; earlier successful unit tests alone do not
-establish production readiness.
+## Candidate evidence (`ea52a28`)
+
+- [Complete live-model corpus](onboarding-social-final-run.json): 26/26 journeys
+  completed, 112 submitted answers, 224 API calls, no fallback wording and no
+  revision calls. Mean length: 4.31 answers. The billable estimate was $1.0474405
+  in total, or $0.0403 per conversation; five answers at the observed mean cost
+  would be about $0.047. These figures exclude transcription, hosting and storage.
+- [Built-application browser evidence](onboarding-browser-final.json): four passed
+  journeys, 16 submitted answers. Desktop and touch-mobile each cover historical
+  work/manual corrections and the exact trustee/finance/friend/frogs flow, through
+  account handoff. The service-fixture and microphone limitations above apply.
+- 230 product unit tests and nine isolated PostgreSQL integration tests passed.
+  TypeScript and production build passed. Repository lint has zero errors and two
+  pre-existing warnings outside onboarding.
+- [Independent GPT-6 Astra review](onboarding-social-final-review.md): 26/26 pass,
+  minimum 83/100, median 87/100, mean 86.94/100, every critical dimension at least
+  3/4, no hard-gate failure. Browser reply sets were inspected separately with no
+  additional blocker. Occasional formulaic acknowledgements and a self-focused
+  browser ending remain non-blocking quality limitations; these are not perfect or
+  human-reviewed conversations.
+- Evaluation deployment: `dpl_CfLQQFSjbBhb1r65zf2sa6fv9Y91`, READY.
+  `https://sorp2026-r6urg0nvi-marcuswarry.vercel.app/get-started/` returns HTTP 200,
+  but the public preview's onboarding session feature is disabled (HTTP 503).
+  Interactive acceptance used its built Next application with the feature enabled
+  and isolated services during the preview build. This is not a claim that an
+  unauthenticated visitor can run onboarding on the hosted preview.
+
+## Release
+
+Build 20 packages the accepted `ea52a28` engine; subsequent release edits are
+documentation, a server comment and the visible build number. Production promotion
+is pending. The previous working deployment, Build 19,
+`dpl_9cvsQzdiJwTWwy2U8HGv3tmUNtuq`, is retained as a rollback candidate. No
+authentication, payment, subscription or database migration accompanies this release.

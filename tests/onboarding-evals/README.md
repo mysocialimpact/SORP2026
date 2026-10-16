@@ -16,7 +16,7 @@ confirmation boundaries, resumption and completion. Registry confirmation fixtur
 are synthetic: this suite does not certify a regulator match. Reports are written
 to `test-results/onboarding-live-eval.json`; do not publish conversations from real users.
 
-Runs are bounded to 40 answers (two model stages per answer) and $1.20, including
+Runs are bounded to 40 answers (two normal model stages and at most one wording revision per answer) and $1.20, including
 measured spend plus conservative admission reservations. Unknown failures retain
 the full reservation.
 Token-based estimated cost is recorded separately. Set `SORP_EVAL_IDS` to comma-separated
