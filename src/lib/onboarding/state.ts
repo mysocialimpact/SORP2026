@@ -23,6 +23,7 @@ export type Objective =
   | "complete";
 export type ProfessionalRelationship = {
   entity: string;
+  entityNature?: "named_organisation";
   aliases: string[];
   kind: "charity" | "firm" | "organisation" | "unknown";
   relationship:
@@ -400,6 +401,7 @@ export type Extraction = Partial<Facts> & {
   utterance?: string;
   topicResponse?: { topic: "responsibilities" | "discovery" | "concerns" | "none"; status: "answered" | "declined" | "uncertain" | "not_answered"; followUp: boolean };
   notice?: string;
+  closeOptional?: boolean;
   usage?: { input: number; output: number; estimatedUsd: number };
 };
 /** Successful semantic interpretation is authoritative: an incidental mention
@@ -531,7 +533,8 @@ export function charityOptions(s: Conversation): string[] {
       .filter(
         (r) =>
           r.kind === "charity" ||
-          (r.relationship === "trustee" && r.kind !== "firm"),
+          (["trustee", "client"].includes(r.relationship) && r.kind !== "firm") ||
+          (r.relationship === "adviser" && r.entityNature === "named_organisation" && r.kind !== "firm"),
       )
       .map((r) => r.entity),
   ];
@@ -918,6 +921,11 @@ export function canFollowUp(before: Conversation, after: Conversation, topic: Ex
     after.turns < TOTAL_TURN_CAP && after.turns - after.repairTurns < OPTIONAL_TURN_CAP && before.dialogue.followUps < 2 &&
     (objective === "concerns" ? !before.dialogue.finalFollowUpUsed : before.dialogue.followUps === 0));
 }
+export function closeOptionalConversation(s: Conversation): Conversation | null {
+  if (!registrationReady(s.facts) || !s.charity.confirmed || s.clarification) return null;
+  return { ...s, dialogue: { ...s.dialogue, reflecting: false },
+    skipped: [...new Set([...s.skipped, ...(["responsibilities", "discovery", "concerns"] as Objective[])])] };
+}
 export function advance(
   s: Conversation,
   patch: Extraction,
@@ -957,17 +965,15 @@ export function advance(
     finalFollowUpUsed: s.dialogue.finalFollowUpUsed || (reflecting && objective === "concerns"),
     reflecting,
   };
-  return attachQuestion(
-    {
+  const progressed: Conversation = {
       ...next,
       asked: [...new Set([...s.asked, objective])],
       skipped:
         skip && objective !== "registration"
           ? [...new Set([...next.skipped, objective])]
           : next.skipped,
-    },
-    patch.questionProposal,
-  );
+    };
+  return attachQuestion(patch.closeOptional ? closeOptionalConversation(progressed) || progressed : progressed, patch.questionProposal);
 }
 export function nextObjective(s: Conversation): Objective {
   if (s.clarification && s.turns < TOTAL_TURN_CAP && !s.finishRequested)
@@ -1288,6 +1294,13 @@ export function suitableDialogue(s: Conversation, p: QuestionProposal): boolean 
   if (plan.objective === "concerns" && !p.question.includes("What keeps you up at night?")) return false;
   if (plan.objective !== "concerns" && /what keeps you up at night\?/i.test(p.question)) return false;
   if (!s.charity.candidates.length && /(?:official|charity) (?:record|match|card).{0,25}(?:shown|displayed)|(?:check|select|confirm).{0,35}(?:record|card) (?:shown|displayed)/i.test(p.question)) return false;
+  // Unverified relationship kinds must not let prose arbitrarily select one
+  // organisation from several unresolved client references.
+  if (plan.objective === "charity" && s.charity.phase === "suggest") {
+    const options = charityOptions(s), spoken = p.question.toLocaleLowerCase();
+    const mentioned = options.filter(name => spoken.includes(name.toLocaleLowerCase().replace(/^the /, "")));
+    if (options.length > 1 && mentioned.length > 0 && mentioned.length < options.length) return false;
+  }
   if (/https?:|(?:your|a) password|(?:I|we)(?:’|')ve (?:found|checked|verified|downloaded)|accounts are ready|(?:introduction|conversation|details) (?:is|are|has been|have been) saved/i.test(p.question)) return false;
   // Check questions, not acknowledgements: saying “your role” is not necessarily asking it again.
   for (const q of questions) {

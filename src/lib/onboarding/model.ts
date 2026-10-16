@@ -10,6 +10,7 @@ import {
   confirmCharity,
   canFollowUp,
   confirmationFollowUp,
+  closeOptionalConversation,
   type Conversation,
   type Extraction,
   type ProfessionalRelationship,
@@ -80,7 +81,7 @@ const factMeaning: Record<string, string> = {
   email: "The speaker's email address, exactly as supplied.",
   role: "The speaker's CURRENT professional role, not a past role or someone else's role.",
   organisation:
-    "Organisation of the speaker's CURRENT employment, trusteeship or volunteering, or their firm. Include the charity where a trustee currently serves. Historical clients and employers do not belong here.",
+    "Named organisation of the speaker's CURRENT employment, trusteeship or volunteering, or their firm. Include the charity where a trustee currently serves. Working independently or freelance describes an arrangement, not an organisation name. Historical clients and employers do not belong here.",
   responsibilities:
     "Specific duties or services, beyond a job title. Trustee/CEO/accountant alone is a role, not responsibilities. Preserve meaningful detail.",
   discovery:
@@ -88,7 +89,7 @@ const factMeaning: Record<string, string> = {
   concerns:
     "Professional worries, challenges, difficulties or problems. Retain them even within a sentence about interests or responsibilities.",
   portfolio:
-    "Approximate number of charities/clients the speaker works with. Preserve stated approximations.",
+    "Approximate number of charities/clients the speaker says they work with. Preserve stated approximations; do not infer a total portfolio size from a few named examples.",
   interests:
     "Professional subjects, opportunities or outcomes the speaker is interested in. Separate interests from concerns when both are supplied.",
   context:
@@ -113,6 +114,10 @@ export const interpretationSchema = object({
       "Accept only an explicit request to START WITH or USE a charity, or agreement with that proposal. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means the user does not want that charity as their starting selection.",
   },
   finishRequested: { type: "boolean" },
+  organisationNature: {
+    ...enumeration(["named_organisation", "working_arrangement", "none"]),
+    description: "Classify the NEW current-organisation fact, if supplied. A named employer/firm/charity is named_organisation. Independent, freelance, self-employed or similar describe a working arrangement and must not populate the organisation field. No new organisation is none.",
+  },
   concernKind: {
     ...enumeration(["professional", "personal", "uncertain", "none"]),
     description: "Classify NEW concerns using the person's meaning. Professional relevance must be supported, not inferred merely because we asked a professional question. An unexplained surprising noun is uncertain; literal private sleep disruption is personal; explicit charity/work context makes a concern professional. No new concern is none.",
@@ -142,6 +147,7 @@ export const interpretationSchema = object({
     type: "array",
     maxItems: 8,
     items: object({
+      entityNature: { ...enumeration(["named_organisation", "person", "description"]), description: "Distinguish an actual named organisation from a person, professional title, unnamed adviser or event/channel description. Only named organisations are professional entity records; never manufacture a proper name from a referral description." },
       entity: {
         ...text(160),
         description:
@@ -320,6 +326,10 @@ export function validateInterpretation(
     intent: p.intent as Extraction["intent"],
     correctedFields: corrected,
   };
+  if (p.organisationNature && p.organisationNature !== "named_organisation") {
+    delete extracted.organisation;
+    delete extracted.organisationKind;
+  }
   if (p.concernKind && p.concernKind !== "professional") delete extracted.concerns;
   for (const key of ["charityChoice", "reference"] as const)
     if (typeof patch[key] === "string" && validEntity(patch[key]))
@@ -343,6 +353,7 @@ export function validateInterpretation(
     : []) {
     if (!item || typeof item !== "object") continue;
     const r = item as Record<string, unknown>;
+    if (r.entityNature && r.entityNature !== "named_organisation") continue;
     if (
       typeof r.entity !== "string" ||
       !validEntity(r.entity) ||
@@ -367,6 +378,7 @@ export function validateInterpretation(
     );
     extracted.professional.push({
       entity: r.entity,
+      ...(r.entityNature === "named_organisation" ? { entityNature: "named_organisation" as const } : {}),
       aliases,
       kind: r.kind as ProfessionalRelationship["kind"],
       relationship: r.relationship as ProfessionalRelationship["relationship"],
@@ -459,15 +471,19 @@ export async function interpretWithModel(message: string, state: Conversation, o
     publicReadiness: { impactReport: { found: false, title: "", url: "" } }, sources: [],
   }, false) : null;
   const afterReflection = afterConfirmation ? confirmationFollowUp(afterConfirmation) : null;
+  const closure = !skip && result.topicResponse && ["uncertain", "declined"].includes(result.topicResponse.status) &&
+    ["responsibilities", "discovery", "concerns"].includes(questionPlan(state).objective) && questionPlan(updated).objective !== "complete"
+    ? closeOptionalConversation(updated) : null;
   try {
-    const spoken = await callModel(dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection, afterReflection));
+    const spoken = await callModel(dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection, afterReflection, closure));
     observe?.({ stage: "dialogue", parsed: spoken.parsed, plan: questionPlan(updated), participation: result.topicResponse, followUpPermitted: !!reflection });
     result.usage = {
       input: understood.usage.input + spoken.usage.input,
       output: understood.usage.output + spoken.usage.output,
       estimatedUsd: understood.usage.estimatedUsd + spoken.usage.estimatedUsd,
     };
-    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection, afterReflection);
+    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection, afterReflection, closure);
+    result.closeOptional = reply.closeOptional;
     if (result.topicResponse) result.topicResponse.followUp = reply.next.objective === "reflection";
     result.questionProposal = reply.next;
     result.afterCharity = reply.afterCharity;

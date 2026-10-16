@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { socialJourneys } from './social-journeys.mjs';
 import { interpretWithModel, ONBOARDING_MODEL, DIALOGUE_MODEL, MODEL_RESERVATION_USD } from '../../src/lib/onboarding/model.ts';
 import { processTurn } from '../../src/lib/onboarding/engine.ts';
-import { initialConversation, applyFacts, normaliseConversation, nextQuestion, nextObjective, proposeCharity, confirmCharity, registrationReady } from '../../src/lib/onboarding/state.ts';
+import { initialConversation, applyFacts, normaliseConversation, nextQuestion, nextObjective, proposeCharity, confirmCharity, registrationReady, charityOptions } from '../../src/lib/onboarding/state.ts';
 if(process.env.SORP_LIVE_EVAL !== 'true' || !(process.env.OPEN_API_KEY || process.env.OPENAI_API_KEY)) throw new Error('Explicit live opt-in and existing credential required');
 const report = { model:ONBOARDING_MODEL, dialogueModel:DIALOGUE_MODEL, extractionReasoning:'low',dialogueReasoning:'medium', stages:2, startedAt:new Date().toISOString(), turns:0, apiCalls:0, inputTokens:0, outputTokens:0, estimatedUsd:0, passed:0, failed:0, journeys:[] };
 const selected = process.env.SORP_SOCIAL_IDS ? socialJourneys.filter(j=>process.env.SORP_SOCIAL_IDS.split(',').includes(j.id)) : socialJourneys;
@@ -42,6 +42,10 @@ async function run(j) {
   }
   try {
     await send(j.opening);
+    if(j.mentioned) {
+      assert.ok(j.mentioned.every(name=>charityOptions(state).includes(name)), "Every unverified client remains a candidate");
+      assert.equal(state.charity.proposed, "", "Multiple client references cannot silently narrow to one");
+    }
     if(j.edit){ state=applyFacts(state,j.edit,'form');record.transcript.push({role:'action',text:`Edited profile: ${JSON.stringify(j.edit)}`}); }
     if(j.resume){state=normaliseConversation(JSON.parse(JSON.stringify(state)));record.transcript.push({role:'action',text:'Reloaded and resumed the same introduction.'});}
     while(nextObjective(state)!=='complete') {

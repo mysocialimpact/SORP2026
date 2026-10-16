@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {initialConversation,applyFacts,advance,confirmCharity,confirmationFollowUp,nextQuestion,nextObjective,suitableDialogue,normaliseConversation} from '../../src/lib/onboarding/state.ts';
+import {initialConversation,applyFacts,advance,confirmCharity,confirmationFollowUp,closeOptionalConversation,charityOptions,nextQuestion,nextObjective,suitableDialogue,normaliseConversation} from '../../src/lib/onboarding/state.ts';
 import {dialogueRequest,decodeDialogue} from '../../src/lib/onboarding/dialogue.ts';
 import {validateInterpretation,modelRequest,interpretWithModel,MODEL_RESERVATION_USD} from '../../src/lib/onboarding/model.ts';
 const ready=()=>confirmCharity(applyFacts(initialConversation(),{name:'Marcus Warry',email:'marcus@example.invalid',role:'Trustee',organisation:'Interim Spaces',responsibilities:'Finance',discovery:'A friend'},'form'),{name:'Interim Spaces',registrationNumber:'1234567',officialUrl:'https://example.invalid/official'});
@@ -146,4 +146,34 @@ test('repair turns do not consume optional curiosity, but the total hard cap sti
  assert.equal(nextObjective(s),'reflection');
  const capped=advance({...ready(),turns:9,repairTurns:5},{utterance:'A concern.',topicResponse:participation('answered',true)});
  assert.equal(nextObjective(capped),'complete');assert.equal(capped.dialogue.reflecting,false);
+});
+test('uncertain classification cannot discard named clients or arbitrarily promote one',()=>{
+ const s=applyFacts(initialConversation(),{name:'Tom Lane',email:'tom@example.invalid',role:'Accountant',organisation:'Cedar Advisory'},'form');
+ s.professional=['Interim Spaces','Brainstrust','Blue Cross'].map((entity,i)=>({entity,aliases:[],kind:i===2?'charity':'organisation',relationship:'client',period:'current',confidence:'stated',role:'',evidence:entity,turn:1}));
+ assert.deepEqual(charityOptions(s),['Interim Spaces','Brainstrust','Blue Cross']);
+ assert.equal(suitableDialogue(s,{objective:'charity',fields:['charity'],question:'Would you like to start with Blue Cross?',natural:true}),false);
+ assert.ok(suitableDialogue(s,{objective:'charity',fields:['charity'],question:'Which would you like to start with: Interim Spaces, Brainstrust or Blue Cross?',natural:true}));
+});
+test('unnamed advisers and referral venues cannot become candidate organisations',()=>{
+ for(const entity of ['finance adviser','conference']){
+   const patch=validateInterpretation({intent:'inform',facts:{},relationships:[{entity,entityNature:'description',aliases:[],kind:'unknown',relationship:'adviser',period:'current',quote:entity}]},`My ${entity} sent me here`,ready());
+   assert.equal(patch.professional.length,0);
+ }
+});
+test('a working arrangement cannot populate the current organisation',()=>{
+ for(const value of ['independent','freelance','self-employed']){
+   const patch=validateInterpretation({intent:'inform',organisationNature:'working_arrangement',facts:{organisation:{value,quote:value,period:'current',correction:false}}},`I am an ${value} consultant`,initialConversation());
+   assert.equal(patch.organisation,undefined);
+ }
+});
+test('a permitted natural close can omit optional topics without changing supplied facts',()=>{
+ const state=ready();state.facts.discovery='';state.skipped=[];
+ const closure=closeOptionalConversation(state);
+ assert.ok(closure);assert.equal(nextObjective(closure),'complete');
+ const output=decodeDialogue({move:'finish',reply:'No problem remembering how you found us. You can create your account and explore Interim Spaces.',afterCharity:null},state,null,null,null,closure);
+ assert.equal(output.closeOptional,true);
+ const next=advance(state,{utterance:'Dunno.',topicResponse:{topic:'discovery',status:'uncertain',followUp:false},closeOptional:output.closeOptional,questionProposal:output.next});
+ assert.equal(nextObjective(next),'complete');assert.equal(next.facts.discovery,'');assert.equal(next.facts.concerns,'');
+ assert.equal(closeOptionalConversation(initialConversation()),null);
+ assert.throws(()=>decodeDialogue({move:'finish',reply:'Finished.',afterCharity:null},state,null));
 });
