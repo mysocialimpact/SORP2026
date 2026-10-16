@@ -6,6 +6,7 @@ import { AccessError } from "@/lib/access-error";
 import {
   cleanFacts,
   mergeFacts,
+  accountReady,
   nextQuestion,
   nextObjective,
   TOTAL_TURN_CAP,
@@ -250,6 +251,10 @@ export async function POST(
         409,
       );
     await claimRequest(session.id, action === "search");
+    if (action === "preflight") {
+      if (!accountReady(session.state)) return json({ error: "Complete your name, email, role and organisation (or independent status), and confirm one official charity before creating an account." }, 409);
+      return json({ ready: true });
+    }
     if (action === "edit") {
       const next = applyFacts(session.state, body.fields || {}, "form");
       const saved = await saveSession(session, next);
@@ -412,6 +417,7 @@ export async function POST(
       return json({ ...snapshot(saved), preparation: "queued" });
     }
     if (action === "complete") {
+      if (!accountReady(session.state)) return json({ error: "A complete profile and one confirmed registered charity are required before saving onboarding." }, 409);
       const identity = await protectPlatformRequest(request);
       // Browser facts never select an account. Only the verified existing session does.
       const facts = mergeFacts(session.state.facts, cleanFacts(body.fields));
