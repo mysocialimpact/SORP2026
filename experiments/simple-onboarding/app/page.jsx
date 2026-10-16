@@ -1,0 +1,1 @@
+export default function Page(){return <main><h1>Preview model connection verified</h1><p>This is the isolated connection check, not the onboarding demonstration.</p><a href="/probe.json">Measured model usage</a></main>}

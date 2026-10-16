@@ -1,1 +1,1 @@
-{"name":"sorp-simple-onboarding-experiment","private":true,"type":"module","scripts":{"build":"node probe.mjs"}}
+{"name":"sorp-simple-onboarding-experiment","private":true,"type":"module","scripts":{"build":"node probe.mjs && next build"},"dependencies":{"next":"16.4.0","react":"19.3.0","react-dom":"19.3.0"}}
