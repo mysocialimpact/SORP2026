@@ -1,0 +1,29 @@
+{
+  "browser": "Chromium 153 mobile emulation; synthetic speech fed through real MediaRecorder and live transcription",
+  "voice": {
+    "transcript": "Hello, I am David Pomer, I am a charity trustee. Hello, I am David Pomer, I am..."
+  },
+  "trace": [
+    {
+      "user": "I'm David Palmer, david.mobile@preview.invalid, a trustee at Interim Spaces.",
+      "assistant": "Lovely to meet you, David. Shall we use Interim Spaces as your starting charity? And what do you focus on in your trustee role?"
+    },
+    {
+      "user": "Yes, let’s use Interim Spaces.",
+      "assistant": "Interim Spaces it is. What areas do you focus on as a trustee?"
+    },
+    {
+      "user": "[Official record confirmed]",
+      "assistant": "Thanks, David — that’s confirmed. Where do you tend to get most involved as a trustee at Interim Spaces?"
+    },
+    {
+      "user": "I oversee finance and the budget. My pal told me about you.",
+      "assistant": "Thanks, David — you oversee finance and the budget, and a friend pointed you our way. What’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?"
+    },
+    {
+      "user": "Frogs. Actual frogs in the pond outside my window! Nothing else is worrying me professionally. I’d like to finish.",
+      "assistant": "Frogs rather than finance — understood! Thanks, David, we’ll leave it there. Your introduction is saved for our team, and you can use the secure account button whenever you’re ready."
+    }
+  ],
+  "errors": []
+}

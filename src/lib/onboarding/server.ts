@@ -1,12 +1,13 @@
 import "server-only";
+import { converse, startConversation } from "./conversation";
 import { interpretWithModel, MODEL_RESERVATION_USD } from "./model";
 import { randomBytes } from "node:crypto";
 import { query, transaction } from "@/lib/console/db";
 import {
-  initialConversation,
   type Conversation,
   type Extraction,
   normaliseConversation,
+  nextQuestion,
 } from "./state";
 import type { Candidate } from "@/app/sorp-public-model";
 export const enabled = () =>
@@ -49,13 +50,21 @@ export async function getSession(
   )[0];
   if (session) {
     session.state = normaliseConversation(session.state, session.selected);
+    if (!session.state.natural)
+      session.state.natural = {
+        ...startConversation().natural!,
+        reply: nextQuestion(session.state),
+      };
     // Existing drafts predate the bounded dialogue window. Reuse their own
     // private transcript on first read; do not make returning users start again.
     if (!session.state.dialogue.recent.length && session.messages.length)
       session.state.dialogue.recent = session.messages
         .filter((m) => m.role === "user" || m.role === "assistant")
         .slice(-8)
-        .map((m) => ({ role: m.role as "user" | "assistant", text: m.text.slice(0, 1600) }));
+        .map((m) => ({
+          role: m.role as "user" | "assistant",
+          text: m.text.slice(0, 1600),
+        }));
     // Migrate the old server-returned search results; new state owns them thereafter.
     if (
       session.state.charity.phase === "suggest" &&
@@ -117,7 +126,7 @@ export async function createSession(attribution: Record<string, string>) {
       );
     await c.query(
       "INSERT INTO research_console.onboarding_sessions(id,state,attribution) VALUES($1,$2,$3)",
-      [id, JSON.stringify(initialConversation()), JSON.stringify(attribution)],
+      [id, JSON.stringify(startConversation()), JSON.stringify(attribution)],
     );
     await c.query(
       "DELETE FROM research_console.onboarding_sessions WHERE expires_at<now()",
@@ -155,6 +164,21 @@ export async function extractWithModel(
   id: string,
   skip = false,
 ): Promise<Extraction> {
+  return modelBudget(id, () =>
+    interpretWithModel(message, state, undefined, skip),
+  );
+}
+export function respondWithModel(
+  message: string,
+  state: Conversation,
+  id: string,
+  event = false,
+) {
+  return modelBudget(id, () => converse(message, state, event));
+}
+async function modelBudget<
+  T extends { usage?: { estimatedUsd: number }; notice?: string },
+>(id: string, run: () => Promise<T>): Promise<T> {
   const key = process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;
   if (!key)
     throw new Error(
@@ -180,18 +204,28 @@ export async function extractWithModel(
       throw new Error(
         "Conversation assistance has reached its budget. Your editable form still works.",
       );
-    const { rows: [reserved] } = await c.query(
+    const {
+      rows: [reserved],
+    } = await c.query(
       "INSERT INTO research_console.onboarding_usage(session_id,reserved_usd) VALUES($1,$2) RETURNING id",
       [id, MODEL_RESERVATION_USD],
     );
     return reserved.id;
   });
-  const result = await interpretWithModel(message, state, undefined, skip);
+  const result = await run();
   const measured = result.usage?.estimatedUsd;
-  // Admission reserves both stages and a possible wording revision before either starts. Settle only successful,
-  // metered requests; uncertain provider failures retain the full reservation.
-  if (!result.notice && measured && Number.isFinite(measured) && measured < MODEL_RESERVATION_USD)
-    await query("UPDATE research_console.onboarding_usage SET reserved_usd=$1 WHERE id=$2", [measured, usageId]).catch(() => undefined);
+  // Reserve before starting a model request; settle only successful metered calls.
+  // Uncertain provider failures retain the full reservation.
+  if (
+    !result.notice &&
+    measured &&
+    Number.isFinite(measured) &&
+    measured < MODEL_RESERVATION_USD
+  )
+    await query(
+      "UPDATE research_console.onboarding_usage SET reserved_usd=$1 WHERE id=$2",
+      [measured, usageId],
+    ).catch(() => undefined);
   return result;
 }
 

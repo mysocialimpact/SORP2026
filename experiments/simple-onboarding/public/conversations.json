@@ -1,0 +1,1345 @@
+[
+  {
+    "name": "Out of order — context already supplied",
+    "rows": [
+      {
+        "user": "I'm Amina Patel, amina@preview.invalid, finance director at Blue Cross. I found you through a colleague. I oversee our annual accounts; our next audit is my biggest worry. Let’s use Blue Cross as our starting charity.",
+        "assistant": "Thanks, Amina — with the annual accounts in your remit, it’s useful to know the next audit is your biggest worry. We’ll start with Blue Cross; please confirm the official charity record when it appears so we have the right organisation."
+      },
+      {
+        "user": "[Confirmed displayed official record]",
+        "assistant": "Thanks, Amina — Blue Cross is confirmed. Your introduction is saved, including your focus on the annual accounts and your concern about the next audit, so our team can pick up from there. When you’re ready, you can use the secure account button to continue."
+      },
+      {
+        "user": "It’s reconciling programme data with finance. I’d rather skip any other optional questions and get started.",
+        "assistant": "Understood, Amina — reconciling programme data with finance is the sticking point for the audit. We’ll leave the optional questions there. Your introduction is saved, and you can use the secure account button to get started."
+      }
+    ],
+    "finalState": {
+      "facts": {
+        "name": "Amina Patel",
+        "email": "amina@preview.invalid",
+        "role": "finance director",
+        "organisation": "Blue Cross",
+        "responsibilities": "Oversees annual accounts",
+        "discovery": "Through a colleague",
+        "concerns": "The next audit is her biggest worry; Reconciling programme data with finance for the next audit",
+        "portfolio": "",
+        "charities": [],
+        "interests": "",
+        "context": "",
+        "organisationKind": "charity"
+      },
+      "dialogue": {
+        "recent": [
+          {
+            "role": "assistant",
+            "text": "Hello — tell me a little about yourself and the charity work you’re involved in. You can talk or type."
+          },
+          {
+            "role": "user",
+            "text": "I'm Amina Patel, amina@preview.invalid, finance director at Blue Cross. I found you through a colleague. I oversee our annual accounts; our next audit is my biggest worry. Let’s use Blue Cross as our starting charity."
+          },
+          {
+            "role": "assistant",
+            "text": "Thanks, Amina — with the annual accounts in your remit, it’s useful to know the next audit is your biggest worry. We’ll start with Blue Cross; please confirm the official charity record when it appears so we have the right organisation."
+          },
+          {
+            "role": "user",
+            "text": "[Interface event: user explicitly confirmed the displayed official record for Blue Cross, charity 224392. The Preview records a preparation event only; production research is disabled.]"
+          },
+          {
+            "role": "assistant",
+            "text": "Thanks, Amina — Blue Cross is confirmed. Your introduction is saved, including your focus on the annual accounts and your concern about the next audit, so our team can pick up from there. When you’re ready, you can use the secure account button to continue."
+          },
+          {
+            "role": "user",
+            "text": "It’s reconciling programme data with finance. I’d rather skip any other optional questions and get started."
+          }
+        ],
+        "followUps": 0,
+        "finalFollowUpUsed": false,
+        "reflecting": false
+      },
+      "turns": 2,
+      "repairTurns": 0,
+      "asked": [],
+      "skipped": [],
+      "version": 3,
+      "professional": [
+        {
+          "kind": "charity",
+          "role": "finance director",
+          "turn": 0,
+          "entity": "Blue Cross",
+          "period": "current",
+          "aliases": [],
+          "evidence": "finance director at Blue Cross",
+          "confidence": "stated",
+          "entityNature": "named_organisation",
+          "relationship": "employee"
+        }
+      ],
+      "corrections": [],
+      "finishRequested": true,
+      "afterCharity": null,
+      "response": null,
+      "acknowledged": [],
+      "revision": 4,
+      "knowledge": {
+        "name": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "role": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "email": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "concerns": {
+          "status": "supplied",
+          "source": "message",
+          "turn": 1
+        },
+        "discovery": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisation": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisationKind": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "responsibilities": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        }
+      },
+      "lastIntent": "clarify",
+      "clarification": null,
+      "charity": {
+        "proposed": "Blue Cross",
+        "confirmed": {
+          "name": "Blue Cross",
+          "status": "Active",
+          "sources": [
+            {
+              "url": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392",
+              "kind": "official_register",
+              "label": "Charity Commission register",
+              "detail": "Registered charity BLUE CROSS, charity number 224392; activities and income/expenditure shown; full-print snippet indicates previous name “THE BLUE CROSS”."
+            },
+            {
+              "url": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC040154",
+              "kind": "official_register",
+              "label": "OSCR charity details",
+              "detail": "Blue Cross, SC040154; known by “The Blue Cross”; address at Shilton Road, Burford; website bluecross.org.uk; object is to encourage and promote kindness to and protection of animals."
+            },
+            {
+              "url": "https://find-and-update.company-information.service.gov.uk/company/00363197",
+              "kind": "official_register",
+              "label": "Companies House",
+              "detail": "BLUE CROSS, company number 00363197; private company limited by guarantee without share capital; registered office Shilton Road, Burford, Oxfordshire; previous company name included “BLUE CROSS (INCORPORATING OUR DUMB FRIENDS LEAGUE)(THE)”."
+            },
+            {
+              "url": "https://www.bluecross.org.uk/about-blue-cross",
+              "kind": "organisation_website",
+              "label": "Blue Cross website",
+              "detail": "Organisation describes itself as an animal welfare charity helping sick, injured and homeless pets, and the people who love them, since 1897."
+            }
+          ],
+          "summary": "Animal welfare charity helping sick, injured and homeless pets, and the people who love them; promotes responsible pet ownership and runs animal-related services.",
+          "website": "https://www.bluecross.org.uk/",
+          "locality": "Burford, Oxfordshire, England",
+          "purposes": [
+            "the advancement of animal welfare"
+          ],
+          "legalForm": "Registered charity; private company limited by guarantee without share capital",
+          "reportUrl": "",
+          "activities": [
+            "animal welfare",
+            "education/training",
+            "veterinary activities",
+            "pet rehoming and support services"
+          ],
+          "entityType": "registered_charity",
+          "officialUrl": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392",
+          "reportTitle": "",
+          "jurisdiction": "ew",
+          "latestIncome": 50636000,
+          "reportPeriod": "",
+          "beneficiaries": [
+            "children/young people",
+            "elderly/old people",
+            "other charities or voluntary bodies",
+            "other defined groups",
+            "the general public"
+          ],
+          "matchStrength": "strong",
+          "accountingBasis": "unknown",
+          "publicReadiness": {
+            "status": "unavailable",
+            "strong": [],
+            "unknown": [
+              "Organisation resolution only; readiness not reviewed."
+            ],
+            "findings": [],
+            "tarScore": null,
+            "attention": [],
+            "impactReport": {
+              "url": "",
+              "found": false,
+              "title": ""
+            },
+            "trusteesReport": {
+              "url": "",
+              "title": "",
+              "period": "",
+              "reviewed": false,
+              "discovery": "unavailable"
+            },
+            "readinessStatus": "unable_to_determine",
+            "websiteReviewed": false,
+            "overallConfidence": "low",
+            "widerEvidenceScore": null,
+            "widerEvidenceReason": ""
+          },
+          "financialYearEnd": "31 Dec 2024",
+          "usefulObservation": "Charity Commission record shows the previous name as “THE BLUE CROSS”; OSCR shows the charity is known by “The Blue Cross”; Companies House lists company number 00363197 and the same Burford address.",
+          "publicAchievements": [],
+          "registrationNumber": "224392",
+          "accountingBasisEvidence": "",
+          "accountingBasisSourceUrl": "",
+          "accountingBasisConfidence": "unknown"
+        },
+        "candidates": [],
+        "declined": [],
+        "phase": "confirmed"
+      },
+      "natural": {
+        "reply": "Understood, Amina — reconciling programme data with finance is the sticking point for the audit. We’ll leave the optional questions there. Your introduction is saved, and you can use the secure account button to get started.",
+        "objectives": [
+          "professional context",
+          "referral",
+          "challenge"
+        ],
+        "independent": false,
+        "uncertainties": [],
+        "complete": true
+      }
+    },
+    "registration": "mock account created; context retained"
+  },
+  {
+    "name": "Manual correction and historical relationship",
+    "rows": [
+      {
+        "user": "My name is Marcus Worrey. I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was. My email is marcus.history@preview.invalid.",
+        "assistant": "Nice to meet you, Marcus. What’s your role now, and which organisation do you work with—or are you independent? Blue Cross could be a starting charity to explore if you’d like, even though your work with them was in the past."
+      },
+      {
+        "user": "I’m an accountant and I work independently now. Let’s use Blue Cross.",
+        "assistant": "Thanks, Marcus — an independent accountant, and Blue Cross as your starting charity. You’ll still need to confirm its official record when it’s shown. What sort of work do you do for charities — accounts preparation, independent examinations, advisory work, or something else?"
+      },
+      {
+        "user": "[Confirmed displayed official record]",
+        "assistant": "Blue Cross is confirmed as your starting charity. What does your work with charities mainly involve these days?"
+      },
+      {
+        "user": "I mostly advise on reporting. My pal recommended you. Getting good source data is my main concern.",
+        "assistant": "Reliable source data underpins good reporting, so I can see why that’s your main concern in your advisory work. And it’s lovely to hear your pal recommended us.\n\nThanks, Marcus — your introduction is saved so our team can pick up the conversation. You can use the secure account button whenever you’re ready."
+      },
+      {
+        "user": "No more questions for now, please.",
+        "assistant": "Of course, Marcus — we’ll leave it there. Thanks for your time."
+      }
+    ],
+    "finalState": {
+      "facts": {
+        "name": "Marcus Warry",
+        "email": "marcus.history@preview.invalid",
+        "role": "accountant",
+        "organisation": "",
+        "responsibilities": "Mostly advises on reporting",
+        "discovery": "Recommended by a pal",
+        "concerns": "Getting good source data",
+        "portfolio": "",
+        "charities": [],
+        "interests": "",
+        "context": "",
+        "organisationKind": "unknown"
+      },
+      "dialogue": {
+        "recent": [
+          {
+            "role": "assistant",
+            "text": "Hello — tell me a little about yourself and the charity work you’re involved in. You can talk or type."
+          },
+          {
+            "role": "user",
+            "text": "My name is Marcus Worrey. I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was. My email is marcus.history@preview.invalid."
+          },
+          {
+            "role": "assistant",
+            "text": "Nice to meet you, Marcus. What’s your role now, and which organisation do you work with—or are you independent? Blue Cross could be a starting charity to explore if you’d like, even though your work with them was in the past."
+          },
+          {
+            "role": "user",
+            "text": "I’m an accountant and I work independently now. Let’s use Blue Cross."
+          },
+          {
+            "role": "assistant",
+            "text": "Thanks, Marcus — an independent accountant, and Blue Cross as your starting charity. You’ll still need to confirm its official record when it’s shown. What sort of work do you do for charities — accounts preparation, independent examinations, advisory work, or something else?"
+          },
+          {
+            "role": "user",
+            "text": "[Interface event: user explicitly confirmed the displayed official record for Blue Cross, charity 224392. The Preview records a preparation event only; production research is disabled.]"
+          },
+          {
+            "role": "assistant",
+            "text": "Blue Cross is confirmed as your starting charity. What does your work with charities mainly involve these days?"
+          },
+          {
+            "role": "user",
+            "text": "I mostly advise on reporting. My pal recommended you. Getting good source data is my main concern."
+          },
+          {
+            "role": "assistant",
+            "text": "Reliable source data underpins good reporting, so I can see why that’s your main concern in your advisory work. And it’s lovely to hear your pal recommended us.\n\nThanks, Marcus — your introduction is saved so our team can pick up the conversation. You can use the secure account button whenever you’re ready."
+          },
+          {
+            "role": "user",
+            "text": "No more questions for now, please."
+          }
+        ],
+        "followUps": 0,
+        "finalFollowUpUsed": false,
+        "reflecting": false
+      },
+      "turns": 4,
+      "repairTurns": 0,
+      "asked": [],
+      "skipped": [],
+      "version": 3,
+      "professional": [
+        {
+          "kind": "charity",
+          "role": "",
+          "turn": 0,
+          "entity": "Blue Cross",
+          "period": "past",
+          "aliases": [
+            "The Blue Cross"
+          ],
+          "evidence": "I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was.",
+          "confidence": "uncertain",
+          "entityNature": "named_organisation",
+          "relationship": "client"
+        }
+      ],
+      "corrections": [
+        {
+          "turn": 1,
+          "field": "name",
+          "value": "Marcus Warry",
+          "source": "form",
+          "previous": "Marcus Worrey"
+        }
+      ],
+      "finishRequested": true,
+      "afterCharity": null,
+      "response": null,
+      "acknowledged": [],
+      "revision": 7,
+      "knowledge": {
+        "name": {
+          "turn": 1,
+          "source": "form",
+          "status": "confirmed"
+        },
+        "role": {
+          "turn": 1,
+          "source": "message",
+          "status": "supplied"
+        },
+        "email": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "concerns": {
+          "turn": 2,
+          "source": "message",
+          "status": "supplied"
+        },
+        "discovery": {
+          "turn": 2,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisationKind": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "responsibilities": {
+          "turn": 2,
+          "source": "message",
+          "status": "supplied"
+        }
+      },
+      "lastIntent": "inform",
+      "clarification": null,
+      "charity": {
+        "proposed": "Blue Cross",
+        "confirmed": {
+          "name": "Blue Cross",
+          "status": "Active",
+          "sources": [
+            {
+              "url": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392",
+              "kind": "official_register",
+              "label": "Charity Commission register",
+              "detail": "Registered charity BLUE CROSS, charity number 224392; activities and income/expenditure shown; full-print snippet indicates previous name “THE BLUE CROSS”."
+            },
+            {
+              "url": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC040154",
+              "kind": "official_register",
+              "label": "OSCR charity details",
+              "detail": "Blue Cross, SC040154; known by “The Blue Cross”; address at Shilton Road, Burford; website bluecross.org.uk; object is to encourage and promote kindness to and protection of animals."
+            },
+            {
+              "url": "https://find-and-update.company-information.service.gov.uk/company/00363197",
+              "kind": "official_register",
+              "label": "Companies House",
+              "detail": "BLUE CROSS, company number 00363197; private company limited by guarantee without share capital; registered office Shilton Road, Burford, Oxfordshire; previous company name included “BLUE CROSS (INCORPORATING OUR DUMB FRIENDS LEAGUE)(THE)”."
+            },
+            {
+              "url": "https://www.bluecross.org.uk/about-blue-cross",
+              "kind": "organisation_website",
+              "label": "Blue Cross website",
+              "detail": "Organisation describes itself as an animal welfare charity helping sick, injured and homeless pets, and the people who love them, since 1897."
+            }
+          ],
+          "summary": "Animal welfare charity helping sick, injured and homeless pets, and the people who love them; promotes responsible pet ownership and runs animal-related services.",
+          "website": "https://www.bluecross.org.uk/",
+          "locality": "Burford, Oxfordshire, England",
+          "purposes": [
+            "the advancement of animal welfare"
+          ],
+          "legalForm": "Registered charity; private company limited by guarantee without share capital",
+          "reportUrl": "",
+          "activities": [
+            "animal welfare",
+            "education/training",
+            "veterinary activities",
+            "pet rehoming and support services"
+          ],
+          "entityType": "registered_charity",
+          "officialUrl": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392",
+          "reportTitle": "",
+          "jurisdiction": "ew",
+          "latestIncome": 50636000,
+          "reportPeriod": "",
+          "beneficiaries": [
+            "children/young people",
+            "elderly/old people",
+            "other charities or voluntary bodies",
+            "other defined groups",
+            "the general public"
+          ],
+          "matchStrength": "strong",
+          "accountingBasis": "unknown",
+          "publicReadiness": {
+            "status": "unavailable",
+            "strong": [],
+            "unknown": [
+              "Organisation resolution only; readiness not reviewed."
+            ],
+            "findings": [],
+            "tarScore": null,
+            "attention": [],
+            "impactReport": {
+              "url": "",
+              "found": false,
+              "title": ""
+            },
+            "trusteesReport": {
+              "url": "",
+              "title": "",
+              "period": "",
+              "reviewed": false,
+              "discovery": "unavailable"
+            },
+            "readinessStatus": "unable_to_determine",
+            "websiteReviewed": false,
+            "overallConfidence": "low",
+            "widerEvidenceScore": null,
+            "widerEvidenceReason": ""
+          },
+          "financialYearEnd": "31 Dec 2024",
+          "usefulObservation": "Charity Commission record shows the previous name as “THE BLUE CROSS”; OSCR shows the charity is known by “The Blue Cross”; Companies House lists company number 00363197 and the same Burford address.",
+          "publicAchievements": [],
+          "registrationNumber": "224392",
+          "accountingBasisEvidence": "",
+          "accountingBasisSourceUrl": "",
+          "accountingBasisConfidence": "unknown"
+        },
+        "candidates": [],
+        "declined": [],
+        "phase": "confirmed"
+      },
+      "natural": {
+        "reply": "Of course, Marcus — we’ll leave it there. Thanks for your time.",
+        "objectives": [
+          "professional context",
+          "referral",
+          "challenge"
+        ],
+        "independent": true,
+        "uncertainties": [],
+        "complete": true
+      }
+    },
+    "registration": "mock account created; context retained"
+  },
+  {
+    "name": "Minimal details and unexpected professional answer",
+    "rows": [
+      {
+        "user": "Hello, I’m David Palmer. david@preview.invalid",
+        "assistant": "Lovely to meet you, David. What’s your role, and which organisation do you work with — or are you independent?"
+      },
+      {
+        "user": "I’m a professional adviser working independently. I help trustees improve reporting. Let’s use Blue Cross.",
+        "assistant": "Thanks, David — so you’re an independent adviser helping trustees improve their reporting. We’ll start with Blue Cross; its official record will need your confirmation when it appears. How did you hear about us?"
+      },
+      {
+        "user": "[Confirmed displayed official record]",
+        "assistant": "Blue Cross is confirmed as your starting charity. How did you come across SORP 2026?"
+      },
+      {
+        "user": "I found you at a conference. My challenge? Our spreadsheets appear to be breeding overnight.",
+        "assistant": "Spreadsheets multiplying overnight — that sounds like a lot to keep on top of! Thanks, David. Your introduction is saved so our team can pick up the conversation from here. You can use the secure account button whenever you’re ready."
+      },
+      {
+        "user": "Ha, version control, mostly. I’d like to skip the rest and start exploring.",
+        "assistant": "Version control — understood! We’ll leave it there, David. Your introduction is saved, and you can use the secure account button whenever you’re ready to start exploring."
+      }
+    ],
+    "finalState": {
+      "facts": {
+        "name": "David Palmer",
+        "email": "david@preview.invalid",
+        "role": "professional adviser",
+        "organisation": "",
+        "responsibilities": "Help trustees improve reporting",
+        "discovery": "At a conference",
+        "concerns": "Spreadsheets proliferating; Version control across proliferating spreadsheets",
+        "portfolio": "",
+        "charities": [],
+        "interests": "",
+        "context": "",
+        "organisationKind": "unknown"
+      },
+      "dialogue": {
+        "recent": [
+          {
+            "role": "assistant",
+            "text": "Hello — tell me a little about yourself and the charity work you’re involved in. You can talk or type."
+          },
+          {
+            "role": "user",
+            "text": "Hello, I’m David Palmer. david@preview.invalid"
+          },
+          {
+            "role": "assistant",
+            "text": "Lovely to meet you, David. What’s your role, and which organisation do you work with — or are you independent?"
+          },
+          {
+            "role": "user",
+            "text": "I’m a professional adviser working independently. I help trustees improve reporting. Let’s use Blue Cross."
+          },
+          {
+            "role": "assistant",
+            "text": "Thanks, David — so you’re an independent adviser helping trustees improve their reporting. We’ll start with Blue Cross; its official record will need your confirmation when it appears. How did you hear about us?"
+          },
+          {
+            "role": "user",
+            "text": "[Interface event: user explicitly confirmed the displayed official record for Blue Cross, charity 224392. The Preview records a preparation event only; production research is disabled.]"
+          },
+          {
+            "role": "assistant",
+            "text": "Blue Cross is confirmed as your starting charity. How did you come across SORP 2026?"
+          },
+          {
+            "role": "user",
+            "text": "I found you at a conference. My challenge? Our spreadsheets appear to be breeding overnight."
+          },
+          {
+            "role": "assistant",
+            "text": "Spreadsheets multiplying overnight — that sounds like a lot to keep on top of! Thanks, David. Your introduction is saved so our team can pick up the conversation from here. You can use the secure account button whenever you’re ready."
+          },
+          {
+            "role": "user",
+            "text": "Ha, version control, mostly. I’d like to skip the rest and start exploring."
+          }
+        ],
+        "followUps": 0,
+        "finalFollowUpUsed": false,
+        "reflecting": false
+      },
+      "turns": 4,
+      "repairTurns": 0,
+      "asked": [],
+      "skipped": [],
+      "version": 3,
+      "professional": [],
+      "corrections": [],
+      "finishRequested": true,
+      "afterCharity": null,
+      "response": null,
+      "acknowledged": [],
+      "revision": 6,
+      "knowledge": {
+        "name": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "role": {
+          "turn": 1,
+          "source": "message",
+          "status": "supplied"
+        },
+        "email": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "concerns": {
+          "status": "supplied",
+          "source": "message",
+          "turn": 3
+        },
+        "discovery": {
+          "turn": 2,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisationKind": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "responsibilities": {
+          "turn": 1,
+          "source": "message",
+          "status": "supplied"
+        }
+      },
+      "lastIntent": "clarify",
+      "clarification": null,
+      "charity": {
+        "proposed": "Blue Cross",
+        "confirmed": {
+          "name": "Blue Cross",
+          "status": "Active",
+          "sources": [
+            {
+              "url": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392",
+              "kind": "official_register",
+              "label": "Charity Commission register",
+              "detail": "Registered charity BLUE CROSS, charity number 224392; activities and income/expenditure shown; full-print snippet indicates previous name “THE BLUE CROSS”."
+            },
+            {
+              "url": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC040154",
+              "kind": "official_register",
+              "label": "OSCR charity details",
+              "detail": "Blue Cross, SC040154; known by “The Blue Cross”; address at Shilton Road, Burford; website bluecross.org.uk; object is to encourage and promote kindness to and protection of animals."
+            },
+            {
+              "url": "https://find-and-update.company-information.service.gov.uk/company/00363197",
+              "kind": "official_register",
+              "label": "Companies House",
+              "detail": "BLUE CROSS, company number 00363197; private company limited by guarantee without share capital; registered office Shilton Road, Burford, Oxfordshire; previous company name included “BLUE CROSS (INCORPORATING OUR DUMB FRIENDS LEAGUE)(THE)”."
+            },
+            {
+              "url": "https://www.bluecross.org.uk/about-blue-cross",
+              "kind": "organisation_website",
+              "label": "Blue Cross website",
+              "detail": "Organisation describes itself as an animal welfare charity helping sick, injured and homeless pets, and the people who love them, since 1897."
+            }
+          ],
+          "summary": "Animal welfare charity helping sick, injured and homeless pets, and the people who love them; promotes responsible pet ownership and runs animal-related services.",
+          "website": "https://www.bluecross.org.uk/",
+          "locality": "Burford, Oxfordshire, England",
+          "purposes": [
+            "the advancement of animal welfare"
+          ],
+          "legalForm": "Registered charity; private company limited by guarantee without share capital",
+          "reportUrl": "",
+          "activities": [
+            "animal welfare",
+            "education/training",
+            "veterinary activities",
+            "pet rehoming and support services"
+          ],
+          "entityType": "registered_charity",
+          "officialUrl": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392",
+          "reportTitle": "",
+          "jurisdiction": "ew",
+          "latestIncome": 50636000,
+          "reportPeriod": "",
+          "beneficiaries": [
+            "children/young people",
+            "elderly/old people",
+            "other charities or voluntary bodies",
+            "other defined groups",
+            "the general public"
+          ],
+          "matchStrength": "strong",
+          "accountingBasis": "unknown",
+          "publicReadiness": {
+            "status": "unavailable",
+            "strong": [],
+            "unknown": [
+              "Organisation resolution only; readiness not reviewed."
+            ],
+            "findings": [],
+            "tarScore": null,
+            "attention": [],
+            "impactReport": {
+              "url": "",
+              "found": false,
+              "title": ""
+            },
+            "trusteesReport": {
+              "url": "",
+              "title": "",
+              "period": "",
+              "reviewed": false,
+              "discovery": "unavailable"
+            },
+            "readinessStatus": "unable_to_determine",
+            "websiteReviewed": false,
+            "overallConfidence": "low",
+            "widerEvidenceScore": null,
+            "widerEvidenceReason": ""
+          },
+          "financialYearEnd": "31 Dec 2024",
+          "usefulObservation": "Charity Commission record shows the previous name as “THE BLUE CROSS”; OSCR shows the charity is known by “The Blue Cross”; Companies House lists company number 00363197 and the same Burford address.",
+          "publicAchievements": [],
+          "registrationNumber": "224392",
+          "accountingBasisEvidence": "",
+          "accountingBasisSourceUrl": "",
+          "accountingBasisConfidence": "unknown"
+        },
+        "candidates": [],
+        "declined": [],
+        "phase": "confirmed"
+      },
+      "natural": {
+        "reply": "Version control — understood! We’ll leave it there, David. Your introduction is saved, and you can use the secure account button whenever you’re ready to start exploring.",
+        "objectives": [
+          "professional context",
+          "referral",
+          "challenge"
+        ],
+        "independent": true,
+        "uncertainties": [],
+        "complete": true
+      }
+    },
+    "registration": "mock account created; context retained"
+  },
+  {
+    "name": "Accountant — firm missing and several clients",
+    "rows": [
+      {
+        "user": "I'm Sarah Jones, sarah@preview.invalid. I'm a chartered accountant working with about 20 charities, including Brainstrust and Blue Cross.",
+        "assistant": "Lovely to meet you, Sarah. Are you with an accountancy firm or working independently? And what does your work with those charities mainly involve?"
+      },
+      {
+        "user": "I work at Burton Sweet. Let’s start with Brainstrust.",
+        "assistant": "Thanks, Sarah — we’ll start with Brainstrust. At Burton Sweet, what do you mainly help your charity clients with — accounts and reporting, audit, or broader advice?"
+      },
+      {
+        "user": "[Confirmed displayed official record]",
+        "assistant": "Brainstrust is confirmed as your starting charity. What does your work with your charity clients mainly involve?"
+      },
+      {
+        "user": "I prepare their accounts and advise trustees. I found you on LinkedIn. Keeping all the reporting deadlines under control is my main challenge.",
+        "assistant": "With about 20 charities to look after, that’s a lot of reporting deadlines to keep track of alongside preparing accounts and advising trustees. Thanks, Sarah — and it’s good to know you found us on LinkedIn. Your introduction is saved so our team can pick up the conversation from here. You can use the secure account button whenever you’re ready."
+      },
+      {
+        "user": "That’s everything, thanks — I’d like to get started.",
+        "assistant": "You’re all set, Sarah — use the secure account button to get started with Brainstrust. Your introduction is saved for our team. Welcome to SORP 2026!"
+      }
+    ],
+    "finalState": {
+      "facts": {
+        "name": "Sarah Jones",
+        "email": "sarah@preview.invalid",
+        "role": "chartered accountant",
+        "organisation": "Burton Sweet",
+        "responsibilities": "Prepares charity clients’ accounts and advises trustees.",
+        "discovery": "LinkedIn",
+        "concerns": "Keeping all the reporting deadlines under control.",
+        "portfolio": "about 20 charities",
+        "charities": [],
+        "interests": "",
+        "context": "",
+        "organisationKind": "firm"
+      },
+      "dialogue": {
+        "recent": [
+          {
+            "role": "assistant",
+            "text": "Hello — tell me a little about yourself and the charity work you’re involved in. You can talk or type."
+          },
+          {
+            "role": "user",
+            "text": "I'm Sarah Jones, sarah@preview.invalid. I'm a chartered accountant working with about 20 charities, including Brainstrust and Blue Cross."
+          },
+          {
+            "role": "assistant",
+            "text": "Lovely to meet you, Sarah. Are you with an accountancy firm or working independently? And what does your work with those charities mainly involve?"
+          },
+          {
+            "role": "user",
+            "text": "I work at Burton Sweet. Let’s start with Brainstrust."
+          },
+          {
+            "role": "assistant",
+            "text": "Thanks, Sarah — we’ll start with Brainstrust. At Burton Sweet, what do you mainly help your charity clients with — accounts and reporting, audit, or broader advice?"
+          },
+          {
+            "role": "user",
+            "text": "[Interface event: user explicitly confirmed the displayed official record for brainstrust, charity 1114634. The Preview records a preparation event only; production research is disabled.]"
+          },
+          {
+            "role": "assistant",
+            "text": "Brainstrust is confirmed as your starting charity. What does your work with your charity clients mainly involve?"
+          },
+          {
+            "role": "user",
+            "text": "I prepare their accounts and advise trustees. I found you on LinkedIn. Keeping all the reporting deadlines under control is my main challenge."
+          },
+          {
+            "role": "assistant",
+            "text": "With about 20 charities to look after, that’s a lot of reporting deadlines to keep track of alongside preparing accounts and advising trustees. Thanks, Sarah — and it’s good to know you found us on LinkedIn. Your introduction is saved so our team can pick up the conversation from here. You can use the secure account button whenever you’re ready."
+          },
+          {
+            "role": "user",
+            "text": "That’s everything, thanks — I’d like to get started."
+          }
+        ],
+        "followUps": 0,
+        "finalFollowUpUsed": false,
+        "reflecting": false
+      },
+      "turns": 4,
+      "repairTurns": 0,
+      "asked": [],
+      "skipped": [],
+      "version": 3,
+      "professional": [
+        {
+          "kind": "charity",
+          "role": "chartered accountant",
+          "turn": 0,
+          "entity": "Brainstrust",
+          "period": "current",
+          "aliases": [],
+          "evidence": "I'm a chartered accountant working with about 20 charities, including Brainstrust and Blue Cross.",
+          "confidence": "uncertain",
+          "entityNature": "named_organisation",
+          "relationship": "adviser"
+        },
+        {
+          "kind": "charity",
+          "role": "chartered accountant",
+          "turn": 0,
+          "entity": "Blue Cross",
+          "period": "current",
+          "aliases": [],
+          "evidence": "I'm a chartered accountant working with about 20 charities, including Brainstrust and Blue Cross.",
+          "confidence": "uncertain",
+          "entityNature": "named_organisation",
+          "relationship": "adviser"
+        },
+        {
+          "kind": "firm",
+          "role": "",
+          "turn": 1,
+          "entity": "Burton Sweet",
+          "period": "current",
+          "aliases": [],
+          "evidence": "I work at Burton Sweet.",
+          "confidence": "stated",
+          "entityNature": "named_organisation",
+          "relationship": "employee"
+        }
+      ],
+      "corrections": [],
+      "finishRequested": true,
+      "afterCharity": null,
+      "response": null,
+      "acknowledged": [],
+      "revision": 6,
+      "knowledge": {
+        "name": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "role": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "email": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "concerns": {
+          "turn": 2,
+          "source": "message",
+          "status": "supplied"
+        },
+        "discovery": {
+          "turn": 2,
+          "source": "message",
+          "status": "supplied"
+        },
+        "portfolio": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisation": {
+          "turn": 1,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisationKind": {
+          "turn": 1,
+          "source": "message",
+          "status": "supplied"
+        },
+        "responsibilities": {
+          "turn": 2,
+          "source": "message",
+          "status": "supplied"
+        }
+      },
+      "lastIntent": "confirm",
+      "clarification": null,
+      "charity": {
+        "proposed": "Brainstrust",
+        "confirmed": {
+          "name": "brainstrust",
+          "status": "Active",
+          "sources": [
+            {
+              "url": "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4023711/contact-information",
+              "kind": "official_register",
+              "label": "Charity Commission for England and Wales",
+              "detail": "Charity number 1114634; BRAINSTRUST; address in Cowes, Isle of Wight; website shown as www.brainstrust.org.uk."
+            },
+            {
+              "url": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC044642",
+              "kind": "official_register",
+              "label": "OSCR",
+              "detail": "Brainstrust; Scottish charity number SC044642; registered charity from 11 February 2014; website www.brainstrust.org.uk; Cowes, Isle of Wight."
+            },
+            {
+              "url": "https://brainstrust.org.uk/",
+              "kind": "organisation_website",
+              "label": "Organisation website",
+              "detail": "States brainstrust is a brain tumour support charity, with address in Cowes, Isle of Wight, and confirms registration with Charity Commission for England and Wales and OSCR."
+            }
+          ],
+          "summary": "Brainstrust is a UK brain tumour charity providing practical and emotional support, coaching, resources, advocacy and campaigning for people living with brain tumours and their carers.",
+          "website": "https://brainstrust.org.uk/",
+          "locality": "Cowes, Isle of Wight, England",
+          "purposes": [
+            "relief of sickness",
+            "promotion and protection of health",
+            "research into causes, diagnosis, treatment and prevention of brain tumours",
+            "support services for people affected by brain tumours"
+          ],
+          "legalForm": "Trust",
+          "reportUrl": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities?_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_objectiveId=A14382018&_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_priv_r_p_mvcRenderCommandName=%2Ffull-print&_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_priv_r_p_organisationNumber=4023711&p_p_cacheability=cacheLevelPage&p_p_id=uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet&p_p_lifecycle=2&p_p_mode=view&p_p_resource_id=%2Faccounts-resource&p_p_state=maximized",
+          "activities": [
+            "one-to-one support",
+            "peer support",
+            "webinars",
+            "events",
+            "practical resources",
+            "campaigning for better care and access to treatments",
+            "patient involvement in research"
+          ],
+          "entityType": "registered_charity",
+          "officialUrl": "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4023711/contact-information",
+          "reportTitle": "Report of the Trustees for the year ended 31 March 2023",
+          "jurisdiction": "ew",
+          "latestIncome": 779256,
+          "reportPeriod": "year ended 31 March 2023",
+          "beneficiaries": [
+            "people with brain tumours",
+            "carers and families",
+            "people with disabilities or health problems"
+          ],
+          "matchStrength": "strong",
+          "accountingBasis": "accruals",
+          "publicReadiness": {
+            "status": "unavailable",
+            "strong": [],
+            "unknown": [
+              "Not reviewed for readiness in this step."
+            ],
+            "findings": [],
+            "tarScore": null,
+            "attention": [],
+            "impactReport": {
+              "url": "",
+              "found": false,
+              "title": ""
+            },
+            "trusteesReport": {
+              "url": "",
+              "title": "",
+              "period": "",
+              "reviewed": false,
+              "discovery": "unavailable"
+            },
+            "readinessStatus": "unable_to_determine",
+            "websiteReviewed": false,
+            "overallConfidence": "low",
+            "widerEvidenceScore": null,
+            "widerEvidenceReason": ""
+          },
+          "financialYearEnd": "31 Mar 2025",
+          "usefulObservation": "The charity’s own website explicitly matches the register entry on name, address and registration status, and also states its Scottish registration number.",
+          "publicAchievements": [
+            "supports people affected by brain tumours across the UK",
+            "provides coaching-led practical and emotional support",
+            "runs resources, events and advocacy work"
+          ],
+          "registrationNumber": "1114634",
+          "accountingBasisEvidence": "Latest public filings show annual submissions and income/expenditure figures, and the charity’s published accounts are available; the organisation’s own site and charity register identify it as a registered charity. The available register excerpt does not state the accounting basis explicitly, so this is a cautious inference from the filed annual accounts context.",
+          "accountingBasisSourceUrl": "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4023711/contact-information",
+          "accountingBasisConfidence": "probable"
+        },
+        "candidates": [],
+        "declined": [],
+        "phase": "confirmed"
+      },
+      "natural": {
+        "reply": "You’re all set, Sarah — use the secure account button to get started with Brainstrust. Your introduction is saved for our team. Welcome to SORP 2026!",
+        "objectives": [
+          "professional context",
+          "referral",
+          "challenge"
+        ],
+        "independent": false,
+        "uncertainties": [],
+        "complete": true
+      }
+    },
+    "registration": "mock account created; context retained"
+  },
+  {
+    "name": "Correction and frustration",
+    "rows": [
+      {
+        "user": "I'm Jo Ellis, jo@preview.invalid, a trustee at Interim Spaces.",
+        "assistant": "Lovely to meet you, Jo. Shall we use Interim Spaces as your starting charity? And what do you focus on in your trustee role?"
+      },
+      {
+        "user": "I already told you Interim Spaces. You’re ignoring me. Yes, use Interim Spaces to start.",
+        "assistant": "Sorry, Jo — I should have acknowledged that properly. We’ll start with Interim Spaces. When its official record appears, please use the confirmation button to confirm it.\n\nWhat does your trustee work there mainly involve?"
+      },
+      {
+        "user": "[Confirmed displayed official record]",
+        "assistant": "Thanks, Jo — Interim Spaces is now confirmed. How did you hear about SORP 2026?"
+      },
+      {
+        "user": "Actually, let’s use Brainstrust instead.",
+        "assistant": "Of course, Jo — we’ll switch your starting charity to Brainstrust. Once its official record is displayed, please confirm it so we have the right charity."
+      },
+      {
+        "user": "[Confirmed displayed official record]",
+        "assistant": "Thanks, Jo — Brainstrust is now confirmed as your starting charity.\n\nThinking about your charity work, what’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?"
+      },
+      {
+        "user": "I’m involved in governance. I found you on Google. I’d rather not discuss my worries. Can we finish?",
+        "assistant": "Of course, Jo — no need to discuss your worries. Thanks for sharing your governance focus and how you found us through Google. Your introduction is saved, with Brainstrust confirmed as your starting charity. You can use the secure account button whenever you’re ready. We’ll leave it there."
+      }
+    ],
+    "finalState": {
+      "facts": {
+        "name": "Jo Ellis",
+        "email": "jo@preview.invalid",
+        "role": "trustee",
+        "organisation": "Interim Spaces",
+        "responsibilities": "Governance",
+        "discovery": "Google",
+        "concerns": "",
+        "portfolio": "",
+        "charities": [],
+        "interests": "",
+        "context": "",
+        "organisationKind": "charity"
+      },
+      "dialogue": {
+        "recent": [
+          {
+            "role": "assistant",
+            "text": "Hello — tell me a little about yourself and the charity work you’re involved in. You can talk or type."
+          },
+          {
+            "role": "user",
+            "text": "I'm Jo Ellis, jo@preview.invalid, a trustee at Interim Spaces."
+          },
+          {
+            "role": "assistant",
+            "text": "Lovely to meet you, Jo. Shall we use Interim Spaces as your starting charity? And what do you focus on in your trustee role?"
+          },
+          {
+            "role": "user",
+            "text": "I already told you Interim Spaces. You’re ignoring me. Yes, use Interim Spaces to start."
+          },
+          {
+            "role": "assistant",
+            "text": "Sorry, Jo — I should have acknowledged that properly. We’ll start with Interim Spaces. When its official record appears, please use the confirmation button to confirm it.\n\nWhat does your trustee work there mainly involve?"
+          },
+          {
+            "role": "user",
+            "text": "[Interface event: user explicitly confirmed the displayed official record for Interim Spaces, charity 1165694. The Preview records a preparation event only; production research is disabled.]"
+          },
+          {
+            "role": "assistant",
+            "text": "Thanks, Jo — Interim Spaces is now confirmed. How did you hear about SORP 2026?"
+          },
+          {
+            "role": "user",
+            "text": "Actually, let’s use Brainstrust instead."
+          },
+          {
+            "role": "assistant",
+            "text": "Of course, Jo — we’ll switch your starting charity to Brainstrust. Once its official record is displayed, please confirm it so we have the right charity."
+          },
+          {
+            "role": "user",
+            "text": "[Interface event: user explicitly confirmed the displayed official record for brainstrust, charity 1114634. The Preview records a preparation event only; production research is disabled.]"
+          },
+          {
+            "role": "assistant",
+            "text": "Thanks, Jo — Brainstrust is now confirmed as your starting charity.\n\nThinking about your charity work, what’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?"
+          },
+          {
+            "role": "user",
+            "text": "I’m involved in governance. I found you on Google. I’d rather not discuss my worries. Can we finish?"
+          }
+        ],
+        "followUps": 0,
+        "finalFollowUpUsed": false,
+        "reflecting": false
+      },
+      "turns": 4,
+      "repairTurns": 0,
+      "asked": [],
+      "skipped": [],
+      "version": 3,
+      "professional": [
+        {
+          "kind": "charity",
+          "role": "trustee",
+          "turn": 0,
+          "entity": "Interim Spaces",
+          "period": "current",
+          "aliases": [],
+          "evidence": "a trustee at Interim Spaces",
+          "confidence": "stated",
+          "entityNature": "named_organisation",
+          "relationship": "trustee"
+        }
+      ],
+      "corrections": [],
+      "finishRequested": true,
+      "afterCharity": null,
+      "response": null,
+      "acknowledged": [],
+      "revision": 8,
+      "knowledge": {
+        "name": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "role": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "email": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisation": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "organisationKind": {
+          "turn": 0,
+          "source": "message",
+          "status": "supplied"
+        },
+        "responsibilities": {
+          "status": "supplied",
+          "source": "message",
+          "turn": 3
+        },
+        "discovery": {
+          "status": "supplied",
+          "source": "message",
+          "turn": 3
+        }
+      },
+      "lastIntent": "inform",
+      "clarification": null,
+      "charity": {
+        "proposed": "Brainstrust",
+        "confirmed": {
+          "name": "brainstrust",
+          "status": "Active",
+          "sources": [
+            {
+              "url": "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4023711/contact-information",
+              "kind": "official_register",
+              "label": "Charity Commission for England and Wales",
+              "detail": "Charity number 1114634; BRAINSTRUST; address in Cowes, Isle of Wight; website shown as www.brainstrust.org.uk."
+            },
+            {
+              "url": "https://www.oscr.org.uk/about-charities/search-the-register/charity-details?number=SC044642",
+              "kind": "official_register",
+              "label": "OSCR",
+              "detail": "Brainstrust; Scottish charity number SC044642; registered charity from 11 February 2014; website www.brainstrust.org.uk; Cowes, Isle of Wight."
+            },
+            {
+              "url": "https://brainstrust.org.uk/",
+              "kind": "organisation_website",
+              "label": "Organisation website",
+              "detail": "States brainstrust is a brain tumour support charity, with address in Cowes, Isle of Wight, and confirms registration with Charity Commission for England and Wales and OSCR."
+            }
+          ],
+          "summary": "Brainstrust is a UK brain tumour charity providing practical and emotional support, coaching, resources, advocacy and campaigning for people living with brain tumours and their carers.",
+          "website": "https://brainstrust.org.uk/",
+          "locality": "Cowes, Isle of Wight, England",
+          "purposes": [
+            "relief of sickness",
+            "promotion and protection of health",
+            "research into causes, diagnosis, treatment and prevention of brain tumours",
+            "support services for people affected by brain tumours"
+          ],
+          "legalForm": "Trust",
+          "reportUrl": "https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities?_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_objectiveId=A14382018&_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_priv_r_p_mvcRenderCommandName=%2Ffull-print&_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_priv_r_p_organisationNumber=4023711&p_p_cacheability=cacheLevelPage&p_p_id=uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet&p_p_lifecycle=2&p_p_mode=view&p_p_resource_id=%2Faccounts-resource&p_p_state=maximized",
+          "activities": [
+            "one-to-one support",
+            "peer support",
+            "webinars",
+            "events",
+            "practical resources",
+            "campaigning for better care and access to treatments",
+            "patient involvement in research"
+          ],
+          "entityType": "registered_charity",
+          "officialUrl": "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4023711/contact-information",
+          "reportTitle": "Report of the Trustees for the year ended 31 March 2023",
+          "jurisdiction": "ew",
+          "latestIncome": 779256,
+          "reportPeriod": "year ended 31 March 2023",
+          "beneficiaries": [
+            "people with brain tumours",
+            "carers and families",
+            "people with disabilities or health problems"
+          ],
+          "matchStrength": "strong",
+          "accountingBasis": "accruals",
+          "publicReadiness": {
+            "status": "unavailable",
+            "strong": [],
+            "unknown": [
+              "Not reviewed for readiness in this step."
+            ],
+            "findings": [],
+            "tarScore": null,
+            "attention": [],
+            "impactReport": {
+              "url": "",
+              "found": false,
+              "title": ""
+            },
+            "trusteesReport": {
+              "url": "",
+              "title": "",
+              "period": "",
+              "reviewed": false,
+              "discovery": "unavailable"
+            },
+            "readinessStatus": "unable_to_determine",
+            "websiteReviewed": false,
+            "overallConfidence": "low",
+            "widerEvidenceScore": null,
+            "widerEvidenceReason": ""
+          },
+          "financialYearEnd": "31 Mar 2025",
+          "usefulObservation": "The charity’s own website explicitly matches the register entry on name, address and registration status, and also states its Scottish registration number.",
+          "publicAchievements": [
+            "supports people affected by brain tumours across the UK",
+            "provides coaching-led practical and emotional support",
+            "runs resources, events and advocacy work"
+          ],
+          "registrationNumber": "1114634",
+          "accountingBasisEvidence": "Latest public filings show annual submissions and income/expenditure figures, and the charity’s published accounts are available; the organisation’s own site and charity register identify it as a registered charity. The available register excerpt does not state the accounting basis explicitly, so this is a cautious inference from the filed annual accounts context.",
+          "accountingBasisSourceUrl": "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4023711/contact-information",
+          "accountingBasisConfidence": "probable"
+        },
+        "candidates": [],
+        "declined": [],
+        "phase": "confirmed"
+      },
+      "natural": {
+        "reply": "Of course, Jo — no need to discuss your worries. Thanks for sharing your governance focus and how you found us through Google. Your introduction is saved, with Brainstrust confirmed as your starting charity. You can use the secure account button whenever you’re ready. We’ll leave it there.",
+        "objectives": [
+          "professional context",
+          "referral",
+          "challenge"
+        ],
+        "independent": false,
+        "uncertainties": [],
+        "complete": true
+      }
+    },
+    "registration": "mock account created; context retained"
+  }
+]

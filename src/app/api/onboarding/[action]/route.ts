@@ -1,6 +1,6 @@
 import { after } from "next/server";
 import { canonicalCharityRecord } from "@/lib/onboarding/charity-record";
-import { processTurn, fallbackTurn } from "@/lib/onboarding/engine";
+import { startConversation } from "@/lib/onboarding/conversation";
 import { query, transaction } from "@/lib/console/db";
 import { protectPlatformRequest } from "@/lib/platform/auth";
 import { AccessError } from "@/lib/access-error";
@@ -9,7 +9,6 @@ import {
   mergeFacts,
   nextQuestion,
   nextObjective,
-  TOTAL_TURN_CAP,
   applyFacts,
   proposeCharity,
   confirmCharity,
@@ -24,7 +23,7 @@ import {
   claimRequest,
   claimOperation,
   attributionFrom,
-  extractWithModel,
+  respondWithModel,
   sessionCookie,
   boundedBody,
   saveSession,
@@ -168,7 +167,11 @@ export async function POST(
           selected: existing.selected,
         });
       const id = await createSession(attributionFrom(body.attribution));
-      const response = json({ available: true });
+      const response = json({
+        available: true,
+        state: startConversation(),
+        messages: [],
+      });
       response.headers.append(
         "set-cookie",
         `${sessionCookie}=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400${request.headers.get("x-forwarded-proto") === "https" || new URL(request.url).protocol === "https:" ? "; Secure" : ""}`,
@@ -180,8 +183,9 @@ export async function POST(
       // Verification may happen on a different device or after the 24-hour draft
       // expires. Recover only from this verified account's own saved signup data.
       const identity = await protectPlatformRequest(request);
-      const { GET: existingAccount } =
-        await import("@/app/api/readiness-account/route");
+      const { GET: existingAccount } = await import(
+        "@/app/api/readiness-account/route"
+      );
       const response = await existingAccount(
         new Request(new URL("/api/readiness-account/", request.url), {
           headers: request.headers,
@@ -252,7 +256,16 @@ export async function POST(
       );
     await claimRequest(session.id, action === "search");
     if (action === "edit") {
-      const next = applyFacts(session.state, body.fields || {}, "form");
+      let next = applyFacts(session.state, body.fields || {}, "form");
+      if (typeof body.independent === "boolean") {
+        next = {
+          ...next,
+          natural: next.natural || startConversation().natural,
+        };
+        next.natural!.independent = body.independent;
+        if (body.independent)
+          next = applyFacts(next, { organisation: "" }, "form");
+      }
       const saved = await saveSession(session, next);
       return json(snapshot(saved));
     }
@@ -263,11 +276,6 @@ export async function POST(
         body.message.length > 3000
       )
         return json({ error: "Use an answer of up to 3,000 characters." }, 400);
-      if (session.state.turns >= TOTAL_TURN_CAP)
-        return json(
-          { error: "Please finish with your editable profile." },
-          409,
-        );
       if (/\b(?:my )?password\s*(?:is|:|=)/i.test(body.message))
         return json(
           { error: "Keep passwords in the secure account fields." },
@@ -287,16 +295,16 @@ export async function POST(
       let next = before,
         notice = "";
       try {
-        const processed = await processTurn(
-          before,
-          body.message,
-          (message, state, skip) => extractWithModel(message, state, session.id, skip),
-          body.skip === true,
-        );
-        next = processed.state;
-        notice = processed.extraction.notice || "";
+        next = (await respondWithModel(body.message, before, session.id)).state;
       } catch (e) {
-        next = fallbackTurn(before, body.message, body.skip === true);
+        next = {
+          ...before,
+          natural: {
+            ...(before.natural || startConversation().natural!),
+            reply:
+              "I couldn’t respond just now. Your saved details are safe; please retry or use the editable profile.",
+          },
+        };
         notice =
           e instanceof Error
             ? e.message
@@ -393,7 +401,22 @@ export async function POST(
           400,
         );
       const selected = candidates[body.index];
-      const next = confirmCharity(session.state, selected);
+      let next = confirmCharity(session.state, selected, false);
+      try {
+        next = (
+          await respondWithModel(
+            `[Interface event: user confirmed the displayed official charity record for ${selected.name}, registration ${selected.registrationNumber}. Public information preparation will be queued by the application.]`,
+            next,
+            session.id,
+            true,
+          )
+        ).state;
+      } catch {
+        next.natural = {
+          ...(next.natural || startConversation().natural!),
+          reply: `${selected.name} is confirmed. Conversation assistance is temporarily unavailable; your editable profile is still here.`,
+        };
+      }
       const messages = [
         ...session.messages,
         {
@@ -447,6 +470,7 @@ export async function POST(
                 relationships: session.state.professional,
                 corrections: session.state.corrections,
                 knowledge: session.state.knowledge,
+                independent: session.state.natural?.independent || false,
               },
             }),
             JSON.stringify(session.messages),

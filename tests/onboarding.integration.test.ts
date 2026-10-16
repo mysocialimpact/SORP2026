@@ -346,7 +346,9 @@ test("state snapshots reject concurrent overwrites and restore unified memory", 
   const reloaded = (await getSession(request))!;
   assert.equal(reloaded.state.revision, saved.state.revision);
   assert.equal(reloaded.state.facts.organisation, "Interim Spaces");
-  assert.match(nextQuestion(reloaded.state), /Interim Spaces.*Shall we/);
+  assert.equal(reloaded.state.charity.proposed, "Interim Spaces");
+  // Direct edits update facts without inventing a new assistant utterance.
+  assert.equal(nextQuestion(reloaded.state), nextQuestion(original.state));
 });
 test("semantic intent and evidence flow through the reducer without poisoning known entities", async () => {
   const {

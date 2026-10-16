@@ -58,7 +58,9 @@ function publicLink(value: string) {
     return "";
   }
 }
-export function Onboarding({ isolatedPreview = false }: { isolatedPreview?: boolean } = {}) {
+export function Onboarding({
+  isolatedPreview = false,
+}: { isolatedPreview?: boolean } = {}) {
   const params = useSearchParams(),
     destination = safeDestination(params.get("next") || params.get("return"));
   const [state, setState] = useState<Conversation>(initialConversation),
@@ -97,10 +99,16 @@ export function Onboarding({ isolatedPreview = false }: { isolatedPreview?: bool
     ready = accountReady(state),
     completed = objective === "complete";
   const fieldComplete = (key: FieldKey) =>
-    key === "name" ? validEntity(state.facts.name,"name") && state.facts.name.trim().split(/\s+/).length > 1 : key === "email"
-      ? validEmail(state.facts.email)
-      : validEntity(state.facts[key], key);
-  const count = fieldKeys.filter(fieldComplete).length + (state.natural?.independent && !fieldComplete("organisation") ? 1 : 0) + (selected ? 1 : 0);
+    key === "name"
+      ? validEntity(state.facts.name, "name") &&
+        state.facts.name.trim().split(/\s+/).length > 1
+      : key === "email"
+        ? validEmail(state.facts.email)
+        : validEntity(state.facts[key], key);
+  const count =
+    fieldKeys.filter(fieldComplete).length +
+    (state.natural?.independent && !fieldComplete("organisation") ? 1 : 0) +
+    (selected ? 1 : 0);
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
     : destination.startsWith("/are-you-sorp-ready")
@@ -361,7 +369,7 @@ export function Onboarding({ isolatedPreview = false }: { isolatedPreview?: bool
           { role: "assistant", text: nextQuestion(local) },
         ]);
     } catch (e) {
-      setDraft(current => current || message);
+      setDraft((current) => current || message);
       recover(e);
     } finally {
       lock.current = false;
@@ -419,7 +427,10 @@ export function Onboarding({ isolatedPreview = false }: { isolatedPreview?: bool
   async function createAccount(event: FormEvent) {
     event.preventDefault();
     if (lock.current) return;
-    if (!accountReady(currentState.current)) { setAccountError("Complete all five registration requirements first."); return; }
+    if (!accountReady(currentState.current)) {
+      setAccountError("Complete all five registration requirements first.");
+      return;
+    }
     if (password !== confirmPassword) {
       setAccountError("Those passwords do not match.");
       return;
@@ -643,107 +654,114 @@ export function Onboarding({ isolatedPreview = false }: { isolatedPreview?: bool
                     <div>
                       <strong>{selected.name}</strong>
                       <p>
-                        {isolatedPreview ? 'Confirmed. Research is disabled in this isolated Preview.' : 'Confirmed. Public information preparation has been queued.'}
+                        {isolatedPreview
+                          ? "Confirmed. Research is disabled in this isolated Preview."
+                          : "Confirmed. Public information preparation has been queued."}
                       </p>
                     </div>
                   </div>
                 )}
-                {(objective === "charity" || candidates.length > 0 || state.charity.phase === "lookup") && !selected && (
-                  <div className="charity-discovery">
-                    <p>
-                      We’ll start with one charity to personalise your
-                      experience. You can add others later.
-                    </p>
-                    {charityOptions(state).length > 0 && (
-                      <div className="charity-mentions">
-                        {charityOptions(state).map((c) => (
-                          <button
-                            type="button"
-                            key={c}
-                            disabled={busy}
-                            onClick={() => {
-                              setQuery(c);
-                              void search(c);
-                            }}
-                          >
-                            Find {c} <Arrow diagonal />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        void search();
-                      }}
-                    >
-                      <label htmlFor="charity-lookup">
-                        Charity name or registration number
-                      </label>
-                      <div>
-                        <input
-                          id="charity-lookup"
-                          value={query}
-                          onChange={(e) => setQuery(e.target.value)}
-                          maxLength={160}
-                          placeholder="Find your starting charity"
-                        />
-                        <button disabled={busy || !query.trim()}>Find →</button>
-                      </div>
-                    </form>
-                    {searched && !candidates.length && (
+                {(objective === "charity" ||
+                  candidates.length > 0 ||
+                  state.charity.phase === "lookup") &&
+                  !selected && (
+                    <div className="charity-discovery">
                       <p>
-                        No reliable registry match yet. Try the charity number
-                        or choose it later.
+                        We’ll start with one charity to personalise your
+                        experience. You can add others later.
                       </p>
-                    )}
-                    {candidates.map((c, i) => (
-                      <article className="charity-match" key={c.officialUrl}>
-                        <p className="onboarding-eyebrow">
-                          A REGISTRY MATCH TO CHECK
-                        </p>
-                        <h3>{c.name}</h3>
-                        <p>
-                          Charity {c.registrationNumber} ·{" "}
-                          {c.jurisdiction || "Public register"}
-                        </p>
-                        <div className="charity-source-links">
-                          {publicLink(c.officialUrl) && (
-                            <a
-                              href={publicLink(c.officialUrl)}
-                              target="_blank"
-                              rel="noreferrer"
+                      {charityOptions(state).length > 0 && (
+                        <div className="charity-mentions">
+                          {charityOptions(state).map((c) => (
+                            <button
+                              type="button"
+                              key={c}
+                              disabled={busy}
+                              onClick={() => {
+                                setQuery(c);
+                                void search(c);
+                              }}
                             >
-                              Official register ↗
-                            </a>
-                          )}
-                          {publicLink(c.website) ? (
-                            <a
-                              href={publicLink(c.website)}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Charity website ↗
-                            </a>
-                          ) : (
-                            <span>Website not established</span>
-                          )}
+                              Find {c} <Arrow diagonal />
+                            </button>
+                          ))}
                         </div>
-                        <p className="charity-source-note">
-                          Details returned by our charity research service.
-                          Please check this is the right organisation.
+                      )}
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          void search();
+                        }}
+                      >
+                        <label htmlFor="charity-lookup">
+                          Charity name or registration number
+                        </label>
+                        <div>
+                          <input
+                            id="charity-lookup"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            maxLength={160}
+                            placeholder="Find your starting charity"
+                          />
+                          <button disabled={busy || !query.trim()}>
+                            Find →
+                          </button>
+                        </div>
+                      </form>
+                      {searched && !candidates.length && (
+                        <p>
+                          No reliable registry match yet. Try the charity number
+                          or choose it later.
                         </p>
-                        <button
-                          className="onboarding-primary"
-                          disabled={busy}
-                          onClick={() => void confirm(i)}
-                        >
-                          Yes, this is the charity <span>✓</span>
-                        </button>
-                      </article>
-                    ))}
-                  </div>
-                )}
+                      )}
+                      {candidates.map((c, i) => (
+                        <article className="charity-match" key={c.officialUrl}>
+                          <p className="onboarding-eyebrow">
+                            A REGISTRY MATCH TO CHECK
+                          </p>
+                          <h3>{c.name}</h3>
+                          <p>
+                            Charity {c.registrationNumber} ·{" "}
+                            {c.jurisdiction || "Public register"}
+                          </p>
+                          <div className="charity-source-links">
+                            {publicLink(c.officialUrl) && (
+                              <a
+                                href={publicLink(c.officialUrl)}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Official register ↗
+                              </a>
+                            )}
+                            {publicLink(c.website) ? (
+                              <a
+                                href={publicLink(c.website)}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Charity website ↗
+                              </a>
+                            ) : (
+                              <span>Website not established</span>
+                            )}
+                          </div>
+                          <p className="charity-source-note">
+                            Details returned by our charity research service.
+                            Please check this is the right organisation.
+                          </p>
+                          <button
+                            className="onboarding-primary"
+                            disabled={busy}
+                            onClick={() => void confirm(i)}
+                          >
+                            Yes, this is the charity <span>✓</span>
+                          </button>
+                        </article>
+                      ))}
+                    </div>
+                  )}
                 {(!completed || editingComplete) && (
                   <form
                     onSubmit={(e) => void send(e)}
@@ -941,12 +959,36 @@ export function Onboarding({ isolatedPreview = false }: { isolatedPreview?: bool
                     />
                   </label>
                 ))}
-                {state.natural && <label style={{fontSize:13,display:'flex',gap:8,alignItems:'center'}}>
-                  <input type="checkbox" checked={state.natural.independent} disabled={busy} onChange={async e => {
-                    try { await persistEdits(); accept(await post('edit', {independent:e.target.checked,revision:currentState.current.revision})); }
-                    catch(error){recover(error);}
-                  }} /> I work independently
-                </label>}
+                {state.natural && (
+                  <label
+                    style={{
+                      fontSize: 13,
+                      display: "flex",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={state.natural.independent}
+                      disabled={busy}
+                      onChange={async (e) => {
+                        try {
+                          await persistEdits();
+                          accept(
+                            await post("edit", {
+                              independent: e.target.checked,
+                              revision: currentState.current.revision,
+                            }),
+                          );
+                        } catch (error) {
+                          recover(error);
+                        }
+                      }}
+                    />{" "}
+                    I work independently
+                  </label>
+                )}
               </div>
               <div
                 className={`profile-reward${reward ? " is-rewarded" : ""}`}
