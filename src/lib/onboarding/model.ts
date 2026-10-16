@@ -9,6 +9,7 @@ import {
   reconcileExtraction,
   confirmCharity,
   canFollowUp,
+  confirmationFollowUp,
   type Conversation,
   type Extraction,
   type ProfessionalRelationship,
@@ -456,16 +457,17 @@ export async function interpretWithModel(message: string, state: Conversation, o
     financialYearEnd: "", accountingBasis: "", accountingBasisConfidence: "",
     website: "", summary: "", reportUrl: "", reportTitle: "", reportPeriod: "",
     publicReadiness: { impactReport: { found: false, title: "", url: "" } }, sources: [],
-  }) : null;
+  }, false) : null;
+  const afterReflection = afterConfirmation ? confirmationFollowUp(afterConfirmation) : null;
   try {
-    const spoken = await callModel(dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection));
+    const spoken = await callModel(dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection, afterReflection));
     observe?.({ stage: "dialogue", parsed: spoken.parsed, plan: questionPlan(updated), participation: result.topicResponse, followUpPermitted: !!reflection });
     result.usage = {
       input: understood.usage.input + spoken.usage.input,
       output: understood.usage.output + spoken.usage.output,
       estimatedUsd: understood.usage.estimatedUsd + spoken.usage.estimatedUsd,
     };
-    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection);
+    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection, afterReflection);
     if (result.topicResponse) result.topicResponse.followUp = reply.next.objective === "reflection";
     result.questionProposal = reply.next;
     result.afterCharity = reply.afterCharity;

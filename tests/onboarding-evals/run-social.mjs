@@ -17,6 +17,7 @@ async function run(j) {
     assert.ok(++report.turns <=160 && report.estimatedUsd + pendingBudget + MODEL_RESERVATION_USD <=8, 'Evaluation budget exhausted');
     pendingBudget += MODEL_RESERVATION_USD;
     record.transcript.push({role:'user',text});
+    const started=Date.now();
     const result=await processTurn(state,text,async(t,s)=>{
       report.apiCalls+=2;
       const diagnostic=[];
@@ -35,7 +36,7 @@ async function run(j) {
     const previousQuestions = record.transcript.filter(t=>t.role==='assistant').map(t=>t.text);
     if(reply.includes('What keeps you up at night?')) assert.ok(!previousQuestions.some(q=>q.includes('What keeps you up at night?')), 'Repeated final concern question');
     record.transcript.push({role:'assistant',text:reply});
-    record.states.push({objective:nextObjective(state),facts:state.facts,confirmed:state.charity.confirmed?.name||null,reflecting:state.dialogue.reflecting});
+    record.states.push({elapsedMs:Date.now()-started,objective:nextObjective(state),facts:state.facts,confirmed:state.charity.confirmed?.name||null,reflecting:state.dialogue.reflecting});
     assert.ok(state.turns<=10);
     assert.ok(state.facts.charities.every(x=>!/^I (already|work|used)/i.test(x)));
   }
@@ -75,6 +76,7 @@ async function run(j) {
   } catch(e){record.error=e.message;report.failed++;}
   record.finalState={objective:nextObjective(state),facts:state.facts,professional:state.professional,confirmed:state.charity.confirmed?.name||null};
   report.journeys.push(record);
+  console.log('SOCIAL_STATE',JSON.stringify({id:j.id,...record.finalState}));
   // One event per turn avoids log truncation and preserves complete review transcripts.
   for(let i=0;i<record.transcript.length;i++) console.log('SOCIAL_TURN',JSON.stringify({id:j.id,index:i,...record.transcript[i]}));
   console.log('SOCIAL_RESULT',JSON.stringify({id:j.id,passed:record.passed,error:record.error,turns:state.turns}));

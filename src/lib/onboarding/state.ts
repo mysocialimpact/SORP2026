@@ -738,12 +738,16 @@ export function proposeCharity(s: Conversation, value: string): Conversation {
 export function confirmCharity(
   s: Conversation,
   candidate: Candidate,
+  recordEvent = true,
 ): Conversation {
-  return attachQuestion(
-    {
+  let confirmed: Conversation = {
       ...s,
       lastIntent: "confirm",
       clarification: null,
+      dialogue: { ...s.dialogue, recent: recordEvent ? [...s.dialogue.recent,
+        { role: "assistant" as const, text: nextQuestion(s).slice(0, 1600) },
+        { role: "user" as const, text: `[Interface action: confirmed the displayed official charity record for ${candidate.name}.]` },
+      ].slice(-8) : s.dialogue.recent },
       charity: {
         ...s.charity,
         proposed: s.charity.proposed || candidate.name,
@@ -751,9 +755,19 @@ export function confirmCharity(
         candidates: [],
         phase: "confirmed",
       },
-    },
-    s.afterCharity || undefined,
-  );
+    };
+  // The same optional move can follow an explicit UI confirmation. Supplying
+  // rich context early must not remove the opportunity to respond to it.
+  if (s.afterCharity?.objective === "reflection")
+    confirmed = confirmationFollowUp(confirmed) || confirmed;
+  return attachQuestion(confirmed, s.afterCharity || undefined);
+}
+export function confirmationFollowUp(s: Conversation): Conversation | null {
+  if (!s.charity.confirmed || s.finishRequested || s.dialogue.followUps ||
+      s.turns >= TOTAL_TURN_CAP - 1 || s.turns - s.repairTurns >= OPTIONAL_TURN_CAP ||
+      !["responsibilities", "discovery", "concerns", "complete"].includes(nextObjective(s)) ||
+      ![s.facts.responsibilities, s.facts.concerns, s.facts.interests, s.facts.portfolio].some(Boolean)) return null;
+  return { ...s, dialogue: { ...s.dialogue, reflecting: true, followUps: s.dialogue.followUps + 1 } };
 }
 export function applyExtraction(
   s: Conversation,
@@ -901,7 +915,7 @@ export function canFollowUp(before: Conversation, after: Conversation, topic: Ex
   return !!(topic && topic.status !== "declined" && !skip && !after.finishRequested &&
     ["responsibilities", "discovery", "concerns"].includes(objective) &&
     ["discovery", "concerns", "complete"].includes(nextObjective(after)) &&
-    after.turns < OPTIONAL_TURN_CAP && before.dialogue.followUps < 2 &&
+    after.turns < TOTAL_TURN_CAP && after.turns - after.repairTurns < OPTIONAL_TURN_CAP && before.dialogue.followUps < 2 &&
     (objective === "concerns" ? !before.dialogue.finalFollowUpUsed : before.dialogue.followUps === 0));
 }
 export function advance(

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {initialConversation,applyFacts,advance,confirmCharity,nextQuestion,nextObjective,suitableDialogue,normaliseConversation} from '../../src/lib/onboarding/state.ts';
+import {initialConversation,applyFacts,advance,confirmCharity,confirmationFollowUp,nextQuestion,nextObjective,suitableDialogue,normaliseConversation} from '../../src/lib/onboarding/state.ts';
 import {dialogueRequest,decodeDialogue} from '../../src/lib/onboarding/dialogue.ts';
 import {validateInterpretation,modelRequest,interpretWithModel,MODEL_RESERVATION_USD} from '../../src/lib/onboarding/model.ts';
 const ready=()=>confirmCharity(applyFacts(initialConversation(),{name:'Marcus Warry',email:'marcus@example.invalid',role:'Trustee',organisation:'Interim Spaces',responsibilities:'Finance',discovery:'A friend'},'form'),{name:'Interim Spaces',registrationNumber:'1234567',officialUrl:'https://example.invalid/official'});
@@ -119,4 +119,31 @@ test('the production two-stage pipeline offers and commits a social move before 
    assert.equal(result.notice,undefined);assert.equal(result.topicResponse.followUp,true);
    assert.equal(nextObjective(advance(ready(),result)),'reflection');assert.equal(calls,2);
  }finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
+});
+test('confirmation preserves the displayed correction acknowledgement and labels the UI action',()=>{
+ const state=applyFacts(initialConversation(),{name:'Alex Rowan',email:'alex@example.invalid',role:'Auditor',organisation:'Interim Spaces'},'form');
+ state.response={objective:'charity',fields:['charity'],question:'Auditor, thanks for correcting that. Shall we start with Interim Spaces?',natural:true,generated:true,contextKey:''};
+ const s=confirmCharity(state,{name:'Interim Spaces',registrationNumber:'1234567',officialUrl:'https://example.invalid/official'});
+ assert.match(s.dialogue.recent.at(-2).text,/thanks for correcting/);
+ assert.match(s.dialogue.recent.at(-1).text,/Interface action: confirmed/);
+ assert.equal(confirmCharity(state,s.charity.confirmed,false).dialogue.recent.length,0,'Speculation must not invent an event');
+});
+test('a rich early answer may invite a follow-up only after explicit charity confirmation',()=>{
+ const state=applyFacts(initialConversation(),{name:'Asha Patel',email:'asha@example.invalid',role:'Trustee',organisation:'Interim Spaces',responsibilities:'Governance',discovery:'A friend',concerns:'Reliable impact data'},'form');
+ const candidate={name:'Interim Spaces',registrationNumber:'1234567',officialUrl:'https://example.invalid/official'};
+ const confirmed=confirmCharity(state,candidate,false),reflection=confirmationFollowUp(confirmed);
+ assert.ok(reflection);assert.equal(nextObjective(reflection),'reflection');
+ const reply=decodeDialogue({move:'progress',reply:'Shall we start with Interim Spaces?',afterCharityMove:'follow_up',afterCharity:'We’ll start with {charityName}. Where are the gaps in the impact information you receive?'},state,confirmed,null,reflection);
+ state.afterCharity=reply.afterCharity;
+ assert.equal(nextObjective(state),'charity');assert.equal(state.charity.confirmed,null);
+ const actual=confirmCharity(state,candidate);
+ assert.equal(nextObjective(actual),'reflection');assert.equal(actual.dialogue.followUps,1);
+ assert.match(nextQuestion(actual),/gaps in the impact information/);
+ assert.equal(nextObjective(advance(actual,{utterance:'We lack consistent outcomes.',context:'We lack consistent outcomes.'})),'complete');
+});
+test('repair turns do not consume optional curiosity, but the total hard cap still applies',()=>{
+ const s=advance({...ready(),turns:6,repairTurns:3},{utterance:'A concern.',topicResponse:participation('answered',true)});
+ assert.equal(nextObjective(s),'reflection');
+ const capped=advance({...ready(),turns:9,repairTurns:5},{utterance:'A concern.',topicResponse:participation('answered',true)});
+ assert.equal(nextObjective(capped),'complete');assert.equal(capped.dialogue.reflecting,false);
 });

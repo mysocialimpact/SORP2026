@@ -240,9 +240,13 @@ try {
     await expect(
       page.getByRole("heading", { name: "Blue Cross (synthetic fixture)" }),
     ).toBeVisible();
+    const historicalConfirmation = page.waitForResponse(r=>r.url().includes("/api/onboarding/confirm/")&&r.request().method()==="POST");
     await page
       .getByRole("button", { name: "Yes, this is the charity" })
       .click();
+    const afterConfirmation=await (await historicalConfirmation).json();
+    if(afterConfirmation.state.dialogue.reflecting)
+      await send("I want boards to understand their impact clearly when funding is tight, rather than just counting activities.");
     await expect(page.locator(".onboarding-finish")).toBeVisible();
     } else {
       const first = await send("I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.social@example.invalid.");
@@ -261,7 +265,7 @@ try {
       const final = await send("Frogs.");
       assert.match(final.question,/frog|amphib|croak|pond/i,"Latest answer must influence displayed reply");
       assert.equal(final.state.facts.concerns, "", "Do not store a joke as a professional concern");
-      await expect(page.locator(".conversation-question")).toHaveText(final.question);
+      await expect(page.locator(".conversation-question h2")).toHaveText(final.question);
       if(final.objective === "reflection") await send("The real ones in the pond next door. Nothing to do with work!");
       await expect(page.locator(".onboarding-finish")).toBeVisible();
       await page.reload();
