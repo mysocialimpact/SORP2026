@@ -25,7 +25,13 @@ const dir = await mkdtemp(path.join(tmpdir(), "sorp-live-eval-"));
 await chmod(dir, 0o755);
 await cp("tests/live-runtime/node_modules", path.join(dir, "node_modules"), {
   recursive: true,
+  verbatimSymlinks: true,
 });
+// Build policy can omit npm symlink hydration. These are public test binaries;
+// never relax permissions on the private checkout or the database itself.
+const binaryPackage = path.join(dir, "node_modules/@embedded-postgres/linux-x64");
+execFileSync(process.execPath, ["scripts/hydrate-symlinks.js"], { cwd: binaryPackage });
+execFileSync("chmod", ["-R", "a+rX", path.join(dir, "node_modules")]);
 const { default: EmbeddedPostgres } = await import(
   path.join(dir, "node_modules/embedded-postgres/dist/index.js")
 );
