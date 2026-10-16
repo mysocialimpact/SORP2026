@@ -645,6 +645,8 @@ export function applyFacts(
   source: "message" | "form" = "message",
 ): Conversation {
   const cleaned = cleanFacts(patch);
+  if (source === "form" && cleaned.organisation && s.natural)
+    s = {...s,natural:{...s.natural,independent:false}};
   if (source === "message")
     for (const key of fieldKeys)
       if (s.knowledge[key]?.status === "confirmed") delete cleaned[key];

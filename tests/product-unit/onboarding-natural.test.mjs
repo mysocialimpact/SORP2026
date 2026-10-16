@@ -31,3 +31,8 @@ test('a company number alongside charity registrations is not a second charity i
  const c={name:'Blue Cross',registrationNumber:'224392 / SC040154 / 00363197',officialUrl:'https://register-of-charities.charitycommission.gov.uk/en/about-the-register-of-charities/-/charity-details/224392'};
  assert.equal(canonicalCharityRecord(c).registrationNumber,'224392');
 });
+
+test('a manual current organisation supersedes independent status in shared memory',()=>{
+ const s=initialConversation();s.natural={reply:'Hello',independent:true,objectives:[],uncertainties:[],complete:false};
+ const next=applyFacts(s,{organisation:'New Firm'},'form');assert.equal(next.natural.independent,false);assert.equal(next.facts.organisation,'New Firm');assert.equal(s.natural.independent,true);
+});

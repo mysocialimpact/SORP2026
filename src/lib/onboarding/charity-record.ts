@@ -15,7 +15,8 @@ export function canonicalCharityRecord(value: unknown): Candidate | null {
     const url = new URL(c.officialUrl);
     if (url.protocol !== "https:" || url.username || url.password) return null;
     const regulator =
-      url.hostname === "register-of-charities.charitycommission.gov.uk"
+      url.hostname === "register-of-charities.charitycommission.gov.uk" ||
+      url.hostname.endsWith(".charitycommission.gov.uk")
         ? "ew"
         : ["www.oscr.org.uk", "oscr.org.uk"].includes(url.hostname)
           ? "sc"
