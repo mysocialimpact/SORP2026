@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const base = process.env.CENTRAL_TEST_REMOTE_URL || 'http://127.0.0.1:4310';
 const local = !process.env.CENTRAL_TEST_REMOTE_URL;
+const output = process.env.CENTRAL_QA_DIRECTORY || 'public/preview-qa';
 if (process.env.VERCEL_ENV !== 'preview' || process.env.SORP_ISOLATED_PREVIEW !== 'true') throw new Error('Refusing to test outside the explicitly isolated Preview');
 let server;
 const run = (cmd, args, env) => new Promise((resolve, reject) => {
@@ -18,9 +19,9 @@ try {
   }
   if (!ready) throw new Error('Isolated application did not start');
  }
- await run(process.execPath, ['tests/central-registration.browser.mjs'], { CENTRAL_TEST_URL: base, CENTRAL_TEST_OUTPUT: 'public/preview-qa' });
+ await run(process.execPath, ['tests/central-registration.browser.mjs'], { CENTRAL_TEST_URL: base, CENTRAL_TEST_OUTPUT: output });
  for (const width of [390, 1440]) {
-  const png = await readFile(`public/preview-qa/build-bar-${width}.png`);
-  await writeFile(`public/preview-qa/build-bar-${width}.json`, JSON.stringify({ base64: png.toString('base64') }));
+  const png = await readFile(`${output}/build-bar-${width}.png`);
+  await writeFile(`${output}/build-bar-${width}.json`, JSON.stringify({ base64: png.toString('base64') }));
  }
 } finally { server?.kill(); }
