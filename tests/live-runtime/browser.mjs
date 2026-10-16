@@ -144,7 +144,7 @@ try {
     await page.goto(
       "http://127.0.0.1:3100/get-started/?next=/ask-sorp/workspace/",
     );
-    const started = page.waitForResponse(r => r.url().includes("/api/onboarding/session/") && r.request().method() === "POST");
+    const started = page.waitForResponse(r => r.url().includes("/api/onboarding/start/") && r.request().method() === "POST");
     await page.getByRole("button", { name: "Start a conversation" }).click();
     assert.equal((await started).status(), 200, "Real draft creation must succeed; offline fallback cannot pass this journey");
     const input = page.getByRole("textbox", {
