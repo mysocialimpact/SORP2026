@@ -1,0 +1,1 @@
+{"name":"sorp-simple-onboarding-experiment","private":true,"type":"module","scripts":{"build":"node probe.mjs"}}
