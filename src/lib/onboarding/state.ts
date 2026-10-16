@@ -1260,6 +1260,7 @@ export function suitableDialogue(s: Conversation, p: QuestionProposal): boolean 
   if (questions.length > 2 || (plan.objective === "complete" && questions.length)) return false;
   if (["registration", "responsibilities", "discovery", "reflection"].includes(plan.objective) && !questions.length) return false;
   if (plan.objective === "concerns" && !p.question.includes("What keeps you up at night?")) return false;
+  if (!s.charity.candidates.length && /(?:official|charity) (?:record|match|card).{0,25}(?:shown|displayed)|(?:check|select|confirm).{0,35}(?:record|card) (?:shown|displayed)/i.test(p.question)) return false;
   if (/https?:|(?:your|a) password|(?:I|we)(?:’|')ve (?:found|checked|verified|downloaded)|accounts are ready|(?:introduction|conversation|details) (?:is|are|has been|have been) saved/i.test(p.question)) return false;
   // Check questions, not acknowledgements: saying “your role” is not necessarily asking it again.
   for (const q of questions) {

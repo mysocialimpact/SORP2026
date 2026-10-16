@@ -429,8 +429,15 @@ export async function interpretWithModel(message: string, state: Conversation, o
   const understood = await callModel(modelRequest(message, state));
   observe?.(understood.parsed);
   const result = validateInterpretation(understood.parsed, message, state);
+  // The dialogue model judges whether curiosity is warranted. Extraction only
+  // classifies participation; the controller grants at most one optional turn.
+  if (result.topicResponse) result.topicResponse.followUp = false;
   result.usage = understood.usage;
   const updated = advance(state, reconcileExtraction(message, state, result), skip);
+  const reflection = questionPlan(state).objective === "concerns" && result.topicResponse?.topic === "concerns" &&
+    result.topicResponse.status !== "declined" && !updated.finishRequested && !skip &&
+    state.dialogue.followUps === 0 && updated.turns < 6 && questionPlan(updated).objective === "complete"
+    ? { ...updated, dialogue: { ...updated.dialogue, reflecting: true } } : null;
   const afterConfirmation = !updated.charity.confirmed && updated.charity.proposed ? confirmCharity(updated, {
     name: updated.charity.proposed, registrationNumber: "", officialUrl: "",
     locality: "", jurisdiction: "", entityType: "", latestIncome: null,
@@ -439,14 +446,15 @@ export async function interpretWithModel(message: string, state: Conversation, o
     publicReadiness: { impactReport: { found: false, title: "", url: "" } }, sources: [],
   }) : null;
   try {
-    const spoken = await callModel(dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation));
+    const spoken = await callModel(dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection));
     observe?.({ stage: "dialogue", parsed: spoken.parsed, plan: questionPlan(updated), participation: result.topicResponse });
     result.usage = {
       input: understood.usage.input + spoken.usage.input,
       output: understood.usage.output + spoken.usage.output,
       estimatedUsd: understood.usage.estimatedUsd + spoken.usage.estimatedUsd,
     };
-    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation);
+    const reply = decodeDialogue(spoken.parsed, updated, afterConfirmation, reflection);
+    if (result.topicResponse) result.topicResponse.followUp = reply.next.objective === "reflection";
     result.questionProposal = reply.next;
     result.afterCharity = reply.afterCharity;
   } catch (error) {

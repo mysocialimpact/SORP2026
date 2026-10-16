@@ -49,6 +49,13 @@ export async function getSession(
   )[0];
   if (session) {
     session.state = normaliseConversation(session.state, session.selected);
+    // Existing drafts predate the bounded dialogue window. Reuse their own
+    // private transcript on first read; do not make returning users start again.
+    if (!session.state.dialogue.recent.length && session.messages.length)
+      session.state.dialogue.recent = session.messages
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .slice(-8)
+        .map((m) => ({ role: m.role as "user" | "assistant", text: m.text.slice(0, 1600) }));
     // Migrate the old server-returned search results; new state owns them thereafter.
     if (
       session.state.charity.phase === "suggest" &&

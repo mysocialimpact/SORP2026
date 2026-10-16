@@ -27,6 +27,8 @@ async function run(j) {
     state=result.state;
     assert.ok(state.response?.natural, 'Every live reply must be generated, not a silent template fallback');
     const reply=nextQuestion(state);
+    const previousQuestions = record.transcript.filter(t=>t.role==='assistant').map(t=>t.text);
+    if(reply.includes('What keeps you up at night?')) assert.ok(!previousQuestions.some(q=>q.includes('What keeps you up at night?')), 'Repeated final concern question');
     record.transcript.push({role:'assistant',text:reply});
     record.states.push({objective:nextObjective(state),facts:state.facts,confirmed:state.charity.confirmed?.name||null,reflecting:state.dialogue.reflecting});
     assert.ok(state.turns<=10);

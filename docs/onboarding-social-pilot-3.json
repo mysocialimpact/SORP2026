@@ -1,0 +1,366 @@
+{
+  "commit": "37ad809",
+  "records": [
+    {
+      "id": "C01",
+      "transcript": [
+        {
+          "id": "C01",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C01",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Marcus Warry, a trustee of Interim Spaces. My email is marcus.warry@example.invalid."
+        },
+        {
+          "id": "C01",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Marcus. Shall we start with Interim Spaces for this conversation?"
+        },
+        {
+          "id": "C01",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C01",
+          "index": 4,
+          "role": "assistant",
+          "text": "Good, we’ll use Interim Spaces. As trustee, what does your involvement mainly cover—finance, operations, fundraising, reporting, or something else?"
+        },
+        {
+          "id": "C01",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C01",
+          "index": 6,
+          "role": "assistant",
+          "text": "Thanks—that gives some useful context. How did you come across SORP 2026: through a colleague, an adviser, a webinar, or just by searching?"
+        },
+        {
+          "id": "C01",
+          "index": 7,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C01",
+          "index": 8,
+          "role": "assistant",
+          "text": "Word of mouth still does the job. One last thing, and it helps us make this useful rather than generic: in your finance role, What keeps you up at night?"
+        },
+        {
+          "id": "C01",
+          "index": 9,
+          "role": "user",
+          "text": "Frogs."
+        },
+        {
+          "id": "C01",
+          "index": 10,
+          "role": "assistant",
+          "text": "Fair enough — frogs are a perfectly respectable answer. When you’re ready, you can create your account and explore Interim Spaces; your introduction will be saved with it so the team can pick things up later."
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "transcript": [
+        {
+          "id": "C02",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C02",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Helen Price, CEO of the charity Interim Spaces. My email is helen.price@example.invalid."
+        },
+        {
+          "id": "C02",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Helen. We can start with Interim Spaces if that’s the right charity for this conversation — shall we?"
+        },
+        {
+          "id": "C02",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C02",
+          "index": 4,
+          "role": "assistant",
+          "text": "Thanks — we’ll work with Interim Spaces. As CEO, what tends to sit most with you day to day: finance and reporting, operations, fundraising, or something else?"
+        },
+        {
+          "id": "C02",
+          "index": 5,
+          "role": "user",
+          "text": "Keeping our services going while we try to grow our team."
+        },
+        {
+          "id": "C02",
+          "index": 6,
+          "role": "assistant",
+          "text": "That’s a real balancing act — keeping services steady while building capacity at the same time. How did you come across SORP 2026?"
+        },
+        {
+          "id": "C02",
+          "index": 7,
+          "role": "user",
+          "text": "A fellow chief executive sent me the link."
+        },
+        {
+          "id": "C02",
+          "index": 8,
+          "role": "assistant",
+          "text": "Word of mouth from another chief executive is usually the useful kind. One last optional thing, just so we understand where this matters most for you: What keeps you up at night?"
+        },
+        {
+          "id": "C02",
+          "index": 9,
+          "role": "user",
+          "text": "Running out of money."
+        },
+        {
+          "id": "C02",
+          "index": 10,
+          "role": "assistant",
+          "text": "That’s the kind of pressure that colours everything, especially when you’re trying to keep services steady. You can create your account and explore Interim Spaces in SORP 2026 now; your introduction will be saved with it, so our team can pick things up later if useful."
+        }
+      ]
+    },
+    {
+      "id": "C13",
+      "transcript": [
+        {
+          "id": "C13",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C13",
+          "index": 1,
+          "role": "user",
+          "text": "My name is Marcus Worrey, and I used to work on a charity client called The Blue Cross, or Blue Cross, I think it was. My email is marcus.worrey@gmail.com."
+        },
+        {
+          "id": "C13",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Marcus. And understood — Blue Cross sounds like a former client rather than where you are now. What’s your role at the moment, and if you’re with an organisation, which one?"
+        },
+        {
+          "id": "C13",
+          "index": 3,
+          "role": "action",
+          "text": "Edited profile: {\"name\":\"Marcus Warry\"}"
+        },
+        {
+          "id": "C13",
+          "index": 5,
+          "role": "user",
+          "text": "I'm now an independent consultant, advising charity boards."
+        },
+        {
+          "id": "C13",
+          "index": 6,
+          "role": "assistant",
+          "text": "Understood — working independently and advising boards gives you a broad view. Shall we start with Blue Cross for this conversation, or is there another charity you want to focus on?"
+        },
+        {
+          "id": "C13",
+          "index": 7,
+          "role": "action",
+          "text": "Searched Blue Cross, inspected the displayed official-record fixture, and explicitly confirmed Blue Cross."
+        },
+        {
+          "id": "C13",
+          "index": 8,
+          "role": "assistant",
+          "text": "Good — we’ll use Blue Cross as the starting point. How did you come across SORP 2026?"
+        },
+        {
+          "id": "C13",
+          "index": 9,
+          "role": "user",
+          "text": "LinkedIn."
+        },
+        {
+          "id": "C13",
+          "index": 10,
+          "role": "assistant",
+          "text": "LinkedIn does its occasional bit, then. One last thing, because it helps us understand where SORP 2026 might be useful: What keeps you up at night?"
+        },
+        {
+          "id": "C13",
+          "index": 11,
+          "role": "user",
+          "text": "Helping boards make sense of their impact."
+        },
+        {
+          "id": "C13",
+          "index": 12,
+          "role": "assistant",
+          "text": "That’s a real challenge, and very much where SORP guidance and impact reporting can help bring some clarity. If you create your account, you can start exploring Blue Cross in SORP 2026, and your introduction will be saved with it so the team can pick things up later."
+        }
+      ]
+    },
+    {
+      "id": "C17",
+      "transcript": [
+        {
+          "id": "C17",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C17",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Sam Green, a trustee at Interim Spaces. My email is sam.green@example.invalid."
+        },
+        {
+          "id": "C17",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Sam. That gives us enough to get going. Shall we start with Interim Spaces?"
+        },
+        {
+          "id": "C17",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C17",
+          "index": 4,
+          "role": "assistant",
+          "text": "Good, we’ll use Interim Spaces. In your trustee role there, what does your involvement mostly cover in practice?"
+        },
+        {
+          "id": "C17",
+          "index": 5,
+          "role": "user",
+          "text": "Finance."
+        },
+        {
+          "id": "C17",
+          "index": 6,
+          "role": "assistant",
+          "text": "Right, the finance side of things. How did you come across SORP 2026 — through a colleague, your accountant, a search, or something else?"
+        },
+        {
+          "id": "C17",
+          "index": 7,
+          "role": "user",
+          "text": "My pal told me."
+        },
+        {
+          "id": "C17",
+          "index": 8,
+          "role": "assistant",
+          "text": "Word of mouth still has a lot going for it. One last optional thing, just so we can keep this useful rather than generic: What keeps you up at night?"
+        },
+        {
+          "id": "C17",
+          "index": 9,
+          "role": "user",
+          "text": "That's a strange question."
+        },
+        {
+          "id": "C17",
+          "index": 10,
+          "role": "assistant",
+          "text": "Fair enough — a bit late-night radio, that. No need to answer it. You can create your account and explore Interim Spaces now, and your introduction will be saved with the account so the team can pick things up later."
+        }
+      ]
+    },
+    {
+      "id": "C24",
+      "transcript": [
+        {
+          "id": "C24",
+          "index": 0,
+          "role": "assistant",
+          "text": "Let’s start with you. What’s your name, email address and what do you do?"
+        },
+        {
+          "id": "C24",
+          "index": 1,
+          "role": "user",
+          "text": "I'm Leah Stone, a trustee at Interim Spaces. My email is leah.stone@example.invalid."
+        },
+        {
+          "id": "C24",
+          "index": 2,
+          "role": "assistant",
+          "text": "Thanks, Leah. We can begin with Interim Spaces if that’s the charity you want to work on here. Shall we start there?"
+        },
+        {
+          "id": "C24",
+          "index": 3,
+          "role": "action",
+          "text": "Searched Interim Spaces, inspected the displayed official-record fixture, and explicitly confirmed Interim Spaces."
+        },
+        {
+          "id": "C24",
+          "index": 4,
+          "role": "assistant",
+          "text": "Right, we’ll use Interim Spaces. As a trustee there, what does your part usually involve day to day or over the year?"
+        },
+        {
+          "id": "C24",
+          "index": 5,
+          "role": "user",
+          "text": "I look after the accounts, although I used to run fundraising at Blue Cross."
+        },
+        {
+          "id": "C24",
+          "index": 6,
+          "role": "assistant",
+          "text": "That’s clear. Finance now, and fundraising previously at Blue Cross. How did you come across SORP 2026?"
+        },
+        {
+          "id": "C24",
+          "index": 7,
+          "role": "user",
+          "text": "A former colleague."
+        },
+        {
+          "id": "C24",
+          "index": 8,
+          "role": "assistant",
+          "text": "Word of mouth is usually the useful kind. One last thing, just so this stays relevant rather than generic: What keeps you up at night?"
+        },
+        {
+          "id": "C24",
+          "index": 9,
+          "role": "user",
+          "text": "Frogs. We run a wetland project and disease is wiping out the local population."
+        },
+        {
+          "id": "C24",
+          "index": 10,
+          "role": "assistant",
+          "text": "That’s a grim thing to be dealing with, especially when the damage is happening in real time. When you’re ready, create your account to explore SORP 2026 for Interim Spaces; your introduction will be saved with it so the team can pick up the conversation later."
+        }
+      ]
+    }
+  ]
+}
