@@ -44,9 +44,13 @@ async function bounded(text, state) {
     throw new Error("Live evaluation budget exhausted");
   reserved += MODEL_RESERVATION_USD;
   report.calls++;
-  const result = await interpretWithModel(text, state, (p) => {
-    lastInterpretation = p;
-  });
+  lastInterpretation = undefined;
+  let result;
+  try { result = await interpretWithModel(text, state, p => { lastInterpretation = p; }); }
+  catch (e) {
+    if (e.usage) { report.inputTokens += e.usage.input; report.outputTokens += e.usage.output; report.estimatedUsd += e.usage.estimatedUsd; }
+    throw e;
+  }
   report.inputTokens += result.usage.input;
   report.outputTokens += result.usage.output;
   report.estimatedUsd += result.usage.estimatedUsd;
@@ -107,6 +111,7 @@ for (const journey of selected) {
   } catch (e) {
     record.passed = false;
     record.interpretation = lastInterpretation;
+    record.providerReason = e.providerReason;
     record.error = String(e.message).replace(/[\w.+-]+@[\w.-]+/g, "[email]");
     report.failed++;
   }
