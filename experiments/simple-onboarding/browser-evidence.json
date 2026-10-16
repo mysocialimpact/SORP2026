@@ -1,0 +1,202 @@
+{
+  "preview": {
+    "url": "https://sorp2026-lgczksruf-marcuswarry.vercel.app",
+    "commit": "1e6ef1cd118adc141a1dd52b92bfe507ad70d2ee",
+    "deployment": "dpl_BG6w6ictQ7cu9YbqigK44ui6z2a4",
+    "state": "READY"
+  },
+  "hostedChecks": {
+    "page": 200,
+    "examples": 200,
+    "modelAndCounterHealth": {
+      "status": 200,
+      "body": {
+        "available": true,
+        "budget": {
+          "reserved_usd": 0.481539,
+          "actual_usd": 0.401539,
+          "calls": 65
+        },
+        "limitUsd": 2,
+        "mockServices": true
+      },
+      "date": "Fri, 16 Oct 2026 15:31:17 GMT"
+    },
+    "productionAccountRoute": 404
+  },
+  "earlierDesktop": {
+    "commit": "b42d11f",
+    "passed": true,
+    "reasoning": "medium",
+    "displayedReplies": [
+      {
+        "width": 1440,
+        "index": 0,
+        "role": "user",
+        "text": "I'm Marcus Moss, a trustee at Interim Spaces. My email is marcus@example.invalid."
+      },
+      {
+        "width": 1440,
+        "index": 1,
+        "role": "assistant",
+        "text": "Lovely to meet you, Marcus. Shall we look up Interim Spaces as the charity for your registration, or would you prefer another charity? And what would you most like help with around SORP 2026?"
+      },
+      {
+        "width": 1440,
+        "index": 2,
+        "role": "user",
+        "text": "Finance."
+      },
+      {
+        "width": 1440,
+        "index": 3,
+        "role": "assistant",
+        "text": "What keeps you up at night on the finance side at Interim Spaces?"
+      },
+      {
+        "width": 1440,
+        "index": 4,
+        "role": "user",
+        "text": "Before we finish, please ask me how I found this platform."
+      },
+      {
+        "width": 1440,
+        "index": 5,
+        "role": "assistant",
+        "text": "Of course — how did you find this platform?"
+      },
+      {
+        "width": 1440,
+        "index": 6,
+        "role": "user",
+        "text": "My pal told me."
+      },
+      {
+        "width": 1440,
+        "index": 7,
+        "role": "assistant",
+        "text": "Thanks — good to hear a friend pointed you our way. Your registration details are ready, so you can use the mock-account action to finish."
+      },
+      {
+        "width": 1440,
+        "index": 8,
+        "role": "user",
+        "text": "What is your final question for me?"
+      },
+      {
+        "width": 1440,
+        "index": 9,
+        "role": "assistant",
+        "text": "What keeps you up at night when it comes to finance at Interim Spaces?"
+      },
+      {
+        "width": 1440,
+        "index": 10,
+        "role": "user",
+        "text": "Frogs."
+      },
+      {
+        "width": 1440,
+        "index": 11,
+        "role": "assistant",
+        "text": "Frogs — an unexpected answer! Thanks for chatting, Marcus. If you’re ready to finish, you can use the mock-account action to complete your registration."
+      }
+    ]
+  },
+  "finalMobile": {
+    "commit": "1e6ef1c",
+    "passed": true,
+    "reasoning": "high",
+    "displayedReplies": [
+      {
+        "width": 390,
+        "index": 0,
+        "role": "user",
+        "text": "I'm Marcus Moss, a trustee at Interim Spaces. My email is marcus@example.invalid."
+      },
+      {
+        "width": 390,
+        "index": 1,
+        "role": "assistant",
+        "text": "Welcome, Marcus, to SORP 2026 from My Social Impact and The Ideas Shed. We’re here to help with SORP guidance, readiness, impact reporting and impact leadership.\n\nIs your trusteeship at Interim Spaces your main professional role, or do you have other work alongside it?"
+      },
+      {
+        "width": 390,
+        "index": 2,
+        "role": "user",
+        "text": "Finance."
+      },
+      {
+        "width": 390,
+        "index": 3,
+        "role": "assistant",
+        "text": "The finance side, then. What keeps you up at night in your role as a trustee at Interim Spaces?"
+      },
+      {
+        "width": 390,
+        "index": 4,
+        "role": "user",
+        "text": "Before we finish, please ask me how I found this platform."
+      },
+      {
+        "width": 390,
+        "index": 5,
+        "role": "assistant",
+        "text": "Of course — how did you find SORP 2026?"
+      },
+      {
+        "width": 390,
+        "index": 6,
+        "role": "user",
+        "text": "My pal told me."
+      },
+      {
+        "width": 390,
+        "index": 7,
+        "role": "assistant",
+        "text": "A friend’s recommendation — good to know. Coming back to the finance side, what keeps you up at night as a trustee at Interim Spaces?"
+      },
+      {
+        "width": 390,
+        "index": 8,
+        "role": "user",
+        "text": "What is your final question for me?"
+      },
+      {
+        "width": 390,
+        "index": 9,
+        "role": "assistant",
+        "text": "My final question is: what keeps you up at night in your role as a trustee at Interim Spaces?"
+      },
+      {
+        "width": 390,
+        "index": 10,
+        "role": "user",
+        "text": "Frogs."
+      },
+      {
+        "width": 390,
+        "index": 11,
+        "role": "assistant",
+        "text": "Frogs — I wasn’t expecting that! Thanks for the chat, Marcus. We can take the finance side of SORP 2026 as our starting point for supporting you at Interim Spaces."
+      }
+    ]
+  },
+  "limits": [
+    "Displayed browser traces omit the automatic reply immediately after UI charity confirmation; paired comparison transcripts include their full exchanges.",
+    "Browser interactions used the built app during Preview build; hosted page, examples, health and absence of production account route were then checked via Vercel.",
+    "Only synthetic records and mock accounts; typed input, no live regulator, voice transcription, emails, subscriptions or payments.",
+    "First six-pair comparison precedes final shorter high-reasoning prompt; it is not a paired cost/quality benchmark for that revision."
+  ],
+  "spend": {
+    "meteredEstimatedUsd": 0.401539,
+    "conservativeReservedUsd": 0.481539,
+    "limitUsd": 2,
+    "unknownInterruptedRequestReservationUsd": 0.08
+  },
+  "productionUnchanged": {
+    "commit": "31900e69a10c0a5f333df3ba2424ea456cceda13",
+    "deployment": "dpl_BY681tCCrYc5xa4Rw5qT6VpL9HUa"
+  },
+  "recommendation": "Refine; do not adopt. Lower initial sampled cost and simpler orchestration, but no demonstrated consistent naturalness improvement. Final Frogs answer still closes with a generic acknowledgement."
+}

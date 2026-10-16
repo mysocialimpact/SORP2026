@@ -75,7 +75,7 @@ the request to finish.
 The existing engine was generally more concise. The alternative repeated mock
 registration instructions, offered menus and prematurely questioned accepted synthetic
 emails. The current preview clarifies that accepted test emails and software validation
-are authoritative, and leaves procedural instructions to the visible controls. That
+are authoritative, and leaves procedural instructions to the visible controls.
 The final preview further shortens the brief to its two objectives and data boundaries,
 and uses high reasoning. These changes were made after the paired medium-reasoning
 comparison; its transcripts and cost advantage are not presented as measurements of
@@ -93,7 +93,13 @@ submits the exact pal/Frogs answers to actual model-generated questions.
 
 Six deterministic tests cover mandatory gates, partial population, malformed values,
 manual corrections, independent status and charity changes. Production builds pass.
-Browser evidence and final spend are recorded separately after the actual API journeys.
+The [browser evidence](browser-evidence.json) records a successful desktop journey on the earlier brief and the final mobile journey on the shorter high-reasoning brief. Both exercised real AI, automatic population, manual edits, mock record confirmation, blocked incomplete registration, reload and mock account creation. The deployed page, examples and health returned HTTP 200; the production account path returned 404.
+
+The final mobile answer to Frogs still offered surprise followed by a generic close. Functional assertions passing is not a conversational-quality pass. No consistent naturalness improvement has been demonstrated.
+
+Metered API estimate at verification: **US$0.401539**. A failed browser run interrupted one request before usage could be read; its entire $0.08 reservation is retained. The conservative total is therefore **US$0.481539**, within the shared $2 ceiling. Future preview interactions consume the same remaining budget.
+
+Working Preview (READY, revision `1e6ef1c`): https://sorp2026-lgczksruf-marcuswarry.vercel.app/ — [real-AI transcripts](https://sorp2026-lgczksruf-marcuswarry.vercel.app/examples). No production rollout is authorised or performed.
 
 **Recommendation: refine, do not adopt yet.** The simpler orchestration is viable and
 cheaper in this sample. A consistent conversational-quality improvement has not been
