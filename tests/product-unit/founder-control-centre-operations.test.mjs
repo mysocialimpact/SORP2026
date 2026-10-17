@@ -17,6 +17,7 @@ const route = await readFile(new URL("../../src/app/api/founder/[...path]/route.
 const auth = await readFile(new URL("../../src/lib/founder/auth.ts", import.meta.url), "utf8");
 const drawers = await readFile(new URL("../../src/components/founder/account-drawers.tsx", import.meta.url), "utf8");
 const independentFounder = await readFile(new URL("../../src/lib/sorp-auth/founder-console.ts", import.meta.url), "utf8");
+const independentIdentity = await readFile(new URL("../../src/lib/sorp-auth/identity.ts", import.meta.url), "utf8");
 
 test("founder home uses the requested operational identity and the one shared set of six product tabs", () => {
   assert.match(header, /FOUNDER CONTROL CENTRE/);
@@ -75,5 +76,8 @@ test("founder can grant any plan free for a chosen number of days, weeks or mont
   for (const unit of ["days", "weeks", "months"]) assert.match(drawers, new RegExp(`value="${unit}"`));
   assert.match(route, /complimentaryAccessEnd\(body\)/);
   assert.match(independentFounder, /complimentaryAccessEnd\(body\)/);
+  assert.match(independentFounder, /e\.complimentary_end<=now\(\).*THEN 'Free'/s);
+  assert.match(independentIdentity, /e\.complimentary_end<=now\(\).*THEN 'Free'/s);
+  assert.match(independentIdentity, /THEN 'expired'/);
   assert.match(route, /complimentaryEnd: row\.complimentary_end \|\| null/);
 });

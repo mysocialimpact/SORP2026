@@ -28,9 +28,14 @@ export async function independentIdentity(headers: Headers) {
       role: IndependentMembership["role"]; plan: string; published_price_pence: number;
       payable_price_pence: number; status: string; complimentary_end: Date | null;
     }>(`SELECT m.organisation_id,o.name,o.type,m.role,
-         coalesce(e.plan,'Free') plan,coalesce(e.published_price_pence,0) published_price_pence,
-         coalesce(e.payable_price_pence,0) payable_price_pence,
-         coalesce(e.status,'standard') status,e.complimentary_end
+         CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now()
+           THEN 'Free' ELSE coalesce(e.plan,'Free') END plan,
+         CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now()
+           THEN 0 ELSE coalesce(e.published_price_pence,0) END published_price_pence,
+         CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now()
+           THEN 0 ELSE coalesce(e.payable_price_pence,0) END payable_price_pence,
+         CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now()
+           THEN 'expired' ELSE coalesce(e.status,'standard') END status,e.complimentary_end
        FROM sorp_auth.membership m JOIN sorp_auth.organisation o ON o.id=m.organisation_id
        LEFT JOIN sorp_auth.entitlement e ON e.organisation_id=o.id
        WHERE m.user_id=$1 AND m.status='active' ORDER BY o.name`, [user.id]),

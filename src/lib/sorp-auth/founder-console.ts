@@ -10,10 +10,11 @@ const json = (data: unknown, status = 200) => Response.json(data,
   { status, headers: { "cache-control": "private, no-store", "x-robots-tag": "noindex, nofollow" } });
 
 async function organisations() {
-  const result = await sorpAuthPool().query(`SELECT o.id,o.id platform_organisation_id,o.name,o.type,e.plan,
-    e.published_price_pence / 100.0 published_price,
-    e.payable_price_pence / 100.0 payable_price,
-    e.status='complimentary_partner' complimentary,e.complimentary_start,
+  const result = await sorpAuthPool().query(`SELECT o.id,o.id platform_organisation_id,o.name,o.type,
+    CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now() THEN 'Free' ELSE e.plan END plan,
+    CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now() THEN 0 ELSE e.published_price_pence / 100.0 END published_price,
+    CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now() THEN 0 ELSE e.payable_price_pence / 100.0 END payable_price,
+    (e.status='complimentary_partner' AND (e.complimentary_end IS NULL OR e.complimentary_end>now())) complimentary,e.complimentary_start,
     e.complimentary_end,e.complimentary_reason,
     (SELECT u.email FROM sorp_auth.membership m JOIN sorp_auth."user" u ON u.id=m.user_id
       WHERE m.organisation_id=o.id AND m.status='active'
