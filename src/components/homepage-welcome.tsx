@@ -1,10 +1,17 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Arrow } from "@/components/ui";
 import { readAudience, serverAudience, subscribeAudience, writeAudience, type Audience } from "@/lib/audience-preference";
 import { ToolLink } from "@/components/tool-link";
 import { useNavigationAccount } from "@/components/navigation-account";
+import { trackSorpEvent } from "@/app/sorp-growth";
+
+let audiencePageSession: string | null = null;
+function audienceSessionId() {
+  audiencePageSession ||= crypto.randomUUID();
+  return audiencePageSession;
+}
 
 const audienceCopy = {
   charity: {
@@ -27,17 +34,51 @@ const audienceCopy = {
 
 export function HomepageAudience() {
   const audience = useSyncExternalStore(subscribeAudience, readAudience, serverAudience);
+  const sectionRef = useRef<HTMLElement>(null);
+  const demonstrated = useRef(false);
+  const interacted = useRef(false);
+  const [demonstrating, setDemonstrating] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || !('IntersectionObserver' in window)) return;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const observer = new IntersectionObserver(entries => {
+      if (!entries[0]?.isIntersecting || demonstrated.current || interacted.current || motion.matches || readAudience()) return;
+      demonstrated.current = true;
+      setDemonstrating(true);
+      observer.disconnect();
+    }, { threshold: 0.35 });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!demonstrating) return;
+    const timer = window.setTimeout(() => setDemonstrating(false), 2100);
+    return () => window.clearTimeout(timer);
+  }, [demonstrating]);
+
+  function stopDemonstration() {
+    interacted.current = true;
+    setDemonstrating(false);
+  }
 
   function select(value: Audience) {
+    stopDemonstration();
     const next = audience === value ? null : value;
     writeAudience(next);
+    if (next) void trackSorpEvent(audienceSessionId(), "homepage_audience_selected", {
+      audience: next, page: "/", occurredAt: new Date().toISOString(),
+    }, false, false);
   }
 
   return (
-    <section className="homepage-audience" id="home-audience" aria-label="Choose your audience">
+    <section ref={sectionRef} className={`homepage-audience${demonstrating ? " is-demonstrating" : ""}`} id="home-audience" aria-label="Choose your audience" onPointerDownCapture={stopDemonstration} onKeyDownCapture={stopDemonstration} onFocusCapture={stopDemonstration}>
       <p className="homepage-audience-intro">
         We’ve built this for
       </p>
+      <p className="homepage-audience-instruction">Click which one you are <span aria-hidden="true">↓</span></p>
       <div className="homepage-audience-options">
         {([
           ["charity", "CHARITIES", "Trustees · CEOs · Finance teams · Staff · Volunteers"],
@@ -47,6 +88,7 @@ export function HomepageAudience() {
             <button type="button" aria-pressed={audience === value} aria-expanded={audience === value} aria-controls={`homepage-audience-${value}`} onClick={() => select(value)}>
               <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>
             </button>
+            {value === "charity" && <span className="homepage-audience-gesture" aria-hidden="true" onAnimationEnd={() => setDemonstrating(false)}><svg className="homepage-audience-cursor" viewBox="0 0 26 32" fill="none"><path d="M2 2v24l6-6 4.2 9 5-2.2-4.1-8.7H23L2 2Z" fill="#242329" stroke="white" strokeWidth="2" strokeLinejoin="round" /></svg><span className="homepage-audience-hand">☝</span></span>}
             {audience === value && <div className={`homepage-audience-detail is-${value}`} id={`homepage-audience-${value}`} role="region" aria-live="polite">
               <h2>{audienceCopy[value].heading}</h2>
               <div>{audienceCopy[value].paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}

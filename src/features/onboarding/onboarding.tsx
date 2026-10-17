@@ -455,6 +455,7 @@ export function Onboarding() {
             sessionId: crypto.randomUUID(),
             step: "scope",
             onboarding: {
+              audience: readAudience(),
               facts: currentState.current.facts,
               professionalContext: {
                 relationships: currentState.current.professional,

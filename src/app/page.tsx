@@ -61,7 +61,7 @@ export default function Home() {
       </FolderHero>
       <div className="gateway-width">
         <p className="homepage-sorp-enthusiasm">
-          We’re excited about SORP 2026 and better charity reporting. <strong>We’re even more excited about what charities can achieve when they move beyond compliance — using better evidence to make clearer decisions, understand what works and create greater impact.</strong>
+          We’re excited about SORP 2026 and better charity reporting. <strong>Even more excited about using technology to help smaller charities make a greater impact.</strong>
         </p>
         <HomepageAudience />
         <HomepageManifesto />
