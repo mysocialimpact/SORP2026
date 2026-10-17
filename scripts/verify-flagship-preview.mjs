@@ -31,7 +31,9 @@ try {
     await new Promise(resolve => setTimeout(resolve, 250));
   }
   for (const width of [1440, 390]) {
-    browser = await chromium.launch({ executablePath: await chromiumBinary.executablePath(), args: chromiumBinary.args.filter(arg => arg !== '--disable-web-security'), headless: true });
+    // Use normal browser process isolation. Lambda's single-process flags can
+    // freeze renderer navigation on this Linux build runner.
+    browser = await chromium.launch({ executablePath: await chromiumBinary.executablePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'], headless: true });
     const context = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 1000 }, isMobile: width === 390, hasTouch: width === 390 });
     const page = await context.newPage();
     activePage = page;
@@ -133,7 +135,8 @@ try {
 } finally {
   console.log('FLAGSHIP_PREVIEW_QA ' + JSON.stringify(report));
   await writeFile(`${output}/report.json`, JSON.stringify(report, null, 2));
-  await browser?.close();
+  await Promise.race([browser?.close(), new Promise(resolve => setTimeout(resolve, 5000))]);
   await pool.end();
   server?.kill();
+  process.exit(process.exitCode || 0);
 }
