@@ -60,3 +60,10 @@ test("an existing user can switch from onboarding to login without losing the pr
   await page.getByRole("link", { name: "Sign in", exact: true }).click();
   expect(new URL(page.url()).searchParams.get("next")).toBe("/social-impact-excellence/?pillar=purpose#journey");
 });
+
+test("account profile changes require an authenticated session", async ({ request }) => {
+  const response = await request.post("/api/readiness-account/", {
+    data: { action: "update-profile", position: "Trustee", organisation: "Unclaimed Charity" },
+  });
+  expect([401, 403]).toContain(response.status());
+});
