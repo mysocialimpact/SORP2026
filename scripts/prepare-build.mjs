@@ -1,4 +1,5 @@
 import { writeFile, mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import pg from 'pg';
 
 // Allocate once per deployment, not per Next worker or page render. Retries of
@@ -9,16 +10,28 @@ export async function allocateBuild(client, deployment, environment) {
   if (!Number.isSafeInteger(row?.number) || row.number <= 20) throw new Error('Invalid deployment build identifier');
   return { number: row.number, deployedAt: new Date(row.deployed_at).toISOString(), environment };
 }
+/** Preview-only identifier when the deployment ledger is not connected to Preview. */
+export function previewBuild(deployment, deployedAt = new Date()) {
+  const digest = createHash('sha256').update(deployment).digest();
+  return { number: 900000 + digest.readUInt32BE(0) % 100000,
+    deployedAt: deployedAt.toISOString(), environment: 'preview' };
+}
 if (process.argv[1]?.endsWith('prepare-build.mjs')) {
   let metadata = { number: null, deployedAt: null, environment: 'development' };
   if (process.env.VERCEL === '1') {
-    const deployment = process.env.VERCEL_DEPLOYMENT_ID;
-    if (!deployment || !process.env.SORP_BUILD_METADATA_URL) throw new Error('Deployment metadata configuration is required; refusing to label a deployment with stale build information.');
-    const client = new pg.Client({ connectionString: process.env.SORP_BUILD_METADATA_URL, connectionTimeoutMillis: 12000, query_timeout: 12000 });
-    try {
-      await client.connect();
-      metadata = await allocateBuild(client, deployment, process.env.VERCEL_ENV === 'production' ? 'production' : 'preview');
-    } finally { await client.end(); }
+    const deployment = process.env.VERCEL_DEPLOYMENT_ID || (process.env.VERCEL_ENV === 'preview'
+      ? process.env.VERCEL_URL || process.env.VERCEL_GIT_COMMIT_SHA : '');
+    if (!deployment) throw new Error('Deployment ID is required for build information.');
+    if (process.env.VERCEL_ENV === 'preview' && !process.env.SORP_BUILD_METADATA_URL) {
+      metadata = previewBuild(deployment);
+    } else {
+      if (!process.env.SORP_BUILD_METADATA_URL) throw new Error('Deployment metadata configuration is required; refusing to label a production deployment with stale build information.');
+      const client = new pg.Client({ connectionString: process.env.SORP_BUILD_METADATA_URL, connectionTimeoutMillis: 12000, query_timeout: 12000 });
+      try {
+        await client.connect();
+        metadata = await allocateBuild(client, deployment, process.env.VERCEL_ENV === 'production' ? 'production' : 'preview');
+      } finally { await client.end(); }
+    }
   }
   await writeFile('.sorp-build.json', JSON.stringify(metadata));
   await mkdir('public', { recursive: true });
