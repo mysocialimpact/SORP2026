@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { Arrow } from "@/components/ui";
+import { readAudience, serverAudience, subscribeAudience, writeAudience, type Audience } from "@/lib/audience-preference";
+import { ToolLink } from "@/components/tool-link";
+import { useNavigationAccount } from "@/components/navigation-account";
 
-const audienceKey = "sorp2026.homepage-audience";
-type Audience = "charity" | "adviser";
 const audienceCopy = {
   charity: {
     heading: "To the charities making a difference, every day.",
@@ -23,30 +24,6 @@ const audienceCopy = {
     ],
   },
 } as const;
-let memoryAudience: Audience | null = null;
-function readAudience(): Audience | null {
-  try {
-    const value = sessionStorage.getItem(audienceKey);
-    return value === "charity" || value === "adviser" ? value : null;
-  } catch { return memoryAudience; }
-}
-function subscribeAudience(listener: () => void) {
-  window.addEventListener(audienceKey, listener);
-  window.addEventListener("storage", listener);
-  return () => {
-    window.removeEventListener(audienceKey, listener);
-    window.removeEventListener("storage", listener);
-  };
-}
-const serverAudience = () => null;
-function writeAudience(next: Audience | null) {
-  memoryAudience = next;
-  try {
-    if (next) sessionStorage.setItem(audienceKey, next);
-    else sessionStorage.removeItem(audienceKey);
-  } catch { /* Retain the selection in memory for this visit. */ }
-  window.dispatchEvent(new Event(audienceKey));
-}
 
 export function HomepageAudience() {
   const audience = useSyncExternalStore(subscribeAudience, readAudience, serverAudience);
@@ -66,17 +43,28 @@ export function HomepageAudience() {
           ["charity", "CHARITIES", "Trustees · CEOs · Finance teams · Staff · Volunteers"],
           ["adviser", "ACCOUNTANTS & ADVISERS", "Accountants · Auditors · Lawyers · Consultants · Funders"],
         ] as const).map(([value, title, description]) => (
-          <button key={value} type="button" aria-pressed={audience === value} aria-expanded={audience === value} aria-controls="homepage-audience-detail" onClick={() => select(value)}>
-            <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>
-          </button>
+          <div className="homepage-audience-option" key={value}>
+            <button type="button" aria-pressed={audience === value} aria-expanded={audience === value} aria-controls={`homepage-audience-${value}`} onClick={() => select(value)}>
+              <span><strong>{title}</strong><span className="homepage-audience-description">{description}</span></span>
+            </button>
+            {audience === value && <div className={`homepage-audience-detail is-${value}`} id={`homepage-audience-${value}`} role="region" aria-live="polite">
+              <h2>{audienceCopy[value].heading}</h2>
+              <div>{audienceCopy[value].paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
+                <a href="/get-started/">Let’s Get Started →</a>
+              </div>
+            </div>}
+          </div>
         ))}
       </div>
-      {audience && <div key={audience} className={`homepage-audience-detail is-${audience}`} id="homepage-audience-detail" role="region" aria-live="polite">
-        <h2>{audienceCopy[audience].heading}</h2>
-        <div>{audienceCopy[audience].paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
-      </div>}
     </section>
   );
+}
+
+export function HomepageReviewLink() {
+  const { status } = useNavigationAccount();
+  return <ToolLink className="gateway-action" href="/are-you-sorp-ready/review/?entry=intro">
+    {status === "signed-in" ? "Start your free review" : "Let’s Get Started"} <Arrow />
+  </ToolLink>;
 }
 
 export function HomepageHello() {

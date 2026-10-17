@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui";
 import { invitationTokenFromDestination } from "@/lib/account-navigation";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { VoiceInput, type VoiceState } from "./voice-input";
+import { readAudience, serverAudience, subscribeAudience } from "@/lib/audience-preference";
 import {
   advance,
   charityOptions,
@@ -62,10 +63,11 @@ function publicLink(value: string) {
 export function Onboarding() {
   const params = useSearchParams(),
     destination = safeDestination(params.get("next") || params.get("return"));
+  const audience = useSyncExternalStore(subscribeAudience, readAudience, serverAudience);
   const [state, setState] = useState<Conversation>(initialConversation),
-    [mode, setMode] = useState<"intro" | "conversation" | "form">("intro");
+    [mode, setMode] = useState<"conversation" | "form">("conversation");
   const [draft, setDraft] = useState(""),
-    [busy, setBusy] = useState(false),
+    [busy, setBusy] = useState(true),
     [notice, setNotice] = useState(""),
     [changed, setChanged] = useState<FieldKey[]>([]),
     [reward, setReward] = useState("");
@@ -88,8 +90,12 @@ export function Onboarding() {
     currentState = useRef(state),
     saving = useRef<Promise<void> | null>(null),
     interacted = useRef(false),
+    started = useRef(false),
     lock = useRef(false);
   const questionRef = useRef<HTMLDivElement>(null),
+    threadRef = useRef<HTMLDivElement>(null),
+    choiceRef = useRef<HTMLDivElement>(null),
+    readyShown = useRef(false),
     profileRef = useRef<HTMLElement>(null),
     attributionRef = useRef<Record<string, string>>({});
   const selected = state.charity.confirmed,
@@ -97,12 +103,13 @@ export function Onboarding() {
   const objective = nextObjective(state),
     ready = registrationReady(state.facts),
     completed = objective === "complete";
-  const accountReady = ready && validEntity(state.facts.organisation, "organisation") && !!selected;
+  const accountReady = ready && validEntity(state.facts.organisation, "organisation");
   const fieldComplete = (key: FieldKey) =>
     key === "email"
       ? validEmail(state.facts.email)
       : validEntity(state.facts[key], key);
-  const count = fieldKeys.filter(fieldComplete).length + (selected ? 1 : 0);
+  const count = fieldKeys.filter(fieldComplete).length;
+  const visibleHistory = history.at(-1)?.role === "assistant" ? history.slice(0, -1) : history;
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
     : destination.startsWith("/are-you-sorp-ready")
@@ -141,7 +148,10 @@ export function Onboarding() {
           ) {
             accept(saved);
             setService(true);
-            setMode(saved.state.turns ? "conversation" : "form");
+            setMode("conversation");
+            setBusy(false);
+          } else if (!controller.signal.aborted) {
+            void start("conversation");
           }
           return;
         }
@@ -149,36 +159,25 @@ export function Onboarding() {
         await post("complete", { fields: {} }).catch(() => undefined);
         if (!controller.signal.aborted) window.location.replace(destination);
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (!controller.signal.aborted) void start("conversation");
+      });
     return () => controller.abort();
     // Load once per destination. accept reads refs, not a captured state snapshot.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [destination]);
   useEffect(() => {
-    if (
-      mode !== "conversation" ||
-      !window.matchMedia("(max-width:760px)").matches
-    )
-      return;
     const frame = requestAnimationFrame(() => {
-      const question = questionRef.current,
-        profile = profileRef.current;
-      if (!question || !profile) return;
-      window.scrollTo({
-        top: Math.max(
-          0,
-          window.scrollY +
-            question.getBoundingClientRect().top -
-            profile.getBoundingClientRect().height -
-            16,
-        ),
-        behavior: window.matchMedia("(prefers-reduced-motion:reduce)").matches
-          ? "instant"
-          : "smooth",
-      });
+      if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight;
     });
     return () => cancelAnimationFrame(frame);
-  }, [mode, state.turns, state.charity.confirmed, candidates.length]);
+  }, [mode, state.turns, history.length, state.charity.confirmed, candidates.length]);
+  useEffect(() => {
+    if (!accountReady || readyShown.current || mode !== "conversation") return;
+    readyShown.current = true;
+    const frame = requestAnimationFrame(() => choiceRef.current?.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }));
+    return () => cancelAnimationFrame(frame);
+  }, [accountReady, mode]);
   useEffect(() => {
     if (accountOpen) dialogRef.current?.showModal();
     else dialogRef.current?.close();
@@ -202,7 +201,7 @@ export function Onboarding() {
       "form",
     );
     replace(next);
-    if (data.messages) setHistory(data.messages);
+    if (data.messages?.length) setHistory(data.messages);
   }
   function recover(error: unknown) {
     const data = (
@@ -257,6 +256,8 @@ export function Onboarding() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editVersion, service]);
   async function start(next: "conversation" | "form") {
+    if (started.current) return;
+    started.current = true;
     interacted.current = true;
     setMode(next);
     setNotice("");
@@ -333,9 +334,11 @@ export function Onboarding() {
         skip ? {} : extractImmediate(message, before),
         skip,
       );
-      if (!service) update(local, before);
+      // Recognised details appear while the existing server conversation is responding.
+      update(local, before);
       setDraft("");
       if (service) {
+        setHistory((items) => [...items, { role: "user", text: message }]);
         const data = await post("turn", {
           message,
           skip,
@@ -345,7 +348,9 @@ export function Onboarding() {
           applyFacts(normaliseConversation(data.state), dirty.current, "form"),
           before,
         );
-        setHistory(data.messages);
+        setHistory(data.messages?.length
+          ? data.messages
+          : (items) => [...items, { role: "assistant", text: nextQuestion(normaliseConversation(data.state)) }].slice(-22));
         setNotice(data.notice || "");
         if (data.lookup) {
           setQuery(data.lookup);
@@ -363,12 +368,14 @@ export function Onboarding() {
           { role: "assistant", text: nextQuestion(local) },
         ]);
     } catch (e) {
+      if (!skip) setDraft(message);
       recover(e);
     } finally {
       lock.current = false;
       setBusy(false);
       void persistEdits().catch(() => undefined);
-      draftRef.current?.focus({ preventScroll: true });
+      if (!validEntity(currentState.current.facts.organisation, "organisation") || !registrationReady(currentState.current.facts))
+        draftRef.current?.focus({ preventScroll: true });
     }
   }
   async function search(value = query) {
@@ -420,8 +427,8 @@ export function Onboarding() {
   async function createAccount(event: FormEvent) {
     event.preventDefault();
     if (lock.current) return;
-    if (!registrationReady(currentState.current.facts) || !validEntity(currentState.current.facts.organisation, "organisation") || !currentState.current.charity.confirmed) {
-      setAccountError("Complete your profile and confirm your starting charity before creating your account.");
+    if (!registrationReady(currentState.current.facts) || !validEntity(currentState.current.facts.organisation, "organisation")) {
+      setAccountError("Add your name, email, role and organisation before creating your account.");
       return;
     }
     if (password !== confirmPassword) {
@@ -492,16 +499,20 @@ export function Onboarding() {
       setBusy(false);
     }
   }
-  const question = busy
-    ? "I’m updating your introduction…"
-    : nextQuestion(state);
+  const firstQuestion = audience === "charity"
+    ? "Tell me a little about yourself and your charity. What’s your name, email and role?"
+    : audience === "adviser"
+      ? "Tell me a little about yourself and your firm: your name, email and role. Which charity are you helping, if you have one in mind?"
+      : "Tell me a little about yourself. What’s your name, email, role and organisation? If you’re helping a charity, which one?";
+  const question = busy && state.turns > 0
+    ? "I’m listening…"
+    : !state.turns && !count
+      ? firstQuestion
+      : nextQuestion(state);
   const charityLookup = (<>
                 {!selected && (
                   <div className="charity-discovery">
-                    <p>
-                      We’ll start with one charity to personalise your
-                      experience. You can add others later.
-                    </p>
+                    <p>If there’s a charity you’re here for, we can find its official record now. You can also do this later.</p>
                     {charityOptions(state).length > 0 && (
                       <div className="charity-mentions">
                         {charityOptions(state).map((c) => (
@@ -594,7 +605,7 @@ export function Onboarding() {
                 )}
   </>);
   return (
-    <main id="main" className="onboarding-page">
+    <main id="main" className="onboarding-page onboarding-refresh">
       <header className="onboarding-header">
         <Link
           href="/"
@@ -613,18 +624,9 @@ export function Onboarding() {
       </header>
       <div className="onboarding-shell">
         <div className="onboarding-heading">
-          <p className="onboarding-eyebrow">
-            <span /> A MORE PERSONAL BEGINNING
-          </p>
-          <h1>
-            Let’s get you <em>started.</em>
-          </h1>
-          <p>
-            To make signing up easier, you can have a conversation with us
-            instead.
-            <br className="desktop-break" /> Just talk or type, and we’ll fill
-            in the form as we go.
-          </p>
+          <p className="onboarding-eyebrow"><span /> LET’S GET STARTED</p>
+          <h1>A conversation worth <em>starting.</em></h1>
+          <p>Tell us about yourself in your own words. We’ll put the useful details in place as we talk, then create your free account so you can save your work across all five tools.</p>
         </div>
         <div className={`onboarding-workspace mode-${mode}`}>
           <section
@@ -635,41 +637,11 @@ export function Onboarding() {
               <span>
                 <i /> YOUR CONVERSATION
               </span>
-              <span>At your pace</span>
+              <button type="button" className="onboarding-text-button" onClick={() => setMode(mode === "form" ? "conversation" : "form")}>
+                {mode === "form" ? "Back to conversation" : "Fill in the form yourself"}
+              </button>
             </div>
-            {mode === "intro" ? (
-              <div className="onboarding-invitation">
-                <div className="conversation-symbol" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <p className="onboarding-eyebrow">
-                  TALK NATURALLY. WATCH IT TAKE SHAPE.
-                </p>
-                <h2>
-                  A few words.
-                  <br />A head start.
-                </h2>
-                <p>
-                  Tell us a little about you and a charity you care about. We’ll
-                  turn it into a useful starting point for your work.
-                </p>
-                <button
-                  className="onboarding-primary"
-                  onClick={() => void start("conversation")}
-                >
-                  Start a conversation <Arrow diagonal />
-                </button>
-                <button
-                  className="onboarding-text-button"
-                  onClick={() => void start("form")}
-                >
-                  Fill in the form yourself <span aria-hidden="true">→</span>
-                </button>
-                <small>About two minutes · No card needed</small>
-              </div>
-            ) : mode === "form" ? (
+            {mode === "form" ? (
               <div className="onboarding-invitation manual-intro">
                 <p className="onboarding-eyebrow">MAKE YOURSELF AT HOME</p>
                 <h2>
@@ -678,7 +650,7 @@ export function Onboarding() {
                   <em>Your way.</em>
                 </h2>
                 <p>
-                  Complete your profile and confirm one charity to personalise your experience.
+                  Complete the essentials below. A charity can be added now or later.
                 </p>
                 <button
                   className="onboarding-text-button"
@@ -692,32 +664,19 @@ export function Onboarding() {
               </div>
             ) : (
               <div className="conversation-body">
-                {history.length > 0 && (
-                  <details className="conversation-history">
-                    <summary>
-                      Our conversation so far{" "}
-                      <span>
-                        {history.filter((h) => h.role === "user").length}{" "}
-                        replies
-                      </span>
-                    </summary>
-                    <div>
-                      {history.map((h, i) => (
-                        <p key={i} className={`history-${h.role}`}>
-                          <small>
-                            {h.role === "user" ? "YOU" : "SORP 2026"}
-                          </small>
-                          {h.text}
-                        </p>
-                      ))}
+                <div className="onboarding-mobile-summary" aria-live="polite">
+                  <span>{count}/4 account details</span>
+                  <strong>{state.facts.name || "Your introduction"}{state.facts.organisation ? ` · ${state.facts.organisation}` : ""}</strong>
+                  <a href="#onboarding-profile-form">Review details ↓</a>
+                </div>
+                <div className="conversation-thread" ref={threadRef} role="log" aria-label="Your conversation" aria-live="polite">
+                  {visibleHistory.map((h, i) => (
+                    <div key={i} className={`conversation-message history-${h.role}`}>
+                      <small>{h.role === "user" ? "YOU" : "SORP 2026"}</small>
+                      <p>{h.text}</p>
                     </div>
-                  </details>
-                )}
-                <div
-                  ref={questionRef}
-                  className="conversation-question"
-                  aria-live="polite"
-                >
+                  ))}
+                  <div ref={questionRef} className="conversation-question">
                   <span
                     className={`assistant-mark${busy ? " is-thinking" : ""}`}
                     aria-hidden="true"
@@ -733,12 +692,9 @@ export function Onboarding() {
                     </svg>
                   </span>
                   <div>
-                    <p className="onboarding-eyebrow">
-                      {completed
-                        ? "READY WHEN YOU ARE"
-                        : "LET’S MAKE THIS YOURS"}
-                    </p>
+                    <p className="onboarding-eyebrow">SORP 2026</p>
                     <h2>{question}</h2>
+                  </div>
                   </div>
                 </div>
                 {selected && (
@@ -749,6 +705,18 @@ export function Onboarding() {
                       <p>
                         {process.env.NEXT_PUBLIC_ISOLATED_PREVIEW === "true" ? "Synthetic confirmation. No research is started in this Preview." : "Confirmed. Public information preparation has been queued."}
                       </p>
+                    </div>
+                  </div>
+                )}
+                {accountReady && !completed && (
+                  <div ref={choiceRef} className="onboarding-choice" aria-label="Your next step">
+                    <p>That’s enough to create your free account. Your work can be saved across all five tools.</p>
+                    <div>
+                      <button type="button" className="onboarding-primary" disabled={busy} onClick={() => setAccountOpen(true)}>Get started <Arrow diagonal /></button>
+                      <button type="button" className="onboarding-text-button" disabled={busy} onClick={() => {
+                        if (objective === "charity") void send(undefined, true);
+                        else draftRef.current?.focus();
+                      }}>Keep chatting ↓</button>
                     </div>
                   </div>
                 )}
@@ -813,15 +781,6 @@ export function Onboarding() {
                     {notice}
                   </p>
                 )}
-                {accountReady && !completed && (
-                  <button
-                    className="mobile-early-exit onboarding-text-button"
-                    disabled={busy}
-                    onClick={() => setAccountOpen(true)}
-                  >
-                    Continue with these details →
-                  </button>
-                )}
                 {!completed && !["registration", "charity"].includes(objective) && (
                   <button
                     className="onboarding-skip"
@@ -845,14 +804,14 @@ export function Onboarding() {
                     <p>
                       {selected
                         ? `Your profile and ${selected.name} will give us a useful place to begin.`
-                        : "Confirm one starting charity before creating your account."}
+                        : "Your details are ready. You can choose a starting charity later."}
                     </p>
                     <button
                       className="onboarding-primary"
                       disabled={!accountReady}
                       onClick={() => setAccountOpen(true)}
                     >
-                      Create my account <Arrow diagonal />
+                      Get started <Arrow diagonal />
                     </button>
                   </div>
                 )}
@@ -879,26 +838,23 @@ export function Onboarding() {
               </div>
               <span
                 className="profile-count"
-                aria-label={`${count} of 5 registration requirements completed`}
+                aria-label={`${count} of 4 required account details completed`}
               >
                 {count}
-                <small>/5</small>
+                <small>/4</small>
               </span>
             </div>
             <p className="onboarding-eyebrow">
-              Profile details
-              {ready && !selected && !state.skipped.includes("charity")
-                ? " · charity not confirmed"
-                : ""}
+              Your details · editable at any time
             </p>
             <div className="profile-progress" aria-hidden="true">
-              <span style={{ width: `${count * 20}%` }} />
+              <span style={{ width: `${count * 25}%` }} />
             </div>
             <p className="profile-hint">
               {mode === "form"
                 ? "A few details to make this yours."
-                : "As you talk, your details appear here."}
-              <span>You can edit anything.</span>
+                : busy && state.turns ? "Checking what you shared…" : "As you talk, your details appear here."}
+              <span>Nothing becomes an account until you choose Get started.</span>
             </p>
             <form
               id="onboarding-profile-form"
@@ -957,6 +913,11 @@ export function Onboarding() {
                 replace(applyFacts(currentState.current, { organisation: value }, "form"));
                 setEditVersion(v => v + 1);
               }} /> I work independently</label>
+              <p className="profile-charity-status">{selected
+                ? `✓ Starting charity: ${selected.name}`
+                : state.charity.proposed
+                  ? `Possible charity: ${state.charity.proposed}. We’ll only select it if you confirm the official record.`
+                  : "Charity you’re helping: add one now, or choose it later."}</p>
               <div
                 className={`profile-reward${reward ? " is-rewarded" : ""}`}
                 role="status"
@@ -984,17 +945,15 @@ export function Onboarding() {
                   }
                   disabled={!accountReady || busy}
                 >
-                  {completed || mode === "form"
-                    ? "Create my account"
-                    : "Continue with these details"}{" "}
+                  Get started{" "}
                   <span>→</span>
                 </button>
                 <p>
                   {accountReady
-                    ? "You can keep talking, or start exploring."
+                    ? "Your free account lets you save work and use the platform’s tools. No payment required."
                     : state.facts.email && !validEmail(state.facts.email)
                       ? "Check your email address to continue."
-                      : "Add your name, email, role and organisation (or independent status), then confirm one charity."}
+                      : "Add your name, email, role and organisation (or independent status)."}
                 </p>
               </div>
             </form>
