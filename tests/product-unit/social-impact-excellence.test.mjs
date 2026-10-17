@@ -9,6 +9,7 @@ import { LEADERSHIP_OPEN_QUESTIONS, LEADERSHIP_SCALE, LEADERSHIP_SECTIONS, leade
 import { LEADERSHIP_QUESTION_GUIDANCE } from "../../src/features/excellence/leadership-guidance.ts";
 import { DATA_METHODOLOGY_VERSION, DATA_OPEN_QUESTIONS, DATA_SCALE, DATA_SECTIONS, dataMaturity, newDataWorkspace, normaliseDataWorkspace, scoreData } from "../../src/features/excellence/data.ts";
 import { DELIVERY_METHODOLOGY_VERSION, DELIVERY_OPEN_QUESTIONS, DELIVERY_SCALE, DELIVERY_SECTIONS, deliveryMaturity, newDeliveryWorkspace, normaliseDeliveryWorkspace, scoreDelivery } from "../../src/features/excellence/delivery.ts";
+import { COMMUNICATIONS_METHODOLOGY_VERSION, COMMUNICATIONS_OPEN_QUESTIONS, COMMUNICATIONS_SCALE, COMMUNICATIONS_SECTIONS, communicationsMaturity, newCommunicationsWorkspace, normaliseCommunicationsWorkspace, scoreCommunications } from "../../src/features/excellence/communications.ts";
 
 test("native charity assessment preserves the established five-pillar, 25-question methodology", () => {
   assert.deepEqual(PILLARS.map(pillar => pillar.key), ["purpose", "leadership", "data", "delivery", "communication"]);
@@ -224,6 +225,64 @@ test("Delivery persistence remains versioned and isolated from every existing pi
   assert.strictEqual(product.purpose, purpose); assert.strictEqual(product.leadership, leadership); assert.strictEqual(product.data, data); assert.strictEqual(product.snapshot, snapshot);
   const invalid = structuredClone(workspace); invalid.reviewStatus = "verified"; invalid.answers[0].score = 0;
   const sanitised = normaliseDeliveryWorkspace(invalid);
+  assert.equal(sanitised.reviewStatus, "not_submitted");
+  assert.equal(sanitised.answers[0].score, null);
+});
+
+test("Communications pathway contains five sections, 20 authored ratings and five open reflections", () => {
+  assert.equal(COMMUNICATIONS_SECTIONS.length, 5);
+  assert.deepEqual(COMMUNICATIONS_SECTIONS.map(section => section.questions.length), [4, 4, 4, 4, 4]);
+  const questions = COMMUNICATIONS_SECTIONS.flatMap(section => section.questions);
+  assert.deepEqual(questions.map(question => question.id), Array.from({ length: 20 }, (_, index) => `COMMUNICATIONS${String(index + 1).padStart(2, "0")}`));
+  assert.equal(new Set(questions.map(question => question.question)).size, 20);
+  assert.equal(new Set(questions.map(question => question.why)).size, 20);
+  const stars = questions.flatMap(question => question.stars);
+  assert.equal(stars.length, 100);
+  assert.equal(new Set(stars).size, 100);
+  assert.ok(questions.every(question => question.why.length >= 100 && question.stars.every(description => description.length >= 50)));
+  assert.deepEqual(COMMUNICATIONS_OPEN_QUESTIONS.map(question => question.id), ["COMMUNICATIONS_OPEN01", "COMMUNICATIONS_OPEN02", "COMMUNICATIONS_OPEN03", "COMMUNICATIONS_OPEN04", "COMMUNICATIONS_OPEN05"]);
+});
+
+test("Communications covers clear, credible and two-way impact communication without rewarding scale", () => {
+  const content = JSON.stringify(COMMUNICATIONS_SECTIONS).toLowerCase();
+  for (const concept of ["activities", "outputs", "outcomes", "impact", "limitations", "uncertainty", "stakeholder", "accessible", "consent", "feedback", "correct"]) assert.match(content, new RegExp(concept));
+  for (const excludedReward of ["follower count establishes", "large budget is required", "communications department is required"]) assert.doesNotMatch(content, new RegExp(excludedReward));
+  assert.equal(COMMUNICATIONS_SECTIONS[1].title, "EVIDENCE, CREDIBILITY & TRANSPARENCY");
+  assert.equal(COMMUNICATIONS_SECTIONS[4].title, "COMMUNICATIONS EFFECTIVENESS & IMPROVEMENT");
+});
+
+test("Communications scoring uses Purpose bands and excludes comments, reflections and evidence", () => {
+  assert.deepEqual(COMMUNICATIONS_SCALE, PURPOSE_SCALE);
+  const workspace = newCommunicationsWorkspace();
+  workspace.answers.slice(0, 19).forEach(answer => { answer.score = 4; });
+  assert.equal(scoreCommunications(workspace.answers), null);
+  workspace.answers[19].score = 4;
+  workspace.answers[0].comment = "Communication context is unscored.";
+  workspace.answers.slice(20).forEach(answer => { answer.answer = "Optional reflection."; answer.score = 1; });
+  workspace.evidence.push({ id: "evidence-1", fileName: "impact-report.pdf", category: "Impact report", notes: "Unscored", size: 1200, uploadedAt: new Date(0).toISOString() });
+  assert.deepEqual(scoreCommunications(workspace.answers), { score: 4, maturity: "Established" });
+  workspace.answers[0].score = 6;
+  assert.equal(scoreCommunications(workspace.answers), null);
+  for (const score of [1, 1.79, 1.8, 2.59, 2.6, 3.39, 3.4, 4.19, 4.2, 5]) assert.equal(communicationsMaturity(score), purposeMaturity(score));
+});
+
+test("Communications persistence is versioned and isolated from all existing pillars", () => {
+  const workspace = newCommunicationsWorkspace({ name: "QA", email: "qa@example.invalid", organisation: "QA Charity" });
+  workspace.status = "draft";
+  workspace.answers[0].score = 5;
+  workspace.answers[0].comment = "Our purpose explanation is tested with stakeholders.";
+  workspace.answers[20].answer = "Accessible engagement remains our main communications challenge.";
+  workspace.submissions.push({ assessmentId: workspace.assessmentId, methodologyVersion: COMMUNICATIONS_METHODOLOGY_VERSION, submittedAt: new Date(0).toISOString(), score: 5, maturity: "Fully Embedded", answers: structuredClone(workspace.answers) });
+  const purpose = { preserved: true }, leadership = { preserved: true }, data = { preserved: true }, delivery = { preserved: true }, snapshot = { answers: [1, 2, 3] };
+  const product = { purpose, leadership, data, delivery, snapshot, communications: workspace };
+  const restored = normaliseCommunicationsWorkspace(product.communications);
+  assert.equal(restored.methodologyVersion, COMMUNICATIONS_METHODOLOGY_VERSION);
+  assert.equal(restored.answers[0].comment, workspace.answers[0].comment);
+  assert.equal(restored.answers[20].answer, workspace.answers[20].answer);
+  assert.equal(restored.submissions.length, 1);
+  assert.strictEqual(product.purpose, purpose); assert.strictEqual(product.leadership, leadership); assert.strictEqual(product.data, data); assert.strictEqual(product.delivery, delivery); assert.strictEqual(product.snapshot, snapshot);
+  const invalid = structuredClone(workspace); invalid.reviewStatus = "verified"; invalid.answers[0].score = 0;
+  const sanitised = normaliseCommunicationsWorkspace(invalid);
   assert.equal(sanitised.reviewStatus, "not_submitted");
   assert.equal(sanitised.answers[0].score, null);
 });

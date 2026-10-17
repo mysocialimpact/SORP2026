@@ -364,7 +364,7 @@ test("Social Impact Excellence preserves the established Purpose pathway inside 
   await page.goto("/social-impact-excellence/journey/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Your path to excellence");
   await expect(page.getByRole("link", { name: /Begin Purpose pathway/ })).toBeVisible();
-  await expect(page.getByText("This deeper pathway is not yet available.")).toHaveCount(1);
+  await expect(page.getByText("This deeper pathway is not yet available.")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
   await page.goto("/social-impact-excellence/purpose/assessment/");
@@ -679,6 +679,85 @@ test("Delivery evidence uses its private purpose and submission remains awaiting
   expect(finalData.delivery?.evidence).toHaveLength(1);
 });
 
+test("Communications assessment saves a separate draft and completes without scoring optional reflections", async ({ page }) => {
+  const writes: Record<string, unknown>[] = [];
+  const purpose = { preserved: "purpose" }, leadership = { preserved: "leadership" }, data = { preserved: "data" }, delivery = { preserved: "delivery" };
+  const result = { overall: 3.4, maturity: "Partly established", pillarScores: ["purpose", "leadership", "data", "delivery", "communication"].map(pillar => ({ pillar, score: 3.4 })), strengths: [], opportunities: [] };
+  let currentData: Record<string, unknown> = { result, purpose, leadership, data, delivery, answers: Array(25).fill(3) };
+  await page.route("**/api/readiness-account/**", async route => {
+    const input = route.request().method() === "POST" ? route.request().postDataJSON() as Record<string, unknown> : {};
+    if (input.action === "load-product") return route.fulfill({ json: { account: { name: "QA Person", email: "qa@example.invalid", organisation: "QA Charity" }, productProgress: { status: "complete", data: currentData } } });
+    if (input.action === "save-product") { writes.push(input); currentData = input.data as Record<string, unknown>; return route.fulfill({ json: { productProgress: { status: "complete", data: input.data } } }); }
+    if (input.action === "list-product-files") return route.fulfill({ json: { files: [] } });
+    return route.fulfill({ json: { signedIn: true } });
+  });
+  await page.goto("/social-impact-excellence/journey/");
+  await expect(page.getByRole("link", { name: /Begin Communication pathway/ })).toBeVisible();
+  await page.goto("/social-impact-excellence/communications/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("clear, credible and understood");
+  await expect(page.getByText(/A small organisation can demonstrate excellent communications/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Add participants" })).toBeDisabled();
+  await page.getByRole("link", { name: /Start Communications Assessment/ }).click();
+  await page.getByLabel("Role").fill("Communications Lead");
+  await page.getByRole("button", { name: "Save and continue →" }).click();
+  const sectionHeadings = ["CLARITY OF PURPOSE & IMPACT STORY", "EVIDENCE, CREDIBILITY & TRANSPARENCY", "STAKEHOLDER COMMUNICATION & ENGAGEMENT", "REPORTING, DISCLOSURE & ACCOUNTABILITY", "COMMUNICATIONS EFFECTIVENESS & IMPROVEMENT"];
+  for (let section = 0; section < sectionHeadings.length; section += 1) {
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(sectionHeadings[section]);
+    await expect(page.getByText(`${section * 4} of 20 maturity questions answered`)).toBeVisible();
+    const why = page.locator(".sie-purpose-guidance details").filter({ hasText: "Why are we asking this?" });
+    const stars = page.locator(".sie-purpose-guidance details").filter({ hasText: "What do the stars mean?" });
+    await expect(why).toHaveCount(4); await expect(stars).toHaveCount(4);
+    await expect(why.first()).not.toHaveAttribute("open", "");
+    await stars.first().getByText("What do the stars mean?").click();
+    await expect(stars.first().locator("p")).toHaveCount(5);
+    const ratings = page.getByRole("radio", { name: /4 star out of 5/ });
+    for (let index = 0; index < 4; index += 1) await ratings.nth(index).click();
+    await page.getByLabel("Additional comments or context (optional)").first().fill("Clarity, evidence and stakeholder context for this rating.");
+    await page.getByRole("button", { name: "Save and continue →" }).click();
+    if (section === 0) { await page.reload(); await expect(page.getByText("4 of 20 maturity questions answered")).toBeVisible(); }
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tell us about communications in your own words.");
+  await expect(page.locator(".sie-purpose-questions textarea")).toHaveCount(5);
+  await page.getByRole("button", { name: "Complete assessment →" }).click();
+  await expect(page).toHaveURL(/\/social-impact-excellence\/communications\/evidence\//);
+  const finalData = writes.at(-1)?.data as { purpose?: unknown; leadership?: unknown; data?: unknown; delivery?: unknown; communications?: { status?: string; reviewStatus?: string; score?: number; answers?: unknown[]; submissions?: unknown[] } };
+  expect(finalData.purpose).toEqual(purpose); expect(finalData.leadership).toEqual(leadership); expect(finalData.data).toEqual(data); expect(finalData.delivery).toEqual(delivery);
+  expect(finalData.communications?.status).toBe("assessment_complete");
+  expect(finalData.communications?.reviewStatus).toBe("not_submitted");
+  expect(finalData.communications?.score).toBe(4);
+  expect(finalData.communications?.answers).toHaveLength(25);
+  expect(finalData.communications?.submissions).toHaveLength(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
+test("Communications evidence uses its private purpose and submission remains awaiting MSI review", async ({ page }) => {
+  const saved: Record<string, unknown>[] = [];
+  const communications = { assessmentId: "communications-1", methodologyVersion: "communications-v1.0", organisationName: "QA Charity", participant: { name: "QA Person", role: "Communications Lead", email: "qa@example.invalid" }, status: "assessment_complete", reviewStatus: "not_submitted", evidenceStatus: "not_started", score: 4, maturity: "Established", answers: Array.from({ length: 25 }, (_, index) => ({ questionId: index < 20 ? `COMMUNICATIONS${String(index + 1).padStart(2, "0")}` : `COMMUNICATIONS_OPEN${String(index - 19).padStart(2, "0")}`, questionNumber: index + 1, score: index < 20 ? 4 : null, comment: "", answer: "" })), evidence: [], submissions: [], progress: 65 };
+  await page.route("**/api/readiness-account/**", async route => {
+    if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: true } });
+    const input = route.request().postDataJSON() as Record<string, unknown>;
+    if (input.action === "load-product") return route.fulfill({ json: { account: { organisation: "QA Charity" }, productProgress: { data: { result: { overall: 4 }, data: { preserved: true }, communications } } } });
+    if (input.action === "list-product-files") { expect(input.purpose).toBe("communications-evidence"); return route.fulfill({ json: { files: [] } }); }
+    if (input.action === "create-product-file-upload") { expect(input.purpose).toBe("communications-evidence"); return route.fulfill({ status: 201, json: { file: { id: "communications-file-1" }, upload: { url: "https://upload.example.test/communications", token: "d".repeat(64) } } }); }
+    if (input.action === "save-product") { saved.push(input); return route.fulfill({ json: { productProgress: { data: input.data } } }); }
+    return route.fulfill({ status: 400, json: { error: "Unexpected action" } });
+  });
+  await page.route("https://upload.example.test/communications", route => route.fulfill({ json: { file: { uploadedAt: "2026-10-17T10:30:00Z" } } }));
+  await page.goto("/social-impact-excellence/communications/evidence/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Bring your answers to life.");
+  await expect(page.getByText(/Evidence remains within the existing private product-file workflow/)).toBeVisible();
+  await page.getByLabel("Choose documents to upload").setInputFiles({ name: "impact-report.pdf", mimeType: "application/pdf", buffer: Buffer.from("Communications evidence") });
+  await page.getByRole("button", { name: "Upload 1 document" }).click();
+  await expect(page.getByText(/uploaded securely/)).toBeVisible();
+  await page.getByRole("button", { name: "Submit evidence stage" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("awaiting MSI review");
+  const finalData = saved.at(-1)?.data as { data?: unknown; communications?: { status?: string; reviewStatus?: string; evidenceStatus?: string; evidence?: unknown[] } };
+  expect(finalData.data).toEqual({ preserved: true });
+  expect(finalData.communications?.status).toBe("evidence_submitted");
+  expect(finalData.communications?.reviewStatus).toBe("awaiting_msi_review");
+  expect(finalData.communications?.evidenceStatus).toBe("submitted");
+  expect(finalData.communications?.evidence).toHaveLength(1);
+});
 test("report review intake creates a private upload record without pretending payment succeeded", async ({ page }) => {
   await page.route("**/api/readiness-account/**", route => {
     if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: true, account: { name: "QA Person", email: "qa@example.invalid", organisation: "QA Charity" }, progress: { sessionId: "qa-complete", step: "done" } } });

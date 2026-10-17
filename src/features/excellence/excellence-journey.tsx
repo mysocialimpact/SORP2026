@@ -9,9 +9,10 @@ import { normalisePurposeWorkspace } from "./purpose";
 import { normaliseLeadershipWorkspace } from "./leadership";
 import { normaliseDataWorkspace } from "./data";
 import { normaliseDeliveryWorkspace } from "./delivery";
+import { normaliseCommunicationsWorkspace } from "./communications";
 import type { ScoredAssessment } from "./models";
 
-type ProductData = { result?: ScoredAssessment; purpose?: unknown; leadership?: unknown; data?: unknown; delivery?: unknown };
+type ProductData = { result?: ScoredAssessment; purpose?: unknown; leadership?: unknown; data?: unknown; delivery?: unknown; communications?: unknown };
 type Payload = { account?: { name?: string; email?: string; organisation?: string }; productProgress?: { data?: ProductData }; error?: string };
 
 export function ExcellenceJourney() {
@@ -31,6 +32,7 @@ export function ExcellenceJourney() {
   const leadership = normaliseLeadershipWorkspace(payload.productProgress?.data?.leadership, payload.account);
   const data = normaliseDataWorkspace(payload.productProgress?.data?.data, payload.account);
   const delivery = normaliseDeliveryWorkspace(payload.productProgress?.data?.delivery, payload.account);
+  const communications = normaliseCommunicationsWorkspace(payload.productProgress?.data?.communications, payload.account);
   return <main className="sie-report sie-journey">
     <header><Link href="/social-impact-excellence/" className="sie-wordmark">SOCIAL IMPACT <strong>EXCELLENCE</strong></Link><Link href="/dashboard/">My dashboard</Link></header>
     <section className="sie-journey-hero"><div><p className="sie-eyebrow">{payload.account?.organisation || "Your charity"}</p><h1>Your path to <em>excellence.</em></h1><p>Your baseline is complete. Use it to decide where deeper work will make the greatest difference.</p></div><div><strong>{result.overall.toFixed(1)}</strong><span>{result.maturity}</span><Link href="/social-impact-excellence/results/">View baseline report →</Link></div></section>
@@ -41,14 +43,14 @@ export function ExcellenceJourney() {
         const isLeadership = pillar.key === "leadership";
         const isData = pillar.key === "data";
         const isDelivery = pillar.key === "delivery";
-        const available = isPurpose || isLeadership || isData || isDelivery;
-        const pathway = isPurpose ? purpose : isLeadership ? leadership : isData ? data : delivery;
+        const available = true;
+        const pathway = isPurpose ? purpose : isLeadership ? leadership : isData ? data : isDelivery ? delivery : communications;
         const submitted = isPurpose ? purpose.status === "complete" : pathway.status === "evidence_submitted";
         const status = available ? submitted ? isPurpose ? "Complete" : "Evidence submitted" : pathway.status === "not_started" ? "Ready to begin" : "In progress" : "Not yet available";
-        const href = isPurpose ? "/social-impact-excellence/purpose/" : isLeadership ? "/social-impact-excellence/leadership/" : isData ? "/social-impact-excellence/data/" : "/social-impact-excellence/delivery/";
+        const href = isPurpose ? "/social-impact-excellence/purpose/" : isLeadership ? "/social-impact-excellence/leadership/" : isData ? "/social-impact-excellence/data/" : isDelivery ? "/social-impact-excellence/delivery/" : "/social-impact-excellence/communications/";
         return <article className={available ? "available" : "future"} key={pillar.key}><div><span>{pillar.number}</span><b>{status}</b></div><h2>{pillar.label}</h2><p>{pillar.strapline}</p><div className="sie-journey-score"><i style={{ width: `${score * 20}%` }} /><strong>{score.toFixed(1)}</strong></div>{available ? <Link href={href}>{pathway.status === "not_started" ? `Begin ${pillar.label} pathway` : `Continue ${pillar.label} pathway`} →</Link> : <span>This deeper pathway is not yet available.</span>}</article>;
       })}
     </section>
-    <section className="sie-next-step"><p>What is available today</p><h2>Purpose, Leadership, Data and Delivery now include structured assessments, detailed guidance, secure supporting evidence and an MSI review checkpoint.</h2><div><Link href="/social-impact-excellence/purpose/">Open Purpose pathway →</Link><Link href="/social-impact-excellence/leadership/">Open Leadership pathway →</Link><Link href="/social-impact-excellence/data/">Open Data pathway →</Link><Link href="/social-impact-excellence/delivery/">Open Delivery pathway →</Link></div></section>
+    <section className="sie-next-step"><p>What is available today</p><h2>All five pillars now include structured assessments, detailed guidance, secure supporting evidence and an MSI review checkpoint.</h2><div><Link href="/social-impact-excellence/purpose/">Open Purpose pathway →</Link><Link href="/social-impact-excellence/leadership/">Open Leadership pathway →</Link><Link href="/social-impact-excellence/data/">Open Data pathway →</Link><Link href="/social-impact-excellence/delivery/">Open Delivery pathway →</Link><Link href="/social-impact-excellence/communications/">Open Communications pathway →</Link></div></section>
   </main>;
 }
