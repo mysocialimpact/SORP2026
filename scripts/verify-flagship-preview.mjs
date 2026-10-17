@@ -21,6 +21,8 @@ await mkdir(output, { recursive: true });
 const pool = new pg.Pool({ connectionString: process.env.CONSOLE_DATABASE_URL, max: 1 });
 const server = remote ? null : spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '0.0.0.0', '--port', '4314'], { env: { ...process.env, SORP_AUTH_BASE_URL: base }, stdio: 'ignore' });
 let browser;
+let activePage;
+const network = [];
 const report = { environment: 'preview', realServices: true, checks: [], emailDelivery: 'Private preview sandbox, not external delivery' };
 try {
   for (let n = 0; n < 80; n++) {
@@ -32,6 +34,11 @@ try {
     browser = await chromium.launch({ executablePath: await chromiumBinary.executablePath(), args: chromiumBinary.args.filter(arg => arg !== '--disable-web-security'), headless: true });
     const context = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 1000 }, isMobile: width === 390, hasTouch: width === 390 });
     const page = await context.newPage();
+    activePage = page;
+    page.on('response', response => {
+      const path = new URL(response.url()).pathname;
+      if (path.startsWith('/api/') || path === '/login/') network.push({ path, status: response.status() });
+    });
     page.setDefaultTimeout(30000);
     // Public-page third-party resources must not block an otherwise usable UI.
     page.setDefaultNavigationTimeout(60000);
@@ -116,7 +123,12 @@ try {
   report.passed = true;
 } catch (error) {
   report.passed = false;
-  report.error = error.message;
+  report.error = error.message.replace(/([?&]token=)[^&\s"']+/g, '$1[redacted]');
+  report.lastRequests = network.slice(-18);
+  if (activePage && !activePage.isClosed()) {
+    report.pagePath = new URL(activePage.url()).pathname;
+    report.visibleText = (await activePage.locator('body').innerText().catch(() => '')).slice(0,3000);
+  }
   process.exitCode = 1;
 } finally {
   console.log('FLAGSHIP_PREVIEW_QA ' + JSON.stringify(report));
