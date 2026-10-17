@@ -38,12 +38,14 @@ async function manage(page: Page, name: string) {
   return page.getByRole("dialog");
 }
 
-async function setPlan(page: Page, name: string, plan: string, duration: string, reason: string) {
+async function setPlan(page: Page, name: string, plan: string, amount: string, unit: "days" | "weeks" | "months", reason: string) {
   const dialog = await manage(page, name);
   const form = dialog.getByRole("heading", { name: "Plan and access" }).locator("..").locator("form");
   await form.getByLabel("Plan").selectOption(plan);
   await form.getByLabel("Complimentary access").check();
-  await form.getByLabel("Duration").selectOption(duration);
+  await form.getByLabel("Duration").selectOption("period");
+  await form.getByLabel("Length").fill(amount);
+  await form.getByLabel("Unit").selectOption(unit);
   await form.getByLabel("Internal reason").fill(reason);
   await form.getByRole("button", { name: /Save entitlement/ }).click();
   await expect(page.getByRole("status")).toContainText("Plan and entitlement updated");
@@ -99,8 +101,8 @@ test("founder can administer plans, invitations and consent-based adviser access
   await createOrganisation(page, "Test Charity Ltd", "Charity");
   await createOrganisation(page, "Unrelated Charity Ltd", "Charity");
 
-  await setPlan(page, "Test Adviser Ltd", "Adviser", "30", "30-day isolated browser test");
-  await setPlan(page, "Test Charity Ltd", "Plus", "90", "90-day isolated browser test");
+  await setPlan(page, "Test Adviser Ltd", "Adviser", "30", "days", "30-day isolated browser test");
+  await setPlan(page, "Test Charity Ltd", "Plus", "13", "weeks", "13-week isolated browser test");
   await page.getByPlaceholder("Name, type or email").fill("");
   const adviserRow = page.getByRole("row", { name: /Test Adviser Ltd/ });
   await expect(adviserRow).toContainText("Adviser");
@@ -162,7 +164,7 @@ test("founder can administer plans, invitations and consent-based adviser access
   expect(revoked.status()).toBe(403);
 
   await page.bringToFront();
-  await setPlan(page, "Test Charity Ltd", "Plus", "indefinite", "Extended in isolated browser test");
+  await setPlan(page, "Test Charity Ltd", "Plus", "2", "months", "Two-month isolated browser test");
   let row = page.getByRole("row", { name: /Test Charity Ltd/ });
   await expect(row).toContainText("Complimentary");
   const revokeDialog = await manage(page, "Test Charity Ltd");
@@ -181,7 +183,7 @@ test("founder can administer plans, invitations and consent-based adviser access
   await customForm.getByLabel("Plan").selectOption("Adviser");
   await customForm.getByLabel("Complimentary access").check();
   await customForm.getByLabel("Duration").selectOption("custom");
-  await customForm.getByLabel("Custom expiry", { exact: true }).fill("2027-06-30");
+  await customForm.getByLabel("Access through", { exact: true }).fill("2027-06-30");
   await customForm.getByLabel("Internal reason").fill("Custom isolated browser test");
   await customForm.getByRole("button", { name: /Save entitlement/ }).click();
   await expect(page.getByRole("status")).toContainText("Plan and entitlement updated");

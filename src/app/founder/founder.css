@@ -61,7 +61,7 @@ button.founder-stat:hover { background:#36343d; }
 .founder-attention li { display:grid; grid-template-columns:auto 1fr; gap:10px; padding:11px; background:#f2eee7; }
 .founder-attention li>span { display:grid; place-items:center; width:27px; height:27px; border-radius:50%; background:#f2d5c9; color:#7d3b27; font-size:10px; font-weight:900; }
 .founder-attention strong { font-size:13px; }
-.founder-attention p { margin:3px 0 0; color:#77727a; font-size:11px; }
+.founder-attention p { margin:3px 0 0; color:#6b6570; font-size:11px; }
 .founder-table-wrap { overflow:auto; background:white; }
 .founder-table { width:100%; min-width:840px; border-collapse:collapse; }
 .founder-table th,.founder-table td { padding:14px 15px; border-bottom:1px solid #e5e0d8; text-align:left; vertical-align:top; }

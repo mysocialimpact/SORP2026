@@ -125,7 +125,7 @@ export function FounderControlCentre() {
     if (!selectedOrganisation) return;
     const form = new FormData(event.currentTarget);
     await perform(async () => {
-      await founderCall(`organisation/${selectedOrganisation.id}/plan`, { method: "POST", body: JSON.stringify({ plan: form.get("plan"), complimentary: form.get("complimentary") === "on", duration: form.get("duration"), expiry: form.get("expiry"), reason: form.get("reason") }) });
+      await founderCall(`organisation/${selectedOrganisation.id}/plan`, { method: "POST", body: JSON.stringify({ plan: form.get("plan"), complimentary: form.get("complimentary") === "on", duration: form.get("duration"), durationAmount: form.get("durationAmount"), durationUnit: form.get("durationUnit"), expiry: form.get("expiry"), reason: form.get("reason") }) });
       const refreshed = await loadDashboard();
       const organisation = refreshed.organisations.find(row => row.id === selectedOrganisation.id);
       if (organisation) await openOrganisationFrom(refreshed, organisation);

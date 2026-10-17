@@ -15,6 +15,8 @@ const sayHello = await readFile(new URL("../../src/components/say-hello.tsx", im
 const actionBar = await readFile(new URL("../../src/components/product-action-bar.tsx", import.meta.url), "utf8");
 const route = await readFile(new URL("../../src/app/api/founder/[...path]/route.ts", import.meta.url), "utf8");
 const auth = await readFile(new URL("../../src/lib/founder/auth.ts", import.meta.url), "utf8");
+const drawers = await readFile(new URL("../../src/components/founder/account-drawers.tsx", import.meta.url), "utf8");
+const independentFounder = await readFile(new URL("../../src/lib/sorp-auth/founder-console.ts", import.meta.url), "utf8");
 
 test("founder home uses the requested operational identity and the one shared set of six product tabs", () => {
   assert.match(header, /FOUNDER CONTROL CENTRE/);
@@ -65,4 +67,13 @@ test("founder organisation and user data remain server-authorised", () => {
   assert.match(route, /action: "founder-overview"/);
   assert.match(auth, /platformAccess\?\.founder !== true/);
   assert.doesNotMatch(auth, /FOUNDER_EMAIL/);
+});
+
+test("founder can grant any plan free for a chosen number of days, weeks or months", () => {
+  assert.match(drawers, /value="period">Fixed period/);
+  assert.match(drawers, /name="durationAmount"/);
+  for (const unit of ["days", "weeks", "months"]) assert.match(drawers, new RegExp(`value="${unit}"`));
+  assert.match(route, /complimentaryAccessEnd\(body\)/);
+  assert.match(independentFounder, /complimentaryAccessEnd\(body\)/);
+  assert.match(route, /complimentaryEnd: row\.complimentary_end \|\| null/);
 });

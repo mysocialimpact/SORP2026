@@ -33,6 +33,8 @@ export function OrganisationDrawer({ organisation, detail, data, busy, invitatio
   const inviteForm = useRef<HTMLFormElement>(null);
   const refreshAction = useRef(onRefresh);
   const [refreshing, setRefreshing] = useState(false);
+  const [duration, setDuration] = useState(organisation.complimentary_end ? "custom" : organisation.complimentary ? "indefinite" : "period");
+  const [durationUnit, setDurationUnit] = useState("months");
   useEffect(() => { refreshAction.current = onRefresh; }, [onRefresh]);
   useEffect(() => {
     const interval = window.setInterval(() => { void refreshAction.current().catch(() => undefined); }, 20_000);
@@ -61,6 +63,7 @@ export function OrganisationDrawer({ organisation, detail, data, busy, invitatio
       <div><span>Account type</span><strong>{organisation.type}</strong></div>
       <div><span>Subscription</span><strong>{organisation.plan}</strong></div>
       <div><span>Status</span><strong>{organisation.complimentary ? "Complimentary" : Number(organisation.payable_price) ? "Paid" : "Free"}</strong></div>
+      {organisation.complimentary && <div><span>Complimentary access</span><strong>{organisation.complimentary_end ? `Through ${displayDate(organisation.complimentary_end)}` : "No expiry"}</strong></div>}
       <div><span>Registered</span><strong>{displayDate(organisation.created_at)}</strong></div>
       <div><span>Last activity</span><strong>{displayDate(organisation.last_activity || organisation.updated_at, true)}</strong></div>
     </div>
@@ -111,13 +114,14 @@ export function OrganisationDrawer({ organisation, detail, data, busy, invitatio
       <form className="founder-form-grid" onSubmit={onPlan}>
         <label>Plan<select name="plan" defaultValue={organisation.plan}><option>Free</option><option>Plus</option><option>Adviser</option><option>Enterprise</option></select></label>
         <label className="founder-check"><input type="checkbox" name="complimentary" defaultChecked={organisation.complimentary} /> Complimentary access</label>
-        <label>Duration<select name="duration" defaultValue={organisation.complimentary_end ? "custom" : "indefinite"}><option value="30">30 days</option><option value="90">90 days</option><option value="custom">Custom expiry</option><option value="indefinite">Indefinite</option></select></label>
-        <label>Custom expiry<input type="date" name="expiry" defaultValue={organisation.complimentary_end?.slice(0, 10)} /></label>
+        <label>Duration<select name="duration" value={duration} onChange={event => setDuration(event.target.value)}><option value="period">Fixed period</option><option value="custom">Until a chosen date</option><option value="indefinite">No expiry</option></select></label>
+        {duration === "period" && <><label>Length<input name="durationAmount" type="number" inputMode="numeric" min="1" max={durationUnit === "months" ? 120 : durationUnit === "weeks" ? 520 : 3650} step="1" defaultValue="1" required /></label><label>Unit<select name="durationUnit" value={durationUnit} onChange={event => setDurationUnit(event.target.value)}><option value="days">Days</option><option value="weeks">Weeks</option><option value="months">Months</option></select></label></>}
+        {duration === "custom" && <label>Access through<input type="date" name="expiry" defaultValue={organisation.complimentary_end?.slice(0, 10)} required /></label>}
         <label className="founder-span">Internal reason<textarea name="reason" defaultValue={organisation.complimentary_reason || "Complimentary Partner"} /></label>
         <button disabled={busy}>Save entitlement</button>
         {organisation.complimentary && <button type="button" className="founder-danger" onClick={onRevokeComplimentary} disabled={busy}>Move safely to Free</button>}
       </form>
-      <p className="founder-note">Published price: {money(organisation.published_price)}. These controls change entitlements but never initiate a charge.</p>
+      <p className="founder-note">Choose any plan and make it complimentary for a fixed number of days, weeks or months, until a chosen date, or without an expiry. Published price: {money(organisation.published_price)}. These controls change entitlements but never initiate a charge.</p>
     </DrawerSection>
 
     <DrawerSection title="Recent activity">

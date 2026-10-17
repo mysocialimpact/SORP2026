@@ -116,5 +116,20 @@ test("organisation people shows invitation history, evidence and actions beneath
   await expect(drawer.getByText("Provider rejected recipient")).toBeVisible();
   await expect(drawer.getByRole("button", { name:"Resend invitation" })).toBeVisible();
   await expect(drawer.getByRole("button", { name:"Retry sending" })).toBeVisible();
-  await expect(drawer.getByRole("button", { name:"View user" })).toBeVisible();
+  await expect(drawer.getByRole("button", { name:"View user" }).first()).toBeVisible();
+});
+
+test("founder chooses a complimentary plan for any number of days, weeks or months", async ({ page }) => {
+  await page.goto("/founder/");
+  await page.getByRole("button", { name:/Brainstrust/ }).first().click();
+  const drawer = page.getByRole("dialog", { name:"Brainstrust" });
+  const form = drawer.getByRole("heading", { name:"Subscription and access" }).locator("..").locator("form");
+  await form.getByLabel("Plan").selectOption("Plus");
+  await form.getByLabel("Complimentary access").check();
+  await form.getByLabel("Duration").selectOption("period");
+  await form.getByLabel("Length").fill("6");
+  await form.getByLabel("Unit").selectOption("weeks");
+  const request = page.waitForRequest(value => value.url().endsWith("/organisation/brainstrust/plan"));
+  await form.getByRole("button", { name:"Save entitlement" }).click();
+  expect((await request).postDataJSON()).toMatchObject({ plan:"Plus", complimentary:true, duration:"period", durationAmount:"6", durationUnit:"weeks" });
 });

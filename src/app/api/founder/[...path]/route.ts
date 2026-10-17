@@ -5,6 +5,7 @@ import { listDirectoryControls, setDirectoryControls, setHumanReviewed } from "@
 import { firms as publicFirms } from "@/lib/accountants";
 import { independentAuthCutover } from "@/lib/sorp-auth/switch";
 import { independentFounderGET, independentFounderPOST } from "@/lib/sorp-auth/founder-console";
+import { complimentaryAccessEnd } from "@/lib/founder/complimentary-access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -325,9 +326,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       const plan = String(body.plan || "Free");
       if (!(plan in plans)) return json({ error: "Unknown plan." }, 400);
       const complimentary = Boolean(body.complimentary);
-      let end: string | null = null;
-      if (body.duration === "30" || body.duration === "90") end = new Date(Date.now() + Number(body.duration) * 86400000).toISOString();
-      else if (body.expiry) { const parsed = new Date(body.expiry); if (Number.isNaN(parsed.getTime())) return json({ error: "Enter a valid expiry date." }, 400); end = parsed.toISOString(); }
+      const end = complimentaryAccessEnd(body);
       const payable = complimentary ? 0 : plans[plan];
       const row = (await founderQuery("UPDATE research_console.founder_organisations SET plan=$1,published_price=$2,payable_price=$3,complimentary=$4,complimentary_start=CASE WHEN $4 THEN COALESCE(complimentary_start,now()) ELSE NULL END,complimentary_end=$5,complimentary_reason=$6,updated_at=now() WHERE id=$7 RETURNING *", [plan, plans[plan], payable, complimentary, end, complimentary ? String(body.reason || "Complimentary access") : null, id]))[0];
       await syncOrganisation(request, row as Record<string, unknown>);

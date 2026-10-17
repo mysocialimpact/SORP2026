@@ -3,6 +3,7 @@ import { sorpAuthPool } from "./auth";
 import { founderQuery } from "@/lib/founder/db";
 import { founderCreateOrganisation, founderInviteMember, founderRequestClientAccess,
   founderRevokeInvitation, founderSetPlan } from "./admin";
+import { complimentaryAccessEnd } from "@/lib/founder/complimentary-access";
 
 type Input = Record<string, unknown>;
 const json = (data: unknown, status = 200) => Response.json(data,
@@ -220,11 +221,8 @@ export async function independentFounderPOST(actor: { id?: string }, resource: s
     return json((await organisationDetail(created.id))!.organisation, 201);
   }
   if (resource === "organisation" && id && action === "plan") {
-    const duration = body.duration;
     const complimentary = body.complimentary === true;
-    const expiry = duration === "30" || duration === "90"
-      ? new Date(Date.now() + Number(duration) * 86400000).toISOString()
-      : duration === "custom" && body.expiry ? new Date(String(body.expiry)).toISOString() : null;
+    const expiry = complimentaryAccessEnd(body);
     await founderSetPlan(actor.id, { organisationId: id, plan: body.plan,
       complimentary, complimentaryEnd: expiry, reason: body.reason });
     return json((await organisationDetail(id))!.organisation);
