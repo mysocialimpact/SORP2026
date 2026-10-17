@@ -19,7 +19,7 @@ const answer = (s, t) => advance(s, extractImmediate(t, s));
 const trustee = () =>
   answer(
     initialConversation(),
-    "I’m Alex Jones, a trustee at Interim Spaces. My email is alex@example.com.",
+    "I’m Alex Jones, a trustee at Interim Spaces. I work for Cedar Advisory. My email is alex@example.com.",
   );
 const confirmed = (s, name = "Interim Spaces") =>
   confirmCharity(s, {
@@ -28,10 +28,10 @@ const confirmed = (s, name = "Interim Spaces") =>
   });
 test("trustee relationship is inferred, suggested immediately and never silently confirmed", () => {
   const s = trustee();
-  assert.equal(s.facts.organisation, "Interim Spaces");
+  assert.equal(s.facts.organisation, "Cedar Advisory");
   assert.equal(s.facts.role, "Trustee");
   assert.deepEqual(charityOptions(s), ["Interim Spaces"]);
-  assert.equal(s.knowledge.organisationKind.status, "inferred");
+  assert.equal(s.facts.organisationKind, "unknown");
   assert.match(nextQuestion(s), /You mentioned Interim Spaces.*Shall we/);
   assert.equal(s.charity.phase, "suggest");
   assert.equal(s.charity.confirmed, null);
@@ -46,8 +46,8 @@ test("exact reminder preserves the entity, acknowledges the correction and does 
     assert.equal(s.lastIntent, "remind");
     assert.equal(s.charity.proposed, "Interim Spaces");
     assert.equal(s.charity.phase, "suggest");
-    assert.equal(s.facts.organisation, "Interim Spaces");
-    assert.deepEqual(s.facts.charities, []);
+    assert.equal(s.facts.organisation, "Cedar Advisory");
+    assert.deepEqual(s.facts.charities, ["Interim Spaces"]);
     assert.match(nextQuestion(s), /You’re right — Interim Spaces.*Shall we/);
     assert.equal(s.repairTurns, 1);
   }
@@ -95,7 +95,7 @@ test("employer rejection retains the employer and removes the charity suggestion
     trustee(),
     "I work there, but that’s not the charity I want to review.",
   );
-  assert.equal(s.facts.organisation, "Interim Spaces");
+  assert.equal(s.facts.organisation, "Cedar Advisory");
   assert.deepEqual(charityOptions(s), []);
   assert.equal(s.charity.confirmed, null);
   assert.match(nextQuestion(s), /Which charity/);
@@ -122,7 +122,7 @@ test("ambiguity, disagreement and questions never fill the currently requested f
   ]) {
     const next = answer(s, text);
     assert.equal(next.facts.responsibilities, "");
-    assert.equal(next.facts.organisation, "Interim Spaces");
+    assert.equal(next.facts.organisation, "Cedar Advisory");
     assert.equal(nextObjective(next), "clarification");
     assert.doesNotMatch(nextQuestion(next), /What keeps you/);
   }
@@ -155,10 +155,10 @@ test("direct edits and reload use the same relationship and question state", () 
     "form",
   );
   s = normaliseConversation(JSON.parse(JSON.stringify(s)));
-  assert.match(nextQuestion(s), /Interim Spaces/);
+  assert.equal(s.charity.proposed, "");
   assert.equal(s.knowledge.role.status, "confirmed");
   s = applyFacts(s, { organisation: "Brainstrust" }, "form");
-  assert.equal(s.charity.proposed, "Brainstrust");
+  assert.equal(s.charity.proposed, "");
   assert.doesNotMatch(nextQuestion(s), /Interim Spaces/);
 });
 test("legacy draft migrates without losing facts or registry confirmation", () => {
@@ -198,7 +198,7 @@ test("entity boundary refuses corrections, questions and model-generated convers
       charities: [value],
       charityChoice: value,
     });
-    assert.equal(s.facts.organisation, "Interim Spaces");
+    assert.equal(s.facts.organisation, "Cedar Advisory");
     assert.equal(s.charity.proposed, "Interim Spaces");
   }
 });

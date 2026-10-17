@@ -10,6 +10,7 @@ import {
   nextObjective,
   TOTAL_TURN_CAP,
   applyFacts,
+  clearCharity,
   proposeCharity,
   confirmCharity,
   validEntity,
@@ -251,7 +252,8 @@ export async function POST(
       );
     await claimRequest(session.id, action === "search");
     if (action === "edit") {
-      const next = applyFacts(session.state, body.fields || {}, "form");
+      const edited = applyFacts(session.state, body.fields || {}, "form");
+      const next = body.clearCharity === true ? clearCharity(edited) : edited;
       const saved = await saveSession(session, next);
       return json(snapshot(saved));
     }

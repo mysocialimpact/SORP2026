@@ -11,11 +11,32 @@ export async function GET(request: Request) {
   return proxyExistingSorpBackend(request, "/api/readiness-account");
 }
 export async function POST(request: Request) {
+  const payload = await request.clone().json().catch(() => ({}));
+  // This onboarding journey requires a server-confirmed registry selection.
+  // Do not change existing login, invitation or legacy account endpoints.
+  if (payload.action === "signup" && payload.progress?.onboarding) {
+    const { enabled, getSession, sameOrigin } = await import("../../../lib/onboarding/server.ts");
+    const { accountReady } = await import("../../../lib/onboarding/state.ts");
+    try { sameOrigin(request); } catch { return Response.json({ error: "Please use this website to create your account." }, { status: 403 }); }
+    if (!enabled()) return Response.json({ error: "Account preparation is unavailable here. Please try again shortly." }, { status: 503 });
+    try {
+      const session = await getSession(request);
+      if (!session || !accountReady(session.state)) return Response.json({ error: "Complete your details and confirm the official charity record first." }, { status: 422 });
+      const f = session.state.facts;
+      if (payload.name?.trim() !== f.name.trim() || payload.email?.trim().toLowerCase() !== f.email.trim().toLowerCase() || payload.position?.trim() !== f.role.trim() || payload.organisation?.trim() !== f.organisation.trim()) {
+        return Response.json({ error: "Your details have changed. Please save them and try again." }, { status: 409 });
+      }
+      // Use the canonical selection, not a charity object supplied by the browser.
+      payload.progress.onboarding.selected = session.state.charity.confirmed;
+      request = new Request(request, { body: JSON.stringify(payload) });
+    } catch {
+      return Response.json({ error: "We couldn’t verify your saved introduction. Please try again." }, { status: 503 });
+    }
+  }
   if (independentAuthCutover()) {
     const { independentAccountPOST } = await import("../../../lib/sorp-auth/compat.ts");
     return independentAccountPOST(request);
   }
-  const payload = await request.clone().json().catch(() => ({}));
   if (payload.action === "create-report-upload") {
     const accountRequest = new Request(request.url, { method: "GET", headers: request.headers });
     const accountResponse = await proxyExistingSorpBackend(accountRequest, "/api/readiness-account");

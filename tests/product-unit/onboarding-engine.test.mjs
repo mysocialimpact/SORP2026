@@ -199,7 +199,7 @@ for (const key of ["name", "email", "role", "organisation"])
     assert.equal(resumed.facts[key], altered);
     assert.ok(resumed.corrections.some((c) => c.field === key));
   });
-test("an explicit conversational correction can revise a form value without revising other fields", () => {
+test("a manual correction stays authoritative even if extraction proposes another correction", () => {
   const s = advance(ready(), {
     intent: "correct",
     target: "name",
@@ -207,7 +207,7 @@ test("an explicit conversational correction can revise a form value without revi
     correctedFields: ["name"],
     email: "wrong@example.invalid",
   });
-  assert.equal(s.facts.name, "Alexandra Rowan");
+  assert.equal(s.facts.name, "Alex Rowan");
   assert.equal(s.facts.email, "alex@example.invalid");
   assert.equal(s.knowledge.name.status, "confirmed");
 });
@@ -216,6 +216,7 @@ test("next-question validation uses the updated facts, rejecting stale requests 
     name: "Alex Rowan",
     email: "alex@example.invalid",
     role: "Trustee",
+    organisation: "Independent",
     questionProposal: {
       objective: "registration",
       fields: ["role"],
@@ -334,6 +335,7 @@ test("historical work requires a present-focused role question, not merely a gen
   const s = advance(initialConversation(), {
     name: "Marcus Warry",
     email: "marcus@example.invalid",
+    organisation: "Independent",
     professional: [relationship("Blue Cross")],
     questionProposal: {
       objective: "registration",
@@ -405,13 +407,14 @@ test("explicit fact-map schema retains separate volunteered context and null unk
   assert.ok(schema.required.includes("portfolio"));
 });
 
-test("typed current affiliations project into the form without promoting historical clients", () => {
+test("typed trusteeships cannot fill employment; only explicit current employment can", () => {
   const current = {
     ...relationship("Interim Spaces", "current", "trustee"),
     confidence: "stated",
   };
   const s = advance(initialConversation(), { professional: [current] });
-  assert.equal(s.facts.organisation, "Interim Spaces");
+  assert.equal(s.facts.organisation, "");
+  assert.equal(advance(initialConversation(), { professional: [{ ...current, relationship: "employer" }] }).facts.organisation, "Interim Spaces");
   const past = advance(initialConversation(), {
     professional: [relationship("Blue Cross")],
   });

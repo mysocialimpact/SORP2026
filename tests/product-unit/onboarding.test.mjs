@@ -30,7 +30,7 @@ test("A: all early facts populate together and charity/discovery are remembered"
   assert.equal(nextObjective(confirmed), "responsibilities");
   const detail = answer(confirmed, "I prepare accounts and advise trustees");
   assert.equal(nextObjective(detail), "concerns");
-  assert.equal(nextQuestion(detail), "What keeps you up at night?");
+  assert.equal(nextQuestion(detail), "What’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?");
 });
 test("B: partial first answer delivers a name without invented registration details", () => {
   const s = answer(
