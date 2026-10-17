@@ -2,22 +2,28 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import pg from 'pg';
 
+// Public releases start at v1 with the intelligent status bar. Increment this
+// deliberately for each production release; the deployment ledger remains the
+// immutable, internal build record used by the footer and operations.
+export const PUBLIC_RELEASE_VERSION = 1;
+
 // Allocate once per deployment, not per Next worker or page render. Retries of
 // the same deployment keep their original number and timestamp.
 export async function allocateBuild(client, deployment, environment) {
   const result = await client.query('SELECT * FROM sorp_build_metadata.allocate($1,$2)', [deployment, environment]);
   const row = result.rows[0];
   if (!Number.isSafeInteger(row?.number) || row.number <= 20) throw new Error('Invalid deployment build identifier');
-  return { number: row.number, deployedAt: new Date(row.deployed_at).toISOString(), environment };
+  return { number: row.number, version: PUBLIC_RELEASE_VERSION,
+    deployedAt: new Date(row.deployed_at).toISOString(), environment };
 }
 /** Preview-only identifier when the deployment ledger is not connected to Preview. */
 export function previewBuild(deployment, deployedAt = new Date()) {
   const digest = createHash('sha256').update(deployment).digest();
-  return { number: 900000 + digest.readUInt32BE(0) % 100000,
+  return { number: 900000 + digest.readUInt32BE(0) % 100000, version: PUBLIC_RELEASE_VERSION,
     deployedAt: deployedAt.toISOString(), environment: 'preview' };
 }
 if (process.argv[1]?.endsWith('prepare-build.mjs')) {
-  let metadata = { number: null, deployedAt: null, environment: 'development' };
+  let metadata = { number: null, version: PUBLIC_RELEASE_VERSION, deployedAt: null, environment: 'development' };
   if (process.env.VERCEL === '1') {
     const deployment = process.env.VERCEL_DEPLOYMENT_ID || (process.env.VERCEL_ENV === 'preview'
       ? process.env.VERCEL_URL || process.env.VERCEL_GIT_COMMIT_SHA : '');

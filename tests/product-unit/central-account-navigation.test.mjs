@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { currentAccountDestination, registrationHref, signInHref, invitationTokenFromDestination, rememberAccountReturn, recoveredAccountReturn } from '../../src/lib/account-navigation.ts';
 import { safeDestination } from '../../src/lib/onboarding/state.ts';
 import { formatBuildTimestamp } from '../../src/lib/build-information.ts';
-import { allocateBuild, previewBuild } from '../../scripts/prepare-build.mjs';
+import { allocateBuild, previewBuild, PUBLIC_RELEASE_VERSION } from '../../scripts/prepare-build.mjs';
 
 for (const destination of [
  '/are-you-sorp-ready/review/?client=one#report',
@@ -30,7 +30,7 @@ test('build timestamp uses UK time across BST and GMT, not the browser clock', (
 });
 test('deployment ledger result is immutable and cannot reset to the old build sequence', async () => {
  const client = { query: async (sql, args) => { assert.deepEqual(args, ['dpl_synthetic', 'preview']); assert.match(sql, /allocate\(\$1,\$2\)/); return { rows: [{ number: 21, deployed_at: '2026-10-16T17:45:00Z' }] }; } };
- assert.deepEqual(await allocateBuild(client, 'dpl_synthetic', 'preview'), { number: 21, deployedAt: '2026-10-16T17:45:00.000Z', environment: 'preview' });
+ assert.deepEqual(await allocateBuild(client, 'dpl_synthetic', 'preview'), { number: 21, version: PUBLIC_RELEASE_VERSION, deployedAt: '2026-10-16T17:45:00.000Z', environment: 'preview' });
  await assert.rejects(() => allocateBuild({ query: async () => ({ rows: [{ number: 20 }] }) }, 'dpl_synthetic', 'preview'));
 });
 test('unconnected previews retain a stable numeric identifier without changing the production ledger', () => {
@@ -38,6 +38,7 @@ test('unconnected previews retain a stable numeric identifier without changing t
  const first = previewBuild('dpl_synthetic', date);
  assert.deepEqual(first, previewBuild('dpl_synthetic', date));
  assert.equal(first.environment, 'preview');
+ assert.equal(first.version, PUBLIC_RELEASE_VERSION);
  assert.ok(first.number >= 900000 && first.number < 1000000);
  assert.notEqual(first.number, previewBuild('dpl_different', date).number);
 });

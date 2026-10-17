@@ -4,12 +4,13 @@ import { readFileSync } from "node:fs";
 // Written by prepare-build exactly once, reused by every Next process.
 const metadata = (() => {
   try { return JSON.parse(readFileSync(".sorp-build.json", "utf8")); }
-  catch { return { number: null, deployedAt: null, environment: "development" }; }
+  catch { return { number: null, version: 1, deployedAt: null, environment: "development" }; }
 })();
 if (process.env.VERCEL === "1" && !metadata.number) throw new Error("Run npm run build to prepare deployment metadata first.");
 const config: NextConfig = {
   env: {
     NEXT_PUBLIC_SITE_BUILD_NUMBER: String(metadata.number || ""),
+    NEXT_PUBLIC_SITE_RELEASE_VERSION: String(metadata.version || 1),
     NEXT_PUBLIC_SITE_BUILT_AT: metadata.deployedAt || "",
     NEXT_PUBLIC_SITE_BUILD_ENVIRONMENT: metadata.environment,
     NEXT_PUBLIC_ISOLATED_PREVIEW: process.env.VERCEL_ENV === "preview" && process.env.SORP_ISOLATED_PREVIEW === "true" ? "true" : "false",

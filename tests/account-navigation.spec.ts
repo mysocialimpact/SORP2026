@@ -10,6 +10,8 @@ test("visitors see one onboarding tab and distinct sign-in and registration acti
   await expect(account.getByRole("link", { name: "Log in" })).toBeVisible();
   await expect(account.getByRole("link", { name: /Let’s Get Started/ })).toBeVisible();
   await expect(page.locator(".build-information-bar")).toBeVisible();
+  await expect(page.locator(".build-information-bar")).toContainText("VISITOR");
+  await expect(page.locator(".build-information-bar")).toContainText("3 free AI questions");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.locator(".platform-sticky-navigation").screenshot({ path: testInfo.outputPath("logged-out-navigation.png") });
   if (testInfo.project.name === "mobile") {
@@ -36,6 +38,7 @@ test("sign-in returns to the originating product, then My Account shows saved pr
   await expect(tabs.locator("a").nth(1)).toContainText("My Account");
   await expect(tabs.locator("a").nth(1)).toHaveAttribute("href", "/settings/");
   await expect(page.getByRole("navigation", { name: "Your account" }).getByRole("link", { name: "My Dashboard" })).toBeVisible();
+  await expect(page.locator(".build-information-bar")).toContainText("FREE");
   await page.locator(".platform-sticky-navigation").screenshot({ path: testInfo.outputPath("logged-in-navigation.png") });
   await tabs.locator("a").nth(1).click();
   await expect(page).toHaveURL(/\/settings\//);
