@@ -1358,3 +1358,160 @@ body:has(.onboarding-page) > .folder-action-clearance {
 .profile-field:has(input[aria-invalid="true"]) {
   border-color: #a3613f;
 }
+
+/* The conversation is the entrance; the editable account details stay in view. */
+.onboarding-refresh {
+  background: radial-gradient(ellipse at 88% 3%, #dfead8 0, transparent 42%), #f7f7f0;
+}
+.onboarding-refresh .onboarding-header {
+  height: 68px;
+}
+.onboarding-refresh .onboarding-shell {
+  max-width: 1340px;
+  padding-top: clamp(24px, 3vw, 42px);
+}
+.onboarding-refresh .onboarding-heading {
+  max-width: 780px;
+  margin: 0 auto 26px;
+}
+.onboarding-refresh .onboarding-heading h1 {
+  font-size: clamp(42px, 5vw, 68px);
+  line-height: 1.02;
+  margin-bottom: 12px;
+}
+.onboarding-refresh .onboarding-heading > p:last-child {
+  font-size: clamp(14px, 1.35vw, 17px);
+  line-height: 1.45;
+}
+.onboarding-refresh .onboarding-workspace {
+  grid-template-columns: minmax(0, 1.28fr) minmax(330px, .82fr);
+  min-height: 615px;
+  border-color: #bccdb9;
+  border-radius: 16px;
+  box-shadow: 0 22px 65px #163f3115;
+  background: #fffefa;
+}
+.onboarding-refresh .conversation-topline {
+  margin-inline: 30px;
+  padding-block: 17px;
+  font-size: 11px;
+}
+.onboarding-refresh .conversation-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 30px 23px;
+}
+.onboarding-refresh .conversation-thread {
+  min-height: 145px;
+  max-height: min(44dvh, 360px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 6px 8px 8px 0;
+  scrollbar-color: #b9cbb7 transparent;
+}
+.onboarding-refresh .conversation-message {
+  max-width: 85%;
+  padding: 14px 17px;
+  border-radius: 16px 16px 16px 5px;
+  background: #eef2e9;
+  color: #193c32;
+  animation: conversation-arrive .25s ease-out both;
+}
+.onboarding-refresh .conversation-message.history-user {
+  align-self: flex-end;
+  border-radius: 16px 16px 5px 16px;
+  background: #e5edfa;
+}
+.onboarding-refresh .conversation-message small {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  color: #456558;
+}
+.onboarding-refresh .conversation-message p { margin: 0; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+.onboarding-refresh .conversation-question {
+  flex: none;
+  margin: 0;
+  padding: 12px 0;
+}
+.onboarding-refresh .conversation-question h2 {
+  max-width: 600px;
+  font-size: clamp(20px, 2vw, 27px);
+  line-height: 1.3;
+  letter-spacing: -.045em;
+}
+.onboarding-refresh .assistant-mark { background: #dcf4a0; color: #1b3931; border-color: #c0da8f; }
+.onboarding-refresh .onboarding-choice {
+  padding: 16px 18px;
+  border: 1px solid #c4d2b5;
+  border-radius: 12px;
+  background: #f0f5e8;
+  animation: conversation-arrive .3s ease-out both;
+}
+.onboarding-refresh .onboarding-choice p { margin: 0 0 12px; font-size: 13px; line-height: 1.45; }
+.onboarding-refresh .onboarding-choice > div { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.onboarding-refresh .onboarding-choice .onboarding-primary { width: auto; min-width: 166px; }
+.onboarding-refresh .onboarding-choice .onboarding-text-button { margin: 0; }
+.onboarding-refresh .onboarding-composer { border-color: #acbead; box-shadow: 0 4px 15px #173d320a; }
+.onboarding-refresh .onboarding-composer textarea { min-height: 74px; max-height: 140px; }
+.onboarding-refresh .onboarding-profile { background: #eaf0e3; padding: 27px 28px; }
+.onboarding-refresh .profile-fields { gap: 9px; }
+.onboarding-refresh .profile-field { background: #fbfcf8; }
+.onboarding-refresh .profile-charity-status { margin: 14px 0 0; font-size: 12px; line-height: 1.45; color: #365647; }
+.onboarding-refresh .profile-hint { margin-bottom: 14px; }
+.onboarding-refresh .profile-destination { margin-top: 17px; }
+.onboarding-refresh .onboarding-mobile-summary { display: none; }
+.onboarding-refresh .conversation-footnote { margin-top: auto; }
+@keyframes conversation-arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 760px) {
+  .onboarding-refresh .onboarding-header { height: 60px; }
+  .onboarding-refresh .onboarding-shell { padding: 20px 12px 0; }
+  .onboarding-refresh .onboarding-heading { margin-bottom: 17px; }
+  .onboarding-refresh .onboarding-heading h1 { font-size: clamp(36px, 10vw, 48px); }
+  .onboarding-refresh .onboarding-heading > p:last-child { font-size: 14px; padding: 0 4px; }
+  .onboarding-refresh .onboarding-workspace { display: flex; flex-direction: column; min-height: 0; border-radius: 13px; overflow: visible; }
+  .onboarding-refresh .onboarding-conversation { order: 1; }
+  .onboarding-refresh .onboarding-profile {
+    order: 2; position: static; top: auto; border: 0; border-top: 1px solid #cbd9c5;
+    border-radius: 0 0 13px 13px; box-shadow: none; padding: 21px 17px;
+  }
+  .onboarding-refresh .conversation-topline { margin-inline: 17px; padding-block: 13px; }
+  .onboarding-refresh .conversation-body { gap: 11px; padding: 13px 17px 20px; }
+  .onboarding-refresh .onboarding-mobile-summary {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 8px;
+    padding: 9px 11px; border: 1px solid #d0dfc9; border-radius: 9px; background: #f3f7ef;
+    font-size: 11px; line-height: 1.3;
+  }
+  .onboarding-refresh .onboarding-mobile-summary span { font-weight: 700; color: #4d6d5a; }
+  .onboarding-refresh .onboarding-mobile-summary strong { flex: 1 1 45%; overflow-wrap: anywhere; }
+  .onboarding-refresh .onboarding-mobile-summary a { font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+  .onboarding-refresh .conversation-thread { max-height: min(36dvh, 300px); min-height: 125px; }
+  .onboarding-refresh .conversation-message { max-width: 94%; padding: 12px 14px; }
+  .onboarding-refresh .conversation-question { margin: 0; gap: 10px; padding-block: 8px; }
+  .onboarding-refresh .conversation-question h2 { font-size: clamp(20px, 5.4vw, 24px); }
+  .onboarding-refresh .onboarding-composer textarea { min-height: 64px; }
+  .onboarding-refresh .onboarding-choice { padding: 13px; }
+  .onboarding-refresh .onboarding-choice > div { gap: 11px; }
+  .onboarding-refresh .onboarding-choice .onboarding-primary { min-width: 145px; }
+  .onboarding-refresh .profile-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .onboarding-refresh .profile-field > span { min-height: 28px; align-items: flex-start; font-size: 10px; }
+  .onboarding-refresh .profile-field input { min-width: 0; font-size: 16px; }
+  .onboarding-refresh .profile-next { display: block; }
+  .onboarding-refresh .profile-next p { font-size: 11px; }
+  .onboarding-refresh .profile-heading h2 { font-size: 24px; }
+  .onboarding-refresh .profile-count { font-size: 25px; }
+}
+@media (max-width: 360px) {
+  .onboarding-refresh .profile-fields { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-refresh .conversation-message,
+  .onboarding-refresh .onboarding-choice { animation: none; }
+}

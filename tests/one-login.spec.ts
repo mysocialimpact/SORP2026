@@ -18,7 +18,7 @@ async function login(page: Page) {
 async function register(page: Page) {
   await page.getByRole("button", { name: /Fill in the form yourself/ }).click();
   for (const [name, value] of Object.entries({ name: "Synthetic Account", email: account.email, role: "Trustee", organisation: "Synthetic Organisation" })) {
-    await page.locator(`.onboarding-profile input[name=${name}]`).fill(value);
+    await page.locator(`.onboarding-profile:visible input[name=${name}]`).fill(value);
   }
   await page.getByLabel("Charity name or registration number").fill("Synthetic Test Charity");
   await page.getByRole("button", { name: "Find →", exact: true }).click();
@@ -40,7 +40,7 @@ test.describe("One login rule with the existing isolated preview account service
       if (response.url().includes("/api/readiness-account") && response.request().method() === "POST" && response.request().postDataJSON()?.action === "signup" && response.ok()) created = true;
     });
     await page.goto("/");
-    await page.locator(".homepage-start-action").getByRole("link", { name: /Start your free review/ }).click();
+    await page.locator(".homepage-start-action").getByRole("link", { name: /Let’s Get Started/ }).click();
     await expect(page).toHaveURL(/\/get-started\//);
     expect(new URL(page.url()).searchParams.get("next")).toBe(journeys[0].path);
     await register(page);
@@ -116,7 +116,8 @@ test.describe("One login rule with the existing isolated preview account service
     await expect(page.getByRole("navigation", { name: "SORP2026 products" })).toContainText("My Account");
     const metadata = await (await request.get("/build-info.json")).json();
     const bar = page.locator(".build-information-bar");
-    await expect(bar.locator("time")).toHaveAttribute("datetime", metadata.deployedAt);
+    if (metadata.deployedAt) await expect(bar.locator("time")).toHaveAttribute("datetime", metadata.deployedAt);
+    else await expect(bar.locator("time")).toHaveCount(0); // Local builds have no deployment timestamp.
     expect(await bar.evaluate(element => getComputedStyle(element).position)).toBe("static");
     await page.evaluate(() => window.scrollTo({ top: 650, behavior: "instant" }));
     expect((await bar.boundingBox())!.y + (await bar.boundingBox())!.height).toBeLessThanOrEqual(0);

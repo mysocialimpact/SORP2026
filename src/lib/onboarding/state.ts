@@ -988,7 +988,9 @@ export function nextObjective(s: Conversation): Objective {
   if (!s.charity.confirmed && !s.skipped.includes("charity")) return "charity";
   if (s.dialogue.reflecting && s.turns < TOTAL_TURN_CAP) return "reflection";
   if (s.turns - s.repairTurns >= OPTIONAL_TURN_CAP) return "complete";
-  for (const key of ["responsibilities", "discovery", "concerns"] as const)
+  // The optional conversation has two invitations: their work and hopes, then concerns.
+  // Referral details remain extractable when volunteered, but are not another question.
+  for (const key of ["responsibilities", "concerns"] as const)
     if (!s.facts[key] && !s.skipped.includes(key)) return key;
   return "complete";
 }
@@ -1041,7 +1043,7 @@ function fallbackQuestion(s: Conversation): string {
         !Object.values(s.facts).some(
           (v) => typeof v === "string" && v && v !== "unknown",
         )
-        ? "Let’s start with you. What’s your name, email address and what do you do?"
+        ? "Tell me a little about yourself. What’s your name, email, role and organisation? If you’re helping a charity, which one?"
         : `${acknowledgement}Thank you${s.facts.name ? `, ${s.facts.name.split(" ")[0]}` : ""}. Could you tell me ${missing.join(" and ")}?`;
     }
     case "charity": {
@@ -1062,11 +1064,7 @@ function fallbackQuestion(s: Conversation): string {
           : "Which charity would you like to start with? One name or charity number is enough to help us prepare a more personal experience.";
     }
     case "responsibilities":
-      return /accountant|auditor|advis[eo]r/i.test(s.facts.role)
-        ? "Do you mainly prepare accounts for charities, advise them more broadly, or a bit of both?"
-        : /trustee|chair/i.test(s.facts.role)
-          ? "Are you mainly involved in governance, financial oversight or something else?"
-          : "What does your work involve day to day?";
+      return "Tell me a little about what you do, and what you’re hoping to achieve.";
     case "discovery":
       return "By the way, how did you come across us?";
     case "concerns":

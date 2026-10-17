@@ -78,7 +78,7 @@ export function ProductActionBar() {
   return <>
     <aside ref={bar} className={`folder-action-bar${readinessLanding ? " is-readiness" : ""}`} data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
       {readinessLanding && <Link className="folder-action-utility folder-action-presentation" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>}
-      <ToolLink className="folder-action-primary" href={action.href}>{readinessLanding && !account?.signedIn ? "Start Free Review" : action.label} <span aria-hidden="true">→</span></ToolLink>
+      <ToolLink className="folder-action-primary" href={action.href}>{path === "/" && account?.signedIn === false ? "Let’s Get Started" : readinessLanding && !account?.signedIn ? "Start Free Review" : action.label} <span aria-hidden="true">→</span></ToolLink>
       <a className="folder-action-utility folder-action-feedback" href="#page-feedback">Give feedback <span aria-hidden="true">→</span></a>
       <a className="folder-action-secondary" href="#say-hello">Talk to us <span aria-hidden="true">→</span></a>
     </aside>

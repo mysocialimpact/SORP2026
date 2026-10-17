@@ -227,14 +227,16 @@
   line-height: 1.15;
   letter-spacing: -.035em;
 }
-.homepage-audience-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.homepage-audience-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
 .homepage-audience-options button {
   position: relative; display: block; min-width: 0; text-align: left;
   padding: 30px 28px 28px; color: #242329; background: #ffad8e;
   border: 2px solid transparent; border-radius: 4px; font: inherit; cursor: pointer;
   transition: transform .16s ease, box-shadow .16s ease;
 }
-.homepage-audience-options button:nth-child(2) { background: #ded7f1; }
+.homepage-audience-option { min-width: 0; }
+.homepage-audience-option > button { width: 100%; min-height: 205px; }
+.homepage-audience-option:nth-child(2) > button { background: #ded7f1; }
 .homepage-audience-options button:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #ffffff20; }
 .homepage-audience-options button[aria-pressed="true"] { border-color: #242329; box-shadow: inset 0 0 0 3px #ffffffb8, 0 0 0 3px #d8ff52; }
 .homepage-audience-options button[aria-pressed="true"]::after {
@@ -259,6 +261,11 @@
 .homepage-audience-detail h2 { max-width: 520px; font-size: clamp(30px, 3.2vw, 46px); line-height: .98; letter-spacing: -.05em; }
 .homepage-audience-detail > div { display: grid; gap: 12px; align-content: start; }
 .homepage-audience-detail p { max-width: 680px; font-size: 16px; line-height: 1.5; }
+.homepage-audience-option .homepage-audience-detail { display: block; padding: 24px; margin-top: 10px; }
+.homepage-audience-option .homepage-audience-detail h2 { font-size: clamp(27px, 2.8vw, 39px); }
+.homepage-audience-option .homepage-audience-detail > div { display: grid; gap: 10px; margin-top: 16px; }
+.homepage-audience-option .homepage-audience-detail p { margin: 0; }
+.homepage-audience-option .homepage-audience-detail a { width: fit-content; margin-top: 12px; border-bottom: 2px solid currentColor; font-weight: 700; text-decoration: none; }
 @media (prefers-reduced-motion: no-preference) {
   .homepage-audience-detail { animation: audience-reveal 260ms ease-out both; }
 }
