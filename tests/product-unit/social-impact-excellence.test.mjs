@@ -8,6 +8,7 @@ import { PURPOSE_QUESTION_GUIDANCE } from "../../src/features/excellence/purpose
 import { LEADERSHIP_OPEN_QUESTIONS, LEADERSHIP_SCALE, LEADERSHIP_SECTIONS, leadershipMaturity, newLeadershipWorkspace, normaliseLeadershipWorkspace, scoreLeadership } from "../../src/features/excellence/leadership.ts";
 import { LEADERSHIP_QUESTION_GUIDANCE } from "../../src/features/excellence/leadership-guidance.ts";
 import { DATA_METHODOLOGY_VERSION, DATA_OPEN_QUESTIONS, DATA_SCALE, DATA_SECTIONS, dataMaturity, newDataWorkspace, normaliseDataWorkspace, scoreData } from "../../src/features/excellence/data.ts";
+import { DELIVERY_METHODOLOGY_VERSION, DELIVERY_OPEN_QUESTIONS, DELIVERY_SCALE, DELIVERY_SECTIONS, deliveryMaturity, newDeliveryWorkspace, normaliseDeliveryWorkspace, scoreDelivery } from "../../src/features/excellence/delivery.ts";
 
 test("native charity assessment preserves the established five-pillar, 25-question methodology", () => {
   assert.deepEqual(PILLARS.map(pillar => pillar.key), ["purpose", "leadership", "data", "delivery", "communication"]);
@@ -167,4 +168,62 @@ test("Data persistence is versioned, restores drafts and preserves immutable sub
   invalid.answers[0].score = 0;
   assert.equal(normaliseDataWorkspace(invalid).reviewStatus, "not_submitted");
   assert.equal(normaliseDataWorkspace(invalid).answers[0].score, null);
+});
+
+test("Delivery pathway contains five sections, 20 authored ratings and five open reflections", () => {
+  assert.equal(DELIVERY_SECTIONS.length, 5);
+  assert.deepEqual(DELIVERY_SECTIONS.map(section => section.questions.length), [4, 4, 4, 4, 4]);
+  const questions = DELIVERY_SECTIONS.flatMap(section => section.questions);
+  assert.deepEqual(questions.map(question => question.id), Array.from({ length: 20 }, (_, index) => `DELIVERY${String(index + 1).padStart(2, "0")}`));
+  assert.equal(new Set(questions.map(question => question.question)).size, 20);
+  assert.equal(new Set(questions.map(question => question.why)).size, 20);
+  const stars = questions.flatMap(question => question.stars);
+  assert.equal(stars.length, 100);
+  assert.equal(new Set(stars).size, 100);
+  assert.ok(questions.every(question => question.why.length >= 100 && question.stars.every(description => description.length >= 50)));
+  assert.equal(DELIVERY_OPEN_QUESTIONS.length, 5);
+  assert.deepEqual(DELIVERY_OPEN_QUESTIONS.map(question => question.id), ["DELIVERY_OPEN01", "DELIVERY_OPEN02", "DELIVERY_OPEN03", "DELIVERY_OPEN04", "DELIVERY_OPEN05"]);
+});
+
+test("Delivery embeds management accounting and operational practice without collapsing into finance alone", () => {
+  const content = JSON.stringify(DELIVERY_SECTIONS).toLowerCase();
+  for (const concept of ["budget", "cost", "management information", "forecast", "resource allocation", "cost-effectiveness", "value for money", "financial resilience", "quality", "partnership"]) assert.match(content, new RegExp(concept));
+  assert.equal(DELIVERY_SECTIONS[1].title, "FINANCIAL MANAGEMENT & RESOURCE ALLOCATION");
+  assert.equal(DELIVERY_SECTIONS[3].title, "PERFORMANCE, EFFICIENCY & VALUE FOR MONEY");
+});
+
+test("Delivery scoring uses Purpose bands and excludes comments, reflections and evidence", () => {
+  assert.deepEqual(DELIVERY_SCALE, PURPOSE_SCALE);
+  const workspace = newDeliveryWorkspace();
+  workspace.answers.slice(0, 19).forEach(answer => { answer.score = 4; });
+  assert.equal(scoreDelivery(workspace.answers), null);
+  workspace.answers[19].score = 4;
+  workspace.answers[0].comment = "Operational and financial context is unscored.";
+  workspace.answers.slice(20).forEach(answer => { answer.answer = "Optional reflection."; answer.score = 1; });
+  workspace.evidence.push({ id: "evidence-1", fileName: "programme-budget.xlsx", category: "Programme budget", notes: "Unscored", size: 1200, uploadedAt: new Date(0).toISOString() });
+  assert.deepEqual(scoreDelivery(workspace.answers), { score: 4, maturity: "Established" });
+  workspace.answers[0].score = 6;
+  assert.equal(scoreDelivery(workspace.answers), null);
+  for (const score of [1, 1.79, 1.8, 2.59, 2.6, 3.39, 3.4, 4.19, 4.2, 5]) assert.equal(deliveryMaturity(score), purposeMaturity(score));
+});
+
+test("Delivery persistence remains versioned and isolated from every existing pillar", () => {
+  const workspace = newDeliveryWorkspace({ name: "QA", email: "qa@example.invalid", organisation: "QA Charity" });
+  workspace.status = "draft";
+  workspace.answers[0].score = 5;
+  workspace.answers[0].comment = "Delivery decisions use proportionate management information.";
+  workspace.answers[20].answer = "Capacity is the most significant practical constraint.";
+  workspace.submissions.push({ assessmentId: workspace.assessmentId, methodologyVersion: DELIVERY_METHODOLOGY_VERSION, submittedAt: new Date(0).toISOString(), score: 5, maturity: "Fully Embedded", answers: structuredClone(workspace.answers) });
+  const purpose = { preserved: true }, leadership = { preserved: true }, data = { preserved: true }, snapshot = { answers: [1, 2, 3] };
+  const product = { purpose, leadership, data, snapshot, delivery: workspace };
+  const restored = normaliseDeliveryWorkspace(product.delivery);
+  assert.equal(restored.methodologyVersion, DELIVERY_METHODOLOGY_VERSION);
+  assert.equal(restored.answers[0].comment, workspace.answers[0].comment);
+  assert.equal(restored.answers[20].answer, workspace.answers[20].answer);
+  assert.equal(restored.submissions.length, 1);
+  assert.strictEqual(product.purpose, purpose); assert.strictEqual(product.leadership, leadership); assert.strictEqual(product.data, data); assert.strictEqual(product.snapshot, snapshot);
+  const invalid = structuredClone(workspace); invalid.reviewStatus = "verified"; invalid.answers[0].score = 0;
+  const sanitised = normaliseDeliveryWorkspace(invalid);
+  assert.equal(sanitised.reviewStatus, "not_submitted");
+  assert.equal(sanitised.answers[0].score, null);
 });
