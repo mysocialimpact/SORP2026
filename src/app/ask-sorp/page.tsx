@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ToolLink } from "@/components/tool-link";
 import { FolderHero } from "@/components/folder-hero";
 import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
@@ -27,7 +28,7 @@ export default function AskSorp() {
           <h1>Over 300 pages of SORP.<br /><span>Now you can just ask.</span></h1>
           <p className="ask-hero-lead">SORP 2026 can be complex. We’ve built Ask SORP to make understanding the requirements simpler, faster and more accessible.</p>
           <p className="ask-hero-support">Ask questions in plain English, explore the relevant guidance and see where the answers come from.</p>
-          <Link className="ask-primary-action" href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></Link>
+          <ToolLink className="ask-primary-action" href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></ToolLink>
           <p className="ask-reassurance">Relevant references. Uncertainty made clear. Professional judgement where it matters.</p>
         </div>
         <div className="ask-hero-visual" aria-hidden="true">
@@ -97,7 +98,7 @@ export default function AskSorp() {
           <h2 id="ask-start-title">What do you need to know?</h2>
           <p>Ask your question in plain English. We’ll show you the relevant guidance and where the answer comes from.</p>
         </div>
-        <Link href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></Link>
+        <ToolLink href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></ToolLink>
       </section>
     </main>
   );

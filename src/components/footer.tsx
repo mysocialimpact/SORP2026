@@ -38,7 +38,7 @@ export function Footer() {
           <Link href="/privacy/">Privacy &amp; accessibility</Link>
           <p>The Ideas Shed Limited · Company 17380053</p>
           <p className="gateway-build" aria-label="Website build information">
-            <strong>Build {number || "local"}</strong>
+            <strong>Build {number || (buildInformation.environment === "preview" ? "preview" : "local")}</strong>
             {" · "}
             <time dateTime={builtAt}>
               {formatBuildTimestamp(builtAt)}

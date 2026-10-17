@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import Link from "next/link";
-import { AccountGateway } from "@/components/account-gateway";
+import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
 import { ProductWorkspaceHeader } from "@/components/product-workspace-header";
 import { useRouter } from "next/navigation";
 import { loadSharedContext } from "@/features/onboarding/shared-context";
@@ -47,7 +47,7 @@ const initial: Saved = { sessionId: "", step: "scope", query: "", research: null
 const locationOf = ({ step, criterion, reportView }: Saved): ReviewLocation => ({ step, criterion, reportView });
 const sameLocation = (left: ReviewLocation, right: ReviewLocation) => left.step === right.step && left.criterion === right.criterion && left.reportView === right.reportView;
 const isLocation = (value: unknown): value is ReviewLocation => Boolean(value && typeof value === "object" && typeof (value as ReviewLocation).step === "string" && Number.isInteger((value as ReviewLocation).criterion) && Number.isInteger((value as ReviewLocation).reportView));
-const normaliseLocation = (location: ReviewLocation): ReviewLocation => location;
+const normaliseLocation = (location: ReviewLocation): ReviewLocation => location.step === "account" ? { ...location, step: "homework" } : location;
 const isTransient = (step: Step) => step === "quick-generating" || step === "generating";
 const phases = ["Introduction", "Find charity", "Published report", "Assessment", "Historical snapshot", "Current readiness", "Your report", "What next"];
 const scale: { value: CanonicalAnswer; label: string }[] = [
@@ -249,12 +249,6 @@ function CompletionActions({ onViewReport, onBook, onTrack }: { onViewReport: ()
   </section>;
 }
 
-function GoogleMark() {
-  return <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.05H12v3.87h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.35Z"/><path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.24-2.51c-.9.6-2.05.96-3.38.96-2.6 0-4.81-1.76-5.6-4.13H3.06v2.59A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 13.9A6 6 0 0 1 6.09 12c0-.66.11-1.3.31-1.9V7.51H3.06A10 10 0 0 0 2 12c0 1.61.39 3.14 1.06 4.49L6.4 13.9Z"/><path fill="#EA4335" d="M12 5.97c1.47 0 2.79.5 3.82 1.5l2.87-2.87A9.62 9.62 0 0 0 12 2a10 10 0 0 0-8.94 5.51L6.4 10.1c.79-2.37 3-4.13 5.6-4.13Z"/></svg>;
-}
-
-const GOOGLE_ACCOUNT_SIGN_IN_ENABLED = false;
-
 function AssessmentProgress({ phase, complete = false }: { phase: number; complete?: boolean }) {
   const current = complete ? phases.length - 1 : phase;
   return <div className="scr-top">
@@ -290,12 +284,6 @@ export function SorpCandidateReview() {
   const [problemStatus, setProblemStatus] = useState("");
   const [problemSending, setProblemSending] = useState(false);
   const [account, setAccount] = useState<ReadinessAccount | null>(null);
-  const [accountMode, setAccountMode] = useState<"signup" | "login">("signup");
-  const [accountPassword, setAccountPassword] = useState("");
-  const [accountPasswordConfirm, setAccountPasswordConfirm] = useState("");
-  const [accountBusy, setAccountBusy] = useState(false);
-  const [accountError, setAccountError] = useState("");
-  const [googleSignInStarting, setGoogleSignInStarting] = useState(false);
   const [reportDragActive, setReportDragActive] = useState(false);
   const contribution = useVoluntaryContribution({
     sessionId: saved.sessionId,
@@ -318,11 +306,11 @@ export function SorpCandidateReview() {
       entryUrl.searchParams.delete("entry");
       window.history.replaceState(window.history.state, "", entryUrl.pathname + entryUrl.search + entryUrl.hash);
     } else if (entryUrl.searchParams.get("entry") === "login") {
-      restored = { ...restored, step: "account" };
-      setAccountMode("login");
+      restored = { ...restored, step: restored.candidate ? "homework" : "find" };
       entryUrl.searchParams.delete("entry");
       window.history.replaceState(window.history.state, "", entryUrl.pathname + entryUrl.search + entryUrl.hash);
     }
+    if (restored.step === "account") restored = { ...restored, step: restored.candidate ? "homework" : "find" };
     setSaved(restored);
     try { const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "null"); const current = locationOf(restored); setNavigation(history && isLocation(history.current) && sameLocation(normaliseLocation(history.current), current) && Array.isArray(history.past) && history.past.every(isLocation) && Array.isArray(history.future) && history.future.every(isLocation) ? { past: history.past.map(normaliseLocation), current, future: history.future.map(normaliseLocation) } : { past: [], current, future: [] }); }
     catch { setNavigation({ past: [], current: locationOf(restored), future: [] }); }
@@ -339,14 +327,13 @@ export function SorpCandidateReview() {
         if (!response.ok) return;
         const data = await response.json() as { signedIn?: boolean; account?: ReadinessAccount; progress?: Partial<Saved> };
         if (!data.signedIn || !data.account) {
-          setSaved(current => current.candidate && !["scope", "public-methodology", "intro", "benefits", "find", "confirmation", "account"].includes(current.step)
-            ? { ...current, step: "account" }
-            : current);
+          router.replace(registrationHref(currentAccountDestination()));
           return;
         }
         setAccount(data.account);
         setSaved(current => {
-          const restored = !current.candidate && data.progress?.sessionId ? { ...initial, ...data.progress } as Saved : current;
+          const restoredProgress = !current.candidate && data.progress?.sessionId ? { ...initial, ...data.progress } as Saved : current;
+          const restored = restoredProgress.step === "account" ? { ...restoredProgress, step: restoredProgress.candidate ? "homework" as const : "find" as const } : restoredProgress;
           const position = data.account!.position && data.account!.position !== "TO CONFIRM" ? data.account!.position : "";
           return { ...restored, name: restored.name || data.account!.name, email: data.account!.email, emailConfirm: data.account!.email, role: restored.role || (roles.includes(position) ? position : position ? "OTHER" : ""), roleOther: restored.roleOther || (position && !roles.includes(position) ? position : "") };
         });
@@ -360,7 +347,7 @@ export function SorpCandidateReview() {
     })();
     const params = new URLSearchParams(window.location.search);
     const oauthError = params.get("account_error");
-    if (oauthError) setAccountError(oauthError);
+    if (oauthError) setError(oauthError);
     if (params.has("account") || oauthError) {
       params.delete("account"); params.delete("account_error");
       window.history.replaceState(window.history.state, "", `${window.location.pathname}${params.size ? `?${params}` : ""}${window.location.hash}`);
@@ -409,7 +396,11 @@ export function SorpCandidateReview() {
     setFeedbackStatus(current => ({ ...current, [phase]: "saved" }));
     event(phase === "quick" ? "quick_review_feedback_submitted" : "full_review_feedback_submitted", { rating });
   }
-  function go(step: Step) { setError(""); setSaved(current => ({ ...current, step: step === "find" && current.sharedCharityConfirmed && current.candidate ? "account" : step })); }
+  function go(step: Step) {
+    setError("");
+    if (step === "find" && saved.sharedCharityConfirmed && saved.candidate) { void startHomework(); return; }
+    setSaved(current => ({ ...current, step: step === "account" ? current.candidate ? "homework" : "find" : step }));
+  }
   const report = saved.report;
   const homeworkComplete = !!saved.state && (validPreparedDocument(saved.preparedDocument) || verifiedCanonicalTar(saved.verifiedTar));
   const tar = report?.tar;
@@ -481,52 +472,6 @@ export function SorpCandidateReview() {
   }
   function confirmCandidate(candidate: Candidate) {
     setSaved(state => ({ ...state, candidate, state: null, verifiedTar: null, preparedDocument: null, walkthroughSeen: false, report: null, corrections: {}, step: "confirmation" }));
-  }
-  async function submitAccount(formEvent: React.FormEvent) {
-    formEvent.preventDefault();
-    if (accountBusy || (!saved.candidate && !account && accountMode !== "login")) return;
-    if (!account) return; // Anonymous accounts are created only at /get-started.
-    const action: "save" | "login" | "signup" = account ? "save" : accountMode;
-    const role = saved.role === "OTHER" ? saved.roleOther.trim() : saved.role;
-    if (action === "login") {
-      if (!saved.email.trim() || !accountPassword) { setAccountError("Enter your email and password to sign in."); return; }
-    } else {
-      if (!saved.name.trim() || !role || !saved.email.trim()) { setAccountError("Please complete your name, role and email before continuing."); return; }
-      if (saved.email.trim().toLowerCase() !== saved.emailConfirm.trim().toLowerCase()) { setAccountError("Those email addresses do not match."); return; }
-      if (action === "signup" && accountPassword !== accountPasswordConfirm) { setAccountError("Those passwords do not match."); return; }
-    }
-    setAccountBusy(true); setAccountError("");
-    try {
-      const progress = { ...saved, email: saved.email.trim().toLowerCase(), emailConfirm: saved.email.trim().toLowerCase(), name: saved.name.trim() };
-      const body = action === "save" ? { action, progress } : action === "signup" ? { action, name: saved.name.trim(), position: role, email: saved.email.trim().toLowerCase(), password: accountPassword, progress } : { action, email: saved.email.trim().toLowerCase(), password: accountPassword };
-      const response = await fetch("/api/readiness-account", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-      const data = await response.json() as { account?: ReadinessAccount; progress?: Partial<Saved>; error?: string; verificationRequired?: boolean };
-      if (response.ok && data.verificationRequired) {
-        setAccountPassword(""); setAccountPasswordConfirm("");
-        setAccountMode("login");
-        setAccountError("Check your email to verify your new account, then sign in. Your review remains saved on this device.");
-        return;
-      }
-      if (!response.ok || !data.account) throw new Error(data.error || "The secure account service could not complete sign-in.");
-      setAccount(data.account);
-      const accountPosition = data.account.position && data.account.position !== "TO CONFIRM" ? data.account.position : "";
-      if (action === "login") {
-        const restored = data.progress?.sessionId ? { ...saved, ...data.progress } : saved;
-        const signedInProgress: Saved = { ...restored, email: data.account.email, emailConfirm: data.account.email, name: restored.name || data.account.name, role: restored.role || (roles.includes(accountPosition) ? accountPosition : accountPosition ? "OTHER" : ""), roleOther: restored.roleOther || (accountPosition && !roles.includes(accountPosition) ? accountPosition : "") };
-        setSaved(signedInProgress);
-        try { localStorage.setItem(KEY, JSON.stringify(signedInProgress)); } catch { /* The server copy remains authoritative. */ }
-        setAccountPassword(""); setAccountPasswordConfirm("");
-        event("account_signed_in");
-        router.replace("/dashboard/?signed-in=1");
-        router.refresh();
-        return;
-      }
-      setAccountPassword(""); setAccountPasswordConfirm("");
-      event(action === "signup" ? "account_created" : "account_signed_in");
-      if (!saved.candidate && !data.progress?.candidate) { go("find"); return; }
-      await startHomework();
-    } catch (cause) { setAccountError(cause instanceof Error ? cause.message : "Sign-in did not complete. Your progress remains safe on this device."); }
-    finally { setAccountBusy(false); }
   }
   async function startHomework() {
     if (!saved.candidate || busy) return;
@@ -764,7 +709,6 @@ export function SorpCandidateReview() {
         {["find", "confirmation"].includes(saved.step) && <div className="si-progress"><span>FIND CHARITY · {saved.step === "find" ? 1 : 2} OF 2</span><span className="si-progress-dots" aria-hidden="true"><i className={saved.step === "find" ? "is-active" : "is-past"} /><i className={saved.step === "confirmation" ? "is-active" : ""} /></span></div>}
         {saved.step === "find" && <><div className="sd-find-hero"><SorpScreenHero><p className="scr-kicker">YOUR ORGANISATION. YOUR STARTING POINT.</p><h1>Let’s find{" "}your charity.</h1></SorpScreenHero><p>Enter your registered charity name or charity number. We’ll confirm we’ve found the right organisation before reviewing anything.</p><form id="scr-find-form" onSubmit={find} className="scr-find"><label htmlFor="scr-query">Charity name or number</label><input id="scr-query" value={saved.query} onChange={e => setSaved(state => ({ ...state, query: e.target.value, research: null, candidate: null, sharedCharityConfirmed: false, state: null }))} placeholder="e.g. Interim Spaces or 1165694"/><button type="submit" disabled={!!busy || !saved.query.trim() || !!saved.research}>{busy ? "FINDING YOUR CHARITY…" : "FIND MY CHARITY →"}</button></form></div>{busy && <div className="scr-search-progress" role="status"><h2>FINDING YOUR CHARITY…</h2><EvidenceChecklist candidate={saved.candidate} research={saved.research} tier={reportingTier} busy phase="identity" /></div>}{saved.candidate && saved.research && !busy && <div className="scr-search-progress" role="status"><h2>WE FOUND A MATCH ✓</h2><EvidenceChecklist candidate={saved.candidate} research={saved.research} tier={reportingTier} busy={false} phase="identity" /></div>}{saved.research && !saved.candidate && !busy && <div className="scr-results"><h2>{saved.research.candidates.length ? "Choose the right registered organisation" : "We need one more clue."}</h2>{saved.research.candidates.map(candidate => <article key={`${candidate.registrationNumber}-${candidate.name}`}><div><strong>{candidate.name}</strong><p>{candidate.locality} · {candidate.registrationNumber || candidate.entityType}</p></div><button type="button" onClick={() => confirmCandidate(candidate)}>VIEW THIS CHARITY →</button></article>)}{!saved.research.candidates.length && <p>Try the registered name, charity number or a location.</p>}</div>}<section className="sd-tiers" aria-label="SORP reporting tiers"><div className="sd-tier-intro"><p className="scr-kicker">GOOD TO KNOW</p><p>Your tier affects which SORP reporting requirements apply.</p></div><div className="sd-tier"><span>TIER 1</span><strong>£500k or less</strong><i aria-hidden="true" /></div><div className="sd-tier"><span>TIER 2</span><strong>Over £500k to £15m</strong><i aria-hidden="true" /></div><div className="sd-tier"><span>TIER 3</span><strong>Over £15m</strong><i aria-hidden="true" /></div></section></>}
         {saved.step === "confirmation" && saved.candidate && <><div className="sd-found"><SorpScreenHero><p className="scr-kicker"><span className="sd-found-mark" aria-hidden="true">✓</span> WE FOUND YOU ✓</p><h1>{saved.candidate.name}</h1></SorpScreenHero><SorpIdentityPreview key={saved.candidate.website} website={saved.candidate.website} name={saved.candidate.name} /></div><div className="sd-identity-facts"><div className="scr-fact"><span>Charity number</span><strong>{saved.candidate.registrationNumber || "Not established"}</strong></div><div className="scr-fact"><span>Charity Commission record</span><strong>{safeLink(saved.candidate.officialUrl) ? <a href={saved.candidate.officialUrl} target="_blank" rel="noreferrer">VIEW OFFICIAL RECORD ↗</a> : "Not available"}</strong></div><div className="scr-fact"><span>Official website</span><strong>{safeLink(saved.candidate.website) ? <a href={saved.candidate.website} target="_blank" rel="noreferrer">VIEW WEBSITE ↗</a> : "Not found"}</strong></div>{saved.candidate.locality && <div className="scr-fact"><span>Location</span><strong>{saved.candidate.locality}</strong></div>}</div><p className="sd-confirm-prompt">Check the details to confirm we’ve found the right charity.</p></>}
-        {saved.step === "account" && (saved.candidate || accountMode === "login") && (!account ? <div className="scr-account"><SorpScreenHero><p className="scr-kicker">SAVE YOUR FREE REVIEW</p><h1>ONE ACCOUNT.<br/>ALL YOUR TOOLS.</h1></SorpScreenHero><AccountGateway returnTo="/are-you-sorp-ready/review/" onLeave={() => localStorage.setItem(KEY, JSON.stringify(saved))}/></div> : <div className="scr-account"><SorpScreenHero><p className="scr-kicker">SAVE YOUR FREE REVIEW</p><h1>{account ? "YOUR REVIEW IS SAVED TO YOUR ACCOUNT." : accountMode === "signup" ? "CREATE YOUR FREE ACCOUNT." : "WELCOME BACK."}</h1></SorpScreenHero><p className="scr-lead">Your SORP2026 account saves progress securely, so you can leave and continue on this or another device.</p>{saved.candidate && <div className="scr-account-organisation"><span>ORGANISATION</span><strong>{saved.candidate.name}</strong><small>Charity number {saved.candidate.registrationNumber}</small></div>}{!account && <button type="button" className="scr-account-switch" onClick={() => { if (accountMode === "login" && !saved.candidate) { setAccountMode("signup"); setAccountError(""); go("find"); return; } setAccountMode(mode => mode === "signup" ? "login" : "signup"); setAccountError(""); }}><span>{accountMode === "signup" ? "ALREADY HAVE AN ACCOUNT?" : "NEW TO ARE YOU SORP READY?"}</span><strong>{accountMode === "signup" ? "SIGN IN →" : "CREATE A FREE ACCOUNT →"}</strong></button>}{!account && GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <><a className={`scr-google-signin${googleSignInStarting ? " is-starting" : ""}`} aria-busy={googleSignInStarting} href="/api/readiness-account/google/start" onClick={() => { setGoogleSignInStarting(true); setAccountError(""); event("google_sign_in_started"); }}><GoogleMark/><span>{googleSignInStarting ? "OPENING GOOGLE…" : "SIGN IN WITH GOOGLE"}</span></a><div className="scr-account-divider"><span>OR USE EMAIL</span></div></>}<form className="scr-account-form" onSubmit={submitAccount}>{account ? <div className="scr-account-signed"><strong>✓ SIGNED IN SECURELY</strong><span>{account.email}</span></div> : null}{accountMode === "signup" || account ? <><label>Your name<input required maxLength={120} autoComplete="name" value={saved.name} onChange={event => setSaved(state => ({ ...state, name: event.target.value }))}/></label><label>Your role<select required value={saved.role} onChange={event => setSaved(state => ({ ...state, role: event.target.value }))}><option value="">Choose your role</option>{roles.map(role => <option key={role} value={role}>{role}</option>)}</select></label>{saved.role === "OTHER" && <label>Describe your role<input required maxLength={120} autoComplete="organization-title" value={saved.roleOther} onChange={event => setSaved(state => ({ ...state, roleOther: event.target.value }))}/></label>}</> : null}{!account && <><label>Email address<input required type="email" maxLength={254} autoComplete="email" value={saved.email} onChange={event => setSaved(state => ({ ...state, email: event.target.value }))}/></label>{accountMode === "signup" && <label>Confirm email address<input required type="email" maxLength={254} autoComplete="email" value={saved.emailConfirm} onChange={event => setSaved(state => ({ ...state, emailConfirm: event.target.value }))}/></label>}<label>Password<input required type="password" minLength={10} maxLength={200} autoComplete={accountMode === "signup" ? "new-password" : "current-password"} value={accountPassword} onChange={event => setAccountPassword(event.target.value)}/></label>{accountMode === "signup" && <label>Confirm password<input required type="password" minLength={10} maxLength={200} autoComplete="new-password" value={accountPasswordConfirm} onChange={event => setAccountPasswordConfirm(event.target.value)}/></label>}</>}{accountError && <div className="scr-account-error" role="alert"><strong>We couldn’t complete that yet.</strong><span>{accountError}</span><span>Your charity selection is still safe on this device.</span></div>}{!account && <Link className="scr-forgot-password" href="/forgot-password/">Forgot password?</Link>}<button type="submit" disabled={accountBusy}>{accountBusy ? "SAVING SECURELY…" : account ? "CONTINUE TO THE PUBLIC REPORT →" : accountMode === "signup" ? "CREATE MY FREE ACCOUNT →" : "SIGN IN AND CONTINUE →"}</button></form><p className="scr-account-note">The assessment and personalised report are free. Your details let us save your work and deliver your report; they do not commit you to paid support.</p></div>)}
         {saved.step === "homework" && <><SorpHomeworkExperience key={homeworkStarted} candidate={saved.state ? saved.candidate : null} tier={saved.state ? reportingTier : "Not yet confirmed"} document={validPreparedDocument(saved.preparedDocument) ? saved.preparedDocument! : null} lens={verifiedCanonicalTar(saved.verifiedTar) ? saved.verifiedTar : null} waiting={!!busy} startedAt={homeworkStarted} sessionId={saved.sessionId} />{homeworkComplete && !busy && <div className="scr-account-confirmed"><strong>✓ PROGRESS SAVED TO {saved.email}</strong><span>Your personalised report will be sent here when the journey is complete.</span></div>}</>}
         {saved.step === "assessment" && <SorpAssessmentExperience key={homeworkStarted} lens={verifiedCanonicalTar(saved.verifiedTar) ? saved.verifiedTar : null} waiting={busy === "tar"} startedAt={homeworkStarted} sessionId={saved.sessionId} resumed={Boolean(saved.walkthroughSeen)} onReady={() => setSaved(state => ({ ...state, walkthroughSeen: true }))}/>}
 
@@ -877,8 +821,7 @@ export function SorpCandidateReview() {
         {saved.step === "intro" && <button onClick={() => go("benefits")}>NEXT <span>→</span></button>}
         {saved.step === "benefits" && <button onClick={() => go("find")}>LET’S GET STARTED <span>→</span></button>}
         {saved.step === "find" && <button type="submit" form="scr-find-form" disabled={!!busy || !saved.query.trim() || !!saved.research}>FIND MY CHARITY <span>→</span></button>}
-        {saved.step === "confirmation" && <><button type="button" className="is-secondary" onClick={() => setSaved(state => ({ ...state, step: "find", research: null }))}>NOT MY CHARITY: TRY AGAIN</button><button onClick={() => { go("account"); event("account_step_viewed"); }}>YES, THIS IS MY CHARITY <span>→</span></button></>}
-        {saved.step === "account" && <span className="scr-bottom-status">Create or sign in to your free account to continue.</span>}
+        {saved.step === "confirmation" && <><button type="button" className="is-secondary" onClick={() => setSaved(state => ({ ...state, step: "find", research: null }))}>NOT MY CHARITY: TRY AGAIN</button><button onClick={() => void startHomework()}>YES, THIS IS MY CHARITY <span>→</span></button></>}
         {saved.step === "homework" && (busy ? <span className="scr-bottom-status">Locating and reading your published report…</span> : homeworkComplete ? <button onClick={() => void review()}>CONTINUE TO ASSESSMENT <span>→</span></button> : <button onClick={() => void startHomework()}>LOCATE AND READ MY REPORT <span>→</span></button>)}
         {saved.step === "assessment" && (busy ? <span className="scr-bottom-status">Applying the SORP methodology to your saved report…</span> : saved.report && verifiedCanonicalTar(saved.verifiedTar) ? <button onClick={() => { setSaved(state => ({ ...state, walkthroughSeen: true, step: "quick" })); }}>{saved.walkthroughSeen ? "VIEW MY HISTORICAL SNAPSHOT" : "SKIP EXPLANATION & VIEW SNAPSHOT"} <span>→</span></button> : <button onClick={() => void review()}>RESUME ASSESSMENT <span>→</span></button>)}
         {saved.step === "quick-generating" && <span className="scr-bottom-status">Building your Historical Snapshot…</span>}

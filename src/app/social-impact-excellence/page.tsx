@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ToolLink } from "@/components/tool-link";
 import { FolderHero } from "@/components/folder-hero";
 import { Arrow } from "@/components/ui";
 import { ExcellenceHome } from "@/features/excellence/excellence-home";
@@ -75,7 +76,7 @@ export default function ExcellencePage() {
         <div><p className="gateway-kicker">Your starting point on SORP2026.org</p><h2 id="excellence-access-title">Start with<br />your organisation.</h2></div>
         <div>
           <p>Create your SORP2026 account and begin your Social Impact Excellence baseline.</p>
-          <Link className="gateway-action" href="/get-started/?next=%2Fsocial-impact-excellence%2Fassessment%2F">Get started with Social Impact Excellence <Arrow /></Link>
+          <ToolLink className="gateway-action" href="/social-impact-excellence/assessment/">Get started with Social Impact Excellence <Arrow /></ToolLink>
           <p className="excellence-access-note">The Social Impact Maturity Assessment is available inside your registered SORP2026 account.</p>
           <Link className="excellence-login-link" href="/login/?return=/social-impact-excellence/">Already registered? Log in <Arrow /></Link>
         </div>

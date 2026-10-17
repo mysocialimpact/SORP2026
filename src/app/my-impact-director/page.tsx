@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
-import { DirectorAssessment } from "@/features/director/assessment";
+import { ToolLink } from "@/components/tool-link";
 import { DirectorBooking } from "@/features/director/booking";
 import s from "@/features/director/director.module.css";
 import { site } from "@/lib/site";
@@ -35,9 +35,9 @@ export default function MyImpactDirectorPage() {
             Because social impact deserves to be taken as seriously as financial performance.
           </p>
           <div className={s.heroActions}>
-            <a className={s.primary} href="#assessment">
+            <ToolLink className={s.primary} href="/my-impact-director/workspace/#assessment">
               Start your free assessment ↗
-            </a>
+            </ToolLink>
             <a className={s.textLink} href="#director-conversation">
               Talk to an Impact Director →
             </a>
@@ -68,7 +68,12 @@ export default function MyImpactDirectorPage() {
           </p>
         </div>
       </FolderHero>
-      <DirectorAssessment />
+      <section id="assessment" className={s.assessment} aria-label="My Impact Director assessment introduction">
+        <div className={s.invitation}>
+          <div><p className={s.kicker}>Free assessment · 21 star-rating questions · about 8 minutes</p><h2>How tech-savvy is<br /> <em>your organisation?</em></h2><p>Discover how you’re already using technology, data and AI, and where you could do more. No technical knowledge required.</p></div>
+          <div><span className={s.bigStar} aria-hidden="true">✳</span><ToolLink className={s.primary} href="/my-impact-director/workspace/#assessment">Start your free assessment ↗</ToolLink><p className={s.small}>Your report, practical recommendations and conversation agenda are free.</p></div>
+        </div>
+      </section>
       <section id="director-support" className={s.service}>
         <div className={s.serviceIntro}>
           <p className={s.kicker}>What we can do together, today</p>
@@ -276,7 +281,7 @@ export default function MyImpactDirectorPage() {
           environmental problems.
         </p>
         <div className={s.closingActions}>
-          <a className={s.primary} href="#assessment">Start your free assessment ↗</a>
+          <ToolLink className={s.primary} href="/my-impact-director/workspace/#assessment">Start your free assessment ↗</ToolLink>
           <a className={s.textLink} href="#director-conversation">Talk to an Impact Director →</a>
         </div>
       </section>

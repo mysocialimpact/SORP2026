@@ -4,7 +4,7 @@ import { accountStatus } from '../../src/lib/account-status.ts';
 
 test('visitor status states the actual public Ask SORP allowance', () => {
   assert.deepEqual(accountStatus({ signedIn: false }), {
-    label: 'VISITOR · 3 free AI questions', compactLabel: 'VISITOR · 3 AI questions',
+    label: 'VISITOR · Register to use tools', compactLabel: 'VISITOR · Register to use tools',
     plan: 'Visitor', founder: false,
   });
 });

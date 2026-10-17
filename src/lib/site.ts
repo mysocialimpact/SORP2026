@@ -13,10 +13,7 @@ export const site = {
   askSorp: externalUrl(
     process.env.ASK_SORP_URL || "https://sorp2026.mysocialimpact.org/",
   ),
-  readiness:
-    process.env.READINESS_ASSESSMENT_URL
-      ? externalUrl(process.env.READINESS_ASSESSMENT_URL)
-      : "/are-you-sorp-ready/review/?entry=intro",
+  readiness: "/are-you-sorp-ready/review/?entry=intro",
   platform: externalUrl(
     process.env.MSI_PLATFORM_URL ||
       "https://platform.mysocialimpact.org/snapshot",

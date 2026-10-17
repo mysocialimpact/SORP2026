@@ -10,7 +10,7 @@
   --ask-lime: #d8ff52;
   width: 100%;
   height: 100vh;
-  height: var(--ask-viewport-height, 100dvh);
+  height: calc(var(--ask-viewport-height, 100dvh) - var(--build-information-height, 0px));
   display: grid;
   grid-template-rows: var(--assessment-header-height) minmax(0, 1fr);
   overflow: hidden;

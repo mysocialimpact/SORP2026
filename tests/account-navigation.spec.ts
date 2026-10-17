@@ -8,10 +8,10 @@ test("visitors see one onboarding tab and distinct sign-in and registration acti
   await expect(tabs.locator("a").nth(1)).toHaveAttribute("href", "/get-started/");
   const account = page.getByRole("navigation", { name: "Account access" });
   await expect(account.getByRole("link", { name: "Log in" })).toBeVisible();
-  await expect(account.getByRole("link", { name: /Let’s Get Started/ })).toBeVisible();
+  await expect(account.getByRole("link", { name: /Start/ })).toBeVisible();
   await expect(page.locator(".build-information-bar")).toBeVisible();
   await expect(page.locator(".build-information-bar")).toContainText("VISITOR");
-  await expect(page.locator(".build-information-bar")).toContainText("3 free AI questions");
+  await expect(page.locator(".build-information-bar")).toContainText("Register to use tools");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.locator(".platform-sticky-navigation").screenshot({ path: testInfo.outputPath("logged-out-navigation.png") });
   if (testInfo.project.name === "mobile") {
@@ -57,7 +57,7 @@ test("sign-in returns to the originating product, then My Account shows saved pr
 
 test("an existing user can switch from onboarding to login without losing the product destination", async ({ page }) => {
   await page.goto("/social-impact-excellence/?pillar=purpose#journey");
-  await page.getByRole("navigation", { name: "Account access" }).getByRole("link", { name: /Let’s Get Started/ }).click();
+  await page.getByRole("navigation", { name: "Account access" }).getByRole("link", { name: /Start/ }).click();
   await expect(page).toHaveURL(/\/get-started\//);
   expect(new URL(page.url()).searchParams.get("next")).toBe("/social-impact-excellence/?pillar=purpose#journey");
   await page.getByRole("link", { name: "Sign in", exact: true }).click();

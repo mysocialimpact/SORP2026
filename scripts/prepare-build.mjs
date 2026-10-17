@@ -1,5 +1,4 @@
 import { writeFile, mkdir } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
 import pg from 'pg';
 
 // Public releases start at v1 with the intelligent status bar. Increment this
@@ -16,10 +15,9 @@ export async function allocateBuild(client, deployment, environment) {
   return { number: row.number, version: PUBLIC_RELEASE_VERSION,
     deployedAt: new Date(row.deployed_at).toISOString(), environment };
 }
-/** Preview-only identifier when the deployment ledger is not connected to Preview. */
+/** Unconnected previews show their actual deployment ID, never an invented number. */
 export function previewBuild(deployment, deployedAt = new Date()) {
-  const digest = createHash('sha256').update(deployment).digest();
-  return { number: 900000 + digest.readUInt32BE(0) % 100000, version: PUBLIC_RELEASE_VERSION,
+  return { number: null, deploymentId: deployment, version: PUBLIC_RELEASE_VERSION,
     deployedAt: deployedAt.toISOString(), environment: 'preview' };
 }
 if (process.argv[1]?.endsWith('prepare-build.mjs')) {
@@ -42,5 +40,5 @@ if (process.argv[1]?.endsWith('prepare-build.mjs')) {
   await writeFile('.sorp-build.json', JSON.stringify(metadata));
   await mkdir('public', { recursive: true });
   await writeFile('public/build-info.json', JSON.stringify(metadata));
-  console.log(metadata.number ? `Build ${metadata.number} · ${metadata.environment} · ${metadata.deployedAt}` : 'Local development build');
+  console.log(metadata.number ? `Build ${metadata.number} · ${metadata.environment} · ${metadata.deployedAt}` : metadata.environment === 'preview' ? `Preview build · ${metadata.deployedAt}` : 'Local development build');
 }

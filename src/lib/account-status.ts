@@ -39,8 +39,8 @@ function activePlan(membership: StatusMembership, now: number) {
  * is described as having a larger allowance until that enforcement changes. */
 export function accountStatus(payload: StatusAccountPayload | null, now = Date.now()): AccountStatus {
   if (!payload?.signedIn) return {
-    label: "VISITOR · 3 free AI questions",
-    compactLabel: "VISITOR · 3 AI questions",
+    label: "VISITOR · Register to use tools",
+    compactLabel: "VISITOR · Register to use tools",
     plan: "Visitor",
     founder: false,
   };

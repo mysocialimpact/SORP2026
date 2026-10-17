@@ -19,7 +19,8 @@
 .build-isolation-note { grid-column: 1 / -1; text-align: center; font-size: 10px; opacity: .9; }
 .build-time-compact, .build-account-compact, .build-environment-compact { display: none; }
 @media (max-width: 600px) {
-  .build-information-bar { gap: 4px 8px; padding-top: calc(6px + env(safe-area-inset-top, 0px)); padding-bottom: 6px; font-size: 9px; letter-spacing: 0; }
+  .build-information-bar { grid-template-columns: 1fr; gap: 2px; padding-top: calc(6px + env(safe-area-inset-top, 0px)); padding-bottom: 6px; font-size: 10px; letter-spacing: 0; }
+  .build-account { justify-self: start; }
   .build-release { gap: .32em; }
   .build-account { font-size: 8px; letter-spacing: .025em; }
   .build-time-full, .build-account-full, .build-environment-full { display: none; }

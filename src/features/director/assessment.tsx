@@ -1,7 +1,9 @@
 "use client";
 import { loadSharedContext } from "@/features/onboarding/shared-context";
-import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { AccountPortal } from "@/components/account-portal";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AccountGateway } from "@/components/account-gateway";
+import { useRouter } from "next/navigation";
+import { currentAccountDestination, registrationHref } from "@/lib/account-navigation";
 import {
   ANCHORS,
   AREAS,
@@ -34,7 +36,8 @@ function downloadText(text: string, filename: string) {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-export function DirectorAssessment() {
+export function DirectorAssessment({ autoStart = false }: { autoStart?: boolean }) {
+  const router = useRouter();
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [owner, setOwner] = useState<Owner | null>(null);
   const [ready, setReady] = useState(false);
@@ -43,7 +46,7 @@ export function DirectorAssessment() {
   const [guest, setGuest] = useState<Draft | null>(null);
   const [recovery, setRecovery] = useState<Draft | null>(null);
   const [locked, setLocked] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(autoStart);
   const revision = useRef(0),
     latest = useRef(draft),
     saved = useRef(""),
@@ -70,11 +73,8 @@ export function DirectorAssessment() {
         const data = await response.json();
         if (controller.signal.aborted) return;
         if (response.status === 401) {
-          const local = readDraft(GUEST);
-          if (local) setDraft(local);
-          setStatus(
-            "A free account keeps your answers, report and next steps together.",
-          );
+          router.replace(registrationHref(currentAccountDestination("/my-impact-director/workspace/#assessment")));
+          return;
         } else {
           if (!response.ok || !data.account?.id)
             throw new Error(
@@ -86,7 +86,7 @@ export function DirectorAssessment() {
             ? data.progress.data
             : {
                 ...emptyDraft(),
-                step: window.location.hash === "#assessment" ? 0 : -1,
+                step: autoStart || window.location.hash === "#assessment" ? 0 : -1,
                 organisation: data.account.organisation || "",
               };
           const shared = !remote.organisation ? await loadSharedContext(controller.signal).catch(() => null) : null;
@@ -128,7 +128,7 @@ export function DirectorAssessment() {
         }
       });
     return () => controller.abort();
-  }, []);
+  }, [autoStart, router]);
   useEffect(() => {
     function activate() {
       if (window.location.hash === "#assessment") setExpanded(true);
@@ -385,9 +385,7 @@ export function DirectorAssessment() {
             <h3 ref={heading} tabIndex={-1}>A free account.<br />A smarter starting point.</h3>
             <p>Keep your progress and return whenever you like. This is your technology snapshot, not another Social Impact Excellence assessment.</p>
           </div>
-          <Suspense fallback={<p role="status">Opening your account options…</p>}>
-            <AccountPortal embedded returnTo="/my-impact-director/#assessment" />
-          </Suspense>
+          <AccountGateway returnTo="/my-impact-director/workspace/#assessment" />
         </div>
       )}
       {expanded && ready && owner && (
