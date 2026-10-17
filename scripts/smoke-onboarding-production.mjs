@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import {chromium} from '@playwright/test';
+import binary from './tests/live-runtime/node_modules/@sparticuz/chromium/build/index.js';
+const base='https://sorp2026.org';
+const browser=await chromium.launch({executablePath:await binary.executablePath(),args:['--no-sandbox','--disable-dev-shm-usage'],headless:true});
+const result={url:base,registrationAttempted:false};
+try {
+ const context=await browser.newContext({viewport:{width:1440,height:1000}});
+ const page=await context.newPage();
+ await page.goto(base+'/get-started/',{waitUntil:'domcontentloaded'});
+ await page.locator('#introduction-answer').waitFor();
+ assert.equal(await page.locator('input[name=name]').count(),1);
+ assert.equal(await page.locator('input[name=email]').count(),1);
+ assert.equal(await page.locator('input[name=role]').count(),1);
+ assert.equal(await page.locator('input[name=organisation]').count(),1);
+ assert.equal(await page.getByLabel('Charity name or registration number').count(),1);
+ assert.equal(await page.locator('#onboarding-profile-form textarea').count(),3);
+ result.eightItems=true;
+ const reply=page.waitForResponse(r=>r.url().includes('/api/onboarding/turn/'),{timeout:90000});
+ await page.locator('#introduction-answer').fill('I am a QA test visitor checking the new onboarding. I work independently as an accountant and help charities with reporting. Please ask me for the details you still need.');
+ await page.locator('.onboarding-send').click();
+ const response=await reply;const data=await response.json();
+ assert.equal(response.status(),200);
+ assert.equal(data.state?.response?.generated,true);
+ assert.equal(data.notice||'','');
+ result.realAI=true;
+ await page.getByRole('button',{name:'Fill in the form',exact:true}).click();
+ assert.equal(await page.locator('#onboarding-profile-form').isVisible(),true);
+ result.desktopForm=true;
+ await page.setViewportSize({width:390,height:844});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ assert.equal(await page.locator('#onboarding-profile-form').isVisible(),true);
+ result.mobileForm=true;
+ await page.goto(base+'/login/?next=/get-started/',{waitUntil:'domcontentloaded'});
+ await page.getByLabel('Password',{exact:true}).waitFor({timeout:30000});
+ assert.equal(await page.getByLabel('Email address',{exact:true}).isVisible(),true);
+ assert.equal(await page.locator('.account-submit').isEnabled(),true);
+ result.loginForm=true;
+ const build=await context.request.get(base+'/build-info.json');
+ result.build=await build.json();
+ assert.equal(result.build.number,42);
+ assert.equal(result.build.environment,'production');
+ result.passed=true;
+} catch(e) {result.passed=false;result.error=e.message;process.exitCode=1;}
+finally {console.log('PRODUCTION_SMOKE '+JSON.stringify(result));await browser.close();process.exit(process.exitCode||0);}
