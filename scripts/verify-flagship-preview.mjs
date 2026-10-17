@@ -1,5 +1,5 @@
 // Opt-in browser verification against the real preview database/model/registry.
-// No mocked routes, production accounts, signup calls or payment calls.
+// No mocked routes, production accounts or payment calls. Signup is isolated.
 import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -33,9 +33,11 @@ try {
     const context = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 1000 }, isMobile: width === 390, hasTouch: width === 390 });
     const page = await context.newPage();
     page.setDefaultTimeout(30000);
+    // Public-page third-party resources must not block an otherwise usable UI.
+    page.setDefaultNavigationTimeout(60000);
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    await page.goto(base + '/get-started/?next=/ask-sorp/workspace/');
+    await page.goto(base + '/get-started/?next=/ask-sorp/workspace/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#introduction-answer')).toBeEnabled();
     const email = `qa-${width}-${Date.now()}@example.invalid`;
     const password = `Preview-${crypto.randomUUID()}-Password!`;
@@ -53,7 +55,7 @@ try {
     assert.equal(answer.notice || '', '', 'Live model must not fall back');
     assert.equal(answer.state.response.generated, true);
     assert.equal(answer.state.facts.organisation, 'Burton Sweet');
-    await page.reload();
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('input[name=name]')).toHaveValue('Sarah Jones');
     const id = (await context.cookies()).find(cookie => cookie.name === 'sorp_onboarding')?.value;
     assert.ok(id);
@@ -75,7 +77,7 @@ try {
     await page.getByRole('button', { name: 'Yes, this is the charity' }).first().click();
     await expect(page.locator('.confirmed-charity')).toBeVisible();
     await expect(page.locator('.profile-next button')).toBeEnabled();
-    await page.reload();
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Fill in the form', exact: true }).click();
     await expect(page.locator('input[name=name]')).toHaveValue('Sarah Jones ACA');
     await expect(page.locator('.confirmed-charity')).toBeVisible();
@@ -91,12 +93,15 @@ try {
     await expect(page.getByRole('link', { name: 'Open preview verification →' })).toBeVisible();
     const unverified = await context.request.post(base + '/api/readiness-account/', { headers: { origin: base }, data: { action: 'login', email, password } });
     assert.equal(unverified.status(), 403, 'Unverified sign-in must fail');
+    const verification = page.waitForResponse(response => response.url().includes('/api/sorp-auth/verify-email'));
     await page.getByRole('link', { name: 'Open preview verification →' }).click();
-    await page.goto(base + '/login/?next=' + encodeURIComponent('/get-started/?next=/ask-sorp/workspace/'));
+    assert.ok((await verification).status() < 400, 'Signed verification link must succeed');
+    report.checks.push({ width, secureSignup: true, unverifiedLoginDenied: true, signedEmailLinkAccepted: true });
+    await page.goto(base + '/login/?next=' + encodeURIComponent('/get-started/?next=/ask-sorp/workspace/'), { waitUntil: 'domcontentloaded' });
     await page.getByLabel('Email address', { exact: true }).fill(email);
     await page.getByLabel('Password', { exact: true }).fill(password);
     await page.locator('form').filter({ has: page.getByLabel('Password', { exact: true }) }).getByRole('button', { name: /Log in/i }).click();
-    await page.waitForURL('**/ask-sorp/workspace/**', { timeout: 30000 });
+    await page.waitForURL('**/ask-sorp/workspace/**', { timeout: 30000, waitUntil: 'domcontentloaded' });
     const accountResponse = await context.request.get(base + '/api/readiness-account/');
     const account = await accountResponse.json();
     assert.equal(account.signedIn, true);
