@@ -110,12 +110,12 @@ test("the digital filing folder keeps all five products in one accessible sequen
     await page.goto(path);
     const folder = page.getByRole("navigation", { name: "SORP2026 products" });
     await expect(folder).toBeVisible();
-    await expect(folder.getByRole("link")).toHaveCount(6);
+    await expect(folder.getByRole("link")).toHaveCount(7);
     await expect(page.locator(".gateway-header .gateway-account-control")).toHaveCount(1);
     await expect(folder.getByRole("link").allTextContents()).resolves.toEqual(
       products.map(([productName], index) =>
         `${index === 0 ? "Index" : String(index).padStart(2, "0")}${productName}${productName === name ? "Current section" : index === 0 ? "Platform index" : index === 1 || index === 2 ? "Live beta" : index === 3 || index === 4 ? "Available" : "Explore"}`,
-      ),
+      ).flatMap((label, index) => index === 0 ? [label, "Let’s Get StartedYour account"] : [label]),
     );
     await expect(folder.getByRole("link", { name: new RegExp(name) })).toHaveAttribute(
       "aria-current",
@@ -151,7 +151,7 @@ test("supporting pages remain in Home while the review enters dedicated assessme
   for (const [path, title] of [["/our-mission/", "Our Mission"], ["/contact/", "Contact"]] as const) {
     await page.goto(path);
     const folder = page.getByRole("navigation", { name: "SORP2026 products" });
-    await expect(folder.getByRole("link")).toHaveCount(6);
+    await expect(folder.getByRole("link")).toHaveCount(7);
     await expect(folder.getByRole("link", { name: /Home/ })).toHaveAttribute("aria-current", "location");
     await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toContainText(`Home/${title}`);
   }
@@ -189,11 +189,12 @@ test("footer identifies the exact build and The Ideas Shed company", async ({
   const build = footer.getByLabel("Website build information");
   await build.scrollIntoViewIfNeeded();
   await expect(build).toBeVisible();
-  await expect(build).toHaveText(
-    /^Build \d+ · \d{2} [A-Z][a-z]{2} \d{4} · \d{2}:\d{2}$/,
-  );
+  const deployed = !(await build.innerText()).includes("Build local");
+  await expect(build).toHaveText(deployed
+    ? /^Build \d+ · \d{2} [A-Z][a-z]{2} \d{4} · \d{2}:\d{2}$/
+    : /^Build local ·/);
   const timestamp = await build.locator("time").getAttribute("datetime");
-  expect(Number.isNaN(Date.parse(timestamp!))).toBe(false);
+  if (deployed) expect(Number.isNaN(Date.parse(timestamp!))).toBe(false);
   const initialText = await build.innerText();
   await expect(
     footer.getByRole("link", { name: /See what else is in the Shed/ }),

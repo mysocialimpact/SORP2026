@@ -193,6 +193,18 @@ export async function independentAccountPOST(request: Request) {
     if (!response.ok) return providerError(response.status);
     return json({ signedOut: true }, 200, { "set-cookie": response.headers.get("set-cookie") || "" });
   }
+  if (action === "update-profile") {
+    if (typeof input.position !== "string" || typeof input.organisation !== "string") return error("Enter your role and organisation as text.", 400);
+    const position = input.position.trim();
+    const organisation = input.organisation.trim();
+    if (position.length > 120 || organisation.length > 180) return error("Those account details are too long.", 400);
+    await sorpAuthPool().query(`INSERT INTO sorp_auth.profile(user_id,position,organisation_label)
+      VALUES($1,$2,$3) ON CONFLICT(user_id) DO UPDATE SET
+      position=excluded.position,organisation_label=excluded.organisation_label,updated_at=now()`,
+    [identity.account.id, position, organisation]);
+    const updated = await independentIdentity(request.headers);
+    return json({ account: updated?.account });
+  }
   if (action === "save") {
     if (!await saveProgress(identity.account.id, input.progress)) return error("The saved assessment is invalid or too large.", 400);
     const updated = await independentIdentity(request.headers);

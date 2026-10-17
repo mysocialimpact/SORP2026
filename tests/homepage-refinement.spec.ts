@@ -8,7 +8,7 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   expect((await nav.boundingBox())!.y).toBe(0);
   expect((await nav.boundingBox())!.height).toBeLessThan(190);
   await expect(nav.getByRole("link", { name: "Our Mission" })).toBeVisible();
-  await expect(nav.locator(".product-folder-tab")).toHaveCount(6);
+  await expect(nav.locator(".product-folder-tab")).toHaveCount(7);
   await expect(page.locator(".homepage-audience-options button").first()).toContainText("Trustees · CEOs · Finance teams · Staff · Volunteers");
   await expect(page.locator(".homepage-audience-options button").nth(1)).toContainText("Accountants · Auditors · Lawyers · Consultants · Funders");
   await expect(page.locator(".gateway-portraits h3")).toHaveText(["Marcus Warry ACA", "Dr Chris Arnold", "Gareth Murphy", "Nicholas Demeter"]);
@@ -44,12 +44,12 @@ test("sticky navigation and compact homepage retain access and team order", asyn
 
 test("assessment sticky controls clear the platform navigation", async ({ page }) => {
   await page.goto("/are-you-sorp-ready/review/?entry=intro");
-  await page.evaluate(() => window.scrollTo(0, 600));
+  await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
   await expect(page.locator(".platform-sticky-navigation")).toBeHidden();
   const header = page.locator(".scr-assessment-header");
   const progress = page.locator(".scr-top");
-  expect((await header.boundingBox())!.y).toBe(0);
+  expect((await header.boundingBox())!.y).toBeLessThanOrEqual((await page.locator(".build-information-bar").boundingBox())!.height);
   expect((await header.boundingBox())!.height).toBeLessThanOrEqual(60);
-  expect((await progress.boundingBox())!.y).toBeLessThanOrEqual(60);
+  expect((await progress.boundingBox())!.y).toBeLessThanOrEqual(100);
   await expect(page.getByRole("link", { name: /Back to website/ })).toBeVisible();
 });

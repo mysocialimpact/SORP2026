@@ -29,7 +29,7 @@ for (const path of routes) test(`folder continuity and actions: ${path}`, async 
   await expect(page.locator(".product-folder-sheet-edge")).toHaveCSS("background-color", await hero.evaluate(el => getComputedStyle(el).backgroundColor));
   await expect(page.getByRole("navigation", { name: "On this page" })).toHaveCount(0);
   const tabs = page.getByRole("navigation", { name: "SORP2026 products" });
-  await expect(tabs.getByRole("link")).toHaveCount(6);
+  await expect(tabs.getByRole("link")).toHaveCount(7);
   await expect(tabs.locator('[aria-current="page"]')).toHaveAttribute("href", path);
   const geometry = await page.evaluate(() => {
     const hero = document.querySelector<HTMLElement>("[data-folder-surface]")!;

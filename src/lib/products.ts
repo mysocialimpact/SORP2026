@@ -87,10 +87,16 @@ export const homeFolder = {
   href: "/", className: "is-home", tabColour: "#cfddcf", tabInk: "#1b3931",
 };
 
+export const accountFolder = {
+  number: "Start", slug: "account", tabLabel: "Let’s Get Started", status: "Your account",
+  href: "/get-started/", className: "is-account", tabColour: "#e8eddf", tabInk: "#1b3931",
+};
+
 export const folderTabs = [homeFolder, ...allProducts];
 
 export function folderForPath(pathname: string) {
   const path = `${pathname.replace(/\/$/, "")}/`;
+  if (["/get-started/", "/settings/", "/login/"].some(accountPath => path.startsWith(accountPath))) return accountFolder;
   return allProducts.find(product => path.startsWith(product.href)) || homeFolder;
 }
 

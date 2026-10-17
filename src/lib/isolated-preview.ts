@@ -24,7 +24,7 @@ export async function isolatedPreviewResponse(request: NextRequest) {
   const body = request.method === 'POST' ? await request.json().catch(() => ({})) : {};
   const access = { founder: false, memberships: [], synthetic: true };
   if (path === '/api/readiness-account') {
-    if (request.method === 'GET') return json(stored ? { signedIn: true, ...stored, platformAccess: access } : { signedIn: false });
+    if (request.method === 'GET') return json(stored ? { signedIn: true, authProvider: 'sorp', ...stored, platformAccess: access } : { signedIn: false });
     if (body.action === 'logout') return json({ signedIn: false }, 200, 'sorp_preview_account=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax');
     if (body.action === 'signup' || body.action === 'login') {
       if (typeof body.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email) || typeof body.password !== 'string' || body.password.length < 10) return json({ error: 'Add a valid test email and password.' }, 400);
@@ -35,6 +35,12 @@ export async function isolatedPreviewResponse(request: NextRequest) {
       return json({ signedIn: true, account, progress, platformAccess: access }, 200, `sorp_preview_account=${payload}.${sign(payload)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600${request.nextUrl.protocol === 'https:' ? '; Secure' : ''}`);
     }
     if (!stored) return json({ signedIn: false, error: 'Sign in to the synthetic account.' }, 401);
+    if (body.action === 'update-profile') {
+      if (typeof body.position !== 'string' || typeof body.organisation !== 'string' || body.position.length > 120 || body.organisation.length > 180) return json({ error: 'Enter valid account details.' }, 400);
+      const updated = { ...stored, account: { ...stored.account, position: body.position.trim(), organisation: body.organisation.trim() } };
+      const payload = Buffer.from(JSON.stringify(updated)).toString('base64url');
+      return json({ account: updated.account, synthetic: true }, 200, `sorp_preview_account=${payload}.${sign(payload)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600${request.nextUrl.protocol === 'https:' ? '; Secure' : ''}`);
+    }
     if (body.action === 'load-product') return json({ signedIn: true, ...stored, productProgress: null });
     if (body.action === 'team-workspace') return json({ signedIn: true, organisation: null });
     if (body.action === 'platform-workspace') return json({ signedIn: true, ...stored, platformAccess: access, organisations: [] });

@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { folderForPath } from "@/lib/products";
+import { NavigationAccountProvider } from "./navigation-account";
 
 export function PlatformNavigation({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -41,5 +42,5 @@ export function PlatformNavigation({ children }: { children: ReactNode }) {
     window.addEventListener("resize", schedule);
     return () => { contentObserver.disconnect(); cancelAnimationFrame(frame); window.removeEventListener("scroll", schedule); window.removeEventListener("resize", schedule); };
   }, [pathname]);
-  return <div ref={ref} className="platform-sticky-navigation" style={{ "--active-folder-colour": folder.tabColour } as CSSProperties}>{children}</div>;
+  return <NavigationAccountProvider><div ref={ref} className="platform-sticky-navigation" style={{ "--active-folder-colour": folder.tabColour } as CSSProperties}>{children}</div></NavigationAccountProvider>;
 }
