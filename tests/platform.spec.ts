@@ -372,6 +372,17 @@ test("Social Impact Excellence preserves the established Purpose pathway inside 
   await page.getByRole("button", { name: "Save and continue →" }).click();
   const sections = ["Purpose Definition", "Intended Change", "Purpose Development", "Purpose Evidence"];
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(sections[0]);
+  const whyGuidance = page.locator(".sie-purpose-guidance details").filter({ hasText: "Why are we asking this?" });
+  const starGuidance = page.locator(".sie-purpose-guidance details").filter({ hasText: "What do the stars mean?" });
+  await expect(whyGuidance).toHaveCount(5);
+  await expect(starGuidance).toHaveCount(5);
+  await expect(whyGuidance.first()).not.toHaveAttribute("open", "");
+  await whyGuidance.first().getByText("Why are we asking this?").click();
+  await expect(whyGuidance.first()).toHaveAttribute("open", "");
+  await starGuidance.first().getByText("What do the stars mean?").click();
+  await expect(starGuidance.first().locator("p")).toHaveCount(5);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
   for (let section = 0; section < sections.length; section += 1) {
     const ratings = page.getByRole("radio", { name: /4 ★/ });
     await expect(ratings).toHaveCount(5);

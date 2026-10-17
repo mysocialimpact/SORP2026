@@ -3,7 +3,7 @@ import test from "node:test";
 import { PILLARS, QUESTIONS } from "../../src/features/excellence/questions.ts";
 import { scoreAssessment } from "../../src/features/excellence/scoring.ts";
 import { SNAPSHOT_MATURITY } from "../../src/features/excellence/snapshot-maturity.ts";
-import { PURPOSE_OPEN_QUESTIONS, PURPOSE_SECTIONS, scorePurpose, newPurposeWorkspace } from "../../src/features/excellence/purpose.ts";
+import { PURPOSE_OPEN_QUESTIONS, PURPOSE_SECTIONS, scorePurpose, newPurposeWorkspace, normalisePurposeWorkspace } from "../../src/features/excellence/purpose.ts";
 import { PURPOSE_QUESTION_GUIDANCE } from "../../src/features/excellence/purpose-guidance.ts";
 
 test("native charity assessment preserves the established five-pillar, 25-question methodology", () => {
@@ -28,8 +28,22 @@ test("native Purpose pathway preserves the released assessment and guidance", ()
   assert.equal(PURPOSE_SECTIONS.flatMap(section => section.questions).length, 20);
   assert.equal(PURPOSE_OPEN_QUESTIONS.length, 5);
   assert.equal(PURPOSE_QUESTION_GUIDANCE.length, 20);
-  for (const guidance of PURPOSE_QUESTION_GUIDANCE) assert.equal(guidance.stars.length, 5);
+  assert.equal(new Set(PURPOSE_QUESTION_GUIDANCE.map(guidance => guidance.why)).size, 20);
+  const starDescriptions = PURPOSE_QUESTION_GUIDANCE.flatMap(guidance => guidance.stars);
+  assert.equal(starDescriptions.length, 100);
+  assert.equal(new Set(starDescriptions).size, 100);
+  for (const guidance of PURPOSE_QUESTION_GUIDANCE) {
+    assert.equal(guidance.stars.length, 5);
+    assert.ok(guidance.why.length >= 120);
+    for (const description of guidance.stars) assert.ok(description.length >= 25);
+  }
   const workspace = newPurposeWorkspace({ name: "QA", email: "qa@example.invalid", organisation: "QA Charity" });
   workspace.answers.slice(0, 20).forEach(answer => { answer.score = 4; });
   assert.deepEqual(scorePurpose(workspace.answers), { score: 4, maturity: "Established" });
+  workspace.answers[0].comment = "Existing context remains attached to the scored question.";
+  workspace.answers[20].answer = "Existing open reflection remains attached to question 21.";
+  const restored = normalisePurposeWorkspace(workspace);
+  assert.equal(restored.answers.length, 25);
+  assert.equal(restored.answers[0].comment, workspace.answers[0].comment);
+  assert.equal(restored.answers[20].answer, workspace.answers[20].answer);
 });
