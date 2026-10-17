@@ -9,10 +9,10 @@ try {
  const page=await context.newPage();
  await page.goto(base+'/get-started/',{waitUntil:'domcontentloaded'});
  await page.locator('#introduction-answer').waitFor();
- assert.equal(await page.locator('input[name=name]').count(),1);
- assert.equal(await page.locator('input[name=email]').count(),1);
- assert.equal(await page.locator('input[name=role]').count(),1);
- assert.equal(await page.locator('input[name=organisation]').count(),1);
+ assert.equal(await page.locator('#onboarding-profile-form input[name=name]').count(),1);
+ assert.equal(await page.locator('#onboarding-profile-form input[name=email]').count(),1);
+ assert.equal(await page.locator('#onboarding-profile-form input[name=role]').count(),1);
+ assert.equal(await page.locator('#onboarding-profile-form input[name=organisation]').count(),1);
  assert.equal(await page.getByLabel('Charity name or registration number').count(),1);
  assert.equal(await page.locator('#onboarding-profile-form textarea').count(),3);
  result.eightItems=true;
