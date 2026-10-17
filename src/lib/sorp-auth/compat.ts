@@ -129,8 +129,9 @@ export async function independentAccountPOST(request: Request) {
     if (!response.ok) return providerError(response.status);
     const created = await response.json() as { user?: { id?: string; email?: string } };
     if (!created.user?.id) return error("The account could not be prepared.", 503);
-    await sorpAuthPool().query(`INSERT INTO sorp_auth.profile(user_id,position)
-      VALUES($1,$2) ON CONFLICT(user_id) DO NOTHING`, [created.user.id, position]);
+    const organisation = typeof input.organisation === "string" ? input.organisation.trim().slice(0, 180) : "";
+    await sorpAuthPool().query(`INSERT INTO sorp_auth.profile(user_id,position,organisation_label)
+      VALUES($1,$2,$3) ON CONFLICT(user_id) DO NOTHING`, [created.user.id, position, organisation]);
     if (!await saveProgress(created.user.id, input.progress)) return error("The assessment could not be saved.", 400);
     return json({ verificationRequired: true,
       account: { id: created.user.id, email: created.user.email, name, position } }, 202);

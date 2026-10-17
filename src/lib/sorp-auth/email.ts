@@ -1,9 +1,11 @@
 type MessageKind = "verify" | "reset";
+import { previewMailEnabled, assertPreviewRecipient, deliverPreviewMail } from "./preview-mail";
 
 const FROM = "SORP 2026 <accounts@sorp2026.org>";
 const REPLY_TO = "marcus@mysocialimpact.org";
 
 function assertRecipientReleased(to: string) {
+  if (previewMailEnabled()) { assertPreviewRecipient(to); return; }
   const recipient = to.trim().toLowerCase();
   const domain = recipient.split("@")[1];
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
@@ -38,14 +40,14 @@ function assertRecipientReleased(to: string) {
 }
 
 export function authMailConfigured() {
-  return Boolean(process.env.RESEND_API_KEY);
+  return previewMailEnabled() || Boolean(process.env.RESEND_API_KEY);
 }
 
 /** Sends account links through SORP's verified Resend domain after provisioning. */
 export async function sendSorpAuthEmail(kind: MessageKind, to: string, link: string) {
   assertRecipientReleased(to);
   const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error("SORP transactional email is not configured.");
+  if (!key && !previewMailEnabled()) throw new Error("SORP transactional email is not configured.");
   const configuredBase = process.env.SORP_AUTH_BASE_URL;
   if (!configuredBase) throw new Error("SORP authentication origin is not configured.");
   const base = new URL(configuredBase);
@@ -60,6 +62,7 @@ export async function sendSorpAuthEmail(kind: MessageKind, to: string, link: str
   })() : target.toString();
   const subject = kind === "verify" ? "Verify your SORP 2026 email" : "Reset your SORP 2026 password";
   const instruction = kind === "verify" ? "Verify your email address" : "Reset your password";
+  if (previewMailEnabled()) { await deliverPreviewMail(to, kind, destination); return; }
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },

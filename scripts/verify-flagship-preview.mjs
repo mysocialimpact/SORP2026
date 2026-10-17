@@ -13,23 +13,23 @@ assert.equal(database.pathname, '/sorp_flagship_pr94');
 assert.equal(database.username, 'sorp_flagship_pr94_runtime');
 assert.equal(process.env.SORP_BACKEND_ORIGIN, 'https://isolated-preview.invalid');
 assert.notEqual(process.env.SORP_ISOLATED_PREVIEW, 'true', 'Synthetic mode must be off');
-const base = process.env.FLAGSHIP_REMOTE_URL || 'http://127.0.0.1:4314';
+const base = process.env.FLAGSHIP_REMOTE_URL || 'http://localhost:4314';
 const remote = !!process.env.FLAGSHIP_REMOTE_URL;
 if (remote) assert.ok(new URL(base).hostname.endsWith('.vercel.app'));
 const output = 'public/flagship-qa';
 await mkdir(output, { recursive: true });
 const pool = new pg.Pool({ connectionString: process.env.CONSOLE_DATABASE_URL, max: 1 });
-const server = remote ? null : spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', '4314'], { env: process.env, stdio: 'ignore' });
+const server = remote ? null : spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '0.0.0.0', '--port', '4314'], { env: { ...process.env, SORP_AUTH_BASE_URL: base }, stdio: 'ignore' });
 let browser;
-const report = { environment: 'preview', realServices: true, checks: [], registration: 'Not tested: isolated account/email service not configured' };
+const report = { environment: 'preview', realServices: true, checks: [], emailDelivery: 'Private preview sandbox, not external delivery' };
 try {
   for (let n = 0; n < 80; n++) {
     try { if ((await fetch(base + '/build-info.json')).ok) break; } catch {}
     if (n === 79) throw Error('Preview server did not start');
     await new Promise(resolve => setTimeout(resolve, 250));
   }
-  browser = await chromium.launch({ executablePath: await chromiumBinary.executablePath(), args: chromiumBinary.args.filter(arg => arg !== '--disable-web-security'), headless: true });
   for (const width of [1440, 390]) {
+    browser = await chromium.launch({ executablePath: await chromiumBinary.executablePath(), args: chromiumBinary.args.filter(arg => arg !== '--disable-web-security'), headless: true });
     const context = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 1000 }, isMobile: width === 390, hasTouch: width === 390 });
     const page = await context.newPage();
     page.setDefaultTimeout(30000);
@@ -37,7 +37,9 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(base + '/get-started/?next=/ask-sorp/workspace/');
     await expect(page.locator('#introduction-answer')).toBeEnabled();
-    const transcript = 'I’m Sarah Jones, an accountant at Burton Sweet. My email is sarah@example.com.';
+    const email = `qa-${width}-${Date.now()}@example.invalid`;
+    const password = `Preview-${crypto.randomUUID()}-Password!`;
+    const transcript = `I’m Sarah Jones, an accountant at Burton Sweet. My email is ${email}.`;
     const responsePromise = page.waitForResponse(response => response.url().includes('/api/onboarding/turn/'), { timeout: 90000 });
     await page.locator('#introduction-answer').fill(transcript);
     await page.locator('.onboarding-send').click();
@@ -82,7 +84,29 @@ try {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: `${output}/real-preview-${width}.png`, fullPage: true });
     report.checks.push({ width, manualCorrection: true, officialSearch: true, charityConfirmation: true, noOverflow: true });
-    await context.close();
+    await page.locator('.profile-next button').click();
+    await page.getByLabel('Choose a password').fill(password);
+    await page.getByLabel('Confirm your password').fill(password);
+    await page.getByRole('button', { name: 'Create my account' }).click();
+    await expect(page.getByRole('link', { name: 'Open preview verification →' })).toBeVisible();
+    const unverified = await context.request.post(base + '/api/readiness-account/', { headers: { origin: base }, data: { action: 'login', email, password } });
+    assert.equal(unverified.status(), 403, 'Unverified sign-in must fail');
+    await page.getByRole('link', { name: 'Open preview verification →' }).click();
+    await page.goto(base + '/login/?next=' + encodeURIComponent('/get-started/?next=/ask-sorp/workspace/'));
+    await page.getByLabel('Email address', { exact: true }).fill(email);
+    await page.getByLabel('Password', { exact: true }).fill(password);
+    await page.locator('form').filter({ has: page.getByLabel('Password', { exact: true }) }).getByRole('button', { name: /Log in/i }).click();
+    await page.waitForURL('**/ask-sorp/workspace/**', { timeout: 30000 });
+    const accountResponse = await context.request.get(base + '/api/readiness-account/');
+    const account = await accountResponse.json();
+    assert.equal(account.signedIn, true);
+    assert.equal(account.account.email, email);
+    assert.equal(account.account.organisation, 'Burton Sweet');
+    const linked = await pool.query('SELECT facts,charity_identity FROM research_console.onboarding_profiles WHERE account_id=$1', [account.account.id]);
+    assert.equal(linked.rows[0].facts.organisation, 'Burton Sweet');
+    assert.ok(linked.rows[0].charity_identity.startsWith('ccew:'));
+    report.checks.push({ width, secureSignup: true, unverifiedLoginDenied: true, signedEmailLinkAccepted: true, authenticatedReturn: true, accountProfilePersisted: true });
+    await browser.close(); browser = null;
   }
   report.passed = true;
 } catch (error) {

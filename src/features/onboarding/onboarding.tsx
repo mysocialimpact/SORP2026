@@ -69,7 +69,8 @@ function publicLink(value: string) {
     return "";
   }
 }
-export function Onboarding() {
+export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbox?: boolean }) {
+  const [previewVerificationUrl, setPreviewVerificationUrl] = useState("");
   const params = useSearchParams(),
     destination = safeDestination(params.get("next") || params.get("return"));
   const audience = useSyncExternalStore(subscribeAudience, readAudience, serverAudience);
@@ -454,6 +455,10 @@ export function Onboarding() {
       setPassword("");
       setConfirmPassword("");
       if (data.verificationRequired) {
+        if (previewEmailSandbox) {
+          const inbox = await post("preview-inbox", {});
+          if (typeof inbox.link === "string") setPreviewVerificationUrl(inbox.link);
+        }
         setVerification(true);
         return;
       }
@@ -632,6 +637,7 @@ export function Onboarding() {
         <div className="onboarding-heading">
           <h1>One account.<br className="mobile-break" /> All five tools<span>.</span></h1>
           <p>Talk to us and we’ll fill in the form as we go. Or complete it yourself.</p>
+          {previewEmailSandbox && <p className="onboarding-preview-notice">Preview test accounts only: use an address ending @example.invalid. Verification uses a private test inbox, not real email.</p>}
           <div className="onboarding-entry">
             <div className="onboarding-modes" aria-label="How to complete your details">
               <button type="button" aria-pressed={mode === "conversation"} onClick={() => setMode("conversation")}>
@@ -752,15 +758,17 @@ export function Onboarding() {
           <>
             <p className="onboarding-eyebrow">ONE LAST CHECK</p>
             <h2>
-              Check your inbox,
+              {previewEmailSandbox ? "Check your test inbox," : "Check your inbox,"}
               <br />
               {state.facts.name.split(" ")[0]}.
             </h2>
             <p>
-              Follow the verification link sent to{" "}
+              {previewEmailSandbox ? "A verification message is saved in the private preview inbox for " : "Follow the verification link sent to "}
               <strong>{state.facts.email}</strong>, then sign in to continue to{" "}
               {product}.
             </p>
+            {previewEmailSandbox && <p>No email has been sent. This account exists only in this preview.</p>}
+            {previewVerificationUrl && <a className="onboarding-primary" href={previewVerificationUrl}>Open preview verification →</a>}
             <Link
               className="onboarding-primary"
               href={`/login/?next=${encodeURIComponent(`/get-started/?next=${encodeURIComponent(destination)}`)}`}
