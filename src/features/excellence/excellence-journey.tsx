@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PILLARS } from "./questions";
 import { normalisePurposeWorkspace } from "./purpose";
+import { normaliseLeadershipWorkspace } from "./leadership";
 import type { ScoredAssessment } from "./models";
 
-type ProductData = { result?: ScoredAssessment; purpose?: unknown };
+type ProductData = { result?: ScoredAssessment; purpose?: unknown; leadership?: unknown };
 type Payload = { account?: { name?: string; email?: string; organisation?: string }; productProgress?: { data?: ProductData }; error?: string };
 
 export function ExcellenceJourney() {
@@ -25,6 +26,7 @@ export function ExcellenceJourney() {
   const result = payload.productProgress?.data?.result;
   if (!result) return <main className="sie-report"><section className="sie-state"><p className="sie-eyebrow">Your starting point</p><h1>Begin with an honest baseline.</h1><p>Complete the 25-question Social Impact Maturity Assessment before moving into deeper pillar work.</p><Link href="/social-impact-excellence/assessment/">Start or continue the assessment →</Link></section></main>;
   const purpose = normalisePurposeWorkspace(payload.productProgress?.data?.purpose, payload.account);
+  const leadership = normaliseLeadershipWorkspace(payload.productProgress?.data?.leadership, payload.account);
   return <main className="sie-report sie-journey">
     <header><Link href="/social-impact-excellence/" className="sie-wordmark">SOCIAL IMPACT <strong>EXCELLENCE</strong></Link><Link href="/dashboard/">My dashboard</Link></header>
     <section className="sie-journey-hero"><div><p className="sie-eyebrow">{payload.account?.organisation || "Your charity"}</p><h1>Your path to <em>excellence.</em></h1><p>Your baseline is complete. Use it to decide where deeper work will make the greatest difference.</p></div><div><strong>{result.overall.toFixed(1)}</strong><span>{result.maturity}</span><Link href="/social-impact-excellence/results/">View baseline report →</Link></div></section>
@@ -32,10 +34,15 @@ export function ExcellenceJourney() {
       {PILLARS.map(pillar => {
         const score = result.pillarScores.find(item => item.pillar === pillar.key)?.score || 0;
         const isPurpose = pillar.key === "purpose";
-        const status = isPurpose ? purpose.status === "complete" ? "Complete" : purpose.status === "not_started" ? "Ready to begin" : "In progress" : "Not yet available";
-        return <article className={isPurpose ? "available" : "future"} key={pillar.key}><div><span>{pillar.number}</span><b>{status}</b></div><h2>{pillar.label}</h2><p>{pillar.strapline}</p><div className="sie-journey-score"><i style={{ width: `${score * 20}%` }} /><strong>{score.toFixed(1)}</strong></div>{isPurpose ? <Link href="/social-impact-excellence/purpose/">{purpose.status === "not_started" ? "Begin Purpose pathway" : "Continue Purpose pathway"} →</Link> : <span>The original platform has not released this deeper pathway yet.</span>}</article>;
+        const isLeadership = pillar.key === "leadership";
+        const available = isPurpose || isLeadership;
+        const pathway = isPurpose ? purpose : leadership;
+        const submitted = isPurpose ? purpose.status === "complete" : leadership.status === "evidence_submitted";
+        const status = available ? submitted ? isLeadership ? "Evidence submitted" : "Complete" : pathway.status === "not_started" ? "Ready to begin" : "In progress" : "Not yet available";
+        const href = isPurpose ? "/social-impact-excellence/purpose/" : "/social-impact-excellence/leadership/";
+        return <article className={available ? "available" : "future"} key={pillar.key}><div><span>{pillar.number}</span><b>{status}</b></div><h2>{pillar.label}</h2><p>{pillar.strapline}</p><div className="sie-journey-score"><i style={{ width: `${score * 20}%` }} /><strong>{score.toFixed(1)}</strong></div>{available ? <Link href={href}>{pathway.status === "not_started" ? `Begin ${pillar.label} pathway` : `Continue ${pillar.label} pathway`} →</Link> : <span>This deeper pathway is not yet available.</span>}</article>;
       })}
     </section>
-    <section className="sie-next-step"><p>What is available today</p><h2>The full existing Purpose pathway is here: structured assessment, detailed guidance, secure supporting evidence and an MSI review checkpoint.</h2><div><Link href="/social-impact-excellence/purpose/">Open Purpose pathway →</Link></div></section>
+    <section className="sie-next-step"><p>What is available today</p><h2>Purpose and Leadership now include structured assessments, detailed guidance, secure supporting evidence and an MSI review checkpoint.</h2><div><Link href="/social-impact-excellence/purpose/">Open Purpose pathway →</Link><Link href="/social-impact-excellence/leadership/">Open Leadership pathway →</Link></div></section>
   </main>;
 }

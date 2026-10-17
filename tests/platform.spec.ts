@@ -364,7 +364,7 @@ test("Social Impact Excellence preserves the established Purpose pathway inside 
   await page.goto("/social-impact-excellence/journey/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Your path to excellence");
   await expect(page.getByRole("link", { name: /Begin Purpose pathway/ })).toBeVisible();
-  await expect(page.getByText("The original platform has not released this deeper pathway yet.")).toHaveCount(4);
+  await expect(page.getByText("This deeper pathway is not yet available.")).toHaveCount(3);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
   await page.goto("/social-impact-excellence/purpose/assessment/");
@@ -426,6 +426,105 @@ test("Purpose evidence uses the private product upload flow and records real com
   const finalData = saved.at(-1)?.data as { purpose?: { status?: string; evidence?: unknown[] } };
   expect(finalData.purpose?.status).toBe("complete");
   expect(finalData.purpose?.evidence).toHaveLength(1);
+});
+
+test("Leadership assessment saves a separate 20-plus-five-question draft and never claims MSI review", async ({ page }) => {
+  const writes: Record<string, unknown>[] = [];
+  const purpose = { status: "draft", preserved: "yes" };
+  const result = { overall: 3.4, maturity: "Partly established", pillarScores: ["purpose", "leadership", "data", "delivery", "communication"].map(pillar => ({ pillar, score: 3.4 })), strengths: [], opportunities: [] };
+  let currentData: Record<string, unknown> = { result, purpose, answers: Array(25).fill(3) };
+  await page.route("**/api/readiness-account/**", async route => {
+    const input = route.request().method() === "POST" ? route.request().postDataJSON() as Record<string, unknown> : {};
+    if (input.action === "load-product") return route.fulfill({ json: { account: { name: "QA Person", email: "qa@example.invalid", organisation: "QA Charity" }, productProgress: { status: "complete", data: currentData } } });
+    if (input.action === "save-product") { writes.push(input); currentData = input.data as Record<string, unknown>; return route.fulfill({ json: { productProgress: { status: "complete", data: input.data } } }); }
+    return route.fulfill({ json: { signedIn: true } });
+  });
+  await page.goto("/social-impact-excellence/journey/");
+  await expect(page.getByRole("link", { name: /Begin Leadership pathway/ })).toBeVisible();
+  await page.goto("/social-impact-excellence/leadership/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Turning commitment into accountability");
+  await expect(page.getByText("Additional Participants")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Add participants" })).toBeDisabled();
+  await page.goto("/social-impact-excellence/leadership/assessment/");
+  await page.getByLabel("Role").fill("Trustee");
+  await page.getByRole("button", { name: "Save and continue →" }).click();
+  const sections = ["Leadership Commitment", "Governance & Accountability", "Leadership Decision-Making", "Leadership Capability & Culture", "Leadership Review & Continuous Improvement"];
+  for (let section = 0; section < sections.length; section += 1) {
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(sections[section]);
+    const why = page.locator(".sie-purpose-guidance details").filter({ hasText: "Why are we asking this?" });
+    const stars = page.locator(".sie-purpose-guidance details").filter({ hasText: "What do the stars mean?" });
+    await expect(why).toHaveCount(4); await expect(stars).toHaveCount(4);
+    await expect(why.first()).not.toHaveAttribute("open", "");
+    await why.first().getByText("Why are we asking this?").click();
+    await stars.first().getByText("What do the stars mean?").click();
+    await expect(stars.first().locator("p")).toHaveCount(5);
+    const ratings = page.getByRole("radio", { name: /4 star out of 5/ });
+    await expect(ratings).toHaveCount(4);
+    for (let index = 0; index < 4; index += 1) await ratings.nth(index).click();
+    await page.getByLabel("Additional comments or context (optional)").first().fill("Proportionate evidence for this leadership judgement.");
+    await page.getByRole("button", { name: "Save and continue →" }).click();
+    if (section === 0) {
+      await page.reload();
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(sections[1]);
+    }
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tell us about leadership in your own words.");
+  const reflections = page.locator(".sie-purpose-questions textarea");
+  await expect(reflections).toHaveCount(5);
+  for (let index = 0; index < 5; index += 1) await reflections.nth(index).fill("A useful qualitative Leadership reflection.");
+  await page.getByRole("button", { name: "Complete assessment →" }).click();
+  await expect(page).toHaveURL(/\/social-impact-excellence\/leadership\/evidence\//);
+  const finalData = writes.at(-1)?.data as { purpose?: unknown; leadership?: { status?: string; reviewStatus?: string; score?: number; answers?: Array<{ questionId?: string }> } };
+  expect(finalData.purpose).toEqual(purpose);
+  expect(finalData.leadership?.status).toBe("assessment_complete");
+  expect(finalData.leadership?.reviewStatus).toBe("not_submitted");
+  expect(finalData.leadership?.score).toBe(4);
+  expect(finalData.leadership?.answers).toHaveLength(25);
+  expect(finalData.leadership?.answers?.[0].questionId).toBe("leadership-01");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
+test("Leadership save failure is visible and does not advance the assessment", async ({ page }) => {
+  const result = { overall: 3.4, pillarScores: [] };
+  await page.route("**/api/readiness-account/**", async route => {
+    if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: true } });
+    const input = route.request().postDataJSON() as Record<string, unknown>;
+    if (input.action === "load-product") return route.fulfill({ json: { account: { name: "QA Person", email: "qa@example.invalid", organisation: "QA Charity" }, productProgress: { data: { result } } } });
+    if (input.action === "save-product") return route.fulfill({ status: 503, json: { error: "Controlled save failure" } });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto("/social-impact-excellence/leadership/assessment/");
+  await page.getByLabel("Role").fill("Trustee");
+  await page.getByRole("button", { name: "Save and continue →" }).click();
+  await expect(page.locator(".sie-form-error")).toContainText("Controlled save failure");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tell us who is completing this assessment.");
+});
+
+test("Leadership evidence stays in its own private upload purpose and submission remains unreviewed", async ({ page }) => {
+  const saved: Record<string, unknown>[] = [];
+  const leadership = { assessmentId: "leadership-1", organisationName: "QA Charity", participant: { name: "QA Person", role: "Trustee", email: "qa@example.invalid" }, status: "assessment_complete", reviewStatus: "not_submitted", evidenceStatus: "not_started", score: 4, maturity: "Established", answers: Array.from({ length: 25 }, (_, index) => ({ questionId: `leadership-${String(index + 1).padStart(2, "0")}`, questionNumber: index + 1, score: index < 20 ? 4 : null, comment: "", answer: index >= 20 ? "Reflection" : "" })), evidence: [], progress: 65 };
+  await page.route("**/api/readiness-account/**", async route => {
+    if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: true } });
+    const input = route.request().postDataJSON() as Record<string, unknown>;
+    if (input.action === "load-product") return route.fulfill({ json: { account: { name: "QA Person", email: "qa@example.invalid", organisation: "QA Charity" }, productProgress: { status: "complete", data: { result: { overall: 4 }, purpose: { preserved: true }, leadership } } } });
+    if (input.action === "list-product-files") { expect(input.purpose).toBe("leadership-evidence"); return route.fulfill({ json: { files: [] } }); }
+    if (input.action === "create-product-file-upload") { expect(input.purpose).toBe("leadership-evidence"); return route.fulfill({ status: 201, json: { file: { id: "leadership-file-1" }, upload: { url: "https://upload.example.test/leadership", token: "c".repeat(64) } } }); }
+    if (input.action === "save-product") { saved.push(input); return route.fulfill({ json: { productProgress: { data: input.data } } }); }
+    return route.fulfill({ status: 400, json: { error: "Unexpected action" } });
+  });
+  await page.route("https://upload.example.test/leadership", route => route.fulfill({ json: { file: { uploadedAt: "2026-10-17T10:00:00Z" } } }));
+  await page.goto("/social-impact-excellence/leadership/evidence/");
+  await page.getByLabel("Choose documents to upload").setInputFiles({ name: "board-minutes.txt", mimeType: "text/plain", buffer: Buffer.from("Leadership evidence") });
+  await page.getByRole("button", { name: "Upload 1 document" }).click();
+  await expect(page.getByText(/uploaded securely/)).toBeVisible();
+  await page.getByRole("button", { name: "Submit evidence stage" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("awaiting MSI review");
+  const finalData = saved.at(-1)?.data as { purpose?: unknown; leadership?: { status?: string; reviewStatus?: string; evidenceStatus?: string; evidence?: unknown[] } };
+  expect(finalData.purpose).toEqual({ preserved: true });
+  expect(finalData.leadership?.status).toBe("evidence_submitted");
+  expect(finalData.leadership?.reviewStatus).toBe("awaiting_msi_review");
+  expect(finalData.leadership?.evidenceStatus).toBe("submitted");
+  expect(finalData.leadership?.evidence).toHaveLength(1);
 });
 
 test("report review intake creates a private upload record without pretending payment succeeded", async ({ page }) => {
