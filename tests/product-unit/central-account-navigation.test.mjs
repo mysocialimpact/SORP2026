@@ -33,14 +33,15 @@ test('deployment ledger result is immutable and cannot reset to the old build se
  assert.deepEqual(await allocateBuild(client, 'dpl_synthetic', 'preview'), { number: 21, version: PUBLIC_RELEASE_VERSION, deployedAt: '2026-10-16T17:45:00.000Z', environment: 'preview' });
  await assert.rejects(() => allocateBuild({ query: async () => ({ rows: [{ number: 20 }] }) }, 'dpl_synthetic', 'preview'));
 });
-test('unconnected previews retain a stable numeric identifier without changing the production ledger', () => {
+test('unconnected previews identify the real deployment without inventing a build number', () => {
  const date = new Date('2026-10-17T10:30:00Z');
  const first = previewBuild('dpl_synthetic', date);
  assert.deepEqual(first, previewBuild('dpl_synthetic', date));
  assert.equal(first.environment, 'preview');
  assert.equal(first.version, PUBLIC_RELEASE_VERSION);
- assert.ok(first.number >= 900000 && first.number < 1000000);
- assert.notEqual(first.number, previewBuild('dpl_different', date).number);
+ assert.equal(first.number, null);
+ assert.equal(first.deploymentId, 'dpl_synthetic');
+ assert.notEqual(first.deploymentId, previewBuild('dpl_different', date).deploymentId);
 });
 
 test('invitation-aware signup retains only a validated invitation token', () => {

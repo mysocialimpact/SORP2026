@@ -1,6 +1,7 @@
 /** Compiled once from the deployment ledger; shared by the bar and footer. */
 export const buildInformation = {
   number: process.env.NEXT_PUBLIC_SITE_BUILD_NUMBER || "",
+  deploymentId: process.env.NEXT_PUBLIC_SITE_DEPLOYMENT_ID || "",
   version: process.env.NEXT_PUBLIC_SITE_RELEASE_VERSION || "1",
   deployedAt: process.env.NEXT_PUBLIC_SITE_BUILT_AT || "",
   environment: process.env.NEXT_PUBLIC_SITE_BUILD_ENVIRONMENT || "development",

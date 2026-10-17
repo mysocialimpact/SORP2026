@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Onboarding } from "@/features/onboarding/onboarding";
+import { ToolReturnFragment } from "@/components/tool-return-fragment";
 import "@/features/onboarding/onboarding.css";
 export const metadata: Metadata = {
   title: "Let’s Get Started",
@@ -17,6 +18,7 @@ export default function GetStartedPage() {
         </main>
       }
     >
+      <ToolReturnFragment />
       <Onboarding />
     </Suspense>
   );

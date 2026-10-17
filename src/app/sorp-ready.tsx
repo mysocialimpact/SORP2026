@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ToolLink } from "@/components/tool-link";
 import { FolderHero } from "@/components/folder-hero";
 
 const reviewUrl = "/are-you-sorp-ready/review/?entry=intro";
 
 function StartReview({ compact = false }: { compact?: boolean }) {
   return (
-    <Link className={compact ? "sr-start sr-start-compact" : "sr-start"} href={reviewUrl}>
+    <ToolLink className={compact ? "sr-start sr-start-compact" : "sr-start"} href={reviewUrl}>
       Start Free Review <span aria-hidden="true">→</span>
-    </Link>
+    </ToolLink>
   );
 }
 

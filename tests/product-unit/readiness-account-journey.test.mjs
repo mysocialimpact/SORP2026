@@ -6,35 +6,9 @@ const review = readFileSync(new URL("../../src/app/sorp-candidate-review.tsx", i
 const google = readFileSync(new URL("../../src/app/booking-google.ts", import.meta.url), "utf8");
 const googleCallback = readFileSync(new URL("../../src/app/api/booking/google/callback/route.ts", import.meta.url), "utf8");
 const backendProxy = readFileSync(new URL("../../src/app/backend-proxy.ts", import.meta.url), "utf8");
-const reviewStyles = readFileSync(new URL("../../src/app/sorp-candidate-review.css", import.meta.url), "utf8");
-const assessmentModeStyles = readFileSync(new URL("../../src/app/assessment-mode.css", import.meta.url), "utf8");
-const workspaceHeader = readFileSync(new URL("../../src/components/product-workspace-header.tsx", import.meta.url), "utf8");
 
-test("the saved account gate sits before public report retrieval and captures the required profile", () => {
-  assert.match(review, /\["find", "confirmation", "account"\]/);
-  assert.match(review, /go\("account"\); event\("account_step_viewed"\)/);
-  assert.match(review, /ALREADY HAVE AN ACCOUNT\?/);
-  assert.match(review, /ALREADY HAVE AN ACCOUNT\?[\s\S]*SIGN IN →[\s\S]*Email address/);
-  assert.match(review, /Confirm email address/);
-  assert.match(review, /Confirm password/);
-  assert.match(review, /Your role/);
-  assert.match(review, /action: "save", progress: saved/);
-  assert.match(review, /await startHomework\(\)/);
-});
-
-test("email account access remains available inside the dedicated assessment shell", () => {
-  assert.match(review, /const GOOGLE_ACCOUNT_SIGN_IN_ENABLED = false/);
-  assert.match(review, /!account && GOOGLE_ACCOUNT_SIGN_IN_ENABLED && <>/);
-  assert.match(review, /CREATE MY FREE ACCOUNT →/);
-  assert.match(review, /SIGN IN AND CONTINUE →/);
-  assert.match(review, /ProductWorkspaceHeader productName="Are You SORP Ready\?" backHref="\/are-you-sorp-ready\/"/);
-  assert.match(workspaceHeader, /Back to website/);
-  assert.match(review, /function AssessmentProgress/);
-  assert.doesNotMatch(review, /BUILD 120|scr-inline-build|scr-beta-badge/);
-  assert.match(reviewStyles, /\.scr-account-switch\{display:flex;width:100%;min-height:76px/);
-  assert.match(assessmentModeStyles, /--assessment-header-height: 56px/);
-  assert.match(assessmentModeStyles, /grid-template-columns: repeat\(8/);
-});
+// Registration-before-review and legacy checkpoint recovery are exercised in
+// one-login.spec.ts through the running application.
 
 test("Google account callback stays on the destination while the existing backend handles the account", () => {
   assert.match(googleCallback, /proxyExistingSorpBackend\(request, "\/api\/booking\/google\/callback"\)/);

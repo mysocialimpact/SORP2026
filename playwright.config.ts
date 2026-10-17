@@ -32,7 +32,7 @@ export default defineConfig({
       use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" },
     },
   ],
-  webServer: process.env.TEST_STATIC === 'true' ? undefined : {
+  webServer: process.env.TEST_STATIC === 'true' || process.env.PLAYWRIGHT_EXTERNAL_SERVER === 'true' ? undefined : {
     command: "npm run start",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,

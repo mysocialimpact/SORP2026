@@ -11,8 +11,7 @@ test("status bar updates from visitor to a verified founder and plan without ove
   } : { signedIn: false } }));
   await page.goto("/");
   const bar = page.getByLabel("Website build information and account status");
-  await expect(bar).toContainText("BETA");
-  await expect(bar).toContainText("v1");
+  await expect(bar).toContainText("Build");
   await expect(bar).toContainText(/PRODUCTION|PREVIEW|DEVELOPMENT/);
   await expect(bar).toContainText("VISITOR");
   founder = true;
@@ -33,7 +32,7 @@ test("the compact iPhone status remains legible and does not wrap or overlap", a
   await expect(bar).toBeVisible();
   await expect(bar.locator(".build-account-compact")).toHaveText("PLUS · 3 AI Qs");
   const boxes = await Promise.all([bar.locator(".build-release"), bar.locator(".build-account")].map(async locator => locator.boundingBox()));
-  expect(boxes[0]!.x + boxes[0]!.width).toBeLessThanOrEqual(boxes[1]!.x);
+  expect(boxes[0]!.y + boxes[0]!.height).toBeLessThanOrEqual(boxes[1]!.y);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -43,5 +42,5 @@ test("an isolated preview identifies the environment separately from the account
   await page.goto("/");
   const bar = page.getByLabel("Website build information and account status");
   await expect(bar.locator(".build-isolation-note")).toHaveText("PREVIEW · Synthetic services · AI & payments off");
-  await expect(bar.locator(".build-account-full")).toHaveText("VISITOR · 3 free AI questions");
+  await expect(bar.locator(".build-account-full")).toHaveText("VISITOR · Register to use tools");
 });

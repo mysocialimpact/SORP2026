@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
 import Link from "next/link";
+import { ToolLink } from "@/components/tool-link";
 import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
 import "./reports.css";
@@ -37,7 +38,7 @@ export default function CharityImpactReportsPage() {
           <h1>Go beyond SORP.<br/><span>Tell the full story of your impact.</span></h1>
           <p className="reports-hero-lead">SORP 2026 asks charities to explain the difference they make. Your impact report gives you room to go further, with powerful stories, compelling pictures, stronger evidence and the methodology behind your results.</p>
           <div className="reports-hero-actions">
-            <Link className="gateway-action" href="/get-started/?next=%2Fcharity-impact-reports%2Freview%2F">Get started with your report <Arrow /></Link>
+            <ToolLink className="gateway-action" href="/charity-impact-reports/review/">Get started with your report <Arrow /></ToolLink>
             <Link className="reports-login-link" href="/login/?return=/charity-impact-reports/review/">Already registered? Log in</Link>
           </div>
         </div>

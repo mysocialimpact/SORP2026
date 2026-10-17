@@ -25,6 +25,7 @@ import { PageFeedback } from "@/components/page-feedback";
 import { SayHello } from "@/components/say-hello";
 import { FounderAdminNavigation } from "@/components/founder/founder-admin-navigation";
 import { site } from "@/lib/site";
+import { NavigationAccountProvider } from "@/components/navigation-account";
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
   title: {
@@ -67,6 +68,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
+        <NavigationAccountProvider>
         <BuildInformationBar />
         <PlatformNavigation><Header /><ProductFolderTabs /><FounderAdminNavigation /></PlatformNavigation>
         <SharedCharityContext />
@@ -75,6 +77,7 @@ export default function RootLayout({
         <SayHello />
         <Footer />
         <ProductActionBar />
+        </NavigationAccountProvider>
       </body>
     </html>
   );

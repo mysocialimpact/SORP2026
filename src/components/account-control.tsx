@@ -36,7 +36,7 @@ export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
 
   return <nav className="gateway-account-group" aria-label="Account access">
     <Link className="gateway-account-text-link" href={signInHref(destination)} onClick={event => navigate(event, "login")}>Log in</Link>
-    <Link className="gateway-account-control" href={registrationHref(destination)} onClick={event => navigate(event, "register")}>Let’s Get Started <Arrow diagonal /></Link>
+    <Link className="gateway-account-control" href={registrationHref(destination)} onClick={event => navigate(event, "register")}>Start <Arrow diagonal /></Link>
   </nav>;
 }
 

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { FolderHero } from "@/components/folder-hero";
-import Link from "next/link";
 import Image from "next/image";
 import { MsiBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
@@ -36,6 +35,7 @@ export const metadata: Metadata = {
   },
   ...(site.live ? { alternates: { canonical: "/" } } : {}),
 };
+import { ToolLink } from "@/components/tool-link";
 export default function Home() {
   return (
     <main id="main" className="gateway homepage-story">
@@ -72,9 +72,9 @@ export default function Home() {
             <h2 id="sorp-tools-title">Are You SORP Ready?</h2>
             <div className="homepage-start-action">
               <p>A free assessment of your charity’s impact and sustainability reporting readiness.</p>
-              <Link className="gateway-action" href={site.readiness!}>
+              <ToolLink className="gateway-action" href="/are-you-sorp-ready/review/?entry=intro">
                 Start your free review <Arrow />
-              </Link>
+              </ToolLink>
             </div>
           </div>
           <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/" target="_blank" rel="noopener noreferrer">Read the official Charities SORP <Arrow diagonal /></a></p>
