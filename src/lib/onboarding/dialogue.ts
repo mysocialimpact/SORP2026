@@ -1,9 +1,9 @@
-import { questionPlan, suitableDialogue, charityOptions, type Conversation, type QuestionProposal } from "./state.ts";
+import { questionPlan, suitableDialogue, charityOptions, challengeQuestion, type Conversation, type QuestionProposal } from "./state.ts";
 
 export function dialogueTask(state: Conversation) {
   const plan = questionPlan(state);
   switch (plan.objective) {
-    case "registration": return `Ask for the genuinely missing registration fields in progressPlan. ${plan.context?.period === "past" && plan.fields.includes("role") ? `They just told you about past work involving ${plan.context.entity}. Acknowledge that specific former relationship as the bridge into asking what they do now. It is not their current employer.` : "Build on relevant professional background they have just shared."} Organisation is only relevant if they have one.`;
+    case "registration": return `Ask for the genuinely missing registration fields in progressPlan. ${plan.context?.period === "past" && plan.fields.includes("role") ? `They just told you about past work involving ${plan.context.entity}. Acknowledge that specific former relationship as the bridge into asking what they do now. It is not their current employer.` : "Build on relevant professional background they have just shared."} Ask for their professional employer/firm or explicit independent status if missing. Trusteeships and clients are separate from employment.`;
     case "charity": return ["remind", "disagree"].includes(state.lastIntent) && !state.charity.candidates.length
       ? "Receive the reminder without defending your previous question or correcting their frustration. Retain the known organisation. If one candidate is now unambiguous, the next step is finding its official record using the visible Find button, so they can check it. Briefly describe that next step without asking for the name or the same permission again. The record has not been found or confirmed yet. Only if the choice remains genuinely ambiguous, explain that and ask which candidate they mean."
       : state.charity.candidates.length
@@ -13,7 +13,7 @@ export function dialogueTask(state: Conversation) {
         : "There is NO official record displayed yet. If one potential charity is known, ask whether they want to start with it; if several, ask which one; if none, ask for a name or number. Do not tell them to check an official record or claim a match yet. This is a suggestion, not confirmation.";
     case "responsibilities": return "Invite them to say a little about their work and what they hope to achieve. Use what they have already shared and do not request their role or organisation again. One concise question is enough.";
     case "discovery": return "Respond to what they have just told you, then ask how they found the platform. A brief acknowledgement can carry a change of subject without explaining the interview structure. Keep a simple factual answer brief; engage with a meaningful disclosure.";
-    case "concerns": return "Receive their latest answer before moving on. Then invite the deliberately unusual final question with the exact standalone sentence: What keeps you up at night? We want to understand what is on their mind. Leave the answer open; do not steer them towards personal life or frame this as moving beyond or outside their work. The invitation is to understand what matters to them. Let that human purpose supply the lead-in; merely announcing that the next question is different or broader does not explain why we are asking. Keep it light and brief, with no speech about data collection; account creation comes later.";
+    case "concerns": return `Receive their latest answer, then naturally introduce this exact final question: ${challengeQuestion} Keep the acknowledgement brief and grounded in their actual answer. Leave the answer open, without steering it or explaining data collection.`;
     case "reflection": return "Their latest answer offers something worth understanding briefly. React and ask one specific, useful follow-up about it, not the original question again. There is room for this one follow-up, then return to the remaining objectives or finish.";
     case "clarification": return "Respond to the actual question/correction or specific ambiguity. Use known facts; do not give a generic platform explanation or an unrelated next question. If they ask for guidance, offer a concise practical starting point, rather than turning this introduction into a long guide or checklist.";
     case "complete": return "End this actual conversation. Respond meaningfully to the final answer, matching its humour, seriousness or reluctance. No more questions. Briefly invite them to create their account and explore the confirmed charity (if any). The completion panel already explains that their introduction is saved with their account so the team can pick up later: do not repeat that administration. Keep the spoken ending to 1–2 short sentences focused on the person and the next step, not a profile summary. If required details remain missing, direct them to the editable profile instead. Never imply an unconfirmed charity is selected.";
@@ -84,7 +84,7 @@ export function decodeDialogue(value: unknown, state: Conversation, afterConfirm
     if (!raw || typeof raw !== "object") throw new Error("Missing reply");
     const p = raw as QuestionProposal;
     if (typeof p.question !== "string" || !Array.isArray(p.fields)) throw new Error("Invalid reply");
-    let text = p.question.trim().replace(/what keeps you up at night\?/gi, "What keeps you up at night?");
+    let text = p.question.trim();
     // Names are rendered from live authoritative state, including edits made after generation.
     if (target.facts.name) {
       text = text.replaceAll(target.facts.name, "{name}");

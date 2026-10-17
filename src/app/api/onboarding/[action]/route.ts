@@ -10,6 +10,7 @@ import {
   nextObjective,
   TOTAL_TURN_CAP,
   applyFacts,
+  clearCharity,
   proposeCharity,
   confirmCharity,
   validEntity,
@@ -175,6 +176,13 @@ export async function POST(
       return response;
     }
     const session = await getSession(request);
+    if (action === "preview-inbox") {
+      const { previewMailEnabled, readPreviewVerification } = await import("@/lib/sorp-auth/preview-mail");
+      if (!previewMailEnabled()) return json({ error: "Not found." }, 404);
+      if (!session) return json({ error: "Open your own preview introduction first." }, 401);
+      const link = await readPreviewVerification(session.state.facts.email, session.id);
+      return link ? json({ link, sandbox: true }) : json({ error: "No verification message for this introduction." }, 404);
+    }
     if (!session && action === "complete") {
       // Verification may happen on a different device or after the 24-hour draft
       // expires. Recover only from this verified account's own saved signup data.
@@ -251,7 +259,8 @@ export async function POST(
       );
     await claimRequest(session.id, action === "search");
     if (action === "edit") {
-      const next = applyFacts(session.state, body.fields || {}, "form");
+      const edited = applyFacts(session.state, body.fields || {}, "form");
+      const next = body.clearCharity === true ? clearCharity(edited) : edited;
       const saved = await saveSession(session, next);
       return json(snapshot(saved));
     }

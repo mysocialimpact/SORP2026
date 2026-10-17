@@ -5,10 +5,10 @@ import {dialogueRequest,decodeDialogue} from '../../src/lib/onboarding/dialogue.
 import {validateInterpretation,modelRequest,interpretWithModel,MODEL_RESERVATION_USD} from '../../src/lib/onboarding/model.ts';
 const ready=()=>confirmCharity(applyFacts(initialConversation(),{name:'Marcus Warry',email:'marcus@example.invalid',role:'Trustee',organisation:'Interim Spaces',responsibilities:'Finance',discovery:'A friend'},'form'),{name:'Interim Spaces',registrationNumber:'1234567',officialUrl:'https://example.invalid/official'});
 const participation=(status='answered',followUp=false)=>({topic:'concerns',status,followUp});
-test('a final-topic response closes the topic without inventing a professional concern',()=>{
+test('a final-topic answer is retained verbatim rather than interpreted as a professional diagnosis',()=>{
  for(const utterance of ['Frogs.','My children.','Nothing, actually.',"I’d rather not say."]){
    const s=advance(ready(),{utterance,topicResponse:participation()});
-   assert.equal(nextObjective(s),'complete');assert.equal(s.facts.concerns,'');
+   assert.equal(nextObjective(s),'complete');assert.equal(s.facts.concerns,utterance);
    assert.equal(s.dialogue.recent.at(-1).text,utterance);
  }
 });
@@ -38,15 +38,15 @@ test('the last optional turn cannot open another follow-up and resume preserves 
 });
 test('natural prose is permitted for concerns and completion, with exact special question and validated objectives',()=>{
  const s=ready();
- assert.ok(suitableDialogue(s,{objective:'concerns',fields:['concerns'],question:'A recommendation from someone you trust. Before we finish, a wider question: What keeps you up at night?',natural:true}));
+ assert.ok(suitableDialogue(s,{objective:'concerns',fields:['concerns'],question:'A recommendation from someone you trust. Before we finish, a wider question: What’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?',natural:true}));
  const complete=advance(s,{utterance:'Deadlines.',concerns:'Deadlines'});
  assert.ok(suitableDialogue(complete,{objective:'complete',fields:[],question:'Those reporting deadlines can pile up. You can now create your account and explore Interim Spaces.',natural:true}));
  assert.equal(suitableDialogue(complete,{objective:'discovery',fields:['discovery'],question:'How did you find us?',natural:true}),false);
 });
 test('generated acknowledgements are not mistaken for repeated identity requests',()=>{
  const s=ready();
- assert.ok(suitableDialogue(s,{objective:'concerns',fields:['concerns'],question:'Your role covers the finances. Before we finish: What keeps you up at night?',natural:true}));
- assert.equal(suitableDialogue(s,{objective:'concerns',fields:['concerns'],question:'What is your email address? What keeps you up at night?',natural:true}),false);
+ assert.ok(suitableDialogue(s,{objective:'concerns',fields:['concerns'],question:'Your role covers the finances. Before we finish: What’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?',natural:true}));
+ assert.equal(suitableDialogue(s,{objective:'concerns',fields:['concerns'],question:'What is your email address? What’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?',natural:true}),false);
 });
 test('generated language cannot claim unperformed verification, credentials or saved account',()=>{
  const s=advance(ready(),{concerns:'Reporting'});
@@ -162,10 +162,10 @@ test('unnamed advisers and referral venues cannot become candidate organisations
    assert.equal(patch.professional.length,0);
  }
 });
-test('a working arrangement cannot populate the current organisation',()=>{
+test('explicit independent working status populates the shared organisation field',()=>{
  for(const value of ['independent','freelance','self-employed']){
    const patch=validateInterpretation({intent:'inform',organisationNature:'working_arrangement',facts:{organisation:{value,quote:value,period:'current',correction:false}}},`I am an ${value} consultant`,initialConversation());
-   assert.equal(patch.organisation,undefined);
+   assert.equal(patch.organisation,'Independent');
  }
 });
 test('one bounded wording revision preserves extraction and accounts for every successful call',async()=>{

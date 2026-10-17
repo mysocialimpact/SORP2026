@@ -82,7 +82,7 @@ const factMeaning: Record<string, string> = {
   email: "The speaker's email address, exactly as supplied.",
   role: "The speaker's CURRENT professional role, not a past role or someone else's role.",
   organisation:
-    "Named organisation of the speaker's CURRENT employment, trusteeship or volunteering, or their firm. Include the charity where a trustee currently serves. Working independently or freelance describes an arrangement, not an organisation name. Historical clients and employers do not belong here.",
+    "The speaker's CURRENT professional employer or firm. Use Independent if explicitly self-employed, independent or freelance. Trusteeships, volunteering, clients and previous employers are separate relationships, NOT evidence of employment. Never infer the employer from the starting charity or vice versa. Leave empty when employment is unclear.",
   responsibilities:
     "Specific duties or services, beyond a job title. Trustee/CEO/accountant alone is a role, not responsibilities. Preserve meaningful detail.",
   discovery:
@@ -98,7 +98,7 @@ const factMeaning: Record<string, string> = {
   organisationKind:
     "Classify the CURRENT employer as charity, firm, other or unknown. This is not official charity verification.",
   charityChoice:
-    "A specifically selected starting charity. A mention, employment or historical client is not selection.",
+    "The charity the person explicitly wants to explore, enquire about, start with or review. For example 'I am a trustee at Interim Spaces but want to explore Oxfam' selects Oxfam, NOT Interim Spaces. A mere mention, employment or historical client is not selection.",
   reference:
     "An entity referred to in a correction/reminder, resolved only when unambiguous from known state.",
 };
@@ -112,12 +112,12 @@ export const interpretationSchema = object({
   charityDecision: {
     ...enumeration(["accept", "reject", "none"]),
     description:
-      "Accept only an explicit request to START WITH or USE a charity, or agreement with that proposal. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means the user does not want that charity as their starting selection.",
+      "Accept an explicit request to explore, review, enquire about, start with or use a charity, or agreement with that proposal. This means find its official record, never silently confirm it. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means they do not want that starting charity.",
   },
   finishRequested: { type: "boolean" },
   organisationNature: {
     ...enumeration(["named_organisation", "working_arrangement", "none"]),
-    description: "Classify the NEW current-organisation fact, if supplied. A named employer/firm/charity is named_organisation. Independent, freelance, self-employed or similar describe a working arrangement and must not populate the organisation field. No new organisation is none.",
+    description: "Classify the NEW employment fact. An employer/firm is named_organisation. Explicit independent, freelance or self-employed status is working_arrangement and becomes Independent in the form. No new employment information is none. Trusteeships and clients are not employment.",
   },
   concernKind: {
     ...enumeration(["professional", "personal", "uncertain", "none"]),
@@ -330,6 +330,7 @@ export function validateInterpretation(
   if (p.organisationNature && p.organisationNature !== "named_organisation") {
     delete extracted.organisation;
     delete extracted.organisationKind;
+    if (p.organisationNature === "working_arrangement" && /\bI(?:[’']m| am| work) (?:an? )?(?:independent(?:ly)?|freelance|self-employed)\b/i.test(message)) extracted.organisation = "Independent";
   }
   if (p.concernKind && p.concernKind !== "professional") delete extracted.concerns;
   for (const key of ["charityChoice", "reference"] as const)

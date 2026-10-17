@@ -6,6 +6,7 @@ import { PostgresDialect } from "kysely";
 import { Pool } from "pg";
 import { attachDatabasePool } from "@vercel/functions";
 import { authMailConfigured, sendSorpAuthEmail } from "./email";
+import { assertPreviewRecipient, previewMailEnabled } from "./preview-mail";
 
 let instance: ReturnType<typeof createAuth> | undefined;
 let pool: Pool | undefined;
@@ -37,6 +38,13 @@ function createAuth() {
     basePath: "/api/sorp-auth",
     secret,
     trustedOrigins: [origin.origin],
+    databaseHooks: {
+      user: { create: { before: async (user) => {
+        // Apply before writing an account, including direct auth API requests.
+        if (previewMailEnabled()) assertPreviewRecipient(user.email);
+        return { data: user };
+      } } },
+    },
     database: { dialect: new PostgresDialect({ pool: sorpAuthPool() }), type: "postgres", schemaName: "sorp_auth", transaction: true },
     emailAndPassword: {
       enabled: true,

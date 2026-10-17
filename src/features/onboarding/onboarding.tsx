@@ -13,6 +13,11 @@ import {
   normaliseConversation,
   extractImmediate,
   fieldKeys,
+  editableKeys,
+  optionalKeys,
+  fieldLimit,
+  challengeQuestion,
+  accountReady as canCreateAccount,
   initialConversation,
   nextObjective,
   nextQuestion,
@@ -23,12 +28,16 @@ import {
   TOTAL_TURN_CAP,
   type Conversation,
   type FieldKey,
+  type EditableKey,
 } from "@/lib/onboarding/state";
-const labels: Record<FieldKey, string> = {
-  name: "Your name",
+const labels: Record<EditableKey, string> = {
+  name: "Full name",
   email: "Email address",
   role: "Professional role",
   organisation: "Organisation or firm",
+  responsibilities: "Tell us a little more about what you do.",
+  discovery: "How did you hear about us?",
+  concerns: challengeQuestion,
 };
 const autocomplete: Record<FieldKey, string> = {
   name: "name",
@@ -60,7 +69,8 @@ function publicLink(value: string) {
     return "";
   }
 }
-export function Onboarding() {
+export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbox?: boolean }) {
+  const [previewVerificationUrl, setPreviewVerificationUrl] = useState("");
   const params = useSearchParams(),
     destination = safeDestination(params.get("next") || params.get("return"));
   const audience = useSyncExternalStore(subscribeAudience, readAudience, serverAudience);
@@ -69,8 +79,11 @@ export function Onboarding() {
   const [draft, setDraft] = useState(""),
     [busy, setBusy] = useState(true),
     [notice, setNotice] = useState(""),
-    [changed, setChanged] = useState<FieldKey[]>([]),
+    [changed, setChanged] = useState<EditableKey[]>([]),
     [reward, setReward] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false),
+    [activity, setActivity] = useState("Opening your conversation"),
+    [lookupSuggested, setLookupSuggested] = useState(false);
   const [history, setHistory] = useState<{ role: string; text: string }[]>([]),
     [service, setService] = useState(false),
     [voice, setVoice] = useState<VoiceState>("ready");
@@ -86,29 +99,25 @@ export function Onboarding() {
     [editingComplete, setEditingComplete] = useState(false);
   const draftRef = useRef<HTMLTextAreaElement>(null),
     dialogRef = useRef<HTMLDialogElement>(null),
-    dirty = useRef<Partial<Record<FieldKey, string>>>({}),
+    dirty = useRef<Partial<Record<EditableKey, string>>>({}),
     currentState = useRef(state),
     saving = useRef<Promise<void> | null>(null),
     interacted = useRef(false),
     started = useRef(false),
     lock = useRef(false);
-  const questionRef = useRef<HTMLDivElement>(null),
-    threadRef = useRef<HTMLDivElement>(null),
-    choiceRef = useRef<HTMLDivElement>(null),
-    readyShown = useRef(false),
-    profileRef = useRef<HTMLElement>(null),
+  const threadRef = useRef<HTMLDivElement>(null),
     attributionRef = useRef<Record<string, string>>({});
   const selected = state.charity.confirmed,
     candidates = state.charity.candidates;
   const objective = nextObjective(state),
-    ready = registrationReady(state.facts),
     completed = objective === "complete";
-  const accountReady = ready && validEntity(state.facts.organisation, "organisation");
+  const accountReady = canCreateAccount(state);
   const fieldComplete = (key: FieldKey) =>
     key === "email"
       ? validEmail(state.facts.email)
       : validEntity(state.facts[key], key);
-  const count = fieldKeys.filter(fieldComplete).length;
+  const count = fieldKeys.filter(fieldComplete).length + Number(!!selected);
+  const optionalCount = optionalKeys.filter(key => state.facts[key].trim()).length;
   const visibleHistory = history.at(-1)?.role === "assistant" ? history.slice(0, -1) : history;
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
@@ -122,62 +131,11 @@ export function Onboarding() {
             ? "My Impact Director"
             : "your dashboard";
   useEffect(() => {
-    const controller = new AbortController();
-    void fetch("/api/readiness-account/", {
-      cache: "no-store",
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        const account = await response.json();
-        if (controller.signal.aborted) return;
-        if (!response.ok || !account.signedIn) {
-          const response = await fetch("/api/onboarding/session/", {
-            cache: "no-store",
-            signal: controller.signal,
-          });
-          const saved = await response.json();
-          if (
-            !controller.signal.aborted &&
-            !interacted.current &&
-            response.ok &&
-            saved.state &&
-            (saved.state.turns ||
-              Object.values(saved.state.facts).some(
-                (v) => typeof v === "string" && v && v !== "unknown",
-              ))
-          ) {
-            accept(saved);
-            setService(true);
-            setMode("conversation");
-            setBusy(false);
-          } else if (!controller.signal.aborted) {
-            void start("conversation");
-          }
-          return;
-        }
-        // Resume a verified registration in the same browser without forcing an existing user to repeat onboarding.
-        await post("complete", { fields: {} }).catch(() => undefined);
-        if (!controller.signal.aborted) window.location.replace(destination);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) void start("conversation");
-      });
-    return () => controller.abort();
-    // Load once per destination. accept reads refs, not a captured state snapshot.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [destination]);
-  useEffect(() => {
     const frame = requestAnimationFrame(() => {
       if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight;
     });
     return () => cancelAnimationFrame(frame);
   }, [mode, state.turns, history.length, state.charity.confirmed, candidates.length]);
-  useEffect(() => {
-    if (!accountReady || readyShown.current || mode !== "conversation") return;
-    readyShown.current = true;
-    const frame = requestAnimationFrame(() => choiceRef.current?.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }));
-    return () => cancelAnimationFrame(frame);
-  }, [accountReady, mode]);
   useEffect(() => {
     if (accountOpen) dialogRef.current?.showModal();
     else dialogRef.current?.close();
@@ -231,7 +189,7 @@ export function Onboarding() {
           fields,
           revision: currentState.current.revision,
         });
-        for (const key of fieldKeys)
+        for (const key of editableKeys)
           if (dirty.current[key] === fields[key]) delete dirty.current[key];
         accept(data);
       } catch (e) {
@@ -259,7 +217,7 @@ export function Onboarding() {
     if (started.current) return;
     started.current = true;
     interacted.current = true;
-    setMode(next);
+    // Loading a draft must not override a method the visitor has just chosen.
     setNotice("");
     setBusy(true);
     lock.current = true;
@@ -291,14 +249,14 @@ export function Onboarding() {
     draftRef.current?.focus({ preventScroll: true });
   }
   function update(next: Conversation, previous: Conversation) {
-    const keys = fieldKeys.filter(
+    const keys = editableKeys.filter(
       (k) => next.facts[k] && next.facts[k] !== previous.facts[k],
     );
     replace(next);
     if (keys.length) {
       setChanged(keys);
       setReward(
-        `${keys.length === 1 ? labels[keys[0]] : `${keys.length} details`} added to your profile`,
+        keys.map(key => `${fieldKeys.includes(key as FieldKey) ? labels[key] : key === "responsibilities" ? "Your introduction" : key === "discovery" ? "How you found us" : "Your challenge"} ${previous.facts[key] ? "updated" : "added"}`).join(" · "),
       );
     }
   }
@@ -325,7 +283,17 @@ export function Onboarding() {
     }
     lock.current = true;
     setBusy(true);
+    setActivity("Listening and filling in your details");
     setReward("");
+    setNotice("");
+    const beforeSend = currentState.current;
+    const immediate = advance(beforeSend, skip ? {} : extractImmediate(message, beforeSend), skip);
+    // Render the message and safe local extraction before any save or AI request.
+    setHistory(items => [...items, { role: "user", text: message }]);
+    setDraft("");
+    update(immediate, beforeSend);
+    // The server revision/state remains authoritative while pending form edits save.
+    currentState.current = beforeSend;
     try {
       await persistEdits();
       const before = currentState.current;
@@ -335,10 +303,8 @@ export function Onboarding() {
         skip,
       );
       // Recognised details appear while the existing server conversation is responding.
-      update(local, before);
-      setDraft("");
+      replace(local);
       if (service) {
-        setHistory((items) => [...items, { role: "user", text: message }]);
         const data = await post("turn", {
           message,
           skip,
@@ -346,7 +312,7 @@ export function Onboarding() {
         });
         update(
           applyFacts(normaliseConversation(data.state), dirty.current, "form"),
-          before,
+          local,
         );
         setHistory(data.messages?.length
           ? data.messages
@@ -354,17 +320,12 @@ export function Onboarding() {
         setNotice(data.notice || "");
         if (data.lookup) {
           setQuery(data.lookup);
-          const found = await post("search", {
-            query: data.lookup,
-            revision: currentState.current.revision,
-          });
-          accept(found);
-          setSearched(true);
+          // Search is an explicit, separate action: no registry wait blocks the reply.
+          setLookupSuggested(true);
         }
       } else
         setHistory((h) => [
           ...h,
-          { role: "user", text: message },
           { role: "assistant", text: nextQuestion(local) },
         ]);
     } catch (e) {
@@ -382,13 +343,14 @@ export function Onboarding() {
     if (lock.current || !value.trim()) return;
     lock.current = true;
     setBusy(true);
+    setActivity("Finding the official charity record");
     setNotice("");
     setSearched(false);
     try {
       await persistEdits();
       if (!service)
         throw new Error(
-          "Charity lookup is not connected here. You can choose your charity later.",
+          "Charity lookup is not connected here. Your details are kept on this page; please retry before creating your account.",
         );
       const data = await post("search", {
         query: value,
@@ -396,6 +358,7 @@ export function Onboarding() {
       });
       accept(data);
       setSearched(true);
+      setLookupSuggested(false);
     } catch (e) {
       recover(e);
     } finally {
@@ -407,6 +370,7 @@ export function Onboarding() {
     if (lock.current) return;
     lock.current = true;
     setBusy(true);
+    setActivity("Confirming your charity");
     setNotice("");
     try {
       await persistEdits();
@@ -424,11 +388,24 @@ export function Onboarding() {
       setBusy(false);
     }
   }
+  async function changeCharity() {
+    if (lock.current) return;
+    lock.current = true;
+    setBusy(true);
+    setActivity("Updating your charity selection");
+    try {
+      await persistEdits();
+      const data = await post("edit", { fields: {}, clearCharity: true, revision: currentState.current.revision });
+      accept(data);
+      setQuery(""); setSearched(false); setReward("");
+    } catch (error) { recover(error); }
+    finally { lock.current = false; setBusy(false); }
+  }
   async function createAccount(event: FormEvent) {
     event.preventDefault();
     if (lock.current) return;
-    if (!registrationReady(currentState.current.facts) || !validEntity(currentState.current.facts.organisation, "organisation")) {
-      setAccountError("Add your name, email, role and organisation before creating your account.");
+    if (!canCreateAccount(currentState.current)) {
+      setAccountError("Complete your details and confirm the official charity record before creating your account.");
       return;
     }
     if (password !== confirmPassword) {
@@ -478,6 +455,10 @@ export function Onboarding() {
       setPassword("");
       setConfirmPassword("");
       if (data.verificationRequired) {
+        if (previewEmailSandbox) {
+          const inbox = await post("preview-inbox", {});
+          if (typeof inbox.link === "string") setPreviewVerificationUrl(inbox.link);
+        }
         setVerification(true);
         return;
       }
@@ -500,20 +481,62 @@ export function Onboarding() {
       setBusy(false);
     }
   }
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/readiness-account/", {
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const account = await response.json();
+        if (controller.signal.aborted) return;
+        if (!response.ok || !account.signedIn) {
+          const response = await fetch("/api/onboarding/session/", {
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          const saved = await response.json();
+          if (
+            !controller.signal.aborted &&
+            !interacted.current &&
+            response.ok &&
+            saved.state &&
+            (saved.state.turns ||
+              Object.values(saved.state.facts).some(
+                (v) => typeof v === "string" && v && v !== "unknown",
+              ))
+          ) {
+            accept(saved);
+            setService(true);
+            setBusy(false);
+          } else if (!controller.signal.aborted) {
+            void start("conversation");
+          }
+          return;
+        }
+        // Resume a verified registration in the same browser without forcing an existing user to repeat onboarding.
+        await post("complete", { fields: {} }).catch(() => undefined);
+        if (!controller.signal.aborted) window.location.replace(destination);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) void start("conversation");
+      });
+    return () => controller.abort();
+    // Load once per destination. accept reads refs, not a captured state snapshot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [destination]);
   const firstQuestion = audience === "charity"
-    ? "Tell me a little about yourself and your charity. What’s your name, email and role?"
+    ? "Tell me about yourself and the charity you’d like to explore: your name, email and professional work."
     : audience === "adviser"
-      ? "Tell me a little about yourself and your firm: your name, email and role. Which charity are you helping, if you have one in mind?"
-      : "Tell me a little about yourself. What’s your name, email, role and organisation? If you’re helping a charity, which one?";
-  const question = busy && state.turns > 0
-    ? "I’m listening…"
-    : !state.turns && !count
+      ? "Tell me about yourself and your firm: your name, email and role. Which charity would you like to explore?"
+      : "Tell me a little about yourself: your name, email and professional work. Which charity would you like to explore?";
+  const question = !state.turns && !count
       ? firstQuestion
       : nextQuestion(state);
   const charityLookup = (<>
                 {!selected && (
                   <div className="charity-discovery">
-                    <p>If there’s a charity you’re here for, we can find its official record now. You can also do this later.</p>
+                    <p>Separate from your employer. Find and confirm the charity you want to explore.</p>
                     {charityOptions(state).length > 0 && (
                       <div className="charity-mentions">
                         {charityOptions(state).map((c) => (
@@ -531,12 +554,7 @@ export function Onboarding() {
                         ))}
                       </div>
                     )}
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        void search();
-                      }}
-                    >
+                    <div className="charity-search">
                       <label htmlFor="charity-lookup">
                         Charity name or registration number
                       </label>
@@ -547,14 +565,15 @@ export function Onboarding() {
                           onChange={(e) => setQuery(e.target.value)}
                           maxLength={160}
                           placeholder="Find your starting charity"
+                          onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); void search(); } }}
                         />
-                        <button disabled={busy || !query.trim()}>Find →</button>
+                        <button type="button" disabled={busy || !query.trim()} onClick={() => void search()}>Find →</button>
                       </div>
-                    </form>
+                    </div>
                     {searched && !candidates.length && (
                       <p>
                         No reliable registry match yet. Try the charity number
-                        or choose it later.
+                        or a more specific name.
                       </p>
                     )}
                     {candidates.map((c, i) => (
@@ -594,6 +613,7 @@ export function Onboarding() {
                           Please check this is the right organisation.
                         </p>
                         <button
+                          type="button"
                           className="onboarding-primary"
                           disabled={busy}
                           onClick={() => void confirm(i)}
@@ -605,376 +625,119 @@ export function Onboarding() {
                   </div>
                 )}
   </>);
+  function edit(key: EditableKey, value: string) {
+    dirty.current[key] = value;
+    replace(applyFacts(currentState.current, { [key]: value }, "form"));
+    setEditVersion(v => v + 1);
+  }
   return (
-    <main id="main" className="onboarding-page onboarding-refresh">
-      <header className="onboarding-header">
-        <Link
-          href="/"
-          className="onboarding-wordmark"
-          aria-label="SORP 2026 home"
-        >
-          SORP<span>2026</span>
-          <i />
-        </Link>
-        <span className="onboarding-header-note">
-          ONE ACCOUNT. GREATER IMPACT.
-        </span>
-        <Link href={`/login/?next=${encodeURIComponent(destination)}`}>
-          Sign in <Arrow diagonal />
-        </Link>
-      </header>
+    <main id="main" className="onboarding-page">
       <div className="onboarding-shell">
         <div className="onboarding-heading">
-          <p className="onboarding-eyebrow"><span /> LET’S GET STARTED</p>
-          <h1>A conversation worth <em>starting.</em></h1>
-          <p>Tell us about yourself in your own words. We’ll put the useful details in place as we talk, then create your free account so you can save your work across all five tools.</p>
-        </div>
-        <div className={`onboarding-workspace mode-${mode}`}>
-          <section
-            className="onboarding-conversation"
-            aria-label="Your introduction"
-          >
-            <div className="conversation-topline">
-              <span>
-                <i /> YOUR CONVERSATION
-              </span>
-              <button type="button" className="onboarding-text-button" onClick={() => setMode(mode === "form" ? "conversation" : "form")}>
-                {mode === "form" ? "Back to conversation" : "Fill in the form yourself"}
+          <h1>One account.<br className="mobile-break" /> All five tools<span>.</span></h1>
+          <p>Talk to us and we’ll fill in the form as we go. Or complete it yourself.</p>
+          {previewEmailSandbox && <p className="onboarding-preview-notice">Preview test accounts only: use an address ending @example.invalid. Verification uses a private test inbox, not real email.</p>}
+          <div className="onboarding-entry">
+            <div className="onboarding-modes" aria-label="How to complete your details">
+              <button type="button" aria-pressed={mode === "conversation"} onClick={() => setMode("conversation")}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8" /></svg>
+                Talk to us
               </button>
+              <button type="button" aria-pressed={mode === "form"} onClick={() => setMode("form")}>Fill in the form <Arrow diagonal /></button>
             </div>
-            {mode === "form" ? (
-              <div className="onboarding-invitation manual-intro">
-                <p className="onboarding-eyebrow">MAKE YOURSELF AT HOME</p>
-                <h2>
-                  Your details.
-                  <br />
-                  <em>Your way.</em>
-                </h2>
-                <p>
-                  Complete the essentials below. A charity can be added now or later.
-                </p>
-                <button
-                  className="onboarding-text-button"
-                  onClick={() => setMode("conversation")}
-                >
-                  Switch to a conversation →
-                </button>
-                {charityLookup}
-                {notice && <p className="onboarding-notice" role="status">{notice}</p>}
-                {selected && <p className="confirmed-charity">✓ {selected.name} confirmed</p>}
-              </div>
-            ) : (
-              <div className="conversation-body">
-                <div className="onboarding-mobile-summary" aria-live="polite">
-                  <span>{count}/4 account details</span>
-                  <strong>{state.facts.name || "Your introduction"}{state.facts.organisation ? ` · ${state.facts.organisation}` : ""}</strong>
-                  <a href="#onboarding-profile-form">Review details ↓</a>
-                </div>
-                <div className="conversation-thread" ref={threadRef} role="log" aria-label="Your conversation" aria-live="polite">
-                  {visibleHistory.map((h, i) => (
-                    <div key={i} className={`conversation-message history-${h.role}`}>
-                      <small>{h.role === "user" ? "YOU" : "SORP 2026"}</small>
-                      <p>{h.text}</p>
-                    </div>
-                  ))}
-                  <div ref={questionRef} className="conversation-question">
-                  <span
-                    className={`assistant-mark${busy ? " is-thinking" : ""}`}
-                    aria-hidden="true"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="19"
-                      height="19"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" />
-                    </svg>
-                  </span>
-                  <div>
-                    <p className="onboarding-eyebrow">SORP 2026</p>
-                    <h2>{question}</h2>
-                  </div>
-                  </div>
-                </div>
-                {selected && (
-                  <div className="confirmed-charity">
-                    <span aria-hidden="true">✓</span>
-                    <div>
-                      <strong>{selected.name}</strong>
-                      <p>
-                        {process.env.NEXT_PUBLIC_ISOLATED_PREVIEW === "true" ? "Synthetic confirmation. No research is started in this Preview." : "Confirmed. Public information preparation has been queued."}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {accountReady && !completed && (
-                  <div ref={choiceRef} className="onboarding-choice" aria-label="Your next step">
-                    <p>That’s enough to create your free account. Your work can be saved across all five tools.</p>
-                    <div>
-                      <button type="button" className="onboarding-primary" disabled={busy} onClick={() => setAccountOpen(true)}>Get started <Arrow diagonal /></button>
-                      <button type="button" className="onboarding-text-button" disabled={busy} onClick={() => {
-                        if (objective === "charity") void send(undefined, true);
-                        else draftRef.current?.focus();
-                      }}>Keep chatting ↓</button>
-                    </div>
-                  </div>
-                )}
-                {(objective === "charity" || (ready && !selected)) && charityLookup}
-                {(!completed || editingComplete) && (
-                  <form
-                    onSubmit={(e) => void send(e)}
-                    className="onboarding-composer"
-                  >
-                    <VoiceInput
-                      disabled={busy}
-                      onState={setVoice}
-                      onTranscript={(text) => {
-                        setDraft((current) =>
-                          [current, text]
-                            .filter(Boolean)
-                            .join(" ")
-                            .slice(0, 3000),
-                        );
-                        draftRef.current?.focus({ preventScroll: true });
-                      }}
-                    />
-                    <label htmlFor="introduction-answer">Your answer</label>
-                    <textarea
-                      ref={draftRef}
-                      id="introduction-answer"
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      rows={3}
-                      maxLength={3000}
-                      placeholder="Tell us in your own words…"
-                      disabled={
-                        busy ||
-                        voice === "recording" ||
-                        voice === "transcribing"
-                      }
-                    />
-                    <div className="composer-bottom">
-                      <span>
-                        {voice === "transcript"
-                          ? "Review your words, then send."
-                          : "Talk or type. You’re in control."}
-                      </span>
-                      <button
-                        className="onboarding-send"
-                        disabled={
-                          busy ||
-                          !draft.trim() ||
-                          ["recording", "transcribing", "permission"].includes(
-                            voice,
-                          )
-                        }
-                      >
-                        {busy ? "Understanding…" : "Send"}{" "}
-                        <span aria-hidden="true">↑</span>
-                      </button>
-                    </div>
-                  </form>
-                )}
-                {notice && (
-                  <p className="onboarding-notice" role="status">
-                    {notice}
-                  </p>
-                )}
-                {!completed && !["registration", "charity"].includes(objective) && (
-                  <button
-                    className="onboarding-skip"
-                    disabled={busy}
-                    onClick={() => void send(undefined, true)}
-                  >
-                    Skip this question
-                  </button>
-                )}
-                {completed && (
-                  <div className="onboarding-finish">
-                    {state.turns < TOTAL_TURN_CAP && (
-                      <button
-                        type="button"
-                        className="onboarding-text-button"
-                        onClick={() => setEditingComplete(true)}
-                      >
-                        Correct a detail
-                      </button>
-                    )}
-                    <p>
-                      {selected
-                        ? `Your profile and ${selected.name} will give us a useful place to begin.`
-                        : "Your details are ready. You can choose a starting charity later."}
-                    </p>
-                    <button
-                      className="onboarding-primary"
-                      disabled={!accountReady}
-                      onClick={() => setAccountOpen(true)}
-                    >
-                      Get started <Arrow diagonal />
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-            <div className="conversation-footnote">
-              <span aria-hidden="true">◇</span>
-              <p>
-                Your introduction will be saved with your account, so if you
-                speak with our team, we can pick up where you left off.{" "}
-                <Link href="/privacy/">Privacy</Link>
-              </p>
-            </div>
-          </section>
-          <aside
-            ref={profileRef}
-            className="onboarding-profile"
-            aria-label="Your live editable profile"
-          >
-            <div className="profile-heading">
-              <div>
-                <p className="onboarding-eyebrow">TAKING SHAPE</p>
-                <h2>Your introduction</h2>
-              </div>
-              <span
-                className="profile-count"
-                aria-label={`${count} of 4 required account details completed`}
-              >
-                {count}
-                <small>/4</small>
-              </span>
-            </div>
-            <p className="onboarding-eyebrow">
-              Your details · editable at any time
-            </p>
-            <div className="profile-progress" aria-hidden="true">
-              <span style={{ width: `${count * 25}%` }} />
-            </div>
-            <p className="profile-hint">
-              {mode === "form"
-                ? "A few details to make this yours."
-                : busy && state.turns ? "Checking what you shared…" : "As you talk, your details appear here."}
-              <span>Nothing becomes an account until you choose Get started.</span>
-            </p>
-            <form
-              id="onboarding-profile-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (accountReady) setAccountOpen(true);
-              }}
-            >
-              <div className="profile-fields">
-                {fieldKeys.map((key) => (
-                  <label
-                    className={`profile-field${changed.includes(key) ? " field-arrived" : ""}${state.facts[key] ? " has-value" : ""}`}
-                    key={key}
-                  >
-                    <span>
-                      {labels[key]}
-                      {key === "organisation" && <small>or independent</small>}
-                      {fieldComplete(key) && <i aria-hidden="true">✓</i>}
-                    </span>
-                    <input
-                      name={key}
-                      type={key === "email" ? "email" : "text"}
-                      aria-invalid={
-                        key === "email" &&
-                        !!state.facts.email &&
-                        !validEmail(state.facts.email)
-                      }
-                      autoComplete={autocomplete[key]}
-                      required={key !== "organisation"}
-                      minLength={key === "email" ? undefined : 2}
-                      maxLength={key === "email" ? 254 : 120}
-                      value={state.facts[key]}
-                      placeholder={
-                        mode === "form"
-                          ? `Enter ${labels[key].toLowerCase()}`
-                          : "—"
-                      }
-                      onChange={(e) => {
-                        dirty.current[key] = e.target.value;
-                        replace(
-                          applyFacts(
-                            currentState.current,
-                            { [key]: e.target.value },
-                            "form",
-                          ),
-                        );
-                        setEditVersion((v) => v + 1);
-                      }}
-                    />
-                  </label>
-                ))}
-              </div>
-              <label className="onboarding-independent"><input type="checkbox" checked={state.facts.organisation === "Independent"} onChange={event => {
-                const value = event.target.checked ? "Independent" : "";
-                dirty.current.organisation = value;
-                replace(applyFacts(currentState.current, { organisation: value }, "form"));
-                setEditVersion(v => v + 1);
-              }} /> I work independently</label>
-              <p className="profile-charity-status">{selected
-                ? `✓ Starting charity: ${selected.name}`
-                : state.charity.proposed
-                  ? `Possible charity: ${state.charity.proposed}. We’ll only select it if you confirm the official record.`
-                  : "Charity you’re helping: add one now, or choose it later."}</p>
-              <div
-                className={`profile-reward${reward ? " is-rewarded" : ""}`}
-                role="status"
-                aria-live="polite"
-                key={reward}
-              >
-                {reward ? (
-                  <>
-                    <span>✓</span> {reward}
-                  </>
+            <p>Already registered? <Link href={`/login/?next=${encodeURIComponent(destination)}`}>Log in</Link></p>
+          </div>
+        </div>
+        {notice && <p className="onboarding-notice" role="status">{notice}</p>}
+        <div className={`onboarding-workspace mode-${mode}${profileOpen ? " profile-open" : ""}`}>
+          <button type="button" className="onboarding-mobile-summary" aria-expanded={profileOpen || mode === "form"} aria-controls="onboarding-profile-form"
+            onClick={() => { if (mode === "form") setMode("conversation"); else setProfileOpen(open => !open); }}>
+            <span><strong>{count}/5 essentials</strong><span>{mode === "form" ? "Back to conversation ↑" : profileOpen ? "Close details ↑" : "Your live form ↓"}</span></span>
+            <span className="mobile-profile-values">{fieldKeys.filter(key => state.facts[key]).map(key => <span key={key}>{state.facts[key]}</span>)}</span>
+            {reward && <span className="mobile-profile-reward" role="status">✓ {reward}</span>}
+          </button>
+          <section className="onboarding-conversation" aria-label="Your introduction">
+            <div className="conversation-topline"><span><i /> YOUR CONVERSATION</span><span>Talk. Type. Make it yours.</span></div>
+            <div className="conversation-body">
+              <div className="conversation-thread" ref={threadRef} role="log" aria-label="Your conversation" aria-live="polite">
+                {visibleHistory.map((h, i) => <div key={i} className={`conversation-message history-${h.role}`}><small>{h.role === "user" ? "YOU" : "SORP 2026"}</small><p>{h.text}</p></div>)}
+                {busy ? (
+                  <div className="conversation-activity" role="status"><span className="activity-dots" aria-hidden="true"><i /><i /><i /></span><span>{activity}…</span></div>
                 ) : (
-                  <>
-                    <span aria-hidden="true">→</span> A conversation that does
-                    something useful.
-                  </>
+                  <div className="conversation-question">
+                    <span className="assistant-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" /></svg></span>
+                    <div><p className="onboarding-eyebrow">SORP 2026</p><h2>{question}</h2></div>
+                  </div>
                 )}
               </div>
+              {lookupSuggested && !selected && <button type="button" className="onboarding-charity-nudge" onClick={() => { setProfileOpen(true); document.getElementById("charity-lookup")?.focus(); }}>Find {query} in your form →</button>}
+              <div className="conversation-reward" role="status">{reward ? <>✓ {reward}</> : <span>Your details stay editable.</span>}</div>
+              {(!completed || editingComplete) && (
+                <form onSubmit={e => void send(e)} className="onboarding-composer">
+                  <label htmlFor="introduction-answer">Your answer</label>
+                  <textarea ref={draftRef} id="introduction-answer" value={draft} onChange={e => setDraft(e.target.value)} rows={2} maxLength={3000}
+                    placeholder="I’m Sarah, an accountant at…"
+                    disabled={busy || ["recording", "transcribing", "permission"].includes(voice)} />
+                  <div className="composer-bottom">
+                    <VoiceInput disabled={busy} onState={setVoice} onTranscript={text => { setDraft(current => [current, text].filter(Boolean).join(" ").slice(0, 3000)); draftRef.current?.focus({ preventScroll: true }); }} />
+                    <button className="onboarding-send" disabled={busy || !draft.trim() || ["recording", "transcribing", "permission"].includes(voice)}>{busy ? "Working…" : "Send"} <span aria-hidden="true">↑</span></button>
+                  </div>
+                </form>
+              )}
+              {!completed && !["registration", "charity"].includes(objective) && <button type="button" className="onboarding-skip" disabled={busy} onClick={() => void send(undefined, true)}>Skip this question</button>}
+              {accountReady && <div className="onboarding-choice">
+                <button type="button" className="onboarding-primary" disabled={busy} onClick={() => setAccountOpen(true)}>Get started →</button>
+                {!completed && <button type="button" className="onboarding-text-button" disabled={busy} onClick={() => draftRef.current?.focus()}>Keep chatting ↓</button>}
+                {completed && state.turns < TOTAL_TURN_CAP && <button type="button" className="onboarding-text-button" onClick={() => setEditingComplete(true)}>Anything to add?</button>}
+              </div>}
+            </div>
+            <div className="conversation-footnote">Your introduction stays with your account. <Link href="/privacy/">Privacy</Link></div>
+          </section>
+          <aside className="onboarding-profile" aria-label="Your live editable profile">
+            <div className="profile-heading"><div><p className="onboarding-eyebrow">YOUR LIVE FORM</p><h2>Taking shape<span>.</span></h2></div>
+              <span className="profile-count" aria-label={`${count} of 5 required details completed`}>{count}<small>/5</small></span>
+            </div>
+            <div className="profile-progress" role="progressbar" aria-label="Required details" aria-valuenow={count} aria-valuemin={0} aria-valuemax={5}><span style={{ width: `${count * 20}%` }} /></div>
+            <form id="onboarding-profile-form" onSubmit={e => { e.preventDefault(); if (accountReady) setAccountOpen(true); }}>
+              <fieldset>
+                <legend>Your details <small>Five essentials</small></legend>
+                <div className="profile-fields">
+                  {fieldKeys.map((key, index) => <label className={`profile-field${changed.includes(key) ? " field-arrived" : ""}${state.facts[key] ? " has-value" : ""}`} key={key}>
+                    <span><small>{String(index + 1).padStart(2, "0")}</small>{labels[key]}{fieldComplete(key) && <i aria-hidden="true">✓</i>}</span>
+                    <input name={key} type={key === "email" ? "email" : "text"} autoComplete={autocomplete[key]} required minLength={key === "email" ? undefined : 2}
+                      aria-invalid={key === "email" && !!state.facts.email && !validEmail(state.facts.email)}
+                      maxLength={fieldLimit(key)} value={state.facts[key]} placeholder={key === "organisation" ? "Your professional employer" : labels[key]} onChange={e => edit(key, e.target.value)} />
+                  </label>)}
+                </div>
+                <label className="onboarding-independent"><input type="checkbox" checked={state.facts.organisation === "Independent"} onChange={e => edit("organisation", e.target.checked ? "Independent" : "")} /> I work independently</label>
+                <div className={`profile-charity${selected ? " charity-confirmed" : ""}`}>
+                  <h3><small>05</small> Charity you’re enquiring about <span>{selected ? "✓" : "Required"}</span></h3>
+                  {selected ? <div className="confirmed-charity">
+                    <strong>{selected.name}</strong><p>Charity {selected.registrationNumber} · Confirmed</p>
+                    <div className="charity-source-links">
+                      {publicLink(selected.officialUrl) && <a href={publicLink(selected.officialUrl)} target="_blank" rel="noreferrer">Official record ↗</a>}
+                      {publicLink(selected.website) && <a href={publicLink(selected.website)} target="_blank" rel="noreferrer">Website ↗</a>}
+                      <button type="button" className="onboarding-text-button" disabled={busy} onClick={() => void changeCharity()}>Change charity</button>
+                    </div>
+                  </div> : charityLookup}
+                </div>
+              </fieldset>
+              <fieldset className="profile-optional">
+                <legend>A little more about you <small>Optional · {optionalCount}/3</small></legend>
+                {optionalKeys.map((key, index) => <label key={key} className={`profile-field${changed.includes(key) ? " field-arrived" : ""}${state.facts[key] ? " has-value" : ""}`}>
+                  <span><small>0{index + 6}</small>{labels[key]}{state.facts[key] && <i aria-hidden="true">✓</i>}</span>
+                  <textarea name={key} rows={key === "concerns" ? 3 : 2} maxLength={fieldLimit(key)} value={state.facts[key]} placeholder="In your own words…" onChange={e => edit(key, e.target.value)} />
+                </label>)}
+              </fieldset>
               <div className="profile-next">
-                <button
-                  type="submit"
-                  className={
-                    mode === "form" || completed
-                      ? "onboarding-primary"
-                      : "onboarding-secondary"
-                  }
-                  disabled={!accountReady || busy}
-                >
-                  Get started{" "}
-                  <span>→</span>
-                </button>
-                <p>
-                  {accountReady
-                    ? "Your free account lets you save work and use the platform’s tools. No payment required."
-                    : state.facts.email && !validEmail(state.facts.email)
-                      ? "Check your email address to continue."
-                      : "Add your name, email, role and organisation (or independent status)."}
-                </p>
+                <button type="submit" className="onboarding-primary" disabled={!accountReady || busy}>Get started <span>→</span></button>
+                <p>{accountReady ? "Create your free account. No payment required." : "Complete the five essentials, including charity confirmation."}</p>
               </div>
             </form>
-            <div className="profile-destination">
-              <span>YOUR NEXT STOP</span>
-              <strong>
-                {product} <Arrow diagonal />
-              </strong>
-              <p>One account for all five SORP 2026 tools.</p>
-            </div>
+            <p className="profile-destination">Next: <strong>{product}</strong></p>
           </aside>
         </div>
-        <footer className="onboarding-footer">
-          <span>
-            Thoughtfully built by <strong>The Ideas Shed</strong>
-          </span>
-          <span>
-            Part of <strong>My Social Impact</strong>
-          </span>
-        </footer>
+        <footer className="onboarding-footer"><span>My Social Impact × The Ideas Shed</span><span>One account. Greater impact.</span></footer>
       </div>
       <dialog
         ref={dialogRef}
@@ -994,15 +757,17 @@ export function Onboarding() {
           <>
             <p className="onboarding-eyebrow">ONE LAST CHECK</p>
             <h2>
-              Check your inbox,
+              {previewEmailSandbox ? "Check your test inbox," : "Check your inbox,"}
               <br />
               {state.facts.name.split(" ")[0]}.
             </h2>
             <p>
-              Follow the verification link sent to{" "}
+              {previewEmailSandbox ? "A verification message is saved in the private preview inbox for " : "Follow the verification link sent to "}
               <strong>{state.facts.email}</strong>, then sign in to continue to{" "}
               {product}.
             </p>
+            {previewEmailSandbox && <p>No email has been sent. This account exists only in this preview.</p>}
+            {previewVerificationUrl && <a className="onboarding-primary" href={previewVerificationUrl}>Open preview verification →</a>}
             <Link
               className="onboarding-primary"
               href={`/login/?next=${encodeURIComponent(`/get-started/?next=${encodeURIComponent(destination)}`)}`}

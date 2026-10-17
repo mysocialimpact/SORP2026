@@ -2,6 +2,11 @@ import type { Candidate } from "../../app/sorp-public-model";
 /** Public, serialisable facts. No credentials, permissions or inferred identity. */
 export const fieldKeys = ["name", "email", "role", "organisation"] as const;
 export type FieldKey = (typeof fieldKeys)[number];
+export const optionalKeys = ["responsibilities", "discovery", "concerns"] as const;
+export const editableKeys = [...fieldKeys, ...optionalKeys] as const;
+export type EditableKey = (typeof editableKeys)[number];
+export const challengeQuestion = "What’s your main challenge at the moment? Or, to put it another way, what keeps you up at night?";
+export const fieldLimit = (key: EditableKey) => key === "email" ? 254 : optionalKeys.includes(key as typeof optionalKeys[number]) ? 600 : 120;
 export type Facts = Record<FieldKey, string> & {
   responsibilities: string;
   discovery: string;
@@ -139,7 +144,9 @@ export const validEmail = (v: string) =>
 export const registrationReady = (f: Facts) =>
   validEntity(f.name, "name") &&
   validEmail(f.email) &&
-  validEntity(f.role, "role");
+  validEntity(f.role, "role") &&
+  validEntity(f.organisation, "organisation");
+export const accountReady = (s: Conversation) => registrationReady(s.facts) && !!s.charity.confirmed;
 export const OPTIONAL_TURN_CAP = 6;
 export const TOTAL_TURN_CAP = 10;
 export function safeDestination(
@@ -184,7 +191,7 @@ export function cleanFacts(input: unknown): Partial<Facts> {
         .trim()
         .slice(
           0,
-          ["concerns", "responsibilities", "interests", "context"].includes(key)
+          ["concerns", "responsibilities", "discovery", "interests", "context"].includes(key)
             ? 600
             : key === "email"
               ? 254
@@ -258,9 +265,10 @@ export function extractImmediate(
   )?.[1];
   if (role) result.role = role.charAt(0).toUpperCase() + role.slice(1);
   const organisation = text.match(
-    /(?:\b(?:accountant|auditor|trustee|director|manager|CEO)\s+(?:at|for)|\bI work (?:at|for))\s+([\p{Lu}][\p{L}\d'’&-]*(?:\s+[\p{Lu}][\p{L}\d'’&-]*){0,5})/u,
+    /(?:\b(?:accountant|auditor|director|manager|CEO)\s+(?:at|for)|\bI work (?:professionally )?(?:at|for))\s+([\p{Lu}][\p{L}\d'’&-]*(?:\s+[\p{Lu}][\p{L}\d'’&-]*){0,5})/u,
   )?.[1];
   if (organisation) result.organisation = organisation;
+  if (/\bI (?:work independently|am (?:independent|self-employed|freelance))\b/i.test(text)) result.organisation = "Independent";
   const discovery = text.match(
     /(?:found you|heard about (?:you|SORP(?: 2026)?)|came across (?:you|SORP(?: 2026)?))(?:\s+(?:on|via|through|from))?\s+([^.!?]+)/i,
   )?.[1];
@@ -288,6 +296,8 @@ export function extractImmediate(
           ),
       )
       .slice(0, 6);
+  const trusteeship = text.match(/\b(?:I[’']m|I am|I serve as|I[’']m [\p{Lu}][\p{L}'’ -]+,)\s+(?:a )?trustee (?:at|of|for)\s+([\p{Lu}][\p{L}\d'’&-]*(?:\s+[\p{Lu}][\p{L}\d'’&-]*){0,5})/u)?.[1];
+  if (trusteeship) result.charities = [...new Set([...(result.charities || []), trusteeship])];
   const number = text.match(
     /(?:charity (?:number|no\.?|registration)\s*:?\s*)((?:SC|NIC)?\d{5,8})/i,
   )?.[1];
@@ -423,7 +433,9 @@ export function reconcileExtraction(
       charityChoice: semantic.charityChoice || explicit.charityChoice,
       charityDecision: semantic.charityDecision || explicit.charityDecision,
     };
-  return { ...semantic, intent };
+  // A directly stated starting-charity request is safe to retain even if the
+  // semantic pass omits it. This proposes a lookup, never registry confirmation.
+  return { ...semantic, intent, charityChoice: semantic.charityChoice || explicitStartingCharity(message) || undefined };
 }
 /** Boundary validation is separate from language understanding. Sentences and
  * unresolved pronouns are never usable entity/search candidates, even if a model returns them. */
@@ -560,7 +572,7 @@ function relationships(s: Conversation): Conversation {
     );
     facts.organisationKind = adviser
       ? "firm"
-      : /trustee|treasurer|charity|nonprofit|non-profit/i.test(facts.role)
+      : /charity (?:employee|CEO|leader)/i.test(facts.role)
         ? "charity"
         : facts.organisationKind === "charity"
           ? "charity"
@@ -615,12 +627,12 @@ export function normaliseConversation(
     skipped: raw.skipped || [],
   };
   // Preserve unfinished human edits as drafts; they do not satisfy validation.
-  for (const key of fieldKeys)
+  for (const key of editableKeys)
     if (
       raw.knowledge?.[key]?.source === "form" &&
       typeof raw.facts?.[key] === "string"
     )
-      state.facts[key] = raw.facts[key].slice(0, key === "email" ? 254 : 120);
+      state.facts[key] = raw.facts[key].slice(0, fieldLimit(key));
   if (!raw.charity && legacySelected)
     state.charity = {
       ...base.charity,
@@ -645,14 +657,14 @@ export function applyFacts(
 ): Conversation {
   const cleaned = cleanFacts(patch);
   if (source === "message")
-    for (const key of fieldKeys)
-      if (s.knowledge[key]?.status === "confirmed") delete cleaned[key];
+    for (const key of editableKeys)
+      if (s.knowledge[key]?.source === "form") delete cleaned[key];
   const facts = mergeFacts(s.facts, cleaned),
     knowledge = { ...s.knowledge };
   if (source === "form")
-    for (const key of fieldKeys)
+    for (const key of editableKeys)
       if (typeof patch[key] === "string")
-        facts[key] = patch[key]!.slice(0, key === "email" ? 254 : 120);
+        facts[key] = patch[key]!.slice(0, fieldLimit(key));
   for (const key of Object.keys(cleaned) as (keyof Facts)[])
     knowledge[key] = {
       status: source === "form" ? "confirmed" : "supplied",
@@ -660,15 +672,13 @@ export function applyFacts(
       turn: s.turns,
     };
   if (source === "form")
-    for (const key of fieldKeys)
+    for (const key of editableKeys)
       if (patch[key] !== undefined) {
-        if (facts[key])
           knowledge[key] = {
-            status: validEntity(facts[key], key) ? "confirmed" : "supplied",
+            status: "confirmed",
             source,
             turn: s.turns,
           };
-        else delete knowledge[key];
       }
   // An explicitly revised employer invalidates a prior classification, not a confirmed charity.
   if (
@@ -699,7 +709,7 @@ export function applyFacts(
     patch.organisation !== undefined &&
     entitySame(r.entity, s.facts.organisation) &&
     r.period === "current" &&
-    ["employer", "employee", "trustee"].includes(r.relationship)
+    ["employer", "employee"].includes(r.relationship)
       ? {
           ...r,
           entity: facts.organisation,
@@ -722,6 +732,11 @@ export function applyFacts(
     corrections: corrections.slice(-12),
     ...(changedWork ? { response: null, afterCharity: null } : {}),
   });
+}
+export function clearCharity(s: Conversation): Conversation {
+  return { ...s, response: null, afterCharity: null, clarification: null,
+    skipped: s.skipped.filter(key => key !== "charity"),
+    charity: { ...s.charity, confirmed: null, proposed: "", candidates: [], phase: "suggest" } };
 }
 export function proposeCharity(s: Conversation, value: string): Conversation {
   if (!validEntity(value)) return { ...s, clarification: "charity" };
@@ -793,7 +808,7 @@ export function applyExtraction(
             (r) =>
               r.period === "current" &&
               r.confidence === "stated" &&
-              ["trustee", "employee", "employer", "volunteer"].includes(
+              ["employee", "employer"].includes(
                 r.relationship,
               ),
           )
@@ -816,7 +831,8 @@ export function applyExtraction(
     delete supplied.organisation;
   // Explicit corrections are the only conversational updates that can replace a confirmed edit.
   const knowledge = { ...s.knowledge };
-  for (const key of patch.correctedFields || []) delete knowledge[key];
+  for (const key of patch.correctedFields || [])
+    if (knowledge[key]?.source !== "form") delete knowledge[key];
   let next = applyFacts(
     { ...s, professional, knowledge, response: null },
     supplied,
@@ -947,9 +963,16 @@ export function advance(
     },
     patch,
   );
-  // Topic participation is distinct from a professional fact. A joke, refusal,
-  // uncertainty or personal answer can close an optional topic without becoming CRM data.
+  // The optional boxes retain an actual answer, not an inferred professional diagnosis.
+  // Refusals remain unrecorded, and direct edits always win.
   const topic = patch.topicResponse;
+  if (topic?.status === "answered" && optionalKeys.includes(topic.topic as typeof optionalKeys[number]) &&
+      objective === topic.topic && patch.utterance && !next.facts[topic.topic as typeof optionalKeys[number]] &&
+      next.knowledge[topic.topic as typeof optionalKeys[number]]?.source !== "form" && !skip) {
+    const key = topic.topic as typeof optionalKeys[number];
+    next.facts[key] = patch.utterance.trim().slice(0, fieldLimit(key));
+    next.knowledge[key] = { status: "supplied", source: "message", turn: next.turns };
+  }
   if (topic && ["responsibilities", "discovery", "concerns"].includes(topic.topic) &&
       (objective === topic.topic || (objective === "reflection" && topic.topic === "concerns")) &&
       topic.status !== "not_answered") {
@@ -988,9 +1011,7 @@ export function nextObjective(s: Conversation): Objective {
   if (!s.charity.confirmed && !s.skipped.includes("charity")) return "charity";
   if (s.dialogue.reflecting && s.turns < TOTAL_TURN_CAP) return "reflection";
   if (s.turns - s.repairTurns >= OPTIONAL_TURN_CAP) return "complete";
-  // The optional conversation has two invitations: their work and hopes, then concerns.
-  // Referral details remain extractable when volunteered, but are not another question.
-  for (const key of ["responsibilities", "concerns"] as const)
+  for (const key of optionalKeys)
     if (!s.facts[key] && !s.skipped.includes(key)) return key;
   return "complete";
 }
@@ -1028,6 +1049,7 @@ function fallbackQuestion(s: Conversation): string {
         !validEntity(s.facts.name, "name") && "your name",
         !validEmail(s.facts.email) && "your email address",
         !validEntity(s.facts.role, "role") && "what you do",
+        !validEntity(s.facts.organisation, "organisation") && "your employer or firm (or whether you work independently)",
       ].filter(Boolean);
       const historical = s.professional.find((r) => r.period === "past");
       if (
@@ -1068,17 +1090,23 @@ function fallbackQuestion(s: Conversation): string {
     case "discovery":
       return "By the way, how did you come across us?";
     case "concerns":
-      return "What keeps you up at night?";
+      return challengeQuestion;
     case "reflection":
       return "Would you like to say a little more about that, or continue with your profile?";
     default:
-      return registrationReady(s.facts)
+      return accountReady(s)
         ? `Your profile details are ready to review.${s.charity.confirmed ? ` ${s.charity.confirmed.name} is your confirmed starting charity.` : ""} You can create your account when you’re ready.`
         : "Let’s finish the remaining account details in your editable profile.";
   }
 }
+function explicitStartingCharity(message: string): string {
+  const name = message.match(/(?:^|[.!?]\s+)(?:I want to|I would like to|I[’']d like to) (?:explore|review|enquire about|start with)\s+([\p{Lu}][\p{L}\d'’&-]*(?:\s+[\p{Lu}][\p{L}\d'’&-]*){0,5})/u)?.[1];
+  return name && validEntity(name, "charity") ? name : "";
+}
 function choiceFromAnswer(message: string, s: Conversation): string {
   const text = message.trim().replace(/[.!]$/, "");
+  const explicit = explicitStartingCharity(text);
+  if (explicit) return explicit;
   const named = text.match(
     /^(?:actually[, ]*|no[, ]*)?(?:let[’']s (?:start with|use)|please use|use|start with|choose|switch to|change (?:it|that) to)\s+(.{2,120}?)(?:\s+instead)?$/i,
   )?.[1];
@@ -1173,7 +1201,7 @@ export function mergeProfessional(
 }
 export function missingRegistration(s: Conversation): FieldKey[] {
   return fieldKeys.filter(
-    (k) => k !== "organisation" && !validEntity(s.facts[k], k),
+    (k) => !validEntity(s.facts[k], k),
   );
 }
 export function questionPlan(s: Conversation) {
@@ -1201,7 +1229,7 @@ export function questionPlan(s: Conversation) {
     context,
     registrationComplete: registrationReady(s.facts),
     charityConfirmed: !!s.charity.confirmed,
-    canContinue: registrationReady(s.facts),
+    canContinue: accountReady(s),
     remainingTurns: Math.max(0, TOTAL_TURN_CAP - s.turns),
   };
 }
@@ -1289,7 +1317,7 @@ export function suitableDialogue(s: Conversation, p: QuestionProposal): boolean 
   const questions = p.question.match(/[^.!?]*\?/g) || [];
   if (questions.length > 2 || (plan.objective === "complete" && questions.length)) return false;
   if (["registration", "responsibilities", "discovery", "reflection"].includes(plan.objective) && !questions.length) return false;
-  if (plan.objective === "concerns" && !p.question.includes("What keeps you up at night?")) return false;
+  if (plan.objective === "concerns" && !p.question.includes(challengeQuestion)) return false;
   if (plan.objective !== "concerns" && /what keeps you up at night\?/i.test(p.question)) return false;
   if (!s.charity.candidates.length && /(?:official|charity) (?:record|match|card).{0,25}(?:shown|displayed)|(?:check|select|confirm).{0,35}(?:record|card) (?:shown|displayed)/i.test(p.question)) return false;
   // Unverified relationship kinds must not let prose arbitrarily select one
