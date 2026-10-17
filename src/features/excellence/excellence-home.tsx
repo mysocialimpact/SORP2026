@@ -14,6 +14,7 @@ type ProductData = {
   result?: ScoredAssessment & { commentary?: string; recommendation?: string };
   purpose?: { status?: string; progress?: number };
   leadership?: { status?: string; progress?: number; reviewStatus?: string };
+  data?: { status?: string; progress?: number; reviewStatus?: string };
   migration?: { source?: string };
 };
 type ProductPayload = { signedIn?: boolean; account?: Account; productProgress?: { status?: string; data?: ProductData } | null; error?: string };
@@ -66,6 +67,8 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
   const purposeStarted = purposeStatus !== "not_started";
   const leadershipStatus = data.leadership?.status || "not_started";
   const leadershipStarted = leadershipStatus !== "not_started";
+  const dataStatus = data.data?.status || "not_started";
+  const dataStarted = dataStatus !== "not_started";
   const primary = teamActive
     ? { href: "/social-impact-excellence/team/", label: "Open Brainstrust’s Team Perspective" }
     : !complete
@@ -74,6 +77,8 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
         ? { href: "/social-impact-excellence/purpose/", label: "Continue the Purpose pathway" }
         : leadershipStarted
           ? { href: "/social-impact-excellence/leadership/", label: "Continue the Leadership pathway" }
+        : dataStarted
+          ? { href: "/social-impact-excellence/data/", label: "Continue the Data pathway" }
         : { href: "/social-impact-excellence/journey/", label: "Choose your next pillar" };
 
   return <main id="main" className="gateway product-page product-excellence excellence-account-home">
@@ -113,15 +118,17 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
         const score = result?.pillarScores.find(item => item.pillar === pillar.key)?.score;
         const isPurpose = pillar.key === "purpose";
         const isLeadership = pillar.key === "leadership";
-        const pathwayStatus = isPurpose ? purposeStatus : isLeadership ? leadershipStatus : "";
-        const pathwayStarted = isPurpose ? purposeStarted : isLeadership ? leadershipStarted : false;
-        const pathwayProgress = isPurpose ? data.purpose?.progress : data.leadership?.progress;
+        const isData = pillar.key === "data";
+        const pathwayStatus = isPurpose ? purposeStatus : isLeadership ? leadershipStatus : isData ? dataStatus : "";
+        const pathwayStarted = isPurpose ? purposeStarted : isLeadership ? leadershipStarted : isData ? dataStarted : false;
+        const pathwayProgress = isPurpose ? data.purpose?.progress : isLeadership ? data.leadership?.progress : data.data?.progress;
         const submitted = isPurpose ? pathwayStatus === "complete" : pathwayStatus === "evidence_submitted";
-        const state = isPurpose || isLeadership ? submitted ? isLeadership ? "Evidence submitted" : "Complete" : pathwayStarted ? `${pathwayProgress || 0}% complete` : complete ? "Ready to begin" : "Complete baseline first" : complete ? "Baseline ready to review" : `${answers.slice(index * 5, index * 5 + 5).filter(Boolean).length}/5 answered`;
-        const pathwayHref = isPurpose ? "/social-impact-excellence/purpose/" : "/social-impact-excellence/leadership/";
-        return <article key={pillar.key}><span>{pillar.number}</span><h3>{pillar.label}</h3><p>{pillar.strapline}</p><i><b style={{ width: `${score ? score * 20 : answers.slice(index * 5, index * 5 + 5).filter(Boolean).length * 20}%` }}/></i><strong>{state}</strong>{(isPurpose || isLeadership) && complete ? <Link href={pathwayHref}>{pathwayStarted ? "Continue" : "Begin"} {pillar.label} pathway →</Link> : <a href="#excellence-pillars">Review pillar answers ↓</a>}</article>;
+        const available = isPurpose || isLeadership || isData;
+        const state = available ? submitted ? isPurpose ? "Complete" : "Evidence submitted" : pathwayStarted ? `${pathwayProgress || 0}% complete` : complete ? "Ready to begin" : "Complete baseline first" : complete ? "Baseline ready to review" : `${answers.slice(index * 5, index * 5 + 5).filter(Boolean).length}/5 answered`;
+        const pathwayHref = isPurpose ? "/social-impact-excellence/purpose/" : isLeadership ? "/social-impact-excellence/leadership/" : "/social-impact-excellence/data/";
+        return <article key={pillar.key}><span>{pillar.number}</span><h3>{pillar.label}</h3><p>{pillar.strapline}</p><i><b style={{ width: `${score ? score * 20 : answers.slice(index * 5, index * 5 + 5).filter(Boolean).length * 20}%` }}/></i><strong>{state}</strong>{available && complete ? <Link href={pathwayHref}>{pathwayStarted ? "Continue" : "Begin"} {pillar.label} pathway →</Link> : <a href="#excellence-pillars">Review pillar answers ↓</a>}</article>;
       })}</div>
-      <p className="excellence-pathway-note">The deeper Purpose and Leadership pathways are available now. Data, Delivery and Communications retain their full baseline questions and results here; deeper guided pathways will appear as they are released.</p>
+      <p className="excellence-pathway-note">The deeper Purpose, Leadership and Data pathways are available now. Delivery and Communications retain their full baseline questions and results here; deeper guided pathways will appear as they are released.</p>
     </section>
 
     {teamActive ? <section className="excellence-team-summary"><div className="gateway-width"><div><p className="gateway-kicker">{organisation} · Team Perspective</p><h2>More than one<br/>point of view.</h2><p>Will can invite colleagues directly, track completion and view the protected organisation result, without Marcus having to set anybody up.</p><Link className="gateway-action" href="/social-impact-excellence/team/">Manage Team Perspective <Arrow /></Link></div><dl><div><dt>Invited</dt><dd>{counts.invited}</dd></div><div><dt>In progress</dt><dd>{counts.started}</dd></div><div><dt>Completed</dt><dd>{counts.completed}</dd></div><div><dt>Combined view</dt><dd>{team?.aggregate?.available ? team.aggregate.overall?.toFixed(1) : `${team?.aggregate?.completed || 0} of ${team?.aggregate?.required || 3}`}</dd></div></dl></div></section> : null}

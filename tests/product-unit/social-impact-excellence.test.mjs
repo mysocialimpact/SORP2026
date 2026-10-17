@@ -7,6 +7,7 @@ import { PURPOSE_OPEN_QUESTIONS, PURPOSE_SCALE, PURPOSE_SECTIONS, purposeMaturit
 import { PURPOSE_QUESTION_GUIDANCE } from "../../src/features/excellence/purpose-guidance.ts";
 import { LEADERSHIP_OPEN_QUESTIONS, LEADERSHIP_SCALE, LEADERSHIP_SECTIONS, leadershipMaturity, newLeadershipWorkspace, normaliseLeadershipWorkspace, scoreLeadership } from "../../src/features/excellence/leadership.ts";
 import { LEADERSHIP_QUESTION_GUIDANCE } from "../../src/features/excellence/leadership-guidance.ts";
+import { DATA_METHODOLOGY_VERSION, DATA_OPEN_QUESTIONS, DATA_SCALE, DATA_SECTIONS, dataMaturity, newDataWorkspace, normaliseDataWorkspace, scoreData } from "../../src/features/excellence/data.ts";
 
 test("native charity assessment preserves the established five-pillar, 25-question methodology", () => {
   assert.deepEqual(PILLARS.map(pillar => pillar.key), ["purpose", "leadership", "data", "delivery", "communication"]);
@@ -113,4 +114,57 @@ test("Leadership draft restoration sanitises invalid data without touching other
   assert.equal(sanitised.answers[1].score, null);
   assert.equal(sanitised.answers[2].questionId, "leadership-03");
   assert.equal(sanitised.reviewStatus, "not_submitted");
+});
+
+test("Data pathway contains the complete authored 20-question methodology", () => {
+  assert.equal(DATA_SECTIONS.length, 5);
+  assert.deepEqual(DATA_SECTIONS.map(section => section.questions.length), [4, 4, 4, 4, 4]);
+  const questions = DATA_SECTIONS.flatMap(section => section.questions);
+  assert.deepEqual(questions.map(question => question.id), Array.from({ length: 20 }, (_, index) => `DATA${String(index + 1).padStart(2, "0")}`));
+  assert.equal(new Set(questions.map(question => question.why)).size, 20);
+  const stars = questions.flatMap(question => question.stars);
+  assert.equal(stars.length, 100);
+  assert.equal(new Set(stars).size, 100);
+  assert.ok(questions.every(question => question.why.length >= 100 && question.stars.every(description => description.length >= 40)));
+  assert.deepEqual(DATA_OPEN_QUESTIONS.map(question => question.id), ["DATA_OPEN01", "DATA_OPEN02", "DATA_OPEN03", "DATA_OPEN04", "DATA_OPEN05"]);
+});
+
+test("Data scoring matches Purpose bands and excludes comments, reflections and evidence", () => {
+  assert.deepEqual(DATA_SCALE, PURPOSE_SCALE);
+  const workspace = newDataWorkspace();
+  workspace.answers.slice(0, 19).forEach(answer => { answer.score = 4; });
+  assert.equal(scoreData(workspace.answers), null);
+  workspace.answers[19].score = 4;
+  workspace.answers[0].comment = "This context is unscored.";
+  workspace.answers.slice(20).forEach(answer => { answer.answer = "Optional qualitative context."; answer.score = 1; });
+  workspace.evidence.push({ id: "evidence-1", fileName: "summary.pdf", category: "Examples of analysis", notes: "Unscored", size: 1200, uploadedAt: new Date(0).toISOString() });
+  assert.deepEqual(scoreData(workspace.answers), { score: 4, maturity: "Established" });
+  workspace.answers[0].score = 6;
+  assert.equal(scoreData(workspace.answers), null);
+  for (const score of [1, 1.79, 1.8, 2.59, 2.6, 3.39, 3.4, 4.19, 4.2, 5]) assert.equal(dataMaturity(score), purposeMaturity(score));
+});
+
+test("Data persistence is versioned, restores drafts and preserves immutable submission history", () => {
+  const workspace = newDataWorkspace({ name: "QA", email: "qa@example.invalid", organisation: "QA Charity" });
+  workspace.status = "draft";
+  workspace.answers[0].score = 5;
+  workspace.answers[0].comment = "A proportionate spreadsheet supports this practice.";
+  workspace.answers[20].answer = "A reflective answer.";
+  workspace.submissions.push({ assessmentId: workspace.assessmentId, methodologyVersion: DATA_METHODOLOGY_VERSION, submittedAt: new Date(0).toISOString(), score: 5, maturity: "Fully Embedded", answers: structuredClone(workspace.answers) });
+  const purpose = { preserved: true }, leadership = { preserved: true }, snapshot = { answers: [1, 2, 3] };
+  const product = { purpose, leadership, snapshot, data: workspace };
+  const restored = normaliseDataWorkspace(product.data);
+  assert.equal(restored.methodologyVersion, DATA_METHODOLOGY_VERSION);
+  assert.equal(restored.answers[0].comment, workspace.answers[0].comment);
+  assert.equal(restored.answers[20].answer, workspace.answers[20].answer);
+  assert.equal(restored.submissions.length, 1);
+  assert.deepEqual(restored.submissions[0].answers, workspace.submissions[0].answers);
+  assert.strictEqual(product.purpose, purpose);
+  assert.strictEqual(product.leadership, leadership);
+  assert.strictEqual(product.snapshot, snapshot);
+  const invalid = structuredClone(workspace);
+  invalid.reviewStatus = "reviewed";
+  invalid.answers[0].score = 0;
+  assert.equal(normaliseDataWorkspace(invalid).reviewStatus, "not_submitted");
+  assert.equal(normaliseDataWorkspace(invalid).answers[0].score, null);
 });
