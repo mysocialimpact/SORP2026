@@ -3,7 +3,7 @@
 import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { chromium, expect } from '@playwright/test';
+import { chromium, expect, request as browserRequest } from '@playwright/test';
 import chromiumBinary from '../tests/live-runtime/node_modules/@sparticuz/chromium/build/index.js';
 import pg from 'pg';
 
@@ -100,6 +100,13 @@ try {
     await page.getByLabel('Confirm your password').fill(password);
     await page.getByRole('button', { name: 'Create my account' }).click();
     await expect(page.getByRole('link', { name: 'Open preview verification →' })).toBeVisible();
+    const stranger = await browserRequest.newContext({ baseURL: base, extraHTTPHeaders: { origin: base } });
+    assert.equal((await stranger.post('/api/onboarding/preview-inbox/', { data: {} })).status(), 401);
+    assert.equal((await stranger.post('/api/onboarding/start/', { data: {} })).status(), 200);
+    assert.equal((await stranger.post('/api/onboarding/edit/', { data: { fields: { email } } })).status(), 200);
+    assert.equal((await stranger.post('/api/onboarding/preview-inbox/', { data: {} })).status(), 404, 'Another draft must not read the verification link even with the same email');
+    await stranger.dispose();
+    report.checks.push({ width, privateInboxIsolation: true });
     const unverified = await context.request.post(base + '/api/readiness-account/', { headers: { origin: base }, data: { action: 'login', email, password } });
     assert.equal(unverified.status(), 403, 'Unverified sign-in must fail');
     const verification = page.waitForResponse(response => response.url().includes('/api/sorp-auth/verify-email'));
@@ -110,13 +117,15 @@ try {
     await page.getByLabel('Email address', { exact: true }).fill(email);
     await page.getByLabel('Password', { exact: true }).fill(password);
     await page.locator('form').filter({ has: page.getByLabel('Password', { exact: true }) }).getByRole('button', { name: /Log in/i }).click();
-    await page.waitForURL('**/ask-sorp/workspace/**', { timeout: 30000, waitUntil: 'domcontentloaded' });
+    // Match the actual destination, not its appearance inside ?next=.
+    await page.waitForURL(url => url.pathname === '/ask-sorp/workspace/', { timeout: 45000, waitUntil: 'domcontentloaded' });
     const accountResponse = await context.request.get(base + '/api/readiness-account/');
     const account = await accountResponse.json();
     assert.equal(account.signedIn, true);
     assert.equal(account.account.email, email);
     assert.equal(account.account.organisation, 'Burton Sweet');
     const linked = await pool.query('SELECT facts,charity_identity FROM research_console.onboarding_profiles WHERE account_id=$1', [account.account.id]);
+    assert.equal(linked.rowCount, 1, 'Verified introduction must be attached to the authenticated account');
     assert.equal(linked.rows[0].facts.organisation, 'Burton Sweet');
     assert.ok(linked.rows[0].charity_identity.startsWith('ccew:'));
     report.checks.push({ width, secureSignup: true, unverifiedLoginDenied: true, signedEmailLinkAccepted: true, authenticatedReturn: true, accountProfilePersisted: true });
