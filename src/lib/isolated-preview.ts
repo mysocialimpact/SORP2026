@@ -30,7 +30,7 @@ export async function isolatedPreviewResponse(request: NextRequest) {
       if (typeof body.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email) || typeof body.password !== 'string' || body.password.length < 10) return json({ error: 'Add a valid test email and password.' }, 400);
       const account = { id: 'synthetic-preview-account', name: String(body.name || 'Returning Test User'), email: body.email.toLowerCase(), position: String(body.position || 'Trustee'), organisation: String(body.organisation || 'Synthetic Charity') };
       // Only the synthetic profile is stored in this browser. Passwords never persist.
-      const progress = body.action === 'signup' ? { onboarding: { facts: body.progress?.onboarding?.facts, selected: body.progress?.onboarding?.selected } } : { sessionId: 'synthetic-saved-review', step: 'scope', onboarding: {} };
+      const progress = body.action === 'signup' ? { onboarding: { facts: body.progress?.onboarding?.facts, selected: body.progress?.onboarding?.selected, audience: body.progress?.onboarding?.audience } } : { sessionId: 'synthetic-saved-review', step: 'scope', onboarding: {} };
       const payload = Buffer.from(JSON.stringify({ account, progress })).toString('base64url');
       return json({ signedIn: true, account, progress, platformAccess: access }, 200, `sorp_preview_account=${payload}.${sign(payload)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600${request.nextUrl.protocol === 'https:' ? '; Secure' : ''}`);
     }

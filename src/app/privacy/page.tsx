@@ -25,10 +25,14 @@ export default function Privacy() {
           content needed to create and deliver that report.
         </p>
         <p>
-          If you choose “I work in a charity” or “I advise charities” on the
+          If you choose “Charities” or “Accountants & Advisers” on the
           homepage, your choice is kept in this browser tab’s session storage.
-          It is optional, is not sent to our analytics service, and can be
-          cleared by selecting the same option again. If you use “Let’s talk”,
+          It is optional and can be cleared by selecting the same option again.
+          When you select an option, we send that choice, the page, time and an
+          anonymous identifier for this page visit to our existing usage service.
+          This analytics identifier is not saved in browser storage. If you
+          later create an account, your choice is saved with your introduction.
+          If you use “Let’s talk”,
           we send the email address, message, selected audience and source to
           the existing SORP message service so My Social Impact can respond.
         </p>

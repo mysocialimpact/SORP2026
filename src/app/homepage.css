@@ -220,13 +220,15 @@
 }
 .homepage-audience-intro {
   margin: 0;
-  padding: 12px 12px 26px;
+  padding: 12px 12px 6px;
   color: #fff;
   font-size: clamp(23px, 2.3vw, 34px);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -.035em;
 }
+.homepage-audience-instruction { margin: 0; padding: 0 12px 22px; color: #d8ff52; font-size: 15px; font-weight: 600; letter-spacing: .01em; }
+.homepage-audience-instruction span { display: inline-block; margin-left: 4px; font-size: 19px; line-height: .7; }
 .homepage-audience-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
 .homepage-audience-options button {
   position: relative; display: block; min-width: 0; text-align: left;
@@ -234,7 +236,10 @@
   border: 2px solid transparent; border-radius: 4px; font: inherit; cursor: pointer;
   transition: transform .16s ease, box-shadow .16s ease;
 }
-.homepage-audience-option { min-width: 0; }
+.homepage-audience-option { position: relative; min-width: 0; }
+.homepage-audience-gesture { position: absolute; top: 48%; left: 50%; z-index: 2; width: 26px; height: 32px; pointer-events: none; opacity: 0; }
+.homepage-audience-cursor { display: block; width: 26px; height: 32px; filter: drop-shadow(0 2px 2px #24232966); }
+.homepage-audience-hand { display: none; }
 .homepage-audience-option > button { width: 100%; min-height: 205px; }
 .homepage-audience-option:nth-child(2) > button { background: #ded7f1; }
 .homepage-audience-options button:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #ffffff20; }
@@ -268,8 +273,12 @@
 .homepage-audience-option .homepage-audience-detail a { width: fit-content; margin-top: 12px; border-bottom: 2px solid currentColor; font-weight: 700; text-decoration: none; }
 @media (prefers-reduced-motion: no-preference) {
   .homepage-audience-detail { animation: audience-reveal 260ms ease-out both; }
+  .homepage-audience.is-demonstrating .homepage-audience-gesture { animation: audience-gesture 2s ease-in-out both; }
+  .homepage-audience.is-demonstrating .homepage-audience-option:first-child > button { animation: audience-hint 2s ease-in-out both; }
 }
 @keyframes audience-reveal { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes audience-gesture { 0% { opacity: 0; transform: translate(130px, 62px); } 18% { opacity: 1; } 52% { opacity: 1; transform: translate(0, 0); } 63% { transform: translate(0, 5px) scale(.86); } 73% { transform: translate(0, 0); } 86% { opacity: 1; } 100% { opacity: 0; transform: translate(0, 0); } }
+@keyframes audience-hint { 0%, 50%, 100% { box-shadow: none; } 63%, 77% { box-shadow: inset 0 0 0 3px #ffffffb8, 0 0 0 4px #d8ff52; } }
 .gateway-home-cover + .gateway-width .gateway-sorp-section { padding-top: 58px; }
 .gateway-signature {
   margin: 76px 0 0;
@@ -320,7 +329,10 @@
   .homepage-hero-definition { margin-top: 22px; font-size: 18px; }
   .gateway-home-cover .gateway-intro-aside { max-width: none; border-left: 0; border-top: 1px solid #718b7055; padding: 24px 0 0; }
   .homepage-audience { margin-top: 30px; padding: 10px; }
-  .homepage-audience-intro { padding: 10px 10px 20px; font-size: 24px; }
+  .homepage-audience-intro { padding: 10px 10px 5px; font-size: 24px; }
+  .homepage-audience-instruction { padding: 0 10px 17px; font-size: 14px; }
+  .homepage-audience-cursor { display: none; }
+  .homepage-audience-hand { display: block; font-size: 34px; line-height: 1; filter: drop-shadow(0 2px 2px #24232966); }
   .homepage-audience-options { grid-template-columns: 1fr; gap: 10px; }
   .homepage-audience-options button { padding: 24px 20px 22px; }
   .homepage-audience-options strong { font-size: clamp(34px, 11vw, 48px); }
@@ -337,6 +349,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .homepage-audience-options button { transition: none; }
+  .homepage-audience-gesture { display: none; }
 }
 
 /* Free-first plans: a deliberately user-controlled horizontal journey. */

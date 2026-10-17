@@ -1,10 +1,14 @@
 import { test, expect } from "@playwright/test";
 
-test("audience choice is optional, reversible and retained without tracking", async ({ page }) => {
-  const writes: string[] = [];
-  page.on("request", request => { if (request.method() === "POST") writes.push(request.url()); });
+test("audience choice is optional, reversible and records real selections", async ({ page }) => {
+  const selections: Record<string, unknown>[] = [];
+  await page.route("**/api/growth-event", route => {
+    selections.push(route.request().postDataJSON());
+    return route.fulfill({ json: { accepted: true } });
+  });
   await page.goto("/");
   await expect(page.getByText("We’ve built this for")).toBeVisible();
+  await expect(page.getByText("Click which one you are")).toBeVisible();
   const charity = page.getByRole("button", { name: /CHARITIES/ });
   const adviser = page.getByRole("button", { name: /ACCOUNTANTS & ADVISERS/ });
   await expect(charity).toHaveAttribute("aria-pressed", "false");
@@ -17,12 +21,15 @@ test("audience choice is optional, reversible and retained without tracking", as
   await expect(adviser).toHaveAttribute("aria-pressed", "true");
   await expect(charity).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByRole("heading", { name: "To the accountants and advisers supporting our charities." })).toBeVisible();
-  await expect(page.locator("#homepage-audience-detail")).toContainText("We’re all ears.");
+  await expect(page.locator("#homepage-audience-adviser")).toContainText("We’re all ears.");
   await page.reload();
   await expect(adviser).toHaveAttribute("aria-pressed", "true");
   await adviser.click();
   await expect(adviser).toHaveAttribute("aria-pressed", "false");
-  expect(writes).toEqual([]);
+  expect(selections).toHaveLength(2);
+  expect(selections.map(event => event.audience)).toEqual(["charity", "adviser"]);
+  expect(selections.every(event => event.eventType === "homepage_audience_selected" && event.page === "/" && typeof event.occurredAt === "string")).toBe(true);
+  expect(selections[0].sessionId).toBe(selections[1].sessionId);
 });
 
 test("Home divider joins the hero and products precede the vision", async ({ page }) => {
@@ -60,12 +67,12 @@ test("the middle story is one compact ambition and vision composition", async ({
   await manifesto.screenshot({ path: testInfo.outputPath("ambition-vision.png") });
 });
 
-test("one compact starting point links directly to the working review", async ({ page }, testInfo) => {
+test("one compact starting point preserves the review destination through onboarding", async ({ page }, testInfo) => {
   await page.goto("/");
   const start = page.locator(".homepage-start");
   await expect(start.getByRole("heading")).toHaveText("Are You SORP Ready?");
   await expect(start).toContainText("A free assessment of your charity’s impact and sustainability reporting readiness.");
-  const review = start.getByRole("link", { name: "Start your free review" });
+  const review = start.getByRole("link", { name: "Let’s Get Started" });
   await expect(review).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=intro");
   await expect(start.getByText("Ask SORP")).toHaveCount(0);
   await expect(page.getByText("Already working with an accountant or adviser? Brilliant.")).toHaveCount(0);
@@ -74,8 +81,8 @@ test("one compact starting point links directly to the working review", async ({
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await start.screenshot({ path: testInfo.outputPath("single-start.png") });
   await review.click();
-  await expect(page).toHaveURL(/\/are-you-sorp-ready\/review\/(?:\?entry=intro)?$/);
-  await expect(page.locator(".si-welcome")).toBeVisible();
+  await expect(page).toHaveURL(/\/get-started\/?\?next=/);
+  await expect(page.locator(".conversation-question")).toBeVisible();
 });
 
 test("hero frames SORP as the requirement and better impact as the opportunity", async ({ page }) => {
@@ -85,7 +92,7 @@ test("hero frames SORP as the requirement and better impact as the opportunity",
   await expect(page.locator(".homepage-editorial")).toContainText("Better impact is the opportunity.");
   await expect(page.locator(".homepage-msi-strapline")).toHaveText("Strategy for Social Impact Excellence");
   const enthusiasm = page.locator(".homepage-sorp-enthusiasm");
-  await expect(enthusiasm).toHaveText("We’re excited about SORP 2026 and better charity reporting. We’re even more excited about what charities can achieve when they move beyond compliance — using better evidence to make clearer decisions, understand what works and create greater impact.");
+  await expect(enthusiasm).toHaveText("We’re excited about SORP 2026 and better charity reporting. Even more excited about using technology to help smaller charities make a greater impact.");
   const positions = await page.locator(".gateway-home-cover, .homepage-sorp-enthusiasm, .homepage-audience").evaluateAll(elements => elements.map(element => element.getBoundingClientRect().top));
   expect(positions).toEqual([...positions].sort((a, b) => a - b));
 });

@@ -44,4 +44,19 @@ test.describe("Conversational onboarding in isolated preview", () => {
     await expect(page.locator(".ask-workspace-page")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
+
+  test("the chosen audience is associated with the new account", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".homepage-audience-option").filter({ hasText: "CHARITIES" }).getByRole("button").click();
+    await page.goto("/get-started/");
+    await page.locator("#introduction-answer:visible").fill("My name is Asha Patel. I am a trustee at Interim Spaces. My email is asha@example.com.");
+    await page.locator(".onboarding-send").click();
+    await page.locator(".onboarding-choice").getByRole("button", { name: /Get started/ }).click();
+    await page.getByLabel("Choose a password").fill("Synthetic-Account-Test-2026");
+    await page.getByLabel("Confirm your password").fill("Synthetic-Account-Test-2026");
+    await page.locator("dialog").getByRole("button", { name: /Create my account/ }).click();
+    await expect(page).toHaveURL(/\/dashboard\//);
+    const data = await page.request.get("/api/readiness-account/");
+    expect((await data.json()).progress.onboarding.audience).toBe("charity");
+  });
 });
