@@ -67,6 +67,20 @@ async function choose(page: Page) {
   await page.getByRole("button", { name: "Yes, this is the charity" }).click();
   await expect(page.locator(".confirmed-charity")).toContainText(charity.name);
 }
+test("a slow saved-draft response does not override the visitor's manual mode", async ({ page }) => {
+  await fixture(page);
+  await open(page);
+  await send(page, intro);
+  await page.route("**/api/onboarding/session/", async route => {
+    await new Promise(resolve => setTimeout(resolve, 1400));
+    await route.fallback();
+  });
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Fill in the form", exact: true }).click();
+  await expect(page.locator('input[name=name]')).toHaveValue("Sarah Jones");
+  await expect(page.getByRole("button", { name: "Fill in the form", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#onboarding-profile-form")).toBeVisible();
+});
 test("first answer renders immediately during a slow response; all eight fields share state", async ({ page }, info) => {
   const service = await fixture(page, 1600);
   await open(page);

@@ -217,7 +217,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     if (started.current) return;
     started.current = true;
     interacted.current = true;
-    setMode(next);
+    // Loading a draft must not override a method the visitor has just chosen.
     setNotice("");
     setBusy(true);
     lock.current = true;
@@ -508,7 +508,6 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
           ) {
             accept(saved);
             setService(true);
-            setMode("conversation");
             setBusy(false);
           } else if (!controller.signal.aborted) {
             void start("conversation");
