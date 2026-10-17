@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {chromium} from '@playwright/test';
-import binary from './tests/live-runtime/node_modules/@sparticuz/chromium/build/index.js';
+import binary from '../tests/live-runtime/node_modules/@sparticuz/chromium/build/index.js';
 const base='https://sorp2026.org';
 const browser=await chromium.launch({executablePath:await binary.executablePath(),args:['--no-sandbox','--disable-dev-shm-usage'],headless:true});
 const result={url:base,registrationAttempted:false};
