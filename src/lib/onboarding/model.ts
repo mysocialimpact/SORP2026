@@ -98,7 +98,7 @@ const factMeaning: Record<string, string> = {
   organisationKind:
     "Classify the CURRENT employer as charity, firm, other or unknown. This is not official charity verification.",
   charityChoice:
-    "A specifically selected starting charity. A mention, employment or historical client is not selection.",
+    "The charity the person explicitly wants to explore, enquire about, start with or review. For example 'I am a trustee at Interim Spaces but want to explore Oxfam' selects Oxfam, NOT Interim Spaces. A mere mention, employment or historical client is not selection.",
   reference:
     "An entity referred to in a correction/reminder, resolved only when unambiguous from known state.",
 };
@@ -112,7 +112,7 @@ export const interpretationSchema = object({
   charityDecision: {
     ...enumeration(["accept", "reject", "none"]),
     description:
-      "Accept only an explicit request to START WITH or USE a charity, or agreement with that proposal. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means the user does not want that charity as their starting selection.",
+      "Accept an explicit request to explore, review, enquire about, start with or use a charity, or agreement with that proposal. This means find its official record, never silently confirm it. Reminding us of an organisation, naming an employer or discussing a previous client is none. Reject means they do not want that starting charity.",
   },
   finishRequested: { type: "boolean" },
   organisationNature: {

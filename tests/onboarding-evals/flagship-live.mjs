@@ -30,7 +30,7 @@ try {
   const trustee = await turn(initialConversation(), "I’m Alex Jones. I am a trustee at Interim Spaces, but I work professionally as a finance manager for Cedar Advisory. My email is alex@example.com. I want to explore Oxfam.");
   assert.equal(trustee.facts.organisation, "Cedar Advisory");
   assert.equal(trustee.charity.confirmed, null);
-  assert.ok(trustee.facts.charities.includes("Oxfam") || trustee.charity.proposed === "Oxfam");
+  assert.equal(trustee.charity.proposed, "Oxfam", JSON.stringify({ proposed: trustee.charity.proposed, charities: trustee.facts.charities, professional: trustee.professional.map(({ entity, relationship }) => ({ entity, relationship })) }));
   const ready = confirmCharity(sarah, { name: "Evaluation-only charity", registrationNumber: "FIXTURE", officialUrl: "https://example.invalid/fixture" });
   const complete = await turn(ready, "I prepare charity accounts and advise trustees. I heard about you through a colleague. My biggest challenge is gathering evidence before reporting deadlines.");
   for (const key of ["responsibilities", "discovery", "concerns"]) assert.ok(complete.facts[key], key);

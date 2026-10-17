@@ -70,6 +70,7 @@ async function choose(page: Page) {
 test("first answer renders immediately during a slow response; all eight fields share state", async ({ page }, info) => {
   const service = await fixture(page, 1600);
   await open(page);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: `test-results/flagship-${info.project.name}-intro.png`, fullPage: true });
   await page.locator("#introduction-answer").fill(intro);
   await page.locator(".onboarding-send").click();
@@ -82,6 +83,7 @@ test("first answer renders immediately during a slow response; all eight fields 
     await expect(page.locator(".mobile-profile-reward")).toBeVisible();
     await expect(page.locator(".onboarding-mobile-summary")).toBeInViewport();
   }
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: `test-results/flagship-${info.project.name}-population.png`, fullPage: true });
   await expect(page.locator("#introduction-answer")).toBeEnabled();
   await expect(page.locator(".conversation-question")).toContainText("Which charity");
@@ -100,6 +102,7 @@ test("first answer renders immediately during a slow response; all eight fields 
   await page.getByRole("button", { name: "Talk to us", exact: true }).click();
   await expect(page.locator("input[name=name]")).toHaveValue("Sarah Jones ACA");
   await expect(page.locator("textarea[name=discovery]")).toHaveValue("A colleague at a conference.");
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: `test-results/flagship-${info.project.name}-complete.png`, fullPage: true });
   await form(page);
   await page.locator(".profile-next button").click();
@@ -125,6 +128,7 @@ test("manual route requires charity, allows optional blanks, preserves return ro
   const results = await new AxeBuilder({ page }).include(".onboarding-page").analyze();
   expect(results.violations).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: `test-results/flagship-${info.project.name}-manual.png`, fullPage: true });
   await page.getByRole("button", { name: "Change charity" }).click();
   await expect(page.locator(".profile-next button")).toBeDisabled();
@@ -172,7 +176,8 @@ test.describe("microphone browser contract", () => {
     await page.waitForTimeout(1100);
     await page.getByRole("button", { name: "Stop recording" }).click();
     await expect(page.locator(".voice-transcribing")).toBeVisible();
-    await page.screenshot({ path: "test-results/flagship-desktop-transcribing.png", fullPage: true });
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.screenshot({ path: "test-results/flagship-desktop-transcribing.png", fullPage: true });
     await expect(page.locator("#introduction-answer")).toHaveValue(intro);
     await page.locator("#introduction-answer").fill(intro.replace("Sarah Jones", "Sarah Jones ACA"));
     await page.locator(".onboarding-send").click();

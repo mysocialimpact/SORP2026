@@ -433,7 +433,9 @@ export function reconcileExtraction(
       charityChoice: semantic.charityChoice || explicit.charityChoice,
       charityDecision: semantic.charityDecision || explicit.charityDecision,
     };
-  return { ...semantic, intent };
+  // A directly stated starting-charity request is safe to retain even if the
+  // semantic pass omits it. This proposes a lookup, never registry confirmation.
+  return { ...semantic, intent, charityChoice: semantic.charityChoice || explicitStartingCharity(message) || undefined };
 }
 /** Boundary validation is separate from language understanding. Sentences and
  * unresolved pronouns are never usable entity/search candidates, even if a model returns them. */
@@ -1097,8 +1099,14 @@ function fallbackQuestion(s: Conversation): string {
         : "Let’s finish the remaining account details in your editable profile.";
   }
 }
+function explicitStartingCharity(message: string): string {
+  const name = message.match(/(?:^|[.!?]\s+)(?:I want to|I would like to|I[’']d like to) (?:explore|review|enquire about|start with)\s+([\p{Lu}][\p{L}\d'’&-]*(?:\s+[\p{Lu}][\p{L}\d'’&-]*){0,5})/u)?.[1];
+  return name && validEntity(name, "charity") ? name : "";
+}
 function choiceFromAnswer(message: string, s: Conversation): string {
   const text = message.trim().replace(/[.!]$/, "");
+  const explicit = explicitStartingCharity(text);
+  if (explicit) return explicit;
   const named = text.match(
     /^(?:actually[, ]*|no[, ]*)?(?:let[’']s (?:start with|use)|please use|use|start with|choose|switch to|change (?:it|that) to)\s+(.{2,120}?)(?:\s+instead)?$/i,
   )?.[1];

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { initialConversation, extractImmediate, advance, applyFacts, confirmCharity, accountReady, optionalKeys, normaliseConversation, nextObjective, nextQuestion, challengeQuestion } from "../../src/lib/onboarding/state.ts";
+import { initialConversation, extractImmediate, reconcileExtraction, advance, applyFacts, confirmCharity, accountReady, optionalKeys, normaliseConversation, nextObjective, nextQuestion, challengeQuestion } from "../../src/lib/onboarding/state.ts";
 const intro = "I’m Sarah Jones, an accountant at Burton Sweet. My email is sarah@example.com.";
 const answer = (s, text) => advance(s, extractImmediate(text, s));
 test("four immediate facts do not imply five completed essentials", () => {
@@ -37,4 +37,14 @@ test("three optional questions stay separate and the last has the exact agreed w
   assert.equal(nextQuestion(s), challengeQuestion);
   s = answer(s, "My biggest challenge is time.");
   assert.equal(nextObjective(s), "complete");
+});
+test("explicit starting-charity request survives an omitted model field without becoming confirmation", () => {
+  const text = "I’m Alex Jones, a trustee at Interim Spaces. I work for Cedar Advisory. I want to explore Oxfam.";
+  const initial = initialConversation();
+  const local = answer(initial, text);
+  assert.equal(local.charity.proposed, "Oxfam");
+  assert.equal(local.facts.organisation, "Cedar Advisory");
+  const server = advance(initial, reconcileExtraction(text, initial, { intent: "inform", organisation: "Cedar Advisory" }));
+  assert.equal(server.charity.proposed, "Oxfam");
+  assert.equal(server.charity.confirmed, null);
 });
