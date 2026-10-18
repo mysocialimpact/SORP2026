@@ -1,3 +1,4 @@
 import { CommunicationsAssessment } from "@/features/excellence/communications-assessment";
+import { protectedExcellencePage } from "@/features/excellence/protected-page";
 
-export default function CommunicationsAssessmentPage() { return <CommunicationsAssessment />; }
+export default async function CommunicationsAssessmentPage() { return protectedExcellencePage("communications", <CommunicationsAssessment />); }

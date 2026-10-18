@@ -4,28 +4,27 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { COMMUNICATIONS_STAGES, normaliseCommunicationsWorkspace, type CommunicationsWorkspace } from "./communications";
+import { PillarStartLink } from "./pillar-start-link";
 
 type Payload = { account?: { name?: string; email?: string; organisation?: string }; productProgress?: { data?: { result?: unknown; communications?: unknown } }; error?: string };
 
 export function CommunicationsPathway() {
   const router = useRouter();
   const [workspace, setWorkspace] = useState<CommunicationsWorkspace>();
-  const [hasBaseline, setHasBaseline] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     void fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "load-product", productId: "social-impact-excellence" }), cache: "no-store" })
-      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/communications/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Communications pathway could not be loaded."); setHasBaseline(Boolean(payload.productProgress?.data?.result)); setWorkspace(normaliseCommunicationsWorkspace(payload.productProgress?.data?.communications, payload.account)); })
+      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/communications/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Communications pathway could not be loaded."); setWorkspace(normaliseCommunicationsWorkspace(payload.productProgress?.data?.communications, payload.account)); })
       .catch(caught => setError(caught instanceof Error ? caught.message : "Your Communications pathway could not be loaded."));
   }, [router]);
   if (error) return <main className="sie-report"><section className="sie-state" role="alert"><h1>We couldn’t open Communications.</h1><p>{error}</p><Link href="/social-impact-excellence/journey/">Return to your journey</Link></section></main>;
   if (!workspace) return <main className="sie-report"><section className="sie-state" role="status"><p>Opening your Communications pathway…</p></section></main>;
-  if (!hasBaseline) return <main className="sie-report"><section className="sie-state"><h1>Complete your baseline first.</h1><p>The five-pillar assessment gives your deeper Communications work the right context.</p><Link href="/social-impact-excellence/assessment/">Continue baseline assessment →</Link></section></main>;
   const assessmentComplete = workspace.status === "assessment_complete" || workspace.status === "evidence_submitted";
   const primaryHref = assessmentComplete ? "/social-impact-excellence/communications/evidence/" : "/social-impact-excellence/communications/assessment/";
   const primaryLabel = workspace.status === "evidence_submitted" ? "Review submitted pathway" : assessmentComplete ? "Continue to supporting evidence" : workspace.status === "draft" ? "Continue Communications Assessment" : "Start Communications Assessment";
   return <main className="sie-report sie-purpose-home sie-communications-home">
     <header><Link href="/social-impact-excellence/" className="sie-wordmark">SOCIAL IMPACT <strong>EXCELLENCE</strong></Link><Link href="/social-impact-excellence/journey/">Your journey</Link></header>
-    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 05 · Communications</p><h1>Make your impact <em>clear, credible and understood.</em></h1><p>The Communications Pillar assesses how effectively your organisation explains its purpose, work, performance and social impact to the people who need to understand them.</p><Link href={primaryHref}>{primaryLabel} →</Link></div><div className="sie-purpose-mark"><span>05</span><strong>COMMUNICATIONS</strong><small>{workspace.progress}% complete</small></div></section>
+    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 05 · Communications</p><h1>Make your impact <em>clear, credible and understood.</em></h1><p>The Communications Pillar assesses how effectively your organisation explains its purpose, work, performance and social impact to the people who need to understand them.</p><PillarStartLink pillar="communications" href={primaryHref} label={primaryLabel} /></div><div className="sie-purpose-mark"><span>05</span><strong>COMMUNICATIONS</strong><small>{workspace.progress}% complete</small></div></section>
     <section className="sie-leadership-intro"><div><p className="sie-eyebrow">Communications Pillar</p><h2>Technology-enabled.<br/><em>Expert-led.</em></h2><p className="sie-leadership-time">Estimated questionnaire completion time: approximately 20–30 minutes.</p></div><div>
       <p>Communications is how an organisation explains and demonstrates its work and impact to stakeholders. It includes both sharing information and listening, responding and engaging.</p>
       <p>This pillar examines clarity, evidence, transparency, accessibility, stakeholder dialogue, responsible storytelling, reporting and continuous improvement. It rewards effective, proportionate practice rather than publication volume, marketing spend or sophisticated software.</p>

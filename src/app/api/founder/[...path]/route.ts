@@ -6,6 +6,9 @@ import { firms as publicFirms } from "@/lib/accountants";
 import { independentAuthCutover } from "@/lib/sorp-auth/switch";
 import { independentFounderGET, independentFounderPOST } from "@/lib/sorp-auth/founder-console";
 import { complimentaryAccessEnd } from "@/lib/founder/complimentary-access";
+import { founderDatabase } from "@/lib/founder/db";
+import { EXCELLENCE_PILLARS, EXCELLENCE_STAGES, baselineOnlyAccess, legacyAccess,
+  maturityProgress, normaliseAccess, pillarProgress } from "@/lib/excellence/access-policy";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -218,7 +221,22 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
           founderQuery("SELECT * FROM research_console.founder_audit_log WHERE target_id=$1 ORDER BY created_at DESC", [id]),
           accountIds.length ? optionalFounderQuery(`SELECT account_id,data,revision,updated_at FROM msi_products.impact_director WHERE account_id = ANY($1::text[])`, [accountIds]) : Promise.resolve([]),
         ]);
-        return json({ organisation, memberships, users, clients, history, products:{ readiness:filterProduct(liveProducts.readiness), impactReports:filterProduct(liveProducts.impactReports), excellence:filterProduct(liveProducts.excellence), impactDirector:directors, askSorp:liveProducts.askSorp || null }, activity:Array.isArray(live.activity)?(live.activity as Record<string,unknown>[]).filter(row=>String(row.organisationId||"")===platformId):[] });
+        const excellenceRows = filterProduct(liveProducts.excellence) as Record<string, unknown>[];
+        const detailed = excellenceRows.map(row => ({ row, data: row.data && typeof row.data === "object" ? row.data : null }));
+        const withData = detailed.filter(entry => entry.data);
+        const maturity = withData.length ? maturityProgress(withData.sort((a,b) => Number(b.row.percentage || 0) - Number(a.row.percentage || 0))[0].data)
+          : { status: excellenceRows.some(row => ["complete", "completed"].includes(String(row.status))) ? "completed" : excellenceRows.length ? "in_progress" : "not_started",
+            percentage: excellenceRows.length ? Math.max(...excellenceRows.map(row => Number(row.percentage || 0))) : 0,
+            score: excellenceRows.find(row => row.score !== null && row.score !== undefined)?.score ?? null, completed: false };
+        const pillars = Object.fromEntries(EXCELLENCE_PILLARS.map(pillar => {
+          const records = withData.map(entry => pillarProgress(entry.data, pillar));
+          return [pillar, records.find(row => row.status === "completed") || records.find(row => row.status === "in_progress") || { status: "not_recorded", percentage: null, score: null }];
+        }));
+        return json({ organisation, memberships, users, clients, history, products:{ readiness:filterProduct(liveProducts.readiness), impactReports:filterProduct(liveProducts.impactReports), excellence:excellenceRows, impactDirector:directors, askSorp:liveProducts.askSorp || null },
+          excellenceAccess: organisation.excellence_access === null ? legacyAccess : normaliseAccess(organisation.excellence_access) || baselineOnlyAccess,
+          excellenceLegacy: organisation.excellence_access === null,
+          excellenceProgress: { maturity, pillars, lastActivity: excellenceRows.map(row => String(row.updatedAt || "")).sort().at(-1) || null },
+          activity:Array.isArray(live.activity)?(live.activity as Record<string,unknown>[]).filter(row=>String(row.organisationId||"")===platformId):[] });
       }
       if (resource === "user" && id) {
         const detail = await platformAction(request, { action:"founder-account-detail", accountId:id });
@@ -319,6 +337,32 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       await syncOrganisation(request, row);
       await audit(actor.email, "organisation_created", "organisation", row.id, null, row);
       return json(row, 201);
+    }
+    if (resource === "organisation" && id && action === "excellence-access") {
+      const category = body.category === "stage" ? "stages" : body.category === "pillar" ? "pillars" : null;
+      const key = String(body.key || "");
+      if (!category || !(category === "stages" ? EXCELLENCE_STAGES : EXCELLENCE_PILLARS).some(item => item === key) || typeof body.enabled !== "boolean")
+        return json({ error: "Choose a valid stage or pillar and access setting." }, 400);
+      const client = await founderDatabase().connect();
+      try {
+        await client.query("BEGIN");
+        const found = await client.query<{ name:string; excellence_access:unknown }>("SELECT name,excellence_access FROM research_console.founder_organisations WHERE id=$1 FOR UPDATE", [id]);
+        const before = found.rows[0];
+        if (!before) { await client.query("ROLLBACK"); return json({ error: "Organisation not found." }, 404); }
+        const current = before.excellence_access === null ? legacyAccess : normaliseAccess(before.excellence_access);
+        if (!current) { await client.query("ROLLBACK"); return json({ error: "This organisation's access settings need review before they can be changed." }, 409); }
+        const next = { stages: { ...current.stages }, pillars: { ...current.pillars } };
+        if (category === "stages") next.stages[key as keyof typeof next.stages] = body.enabled;
+        else next.pillars[key as keyof typeof next.pillars] = body.enabled;
+        const updated = await client.query("UPDATE research_console.founder_organisations SET excellence_access=$1::jsonb,updated_at=now() WHERE id=$2 RETURNING excellence_access", [JSON.stringify(next), id]);
+        await client.query("INSERT INTO research_console.founder_audit_log(actor,action,target_type,target_id,before_state,after_state) VALUES($1,'excellence_access_changed','organisation',$2,$3::jsonb,$4::jsonb)",
+          [actor.email, id, JSON.stringify({ category, key, enabled: (current[category] as Record<string, boolean>)[key] }), JSON.stringify({ category, key, enabled: body.enabled })]);
+        await client.query("COMMIT");
+        return json({ access: updated.rows[0].excellence_access, category, key, enabled: body.enabled });
+      } catch (error) {
+        await client.query("ROLLBACK").catch(() => undefined);
+        throw error;
+      } finally { client.release(); }
     }
     if (resource === "organisation" && id && action === "plan") {
       const before = (await founderQuery("SELECT * FROM research_console.founder_organisations WHERE id=$1", [id]))[0] as Record<string, unknown> | undefined;

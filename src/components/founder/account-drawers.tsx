@@ -11,6 +11,7 @@ import {
   label,
   money,
 } from "./founder-model";
+import { EXCELLENCE_PILLARS, EXCELLENCE_STAGES } from "@/lib/excellence/access-policy";
 
 type OrganisationProps = {
   organisation: Organisation;
@@ -25,12 +26,13 @@ type OrganisationProps = {
   onResendInvitation: (id?: string) => void;
   onRevokeComplimentary: () => void;
   onClientAccess: (event: FormEvent<HTMLFormElement>) => void;
+  onExcellenceAccess: (category: "stage" | "pillar", key: string, enabled: boolean) => void;
   onOpenUser: (userId: string) => void;
   onMembershipChange: (userId: string, role: string, status: string) => void;
   onRefresh: () => Promise<void>;
 };
 
-export function OrganisationDrawer({ organisation, detail, data, busy, invitationFeedback, onClose, onPlan, onInvite, onRevokeInvitation, onResendInvitation, onRevokeComplimentary, onClientAccess, onOpenUser, onMembershipChange, onRefresh }: OrganisationProps) {
+export function OrganisationDrawer({ organisation, detail, data, busy, invitationFeedback, onClose, onPlan, onInvite, onRevokeInvitation, onResendInvitation, onRevokeComplimentary, onClientAccess, onExcellenceAccess, onOpenUser, onMembershipChange, onRefresh }: OrganisationProps) {
   const inviteForm = useRef<HTMLFormElement>(null);
   const refreshAction = useRef(onRefresh);
   const [refreshing, setRefreshing] = useState(false);
@@ -109,6 +111,35 @@ export function OrganisationDrawer({ organisation, detail, data, busy, invitatio
         <ProductSummary name="Social Impact Excellence" rows={detail?.products.excellence || []} />
         <ProductSummary name="My Impact Director" rows={detail?.products.impactDirector || []} />
       </div>
+    </DrawerSection>
+
+    <DrawerSection title="Social Impact Excellence — access & progress">
+      <p className="founder-note">Access is controlled for the organisation; progress is kept separately for each person. Locking never deletes saved answers or scores.</p>
+      {detail?.excellenceLegacy && <p className="founder-note" role="status">Established legacy access is preserved. The first change will begin explicit founder management without changing the other settings.</p>}
+      <div className="founder-excellence-summary">
+        <span>Maturity Assessment</span>
+        <strong>{label(detail?.excellenceProgress?.maturity.status || "not_started")} · {detail?.excellenceProgress?.maturity.percentage ?? 0}%</strong>
+        {detail?.excellenceProgress?.maturity.score !== null && detail?.excellenceProgress?.maturity.score !== undefined && <small>Score {detail.excellenceProgress.maturity.score}/5</small>}
+        <small>Last activity: {displayDate(detail?.excellenceProgress?.lastActivity, true)}</small>
+      </div>
+      <h4>Five stages</h4>
+      <div className="founder-excellence-access-list">{EXCELLENCE_STAGES.map((key, index) => {
+        const names = ["Social Impact Maturity Assessment", "Diagnostic Review", "Social Impact Blueprint", "Roadmap", "Social Impact Excellence"];
+        const enabled = detail?.excellenceAccess?.stages[key];
+        return <div key={key}><div><strong>{index + 1}. {names[index]}</strong><small>{index === 0 ? label(detail?.excellenceProgress?.maturity.status || "not_started") : "No stage assessment workflow recorded"}</small></div><b className={enabled ? "is-available" : "is-locked"}>{enabled === undefined ? "Checking…" : enabled ? "Activated" : "Locked"}</b><button type="button" disabled={busy || enabled === undefined} onClick={() => onExcellenceAccess("stage", key, !enabled)}>{enabled ? "Lock access" : "Activate access"}</button></div>;
+      })}</div>
+      <p className="founder-note">Stages 2–5 are currently described in the journey, but do not yet have standalone assessment tools. Activation records permission; it does not imply a completed service.</p>
+      <h4>Five pillar deep dives</h4>
+      <p className="founder-note">A pillar requires both founder activation and a completed Maturity Assessment. Activation alone never bypasses the prerequisite.</p>
+      <div className="founder-excellence-access-list">{EXCELLENCE_PILLARS.map(key => {
+        const enabled = detail?.excellenceAccess?.pillars[key];
+        const progress = detail?.excellenceProgress?.pillars[key];
+        return <div key={key}><div><strong>{label(key)} deep dive</strong><small>{label(progress?.status || "not_recorded")}{progress?.percentage !== null && progress?.percentage !== undefined ? ` · ${progress.percentage}%` : ""}{progress?.score !== null && progress?.score !== undefined ? ` · Score ${progress.score}/5` : ""}</small></div><b className={enabled ? "is-available" : "is-locked"}>{enabled === undefined ? "Checking…" : enabled ? "Activated" : "Locked"}</b><button type="button" disabled={busy || enabled === undefined} onClick={() => onExcellenceAccess("pillar", key, !enabled)}>{enabled ? "Lock access" : "Activate access"}</button></div>;
+      })}</div>
+      {detail?.products.excellence?.length ? <div className="founder-excellence-records"><h4>Saved assessment records</h4>{detail.products.excellence.map((row, index) => {
+        const user = detail.users.find(item => item.id === row.accountId || item.email === row.email);
+        return <p key={row.id || index}><span>{user?.name || row.user || row.email || "Account holder"} · {label(row.status || "in_progress")} · {displayDate(row.updatedAt, true)}</span>{user && <button type="button" className="founder-link" onClick={() => onOpenUser(user.id)}>View user and assessment →</button>}</p>;
+      })}</div> : <p className="founder-muted">No individual Social Impact Excellence assessment record is reported for this organisation.</p>}
     </DrawerSection>
 
     <DrawerSection title="Subscription and access">

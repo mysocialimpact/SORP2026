@@ -1,5 +1,6 @@
 import { independentAccountGET, independentAccountPOST } from "@/lib/sorp-auth/compat";
 import { independentAuthRoutesEnabled } from "@/lib/sorp-auth/switch";
+import { guardExcellenceMutation } from "@/lib/excellence/mutation-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +16,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   if (!independentAuthRoutesEnabled()) return disabled();
+  const blocked = await guardExcellenceMutation(request, await request.clone().json().catch(() => ({})));
+  if (blocked) return blocked;
   try { return await independentAccountPOST(request); }
   catch { return Response.json({ error: "The independent account service is unavailable." }, { status: 503 }); }
 }

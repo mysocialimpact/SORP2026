@@ -4,28 +4,27 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LEADERSHIP_STAGES, normaliseLeadershipWorkspace, type LeadershipWorkspace } from "./leadership";
+import { PillarStartLink } from "./pillar-start-link";
 
 type Payload = { account?: { name?: string; email?: string; organisation?: string }; productProgress?: { data?: { result?: unknown; leadership?: unknown } }; error?: string };
 
 export function LeadershipPathway() {
   const router = useRouter();
   const [workspace, setWorkspace] = useState<LeadershipWorkspace>();
-  const [hasBaseline, setHasBaseline] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     void fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "load-product", productId: "social-impact-excellence" }), cache: "no-store" })
-      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/leadership/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Leadership pathway could not be loaded."); setHasBaseline(Boolean(payload.productProgress?.data?.result)); setWorkspace(normaliseLeadershipWorkspace(payload.productProgress?.data?.leadership, payload.account)); })
+      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/leadership/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Leadership pathway could not be loaded."); setWorkspace(normaliseLeadershipWorkspace(payload.productProgress?.data?.leadership, payload.account)); })
       .catch(caught => setError(caught instanceof Error ? caught.message : "Your Leadership pathway could not be loaded."));
   }, [router]);
   if (error) return <main className="sie-report"><section className="sie-state" role="alert"><h1>We couldn’t open Leadership.</h1><p>{error}</p><Link href="/social-impact-excellence/journey/">Return to your journey</Link></section></main>;
   if (!workspace) return <main className="sie-report"><section className="sie-state" role="status"><p>Opening your Leadership pathway…</p></section></main>;
-  if (!hasBaseline) return <main className="sie-report"><section className="sie-state"><h1>Complete your baseline first.</h1><p>The five-pillar assessment gives your deeper Leadership work the right context.</p><Link href="/social-impact-excellence/assessment/">Continue baseline assessment →</Link></section></main>;
   const assessmentComplete = workspace.status === "assessment_complete" || workspace.status === "evidence_submitted";
   const primaryHref = assessmentComplete ? "/social-impact-excellence/leadership/evidence/" : "/social-impact-excellence/leadership/assessment/";
   const primaryLabel = workspace.status === "evidence_submitted" ? "Review submitted pathway" : assessmentComplete ? "Continue to supporting evidence" : workspace.status === "draft" ? "Continue Leadership assessment" : "Begin Leadership assessment";
   return <main className="sie-report sie-purpose-home sie-leadership-home">
     <header><Link href="/social-impact-excellence/" className="sie-wordmark">SOCIAL IMPACT <strong>EXCELLENCE</strong></Link><Link href="/social-impact-excellence/journey/">Your journey</Link></header>
-    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 02 · Leadership</p><h1>Turning commitment into <em>accountability.</em></h1><p>Strong social impact requires more than a compelling purpose. It requires leaders who take responsibility for making impact a genuine organisational priority.</p><Link href={primaryHref}>{primaryLabel} →</Link></div><div className="sie-purpose-mark"><span>02</span><strong>LEADERSHIP</strong><small>{workspace.progress}% complete</small></div></section>
+    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 02 · Leadership</p><h1>Turning commitment into <em>accountability.</em></h1><p>Strong social impact requires more than a compelling purpose. It requires leaders who take responsibility for making impact a genuine organisational priority.</p><PillarStartLink pillar="leadership" href={primaryHref} label={primaryLabel} /></div><div className="sie-purpose-mark"><span>02</span><strong>LEADERSHIP</strong><small>{workspace.progress}% complete</small></div></section>
     <section className="sie-leadership-intro"><div><p className="sie-eyebrow">Leadership: Turning Commitment into Accountability</p><h2>Technology-enabled.<br/><em>Expert-led.</em></h2><p className="sie-leadership-time">Estimated questionnaire completion time: 20–30 minutes.</p></div><div>
       <p>Leadership influences the decisions organisations make, the resources they allocate, the responsibilities they establish and the culture they create. Without effective leadership, even the strongest social impact ambitions can struggle to translate into meaningful progress.</p>
       <p>This diagnostic explores how your organisation&apos;s leadership approaches social impact, including governance, accountability, decision-making, organisational commitment and leadership capability.</p>

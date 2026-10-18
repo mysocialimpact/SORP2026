@@ -147,6 +147,13 @@ export type OrganisationDetail = {
   history: Array<Record<string, unknown>>;
   activity: Array<Record<string, unknown>>;
   products: Dashboard["products"];
+  excellenceAccess?: import("@/lib/excellence/access-policy").ExcellenceAccess;
+  excellenceLegacy?: boolean;
+  excellenceProgress?: {
+    maturity: { status: string; percentage: number; score: number | null; completed?: boolean };
+    pillars: Record<import("@/lib/excellence/access-policy").ExcellencePillar, { status: string; percentage: number | null; score: number | null }>;
+    lastActivity?: string | null;
+  };
 };
 
 export type UserDetail = {

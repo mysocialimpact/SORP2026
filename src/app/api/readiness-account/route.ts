@@ -12,6 +12,11 @@ export async function GET(request: Request) {
 }
 export async function POST(request: Request) {
   const payload = await request.clone().json().catch(() => ({}));
+  if (String(payload.action || "").trim() === "save" || String(payload.productId || "").trim() === "social-impact-excellence") {
+    const { guardExcellenceMutation } = await import("../../../lib/excellence/mutation-guard.ts");
+    const blocked = await guardExcellenceMutation(request, payload);
+    if (blocked) return blocked;
+  }
   // This onboarding journey requires a server-confirmed registry selection.
   // Do not change existing login, invitation or legacy account endpoints.
   if (payload.action === "signup" && payload.progress?.onboarding) {

@@ -167,6 +167,17 @@ export function FounderControlCentre() {
     }, "Complimentary access could not be revoked.");
   };
 
+  const updateExcellenceAccess = async (category: "stage" | "pillar", key: string, enabled: boolean) => {
+    if (!selectedOrganisation) return;
+    if (!enabled && !window.confirm(`Lock ${key} for ${selectedOrganisation.name}? Saved work and scores will be preserved, but customers cannot continue until access is restored.`)) return;
+    if (organisationDetail?.excellenceLegacy && !window.confirm(`${selectedOrganisation.name} currently has established legacy access. This change will start explicit founder management; all other access settings will be retained. Continue?`)) return;
+    await perform(async () => {
+      await founderCall(`organisation/${selectedOrganisation.id}/excellence-access`, { method:"POST", body:JSON.stringify({ category, key, enabled }) });
+      setOrganisationDetail(await founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`));
+      setNotice(`${key[0].toUpperCase()}${key.slice(1)} ${enabled ? "activated" : "locked"} for ${selectedOrganisation.name}. The change was saved and audited.`);
+    }, "The access change could not be saved.");
+  };
+
   const requestClientAccess = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!selectedOrganisation) return;
@@ -249,7 +260,7 @@ export function FounderControlCentre() {
     </div>
 
     {creating && <Drawer title="Create organisation" onClose={() => setCreating(false)}><form className="founder-form-grid" onSubmit={createOrganisation}><label className="founder-span">Organisation name<input name="name" required minLength={2} autoFocus /></label><label>Type<select name="type" defaultValue="Charity"><option>Charity</option><option>Adviser</option><option>Other</option></select></label><button disabled={busy}>Create organisation</button><p className="founder-note founder-span">This creates a real account record; it is not demonstration data.</p></form></Drawer>}
-    {selectedOrganisation && <OrganisationDrawer organisation={selectedOrganisation} detail={organisationDetail} data={data} busy={busy} invitationFeedback={invitationFeedback} onClose={() => setSelectedOrganisation(null)} onPlan={updatePlan} onInvite={invite} onRevokeInvitation={revokeInvitation} onResendInvitation={resendInvitation} onRevokeComplimentary={revokeComplimentary} onClientAccess={requestClientAccess} onOpenUser={openUser} onMembershipChange={changeMembership} onRefresh={async () => { const [dashboard, detail] = await Promise.all([founderCall<Dashboard>("dashboard"), founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`)]); setData(dashboard); setOrganisationDetail(detail); }} />}
+    {selectedOrganisation && <OrganisationDrawer organisation={selectedOrganisation} detail={organisationDetail} data={data} busy={busy} invitationFeedback={invitationFeedback} onClose={() => setSelectedOrganisation(null)} onPlan={updatePlan} onInvite={invite} onRevokeInvitation={revokeInvitation} onResendInvitation={resendInvitation} onRevokeComplimentary={revokeComplimentary} onClientAccess={requestClientAccess} onExcellenceAccess={updateExcellenceAccess} onOpenUser={openUser} onMembershipChange={changeMembership} onRefresh={async () => { const [dashboard, detail] = await Promise.all([founderCall<Dashboard>("dashboard"), founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`)]); setData(dashboard); setOrganisationDetail(detail); }} />}
     {selectedUser && <UserDrawer detail={selectedUser} onClose={() => setSelectedUser(null)} onOpenOrganisation={openOrganisation} />}
     {selectedFirm && <FirmDrawer firm={selectedFirm} busy={busy} onClose={() => setSelectedFirm(null)} onSaved={refreshed => { setAccountants(refreshed); setSelectedFirm(refreshed.firms.find(row => row.id === selectedFirm.id) || null); }} onError={setError} onNotice={setNotice} />}
   </main>;

@@ -4,28 +4,27 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DATA_STAGES, normaliseDataWorkspace, type DataWorkspace } from "./data";
+import { PillarStartLink } from "./pillar-start-link";
 
 type Payload = { account?: { name?: string; email?: string; organisation?: string }; productProgress?: { data?: { result?: unknown; data?: unknown } }; error?: string };
 
 export function DataPathway() {
   const router = useRouter();
   const [workspace, setWorkspace] = useState<DataWorkspace>();
-  const [hasBaseline, setHasBaseline] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     void fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "load-product", productId: "social-impact-excellence" }), cache: "no-store" })
-      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/data/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Data pathway could not be loaded."); setHasBaseline(Boolean(payload.productProgress?.data?.result)); setWorkspace(normaliseDataWorkspace(payload.productProgress?.data?.data, payload.account)); })
+      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/data/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Data pathway could not be loaded."); setWorkspace(normaliseDataWorkspace(payload.productProgress?.data?.data, payload.account)); })
       .catch(caught => setError(caught instanceof Error ? caught.message : "Your Data pathway could not be loaded."));
   }, [router]);
   if (error) return <main className="sie-report"><section className="sie-state" role="alert"><h1>We couldn’t open Data.</h1><p>{error}</p><Link href="/social-impact-excellence/journey/">Return to your journey</Link></section></main>;
   if (!workspace) return <main className="sie-report"><section className="sie-state" role="status"><p>Opening your Data pathway…</p></section></main>;
-  if (!hasBaseline) return <main className="sie-report"><section className="sie-state"><h1>Complete your baseline first.</h1><p>The five-pillar assessment gives your deeper Data work the right context.</p><Link href="/social-impact-excellence/assessment/">Continue baseline assessment →</Link></section></main>;
   const assessmentComplete = workspace.status === "assessment_complete" || workspace.status === "evidence_submitted";
   const primaryHref = assessmentComplete ? "/social-impact-excellence/data/evidence/" : "/social-impact-excellence/data/assessment/";
   const primaryLabel = workspace.status === "evidence_submitted" ? "Review submitted pathway" : assessmentComplete ? "Continue to supporting evidence" : workspace.status === "draft" ? "Continue Data Assessment" : "Start Data Assessment";
   return <main className="sie-report sie-purpose-home sie-data-home">
     <header><Link href="/social-impact-excellence/" className="sie-wordmark">SOCIAL IMPACT <strong>EXCELLENCE</strong></Link><Link href="/social-impact-excellence/journey/">Your journey</Link></header>
-    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 03 · Data</p><h1>Understand the <em>difference you make.</em></h1><p>Credible information helps you understand what is changing, for whom, and how your organisation may be contributing. It also helps you recognise what you do not yet know and decide where better evidence would be useful.</p><Link href={primaryHref}>{primaryLabel} →</Link></div><div className="sie-purpose-mark"><span>03</span><strong>DATA</strong><small>{workspace.progress}% complete</small></div></section>
+    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 03 · Data</p><h1>Understand the <em>difference you make.</em></h1><p>Credible information helps you understand what is changing, for whom, and how your organisation may be contributing. It also helps you recognise what you do not yet know and decide where better evidence would be useful.</p><PillarStartLink pillar="data" href={primaryHref} label={primaryLabel} /></div><div className="sie-purpose-mark"><span>03</span><strong>DATA</strong><small>{workspace.progress}% complete</small></div></section>
     <section className="sie-leadership-intro"><div><p className="sie-eyebrow">Data Pillar</p><h2>Technology-enabled.<br/><em>Expert-led.</em></h2><p className="sie-leadership-time">Estimated questionnaire completion time: approximately 20–30 minutes.</p></div><div>
       <p>The Data Pillar explores how you select indicators, gather evidence, maintain its quality, interpret findings and use what you learn. It values people&apos;s experiences alongside numbers and takes a proportionate approach: useful, trustworthy evidence matters more than the volume of data or sophistication of your software.</p>
       <p>Start with 20 maturity questions and five reflective questions. Your answers provide a provisional self-assessment, which My Social Impact considers alongside any supporting evidence and stakeholder interviews. We provide guidance, constructive challenge and professional review throughout.</p>

@@ -4,28 +4,27 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DELIVERY_STAGES, normaliseDeliveryWorkspace, type DeliveryWorkspace } from "./delivery";
+import { PillarStartLink } from "./pillar-start-link";
 
 type Payload = { account?: { name?: string; email?: string; organisation?: string }; productProgress?: { data?: { result?: unknown; delivery?: unknown } }; error?: string };
 
 export function DeliveryPathway() {
   const router = useRouter();
   const [workspace, setWorkspace] = useState<DeliveryWorkspace>();
-  const [hasBaseline, setHasBaseline] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     void fetch("/api/readiness-account/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "load-product", productId: "social-impact-excellence" }), cache: "no-store" })
-      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/delivery/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Delivery pathway could not be loaded."); setHasBaseline(Boolean(payload.productProgress?.data?.result)); setWorkspace(normaliseDeliveryWorkspace(payload.productProgress?.data?.delivery, payload.account)); })
+      .then(async response => { const payload = await response.json() as Payload; if (response.status === 401) { router.replace(registrationHref(currentAccountDestination("/social-impact-excellence/delivery/"))); return; } if (!response.ok) throw new Error(payload.error || "Your Delivery pathway could not be loaded."); setWorkspace(normaliseDeliveryWorkspace(payload.productProgress?.data?.delivery, payload.account)); })
       .catch(caught => setError(caught instanceof Error ? caught.message : "Your Delivery pathway could not be loaded."));
   }, [router]);
   if (error) return <main className="sie-report"><section className="sie-state" role="alert"><h1>We couldn’t open Delivery.</h1><p>{error}</p><Link href="/social-impact-excellence/journey/">Return to your journey</Link></section></main>;
   if (!workspace) return <main className="sie-report"><section className="sie-state" role="status"><p>Opening your Delivery pathway…</p></section></main>;
-  if (!hasBaseline) return <main className="sie-report"><section className="sie-state"><h1>Complete your baseline first.</h1><p>The five-pillar assessment gives your deeper Delivery work the right context.</p><Link href="/social-impact-excellence/assessment/">Continue baseline assessment →</Link></section></main>;
   const assessmentComplete = workspace.status === "assessment_complete" || workspace.status === "evidence_submitted";
   const primaryHref = assessmentComplete ? "/social-impact-excellence/delivery/evidence/" : "/social-impact-excellence/delivery/assessment/";
   const primaryLabel = workspace.status === "evidence_submitted" ? "Review submitted pathway" : assessmentComplete ? "Continue to supporting evidence" : workspace.status === "draft" ? "Continue Delivery Assessment" : "Start Delivery Assessment";
   return <main className="sie-report sie-purpose-home sie-delivery-home">
     <header><Link href="/social-impact-excellence/" className="sie-wordmark">SOCIAL IMPACT <strong>EXCELLENCE</strong></Link><Link href="/social-impact-excellence/journey/">Your journey</Link></header>
-    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 04 · Delivery</p><h1>Where impact meets <em>operational and financial reality.</em></h1><p>The Delivery Pillar assesses how effectively your organisation translates its social impact ambitions into practical, financially informed action.</p><Link href={primaryHref}>{primaryLabel} →</Link></div><div className="sie-purpose-mark"><span>04</span><strong>DELIVERY</strong><small>{workspace.progress}% complete</small></div></section>
+    <section className="sie-purpose-hero"><div><p className="sie-eyebrow">Pillar 04 · Delivery</p><h1>Where impact meets <em>operational and financial reality.</em></h1><p>The Delivery Pillar assesses how effectively your organisation translates its social impact ambitions into practical, financially informed action.</p><PillarStartLink pillar="delivery" href={primaryHref} label={primaryLabel} /></div><div className="sie-purpose-mark"><span>04</span><strong>DELIVERY</strong><small>{workspace.progress}% complete</small></div></section>
     <section className="sie-leadership-intro"><div><p className="sie-eyebrow">Delivery Pillar</p><h2>Technology-enabled.<br/><em>Expert-led.</em></h2><p className="sie-leadership-time">Estimated questionnaire completion time: approximately 20–30 minutes.</p></div><div>
       <p>Delivery is where social impact meets operational and financial reality. This pillar explores how people, money, programmes and operational resources are managed to create meaningful and sustainable social value.</p>
       <p>It examines whether budgets, programme costs, management information, forecasts and resource decisions genuinely inform delivery, alongside capacity, partnerships, quality, efficiency and adaptation.</p>

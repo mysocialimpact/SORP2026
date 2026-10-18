@@ -7,6 +7,8 @@ import { Arrow } from "@/components/ui";
 import { PILLARS, QUESTIONS } from "./questions";
 import { SNAPSHOT_MATURITY_LABELS } from "./snapshot-maturity";
 import type { ScoredAssessment } from "./models";
+import { useExcellenceAccess } from "./use-excellence-access";
+import { EXCELLENCE_STAGES } from "@/lib/excellence/access-policy";
 
 type Account = { id?: string; name?: string; email?: string; organisation?: string };
 type ProductData = {
@@ -31,6 +33,7 @@ function answerLabel(answer: number | null | undefined) {
 }
 
 export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
+  const { access, error: accessError } = useExcellenceAccess();
   const [product, setProduct] = useState<ProductPayload>();
   const [team, setTeam] = useState<TeamWorkspace | null>(null);
   const [error, setError] = useState("");
@@ -55,11 +58,13 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
   if (error) return <main id="main" className="gateway product-page product-excellence"><section className="excellence-home-state gateway-width" role="alert"><h1>We couldn’t open your Social Impact Excellence workspace.</h1><p>{error}</p><Link href="/dashboard/">Return to your dashboard</Link></section></main>;
   if (!product) return <main id="main" className="gateway product-page product-excellence"><section className="excellence-home-state gateway-width" role="status"><p>Opening Social Impact Excellence…</p></section></main>;
   if (!product.signedIn) return publicPage;
+  if (accessError) return <main className="gateway product-page product-excellence"><section className="excellence-home-state gateway-width" role="alert"><h1>We couldn’t check your organisation’s access.</h1><p>{accessError}</p></section></main>;
+  if (!access) return <main className="gateway product-page product-excellence"><section className="excellence-home-state gateway-width" role="status"><p>Checking your organisation’s journey…</p></section></main>;
 
   const data = product.productProgress?.data || {};
   const result = data.result;
   const answered = answers.filter(answer => answer !== null).length;
-  const complete = Boolean(result) && answered === 25;
+  const complete = access.maturity.completed;
   const firstName = product.account?.name?.split(/\s+/)[0] || "there";
   const organisation = team?.organisation?.name || product.account?.organisation || "Your organisation";
   const teamActive = team?.organisation?.programme === "team" || team?.organisation?.programme === "excellence";
@@ -78,18 +83,18 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
   const primary = teamActive
     ? { href: "/social-impact-excellence/team/", label: "Open Brainstrust’s Team Perspective" }
     : !complete
-      ? { href: `/social-impact-excellence/assessment/${answered ? `?question=${Math.min(answered + 1, 25)}` : ""}`, label: answered ? "Continue your baseline" : "Start your baseline" }
-      : purposeStarted
+      ? access.maturity.available ? { href: `/social-impact-excellence/assessment/${answered ? `?question=${Math.min(answered + 1, 25)}` : ""}`, label: answered ? "Continue your baseline" : "Start your baseline" } : { href: "/social-impact-excellence/journey/", label: "Explore your journey" }
+      : purposeStarted && access.pillars.purpose.available
         ? { href: "/social-impact-excellence/purpose/", label: "Continue the Purpose pathway" }
-        : leadershipStarted
+        : leadershipStarted && access.pillars.leadership.available
           ? { href: "/social-impact-excellence/leadership/", label: "Continue the Leadership pathway" }
-        : dataStarted
+        : dataStarted && access.pillars.data.available
           ? { href: "/social-impact-excellence/data/", label: "Continue the Data pathway" }
-        : deliveryStarted
+        : deliveryStarted && access.pillars.delivery.available
           ? { href: "/social-impact-excellence/delivery/", label: "Continue the Delivery pathway" }
-        : communicationsStarted
+        : communicationsStarted && access.pillars.communications.available
           ? { href: "/social-impact-excellence/communications/", label: "Continue the Communications pathway" }
-        : { href: "/social-impact-excellence/journey/", label: "Choose your next pillar" };
+      : { href: "/social-impact-excellence/journey/", label: "Explore your next steps" };
 
   return <main id="main" className="gateway product-page product-excellence excellence-account-home">
     <FolderHero product="social-impact-excellence" id="excellence-overview" className="excellence-account-hero">
@@ -104,9 +109,15 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
       <div className="excellence-now-grid">
         <article className="is-primary"><span>Recommended now</span><h3>{teamActive ? "Bring in the Brainstrust team." : complete ? "Turn the baseline into action." : "Complete your honest baseline."}</h3><p>{teamActive ? `${counts.completed} completed · ${counts.started} in progress · ${counts.invited} invited` : complete ? "Use the five pillar scores to choose where focused work will make the greatest difference." : `${25 - answered} questions remain. Your existing answers will not be lost.`}</p><Link href={primary.href}>{primary.label} <Arrow /></Link></article>
         <article><span>Your evidence</span><h3>See every answer you gave.</h3><p>The questions and selected maturity levels are shown below, grouped into the five pillars.</p><a href="#excellence-pillars">Review all answers ↓</a></article>
-        <article><span>Your result</span><h3>{result ? `${result.overall.toFixed(1)} · ${result.maturity}` : "Your report is still forming."}</h3><p>{result?.recommendation || "Complete all 25 questions to generate your private five-pillar report and suggested next step."}</p>{result ? <Link href="/social-impact-excellence/results/">Open baseline report <Arrow /></Link> : <Link href="/social-impact-excellence/assessment/">Continue assessment <Arrow /></Link>}</article>
+        <article><span>Your result</span><h3>{result ? `${result.overall.toFixed(1)} · ${result.maturity}` : "Your report is still forming."}</h3><p>{result?.recommendation || "Complete all 25 questions to generate your private five-pillar report and suggested next step."}</p>{result ? <Link href="/social-impact-excellence/results/">Open baseline report <Arrow /></Link> : access.maturity.available ? <Link href="/social-impact-excellence/assessment/">Continue assessment <Arrow /></Link> : <span>Assessment awaiting activation</span>}</article>
       </div>
     </section>
+
+    <section className="excellence-access-stages gateway-width" aria-label="Your five journey stages"><header><p className="gateway-kicker">The wider journey</p><h2>Your five stages</h2><p>Every stage stays visible. Your organisation’s access is activated separately from your assessment progress.</p></header><ol>{EXCELLENCE_STAGES.map((key, index) => {
+      const names = ["Social Impact Maturity Assessment", "Diagnostic Review", "Social Impact Blueprint", "Roadmap", "Social Impact Excellence"];
+      const descriptions = ["Understand where you stand.", "Explore strengths, gaps and opportunities.", "Shape the future you want to achieve.", "Prioritise practical actions.", "Embed continuous improvement."];
+      return <li key={key}><span>0{index + 1}</span><div><strong>{names[index]}</strong><p>{descriptions[index]}</p></div><b>{access.access.stages[key] ? index === 0 ? "Available" : "Activated · workflow not yet online" : "Locked"}</b></li>;
+    })}</ol></section>
 
     <section id="excellence-pillars" className="excellence-answer-section gateway-width" aria-labelledby="your-answers-title">
       <header><p className="gateway-kicker">Your five pillars · Your answers</p><h2 id="your-answers-title">Nothing hidden.<br/>Everything easy to revisit.</h2><p>Open a pillar to see the five original questions and the answer currently saved in {organisation}’s account.</p></header>
@@ -117,7 +128,7 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
         const score = result?.pillarScores.find(item => item.pillar === pillar.key)?.score;
         return <details key={pillar.key} open={pillarIndex === 0}>
           <summary><span>{pillar.number}</span><div><strong>{pillar.label}</strong><small>{pillar.strapline}</small></div><b>{score ? `${score.toFixed(1)} / 5` : `${answeredInPillar} / 5 answered`}</b></summary>
-          <ol>{pillarQuestions.map((question, offset) => { const answer = pillarAnswers[offset]; return <li key={question.id}><span>{String(question.id).padStart(2, "0")}</span><div><p>{question.statement}</p><small>{question.meaning}</small></div><strong className={answer ? "is-answered" : ""}>{answerLabel(answer)}</strong><Link href={`/social-impact-excellence/assessment/?question=${question.id}`}>{answer ? "Review" : "Answer"}<span className="sr-only"> question {question.id}</span> →</Link></li>; })}</ol>
+          <ol>{pillarQuestions.map((question, offset) => { const answer = pillarAnswers[offset]; return <li key={question.id}><span>{String(question.id).padStart(2, "0")}</span><div><p>{question.statement}</p><small>{question.meaning}</small></div><strong className={answer ? "is-answered" : ""}>{answerLabel(answer)}</strong>{access.maturity.available ? <Link href={`/social-impact-excellence/assessment/?question=${question.id}`}>{answer ? "Review" : "Answer"}<span className="sr-only"> question {question.id}</span> →</Link> : <span>Locked</span>}</li>; })}</ol>
         </details>;
       })}</div>
     </section>
@@ -130,17 +141,17 @@ export function ExcellenceHome({ publicPage }: { publicPage: ReactNode }) {
         const isLeadership = pillar.key === "leadership";
         const isData = pillar.key === "data";
         const isDelivery = pillar.key === "delivery";
-        const isCommunications = pillar.key === "communication";
+        const accessKey = pillar.key === "communication" ? "communications" : pillar.key;
         const pathwayStatus = isPurpose ? purposeStatus : isLeadership ? leadershipStatus : isData ? dataStatus : isDelivery ? deliveryStatus : communicationsStatus;
         const pathwayStarted = isPurpose ? purposeStarted : isLeadership ? leadershipStarted : isData ? dataStarted : isDelivery ? deliveryStarted : communicationsStarted;
         const pathwayProgress = isPurpose ? data.purpose?.progress : isLeadership ? data.leadership?.progress : isData ? data.data?.progress : isDelivery ? data.delivery?.progress : data.communications?.progress;
         const submitted = isPurpose ? pathwayStatus === "complete" : pathwayStatus === "evidence_submitted";
-        const available = isPurpose || isLeadership || isData || isDelivery || isCommunications;
-        const state = available ? submitted ? isPurpose ? "Complete" : "Evidence submitted" : pathwayStarted ? `${pathwayProgress || 0}% complete` : complete ? "Ready to begin" : "Complete baseline first" : complete ? "Baseline ready to review" : `${answers.slice(index * 5, index * 5 + 5).filter(Boolean).length}/5 answered`;
+        const available = access.pillars[accessKey].available;
+        const state = !complete ? "Complete baseline first" : !access.access.pillars[accessKey] ? "Awaiting activation" : submitted ? isPurpose ? "Complete" : "Evidence submitted" : pathwayStarted ? `${pathwayProgress || 0}% complete` : "Ready to begin";
         const pathwayHref = isPurpose ? "/social-impact-excellence/purpose/" : isLeadership ? "/social-impact-excellence/leadership/" : isData ? "/social-impact-excellence/data/" : isDelivery ? "/social-impact-excellence/delivery/" : "/social-impact-excellence/communications/";
-        return <article key={pillar.key}><span>{pillar.number}</span><h3>{pillar.label}</h3><p>{pillar.strapline}</p><i><b style={{ width: `${score ? score * 20 : answers.slice(index * 5, index * 5 + 5).filter(Boolean).length * 20}%` }}/></i><strong>{state}</strong>{available && complete ? <Link href={pathwayHref}>{pathwayStarted ? "Continue" : "Begin"} {pillar.label} pathway →</Link> : <a href="#excellence-pillars">Review pillar answers ↓</a>}</article>;
+        return <article key={pillar.key}><span>{pillar.number}</span><h3>{pillar.label}</h3><p>{pillar.strapline}</p><i><b style={{ width: `${score ? score * 20 : answers.slice(index * 5, index * 5 + 5).filter(Boolean).length * 20}%` }}/></i><strong>{state}</strong>{available ? <Link href={pathwayHref}>{pathwayStarted ? "Continue" : "Begin"} {pillar.label} pathway →</Link> : <span>{!complete ? "Complete your Maturity Assessment before beginning." : "This deep dive is awaiting activation."}</span>}</article>;
       })}</div>
-      <p className="excellence-pathway-note">All five deeper pathways are available now, with structured assessments, detailed guidance, secure supporting evidence and an MSI review checkpoint.</p>
+      <p className="excellence-pathway-note">The five deep dives become available individually when your Maturity Assessment is complete and access has been activated for your organisation.</p>
     </section>
 
     {teamActive ? <section className="excellence-team-summary"><div className="gateway-width"><div><p className="gateway-kicker">{organisation} · Team Perspective</p><h2>More than one<br/>point of view.</h2><p>Will can invite colleagues directly, track completion and view the protected organisation result, without Marcus having to set anybody up.</p><Link className="gateway-action" href="/social-impact-excellence/team/">Manage Team Perspective <Arrow /></Link></div><dl><div><dt>Invited</dt><dd>{counts.invited}</dd></div><div><dt>In progress</dt><dd>{counts.started}</dd></div><div><dt>Completed</dt><dd>{counts.completed}</dd></div><div><dt>Combined view</dt><dd>{team?.aggregate?.available ? team.aggregate.overall?.toFixed(1) : `${team?.aggregate?.completed || 0} of ${team?.aggregate?.required || 3}`}</dd></div></dl></div></section> : null}
