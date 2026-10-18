@@ -18,7 +18,7 @@ import {
   modelRequest,
   MAX_OUTPUT_TOKENS,
 } from "../../src/lib/onboarding/model.ts";
-import { processTurn, quickTurn } from "../../src/lib/onboarding/engine.ts";
+import { processTurn, quickTurn, registrationExtraction } from "../../src/lib/onboarding/engine.ts";
 const relationship = (entity, period = "past", relationship = "client") => ({
   entity,
   aliases: [],
@@ -52,6 +52,22 @@ test("standalone email and optional skip advance without waiting for AI", () => 
   const optional = confirmCharity(ready(), { name: "Fixture charity" });
   const skipped = quickTurn(optional, "Skip this for now", true);
   assert.equal(nextObjective(skipped), "discovery");
+});
+test("only complete explicit first introductions can skip duplicate interpretation", () => {
+  const text = "I’m Sarah Jones, an accountant at Burton Sweet. My email is sarah@example.com.";
+  const facts = registrationExtraction(initialConversation(), text);
+  assert.equal(facts.name, "Sarah Jones");
+  assert.equal(facts.organisation, "Burton Sweet");
+  for (const message of [text + " I used to work with Oxfam.", text + " I want to explore Interim Spaces.", "I’m Alex Jones, a trustee at Interim Spaces. My email is alex@example.com.", "I’m Sarah Jones, an accountant at Burton Sweet. My colleague’s email is sarah@example.com."]) assert.equal(registrationExtraction(initialConversation(), message), null);
+  assert.equal(registrationExtraction(applyFacts(initialConversation(), { organisation: "My correction" }, "form"), text), null);
+  assert.equal(registrationExtraction({ ...initialConversation(), turns: 1 }, text), null);
+});
+test("a simple yes chooses a suggested charity for lookup without confirming its record", () => {
+  const state = advance(initialConversation(), { name: "Alex Jones", email: "alex@example.com", role: "Trustee", organisation: "Cedar Advisory", charities: ["Interim Spaces"] });
+  const next = quickTurn(state, "Yes please");
+  assert.equal(next.charity.proposed, "Interim Spaces");
+  assert.equal(next.charity.phase, "lookup");
+  assert.equal(next.charity.confirmed, null);
 });
 const output = (facts, extra = {}) => ({
   intent: "inform",

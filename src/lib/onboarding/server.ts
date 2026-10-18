@@ -1,5 +1,6 @@
 import "server-only";
 import { interpretWithModel, MODEL_RESERVATION_USD } from "./model";
+import { registrationExtraction } from "./engine";
 import { randomBytes } from "node:crypto";
 import { query, transaction } from "@/lib/console/db";
 import {
@@ -186,7 +187,8 @@ export async function extractWithModel(
     );
     return reserved.id;
   });
-  const result = await interpretWithModel(message, state, undefined, skip);
+  const immediate = !skip ? registrationExtraction(state, message) : null;
+  const result = await interpretWithModel(message, state, undefined, skip, immediate || undefined);
   const measured = result.usage?.estimatedUsd;
   // Admission reserves both stages and a possible wording revision before either starts. Settle only successful,
   // metered requests; uncertain provider failures retain the full reservation.
