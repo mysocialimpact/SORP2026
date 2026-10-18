@@ -222,7 +222,20 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
           accountIds.length ? optionalFounderQuery(`SELECT account_id,data,revision,updated_at FROM msi_products.impact_director WHERE account_id = ANY($1::text[])`, [accountIds]) : Promise.resolve([]),
         ]);
         const excellenceRows = filterProduct(liveProducts.excellence) as Record<string, unknown>[];
-        const detailed = excellenceRows.map(row => ({ row, data: row.data && typeof row.data === "object" ? row.data : null }));
+        // The overview deliberately contains summaries only. Reuse the existing
+        // founder-only account detail for saved answers and pillar progress.
+        const detailed = await Promise.all(excellenceRows.map(async row => {
+          const accountId = String(row.accountId || "");
+          if (!accountId) return { row, data: null };
+          const account = await platformAction(request, { action: "founder-account-detail", accountId }) as Record<string, unknown>;
+          const products = Array.isArray(account.products) ? account.products as Record<string, unknown>[] : [];
+          const saved = products.find(item => item.product_id === "social-impact-excellence");
+          const progress = account.readiness && typeof account.readiness === "object" ? (account.readiness as Record<string, unknown>).progress : null;
+          const legacyProducts = progress && typeof progress === "object" ? (progress as Record<string, unknown>).__sorpPlatformProducts : null;
+          const legacy = legacyProducts && typeof legacyProducts === "object" ? (legacyProducts as Record<string, unknown>)["social-impact-excellence"] : null;
+          const record = saved || (legacy && typeof legacy === "object" ? legacy as Record<string, unknown> : null);
+          return { row, data: record?.data && typeof record.data === "object" ? record.data : null };
+        }));
         const withData = detailed.filter(entry => entry.data);
         const maturity = withData.length ? maturityProgress(withData.sort((a,b) => Number(b.row.percentage || 0) - Number(a.row.percentage || 0))[0].data)
           : { status: excellenceRows.some(row => ["complete", "completed"].includes(String(row.status))) ? "completed" : excellenceRows.length ? "in_progress" : "not_started",

@@ -230,6 +230,10 @@ function ProductSummary({ name, rows = [], note }: { name: string; rows?: Array<
 
 export function UserDrawer({ detail, onClose, onOpenOrganisation }: { detail: UserDetail; onClose: () => void; onOpenOrganisation: (id?: string | null) => void }) {
   const user = detail.user;
+  const excellence = (detail.products || []).find(row => row.product_id === "social-impact-excellence");
+  const legacyProducts = detail.readiness?.progress?.__sorpPlatformProducts;
+  const legacyExcellence = legacyProducts && typeof legacyProducts === "object" ? (legacyProducts as Record<string, unknown>)["social-impact-excellence"] : null;
+  const excellenceData = excellence?.data || (legacyExcellence && typeof legacyExcellence === "object" ? (legacyExcellence as Record<string, unknown>).data : null);
   return <Drawer title={user.name || user.email} onClose={onClose}>
     <div className="founder-record-summary">
       <div><span>Email</span><strong>{user.email}</strong></div>
@@ -249,6 +253,10 @@ export function UserDrawer({ detail, onClose, onOpenOrganisation }: { detail: Us
       </div>
     </DrawerSection>
     {detail.readiness?.progress && <DrawerSection title="Readiness assessment detail"><AssessmentSnapshot progress={detail.readiness.progress} /></DrawerSection>}
+    {typeof excellenceData === "object" && excellenceData !== null && <DrawerSection title="Social Impact Excellence assessment detail">
+      <p className="founder-note">Read-only saved assessment record. Access changes never alter these answers or scores.</p>
+      <details className="founder-snapshot"><summary>Inspect Maturity Assessment and pillar work</summary><pre>{JSON.stringify(excellenceData, null, 2)}</pre></details>
+    </DrawerSection>}
   </Drawer>;
 }
 

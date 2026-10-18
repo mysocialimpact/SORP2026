@@ -69,6 +69,8 @@ test("founder organisation and user data remain server-authorised", () => {
   assert.match(route, /action: "founder-overview"/);
   assert.match(auth, /platformAccess\?\.founder !== true/);
   assert.doesNotMatch(auth, /FOUNDER_EMAIL/);
+  assert.match(route, /const detailed = await Promise\.all\(excellenceRows\.map/);
+  assert.match(drawers, /Inspect Maturity Assessment and pillar work/);
 });
 
 test("founder can grant any plan free for a chosen number of days, weeks or months", () => {
