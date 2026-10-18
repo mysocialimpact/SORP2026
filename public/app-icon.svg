@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="SORP 2026">
+  <rect width="512" height="512" rx="92" fill="#faf9f6"/>
+  <rect x="14" y="14" width="484" height="484" rx="80" fill="none" stroke="#d9ddd3" stroke-width="2"/>
+  <text x="92" y="246" fill="#242329" font-family="Arial, Helvetica, sans-serif" font-size="110" font-weight="700" letter-spacing="-8">SORP</text>
+  <text x="91" y="350" fill="#242329" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="400" letter-spacing="-8">2026</text>
+  <circle cx="342" cy="332" r="15" fill="#ff633b"/>
+</svg>
