@@ -114,7 +114,7 @@ body:has(.onboarding-page) > .platform-sticky-navigation { position:relative; to
 .voice-description strong { display:block; font-size:11px; line-height:1.5; font-weight:500; }.voice-description > span { display:none; }
 .voice-wave { display:flex; align-items:center; gap:2px; height:25px; }.voice-wave i { width:2px; border-radius:2px; background:var(--accent); }
 .voice-transcribing .voice-wave i { animation:onboarding-pulse .6s ease-in-out infinite alternate; }
-.voice-error { font-size:11px; line-height:1.6; color:#a33220; margin-top:8px; }.voice-error button { color:inherit; font:inherit; background:none; border:0; text-decoration:underline; padding:8px 0; }
+.voice-error { font-size:11px; line-height:1.6; color:#a33220; margin-top:8px; }.voice-error p { margin:0 0 6px; }.voice-error button { color:inherit; font:inherit; background:none; border:0; text-decoration:underline; text-underline-offset:3px; padding:7px 8px 7px 0; min-height:36px; cursor:pointer; }
 .onboarding-account-dialog { width:min(480px,calc(100% - 32px)); max-height:calc(100dvh - 32px); padding:35px; border:1px solid #c7c2bc; border-radius:18px; background:#faf9f6; color:var(--ink); overflow-y:auto; }
 .onboarding-account-dialog::backdrop { background:#24232988; backdrop-filter:blur(4px); }
 .onboarding-account-dialog h2 { font:500 34px/1.15 var(--sans); letter-spacing:-.04em; margin:16px 0; }.onboarding-account-dialog p { font-size:13px; line-height:1.6; }
