@@ -14,6 +14,7 @@ import "./platform.css";
 import "./typography.css";
 import "./refinement.css";
 import "./folder-continuity.css";
+import "./install-app.css";
 import "./shared-contact.css";
 import { SharedCharityContext } from "@/features/onboarding/shared-context";
 import { Header } from "@/components/header";
@@ -57,6 +58,8 @@ export const metadata: Metadata = {
     description: "Free tools and affordable expertise to help charities navigate SORP 2026 and achieve greater impact.",
     images: ["https://sorp2026.org/social-share-sorp2026-v2.png"],
   },
+  icons: { apple: "/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "SORP 2026", statusBarStyle: "default" },
 };
 export const viewport: Viewport = { themeColor: "#faf9f6", viewportFit: "cover" };
 export default function RootLayout({

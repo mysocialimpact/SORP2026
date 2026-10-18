@@ -1,0 +1,55 @@
+.install-app-trigger {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #b4b9af;
+  border-radius: 999px;
+  background: transparent;
+  color: #29453a;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+.install-app-trigger:hover { background: #e8eddf; border-color: #7b9484; transform: translateY(-1px); }
+.install-app-trigger svg { width: 12px; height: 12px; }
+.install-app-trigger:focus-visible, .install-app-dialog :focus-visible { outline: 3px solid #6148bc; outline-offset: 3px; }
+.install-app-dialog {
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 26px;
+  border: 1px solid #d9ddd3;
+  border-radius: 18px;
+  background: #faf9f6;
+  color: #242329;
+  box-shadow: 0 24px 70px #24232945;
+  font-family: var(--sans);
+}
+.install-app-dialog::backdrop { background: #2423298c; backdrop-filter: blur(3px); }
+.install-app-dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.install-app-eyebrow { color: #426352; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+.install-app-dialog-heading button { width: 38px; height: 38px; border: 0; border-radius: 50%; background: #e9ede6; color: inherit; font: inherit; font-size: 25px; cursor: pointer; }
+.install-app-dialog h2 { margin: 22px 0 16px; font-size: 30px; font-weight: 600; letter-spacing: -.05em; line-height: 1.1; }
+.install-app-dialog p { margin: 0 0 15px; font-size: 15px; line-height: 1.5; }
+.install-app-dialog-note { color: #625f65; font-size: 13px !important; }
+.install-app-done { min-height: 42px; margin-top: 6px; padding: 9px 18px; border: 0; border-radius: 5px; background: #242329; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+@media (max-width: 900px) {
+  .platform-sticky-navigation .install-app-trigger { grid-column: 1 / -1; grid-row: 3; justify-self: end; min-height: 32px; padding: 5px 10px; font-size: 10px; }
+  .platform-sticky-navigation .gateway-account-group { grid-column: 2; grid-row: 1; }
+}
+@media (max-width: 360px) {
+  .platform-sticky-navigation .gateway-account-group { grid-column: 1; grid-row: 2; }
+  .platform-sticky-navigation .gateway-directory-nav { grid-column: 1; grid-row: 3; }
+  .platform-sticky-navigation .install-app-trigger { grid-column: 1; grid-row: 4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .install-app-trigger { transition: none; }
+  .install-app-trigger:hover { transform: none; }
+}

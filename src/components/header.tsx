@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AccountControl } from "./account-control";
 import { Arrow } from "./ui";
+import { InstallApp } from "./install-app";
 export function Header() {
   const pathname = usePathname();
   const founderMode = pathname === "/founder" || pathname.startsWith("/founder/");
@@ -30,6 +31,7 @@ export function Header() {
           <Link href="/accountants-advisers/">Find Accountants <Arrow diagonal /></Link>
           <Link href="#say-hello">Talk to Us <Arrow diagonal /></Link>
         </nav>
+        <InstallApp />
         <AccountControl />
       </div>
     </header>
