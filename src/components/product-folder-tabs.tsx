@@ -9,12 +9,13 @@ import { useNavigationAccount } from "./navigation-account";
 
 export function ProductFolderTabs() {
   const pathname = usePathname();
-  const { status, readinessComplete } = useNavigationAccount();
+  const { status, readinessComplete, founder } = useNavigationAccount();
   const [founderView, setFounderView] = useState<FounderView>("home");
   const tabStrip = useRef<HTMLElement>(null);
   const selectedTab = useRef<HTMLAnchorElement>(null);
   const normalisedPath = pathname.endsWith("/") ? pathname : `${pathname}/`;
   const founderMode = normalisedPath.startsWith("/founder/");
+  const founderNavigation = founderMode || (status === "signed-in" && founder);
   const founderPrimary = founderPrimaryView(founderView);
   const founderIndex = FOUNDER_PRODUCT_VIEWS.indexOf(founderPrimary);
   const activeFolder = founderMode ? folderTabs[Math.max(0, founderIndex)] : folderForPath(normalisedPath);
@@ -49,7 +50,7 @@ export function ProductFolderTabs() {
       <nav ref={tabStrip} className="product-folder-tabs" aria-label="SORP2026 products">
         <div className="product-folder-tabs-track" data-founder-mode={founderMode}>
           {visibleTabs.map((tab, index) => {
-            const founderTarget = FOUNDER_PRODUCT_VIEWS[index] || "home";
+            const founderTarget = FOUNDER_PRODUCT_VIEWS[folderTabs.findIndex(folder => folder.slug === tab.slug)] || "home";
             const active = founderMode ? founderPrimary === founderTarget : activePath === tab.href;
             const exact = founderMode || normalisedPath === tab.href || (tab.slug === "account" && ["/settings/", "/login/"].includes(normalisedPath));
             const laterJourney = !founderMode && tab.number !== "Index" && tab.number !== "Start" && Number(tab.number) >= 3 && !readinessComplete;
@@ -64,7 +65,7 @@ export function ProductFolderTabs() {
               <Link
                 key={tab.slug}
                 ref={active ? selectedTab : undefined}
-                href={founderMode ? `/founder/#${founderTarget}` : accountTab ? status === "signed-in" ? "/settings/" : status === "signed-out" ? "/get-started/" : "/dashboard/" : tab.href}
+                href={accountTab ? founderNavigation ? "/founder/#organisations" : status === "signed-in" ? "/settings/" : status === "signed-out" ? "/get-started/" : "/dashboard/" : founderNavigation ? `/founder/#${founderTarget}` : tab.href}
                 className={`product-folder-tab ${tab.className}${active ? " is-active" : ""}${laterJourney ? " is-journey-later" : ""}`}
                 aria-current={active ? (exact ? "page" : "location") : undefined}
                 aria-label={accountTab && !accountReady ? "Checking account" : undefined}
@@ -72,8 +73,8 @@ export function ProductFolderTabs() {
                 onClick={founderMode ? () => { setFounderView(founderTarget); announceFounderView(founderTarget); } : undefined}
               >
                 <span aria-hidden="true">{accountTab ? "" : tab.number}</span>
-                <strong>{accountTab ? status === "signed-in" ? "My Account" : status === "signed-out" ? "Let’s Get Started" : "Account" : tab.tabLabel}</strong>
-                <small>{active ? (founderMode ? "Founder dashboard" : "Current section") : tab.status}</small>
+                <strong>{accountTab ? founderNavigation ? "Manage Accounts" : status === "signed-in" ? "My Account" : status === "signed-out" ? "Let’s Get Started" : "Account" : tab.tabLabel}</strong>
+                <small>{founderNavigation && !accountTab ? "Founder usage" : active ? "Current section" : tab.status}</small>
               </Link>
             );
           })}

@@ -48,10 +48,16 @@ export function accountStatus(payload: StatusAccountPayload | null, now = Date.n
   const plan = memberships.map(item => activePlan(item, now)).reduce<keyof typeof planOrder>(
     (best, candidate) => planOrder[candidate] > planOrder[best] ? candidate : best, "Free");
   const founder = payload.platformAccess?.founder === true;
+  if (founder) return {
+    label: "FOUNDER · Control Centre",
+    compactLabel: "FOUNDER · Control Centre",
+    plan,
+    founder,
+  };
   const planLabel = plan === "Adviser" ? "ADVISER PLAN" : plan.toUpperCase();
   return {
-    label: `${founder ? "FOUNDER · " : ""}${planLabel} · 3 AI questions`,
-    compactLabel: `${founder ? "FOUNDER · " : ""}${plan === "Adviser" ? "ADVISER" : plan.toUpperCase()} · 3 AI Qs`,
+    label: `${planLabel} · 3 AI questions`,
+    compactLabel: `${plan === "Adviser" ? "ADVISER" : plan.toUpperCase()} · 3 AI Qs`,
     plan,
     founder,
   };

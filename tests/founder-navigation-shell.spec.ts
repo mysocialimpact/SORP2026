@@ -44,6 +44,27 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+test("founder can reach each usage view from a public product page", async ({ page }) => {
+  await page.goto("/ask-sorp/");
+  const tabs = page.getByRole("navigation", { name: "SORP2026 products" });
+  await expect(tabs.locator(".is-ask")).toHaveAttribute("href", "/founder/#askSorp");
+  await tabs.locator(".is-ask").click();
+  await expect(page).toHaveURL(/\/founder\/#askSorp$/);
+  await expect(page.getByRole("heading", { name: "Usage overview" })).toBeVisible();
+  await page.getByRole("navigation", { name: "SORP2026 products" }).locator(".is-ready").click();
+  await expect(page.getByRole("heading", { name: "Readiness assessments" })).toBeVisible();
+  await expect(page.getByText("Will Jones").first()).toBeVisible();
+});
+
+test("founder customer dashboard and account routes return to the Control Centre", async ({ page }) => {
+  await page.goto("/dashboard/");
+  await expect(page).toHaveURL(/\/founder\/$/);
+  await expect(page.getByLabel("Search organisations or users...")).toBeVisible();
+  await page.goto("/settings/");
+  await expect(page).toHaveURL(/\/founder\/#organisations$/);
+  await expect(page.getByRole("heading", { name: "Account directory" })).toBeVisible();
+});
+
 test("founder shell has one product navigation, one persistent administration row and no customer chrome", async ({ page }) => {
   await page.goto("/founder/");
   await expect(page.getByText("FOUNDER CONTROL CENTRE", { exact: true })).toBeVisible();

@@ -17,8 +17,31 @@ test("status bar updates from visitor to a verified founder and plan without ove
   founder = true;
   await page.evaluate(() => window.dispatchEvent(new Event("sorp2026:account-changed")));
   await expect(bar).toContainText("FOUNDER");
-  await expect(bar).toContainText("ADVISER PLAN");
+  await expect(bar).toContainText("Control Centre");
+  await expect(bar).not.toContainText("3 AI questions");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test("verified founder sees management destinations from public pages, without changing customer navigation", async ({ page }) => {
+  let founder = true;
+  await page.route("**/api/readiness-account/", route => route.fulfill({ json: {
+    signedIn: true,
+    platformAccess: { founder },
+  } }));
+  await page.goto("/ask-sorp/");
+  const tabs = page.getByRole("navigation", { name: "SORP2026 products" });
+  await expect(tabs.locator(".is-ask")).toHaveAttribute("href", "/founder/#askSorp");
+  await expect(tabs.locator(".is-ready")).toHaveAttribute("href", "/founder/#readiness");
+  await expect(tabs.locator(".is-reports")).toHaveAttribute("href", "/founder/#impactReports");
+  await expect(tabs.locator(".is-excellence")).toHaveAttribute("href", "/founder/#excellence");
+  await expect(tabs.locator(".is-director")).toHaveAttribute("href", "/founder/#impactDirector");
+  await expect(tabs.locator(".is-account")).toContainText("Manage Accounts");
+  await expect(tabs.locator(".is-account")).toHaveAttribute("href", "/founder/#organisations");
+  await expect(page.getByRole("link", { name: "Founder Dashboard" })).toHaveAttribute("href", "/founder/");
+  founder = false;
+  await page.reload();
+  await expect(tabs.locator(".is-ask")).toHaveAttribute("href", "/ask-sorp/");
+  await expect(tabs.locator(".is-account")).toHaveAttribute("href", "/settings/");
 });
 
 test("the compact iPhone status remains legible and does not wrap or overlap", async ({ page }) => {
