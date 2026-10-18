@@ -11,15 +11,16 @@ const originalFetch = globalThis.fetch;
 let profile = "baseline", calls = [], totalCalls = 0, totalCost = 0;
 globalThis.fetch = async (url, options) => {
   if (String(url) !== "https://api.openai.com/v1/responses") return originalFetch(url, options);
-  assert.ok(++totalCalls <= 24, "Live comparison request limit reached");
+  assert.ok(++totalCalls <= 32, "Live comparison request limit reached");
   const body = JSON.parse(options.body);
   const stage = body.text.format.name === "onboarding_interpretation" ? "interpretation" : "dialogue";
-  body.reasoning = { effort: profile === "baseline" ? stage === "interpretation" ? "low" : "medium" : "none" };
+  body.reasoning = { effort: profile === "baseline" ? stage === "interpretation" ? "low" : "medium" : stage === "dialogue" && profile === "fast" ? "low" : "none" };
+  if (profile === "mini" && stage === "dialogue") body.model = "gpt-5.4-mini-2026-03-17";
   body.max_output_tokens = profile === "baseline" ? stage === "interpretation" ? 4000 : 3000 : stage === "interpretation" ? 2500 : 1200;
   const started = performance.now();
   const response = await originalFetch(url, { ...options, body: JSON.stringify(body) });
   const data = await response.clone().json();
-  calls.push({ stage, ms: Math.round(performance.now() - started), status: response.status, outputTokens: data.usage?.output_tokens, reasoningTokens: data.usage?.output_tokens_details?.reasoning_tokens });
+  calls.push({ stage, model: body.model, ms: Math.round(performance.now() - started), status: response.status, error: data.error?.message, outputTokens: data.usage?.output_tokens, reasoningTokens: data.usage?.output_tokens_details?.reasoning_tokens });
   return response;
 };
 
@@ -32,7 +33,7 @@ const cases = [
 ];
 const results = [];
 for (const scenario of cases) {
-  for (const candidate of ["baseline", "fast"]) {
+  for (const candidate of ["fast", "mini"]) {
     profile = candidate; calls = [];
     const started = performance.now();
     const record = { id: scenario.id, profile };
