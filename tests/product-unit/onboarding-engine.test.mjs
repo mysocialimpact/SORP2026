@@ -18,7 +18,7 @@ import {
   modelRequest,
   MAX_OUTPUT_TOKENS,
 } from "../../src/lib/onboarding/model.ts";
-import { processTurn } from "../../src/lib/onboarding/engine.ts";
+import { processTurn, quickTurn } from "../../src/lib/onboarding/engine.ts";
 const relationship = (entity, period = "past", relationship = "client") => ({
   entity,
   aliases: [],
@@ -41,6 +41,18 @@ const ready = () =>
     },
     "form",
   );
+test("standalone email and optional skip advance without waiting for AI", () => {
+  const emailed = quickTurn(initialConversation(), "sarah@example.com");
+  assert.equal(emailed.facts.email, "sarah@example.com");
+  assert.equal(emailed.turns, 1);
+  assert.equal(emailed.charity.confirmed, null);
+  assert.equal(quickTurn(initialConversation(), "I’m Sarah at Burton Sweet"), null);
+  assert.equal(quickTurn(emailed, "sarah@example.com"), null);
+  assert.equal(quickTurn(initialConversation(), "Skip this for now", true), null);
+  const optional = confirmCharity(ready(), { name: "Fixture charity" });
+  const skipped = quickTurn(optional, "Skip this for now", true);
+  assert.equal(nextObjective(skipped), "discovery");
+});
 const output = (facts, extra = {}) => ({
   intent: "inform",
   target: "unknown",
