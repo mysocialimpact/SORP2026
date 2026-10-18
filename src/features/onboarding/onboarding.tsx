@@ -842,20 +842,20 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
                 autoComplete="new-password"
                 type="password"
                 required
-                minLength={12}
+                minLength={8}
                 maxLength={200}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </label>
-            <small>At least 12 characters. Kept out of the conversation.</small>
+            <small>At least 8 characters. Kept out of the conversation.</small>
             <label>
               Confirm your password
               <input
                 autoComplete="new-password"
                 type="password"
                 required
-                minLength={12}
+                minLength={8}
                 maxLength={200}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

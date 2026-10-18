@@ -50,7 +50,7 @@ function createAuth() {
       enabled: true,
       requireEmailVerification: true,
       autoSignIn: false,
-      minPasswordLength: 12,
+      minPasswordLength: 8,
       maxPasswordLength: 200,
       password: { hash: hashPassword, verify: verifyPassword },
       revokeSessionsOnPasswordReset: true,
