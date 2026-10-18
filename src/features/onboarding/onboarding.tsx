@@ -80,7 +80,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     [busy, setBusy] = useState(true),
     [notice, setNotice] = useState(""),
     [changed, setChanged] = useState<EditableKey[]>([]),
-    [reward, setReward] = useState("");
+    [reward, setReward] = useState<{ title: string; detail: string } | null>(null);
   const [profileOpen, setProfileOpen] = useState(false),
     [activity, setActivity] = useState("Opening your conversation"),
     [lookupSuggested, setLookupSuggested] = useState(false);
@@ -118,7 +118,6 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
       : validEntity(state.facts[key], key);
   const count = fieldKeys.filter(fieldComplete).length + Number(!!selected);
   const optionalCount = optionalKeys.filter(key => state.facts[key].trim()).length;
-  const visibleHistory = history.at(-1)?.role === "assistant" ? history.slice(0, -1) : history;
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
     : destination.startsWith("/are-you-sorp-ready")
@@ -145,6 +144,11 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     const timer = setTimeout(() => setChanged([]), 2200);
     return () => clearTimeout(timer);
   }, [changed]);
+  useEffect(() => {
+    if (!reward || busy) return;
+    const timer = setTimeout(() => setReward(null), 4800);
+    return () => clearTimeout(timer);
+  }, [reward, busy]);
   function replace(next: Conversation) {
     currentState.current = next;
     setState(next);
@@ -255,9 +259,14 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     replace(next);
     if (keys.length) {
       setChanged(keys);
-      setReward(
-        keys.map(key => `${fieldKeys.includes(key as FieldKey) ? labels[key] : key === "responsibilities" ? "Your introduction" : key === "discovery" ? "How you found us" : "Your challenge"} ${previous.facts[key] ? "updated" : "added"}`).join(" · "),
-      );
+      const shortLabels: Record<EditableKey, string> = {
+        name: "Name", email: "Email", role: "Role", organisation: "Organisation",
+        responsibilities: "Introduction", discovery: "How you found us", concerns: "Your challenge",
+      };
+      setReward({
+        title: keys.length === 1 ? `${shortLabels[keys[0]]} ${previous.facts[keys[0]] ? "updated" : "captured"}` : `${keys.length} details captured`,
+        detail: keys.map(key => shortLabels[key]).join(" · "),
+      });
     }
   }
   async function send(event?: FormEvent, skip = false) {
@@ -284,7 +293,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     lock.current = true;
     setBusy(true);
     setActivity("Listening and filling in your details");
-    setReward("");
+    setReward(null);
     setNotice("");
     const beforeSend = currentState.current;
     const immediate = advance(beforeSend, skip ? {} : extractImmediate(message, beforeSend), skip);
@@ -294,9 +303,13 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     update(immediate, beforeSend);
     // The server revision/state remains authoritative while pending form edits save.
     currentState.current = beforeSend;
+    const reassurance = setTimeout(() => setActivity("Putting your reply together"), 1600);
     try {
-      await persistEdits();
+      // A save already in flight must finish first. Any other manual edits can
+      // travel with this turn instead of costing an extra network round trip.
+      if (saving.current) await saving.current;
       const before = currentState.current;
+      const fields = { ...dirty.current };
       const local = advance(
         before,
         skip ? {} : extractImmediate(message, before),
@@ -308,8 +321,11 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
         const data = await post("turn", {
           message,
           skip,
+          fields,
           revision: before.revision,
         });
+        for (const key of editableKeys)
+          if (dirty.current[key] === fields[key]) delete dirty.current[key];
         update(
           applyFacts(normaliseConversation(data.state), dirty.current, "form"),
           local,
@@ -332,6 +348,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
       if (!skip) setDraft(message);
       recover(e);
     } finally {
+      clearTimeout(reassurance);
       lock.current = false;
       setBusy(false);
       void persistEdits().catch(() => undefined);
@@ -379,7 +396,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
         revision: currentState.current.revision,
       });
       accept(data);
-      setReward(`${data.state.charity.confirmed.name} confirmed`);
+      setReward({ title: "Charity confirmed", detail: data.state.charity.confirmed.name });
       setEditingComplete(false);
     } catch (e) {
       recover(e);
@@ -397,7 +414,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
       await persistEdits();
       const data = await post("edit", { fields: {}, clearCharity: true, revision: currentState.current.revision });
       accept(data);
-      setQuery(""); setSearched(false); setReward("");
+      setQuery(""); setSearched(false); setReward(null);
     } catch (error) { recover(error); }
     finally { lock.current = false; setBusy(false); }
   }
@@ -533,6 +550,10 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
   const question = !state.turns && !count
       ? firstQuestion
       : nextQuestion(state);
+  const earlierHistory = history.at(-1)?.role === "assistant" ? history.slice(0, -1) : history;
+  const visibleHistory = earlierHistory.filter((item, index) =>
+    !(item.role === "assistant" && index === earlierHistory.length - 2 &&
+      item.text.trim() === question.trim()));
   const charityLookup = (<>
                 {!selected && (
                   <div className="charity-discovery">
@@ -654,7 +675,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
             onClick={() => { if (mode === "form") setMode("conversation"); else setProfileOpen(open => !open); }}>
             <span><strong>{count}/5 essentials</strong><span>{mode === "form" ? "Back to conversation ↑" : profileOpen ? "Close details ↑" : "Your live form ↓"}</span></span>
             <span className="mobile-profile-values">{fieldKeys.filter(key => state.facts[key]).map(key => <span key={key}>{state.facts[key]}</span>)}</span>
-            {reward && <span className="mobile-profile-reward" role="status">✓ {reward}</span>}
+            {reward && <span className="mobile-profile-reward" role="status">✓ {reward.title}</span>}
           </button>
           <section className="onboarding-conversation" aria-label="Your introduction">
             <div className="conversation-topline"><span><i /> YOUR CONVERSATION</span><span>Talk. Type. Make it yours.</span></div>
@@ -671,7 +692,9 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
                 )}
               </div>
               {lookupSuggested && !selected && <button type="button" className="onboarding-charity-nudge" onClick={() => { setProfileOpen(true); document.getElementById("charity-lookup")?.focus(); }}>Find {query} in your form →</button>}
-              <div className="conversation-reward" role="status">{reward ? <>✓ {reward}</> : <span>Your details stay editable.</span>}</div>
+              <div className={`conversation-reward${reward ? " has-reward" : ""}`} role="status" aria-live="polite">
+                {reward ? <><span className="reward-spark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M12 2v20M2 12h20M5 5l14 14M5 19 19 5" /></svg></span><span><strong>{reward.title}</strong><small>{reward.detail}</small></span></> : <span>Your details stay editable.</span>}
+              </div>
               {(!completed || editingComplete) && (
                 <form onSubmit={e => void send(e)} className="onboarding-composer">
                   <label htmlFor="introduction-answer">Your answer</label>
@@ -695,9 +718,10 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
           </section>
           <aside className="onboarding-profile" aria-label="Your live editable profile">
             <div className="profile-heading"><div><p className="onboarding-eyebrow">YOUR LIVE FORM</p><h2>Taking shape<span>.</span></h2></div>
-              <span className="profile-count" aria-label={`${count} of 5 required details completed`}>{count}<small>/5</small></span>
+              <span key={count} className="profile-count" aria-label={`${count} of 5 required details completed`}>{count}<small>/5</small></span>
             </div>
             <div className="profile-progress" role="progressbar" aria-label="Required details" aria-valuenow={count} aria-valuemin={0} aria-valuemax={5}><span style={{ width: `${count * 20}%` }} /></div>
+            <div className="profile-milestones" aria-hidden="true">{[...fieldKeys, "charity"].map((key, index) => <span key={key} className={(index < 4 ? fieldComplete(key as FieldKey) : !!selected) ? "achieved" : ""}>{index < 4 ? labels[key as FieldKey] : "Charity"}</span>)}</div>
             <form id="onboarding-profile-form" onSubmit={e => { e.preventDefault(); if (accountReady) setAccountOpen(true); }}>
               <fieldset>
                 <legend>Your details <small>Five essentials</small></legend>

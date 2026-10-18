@@ -12,6 +12,7 @@ async function fixture(page: Page, delay = 0) {
   let state = initialConversation();
   let signedIn = false;
   let registration: Record<string, unknown> | undefined;
+  const actions: string[] = [];
   const messages: { role: string; text: string }[] = [];
   await page.route("**/api/**", async route => {
     const request = route.request(), url = new URL(request.url());
@@ -33,8 +34,10 @@ async function fixture(page: Page, delay = 0) {
     if (url.pathname.startsWith("/api/onboarding/")) {
       const action = url.pathname.split("/").filter(Boolean).at(-1);
       const b = request.method() === "POST" ? request.postDataJSON() : {};
+      if (request.method() === "POST") actions.push(action || "");
       if (action === "turn") {
         await new Promise(resolve => setTimeout(resolve, delay));
+        if (b.fields) state = applyFacts(state, b.fields, "form");
         state = advance(state, extractImmediate(b.message, state), b.skip);
         messages.push({ role: "user", text: b.message }, { role: "assistant", text: nextQuestion(state) });
       }
@@ -46,7 +49,7 @@ async function fixture(page: Page, delay = 0) {
     }
     return route.fulfill({ json: { ok: true, account: null } });
   });
-  return { state: () => state, registration: () => registration };
+  return { state: () => state, registration: () => registration, actions: () => actions };
 }
 async function open(page: Page) {
   await page.goto("/get-started/?next=/ask-sorp/workspace/");
@@ -93,6 +96,8 @@ test("first answer renders immediately during a slow response; all eight fields 
   await expect(page.locator("input[name=organisation]")).toHaveValue("Burton Sweet", { timeout: 700 });
   await expect(page.locator(".conversation-activity")).toBeVisible();
   await expect(page.locator(".field-arrived")).toHaveCount(4);
+  await expect(page.locator(".conversation-reward.has-reward")).toContainText("4 details captured");
+  await expect(page.locator(".profile-milestones .achieved")).toHaveCount(4);
   if (info.project.name === "mobile") {
     await expect(page.locator(".mobile-profile-reward")).toBeVisible();
     await expect(page.locator(".onboarding-mobile-summary")).toBeInViewport();
@@ -123,12 +128,43 @@ test("first answer renders immediately during a slow response; all eight fields 
   await page.getByLabel("Choose a password").fill("Isolated-Password-123!");
   await page.getByLabel("Confirm your password").fill("Isolated-Password-123!");
   await page.getByRole("button", { name: "Create my account" }).click();
-  await expect(page.locator("dialog")).toContainText("Check your inbox");
+  await expect(page.locator(".onboarding-account-dialog")).toContainText("Check your inbox");
   expect(service.registration()?.name).toBe("Sarah Jones ACA");
   const onboarding = (service.registration()?.progress as {onboarding:{facts:{discovery:string};selected:Candidate}}).onboarding;
   expect(onboarding.facts.discovery).toBe("A colleague at a conference.");
   expect(onboarding.selected.name).toBe(charity.name);
   await expect(page.getByRole("link", { name: "Sign in after verifying" })).toHaveAttribute("href", /ask-sorp/);
+});
+test("manual corrections travel with Send without an extra save request", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "The full editable form is collapsed on mobile");
+  const service = await fixture(page, 800);
+  await open(page);
+  await page.locator('input[name=organisation]').fill("Burton Sweet");
+  await page.locator("#introduction-answer").fill("I’m Sarah Jones, an accountant. My email is sarah@example.com.");
+  await page.locator(".onboarding-send").click();
+  await expect(page.locator(".conversation-activity")).toBeVisible();
+  await expect(page.locator("#introduction-answer")).toBeEnabled();
+  expect(service.state().facts.organisation).toBe("Burton Sweet");
+  expect(service.actions().filter(action => action === "edit")).toHaveLength(0);
+});
+test("a repeated assistant reply appears only once, as the current reply", async ({ page }) => {
+  const service = await fixture(page);
+  await open(page);
+  await send(page, "I’m Sarah Jones, an accountant at Burton Sweet.");
+  await page.route("**/api/onboarding/turn/", async route => {
+    const state = advance(service.state(), extractImmediate("sarah@example.com", service.state()));
+    const repeated = nextQuestion(state);
+    await route.fulfill({ json: { state, messages: [
+      { role: "user", text: "I’m Sarah Jones, an accountant at Burton Sweet." },
+      { role: "assistant", text: repeated },
+      { role: "user", text: "sarah@example.com" },
+      { role: "assistant", text: repeated },
+    ] } });
+  });
+  await send(page, "sarah@example.com");
+  const question = await page.locator(".conversation-question h2").innerText();
+  await expect(page.locator(".conversation-thread")).toContainText(question);
+  await expect(page.locator(".conversation-thread .history-assistant")).toHaveCount(0);
 });
 test("manual route requires charity, allows optional blanks, preserves return route and has no overflow", async ({ page }, info) => {
   await fixture(page); await open(page); await form(page);

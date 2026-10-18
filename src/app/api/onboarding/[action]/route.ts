@@ -1,5 +1,5 @@
 import { after } from "next/server";
-import { processTurn, fallbackTurn } from "@/lib/onboarding/engine";
+import { processTurn, fallbackTurn, quickTurn } from "@/lib/onboarding/engine";
 import { query, transaction } from "@/lib/console/db";
 import { protectPlatformRequest } from "@/lib/platform/auth";
 import { AccessError } from "@/lib/access-error";
@@ -295,14 +295,18 @@ export async function POST(
       let next = before,
         notice = "";
       try {
-        const processed = await processTurn(
-          before,
-          body.message,
-          (message, state, skip) => extractWithModel(message, state, session.id, skip),
-          body.skip === true,
-        );
-        next = processed.state;
-        notice = processed.extraction.notice || "";
+        const quick = quickTurn(before, body.message, body.skip === true);
+        if (quick) next = quick;
+        else {
+          const processed = await processTurn(
+            before,
+            body.message,
+            (message, state, skip) => extractWithModel(message, state, session.id, skip),
+            body.skip === true,
+          );
+          next = processed.state;
+          notice = processed.extraction.notice || "";
+        }
       } catch (e) {
         next = fallbackTurn(before, body.message, body.skip === true);
         notice =
