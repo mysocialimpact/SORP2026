@@ -70,6 +70,7 @@ after(async () => {
     await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id=$1", [adviserClientOrgId]);
     await db.query("DELETE FROM sorp_auth.organisation WHERE id=$1", [adviserClientOrgId]);
   }
+  await db.query("DELETE FROM sorp_auth.invitation WHERE organisation_id=$1", [customerOrgId]);
   await db.query("DELETE FROM sorp_auth.membership WHERE organisation_id=$1", [customerOrgId]);
   await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id=$1", [customerOrgId]);
   await db.query("DELETE FROM sorp_auth.organisation WHERE id=$1", [customerOrgId]);
