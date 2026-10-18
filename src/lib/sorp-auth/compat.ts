@@ -3,7 +3,8 @@ import { sorpAuth, sorpAuthPool } from "./auth";
 import { independentIdentity } from "./identity";
 import { openTeamResponse, removeTeamInvitation, saveTeamResponse, teamInvite,
   teamWorkspace, updateTeamRound } from "./team";
-import { acceptOrganisationInvitation, adviserClient, adviserCreateClient, adviserInviteMember,
+import { acceptOrganisationInvitation, adviserClient, adviserCreateClient, adviserInviteClientMember,
+  adviserInviteMember, adviserLoadClientAssessment, adviserSaveClientAssessment,
   adviserWorkspace, createOwnOrganisation, decideClientAccess,
   readClientAssessment } from "./admin";
 import { listReportReviews, prepareReportUpload } from "./report-review";
@@ -174,6 +175,16 @@ export async function independentAccountPOST(request: Request) {
     try { return json(action === "adviser-workspace"
       ? await adviserWorkspace(identity.account.id, input) : await adviserClient(identity.account.id, input)); }
     catch { return error("This adviser workspace or client assessment is unavailable.", 403); }
+  }
+  if (action === "adviser-assessment-load" || action === "adviser-assessment-save") {
+    try { return json(action === "adviser-assessment-load"
+      ? await adviserLoadClientAssessment(identity.account.id, input)
+      : await adviserSaveClientAssessment(identity.account.id, input)); }
+    catch { return error("The adviser does not have approved permission to edit this client assessment.", 403); }
+  }
+  if (action === "adviser-client-invite") {
+    try { return json(await adviserInviteClientMember(identity.account.id, input), 201); }
+    catch { return error("The adviser does not have approved permission to invite people to this client.", 403); }
   }
   if (action === "adviser-invite" || action === "adviser-create-client") {
     try { return json(action === "adviser-invite"

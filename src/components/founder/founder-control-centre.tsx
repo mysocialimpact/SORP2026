@@ -179,6 +179,22 @@ export function FounderControlCentre() {
     }, "Client access could not be requested.");
   };
 
+  const changeMembership = async (userId: string, role: string, status: string) => {
+    if (!selectedOrganisation) return;
+    if (status === "revoked" && !window.confirm("Revoke this person’s access to the organisation? Their saved work will be retained.")) return;
+    await perform(async () => {
+      await founderCall(`organisation/${selectedOrganisation.id}/membership`, { method: "POST",
+        body: JSON.stringify({ userId, role, status }) });
+      const [dashboard, detail] = await Promise.all([loadDashboard(),
+        founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`)]);
+      setOrganisationDetail(detail);
+      const refreshed = dashboard.organisations.find(row => row.id === selectedOrganisation.id);
+      if (refreshed) setSelectedOrganisation(refreshed);
+      setNotice(status === "revoked" ? "Organisation access revoked. Saved work was retained."
+        : status === "active" ? "Membership access updated." : "Membership updated.");
+    }, "The membership could not be updated. The last active owner cannot be removed or demoted.");
+  };
+
   const revokeInvitation = async (id?: string) => {
     if (!id || !window.confirm("Revoke this pending invitation?")) return;
     await perform(async () => {
@@ -233,7 +249,7 @@ export function FounderControlCentre() {
     </div>
 
     {creating && <Drawer title="Create organisation" onClose={() => setCreating(false)}><form className="founder-form-grid" onSubmit={createOrganisation}><label className="founder-span">Organisation name<input name="name" required minLength={2} autoFocus /></label><label>Type<select name="type" defaultValue="Charity"><option>Charity</option><option>Adviser</option><option>Other</option></select></label><button disabled={busy}>Create organisation</button><p className="founder-note founder-span">This creates a real account record; it is not demonstration data.</p></form></Drawer>}
-    {selectedOrganisation && <OrganisationDrawer organisation={selectedOrganisation} detail={organisationDetail} data={data} busy={busy} invitationFeedback={invitationFeedback} onClose={() => setSelectedOrganisation(null)} onPlan={updatePlan} onInvite={invite} onRevokeInvitation={revokeInvitation} onResendInvitation={resendInvitation} onRevokeComplimentary={revokeComplimentary} onClientAccess={requestClientAccess} onOpenUser={openUser} onRefresh={async () => { const [dashboard, detail] = await Promise.all([founderCall<Dashboard>("dashboard"), founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`)]); setData(dashboard); setOrganisationDetail(detail); }} />}
+    {selectedOrganisation && <OrganisationDrawer organisation={selectedOrganisation} detail={organisationDetail} data={data} busy={busy} invitationFeedback={invitationFeedback} onClose={() => setSelectedOrganisation(null)} onPlan={updatePlan} onInvite={invite} onRevokeInvitation={revokeInvitation} onResendInvitation={resendInvitation} onRevokeComplimentary={revokeComplimentary} onClientAccess={requestClientAccess} onOpenUser={openUser} onMembershipChange={changeMembership} onRefresh={async () => { const [dashboard, detail] = await Promise.all([founderCall<Dashboard>("dashboard"), founderCall<OrganisationDetail>(`organisation/${selectedOrganisation.id}`)]); setData(dashboard); setOrganisationDetail(detail); }} />}
     {selectedUser && <UserDrawer detail={selectedUser} onClose={() => setSelectedUser(null)} onOpenOrganisation={openOrganisation} />}
     {selectedFirm && <FirmDrawer firm={selectedFirm} busy={busy} onClose={() => setSelectedFirm(null)} onSaved={refreshed => { setAccountants(refreshed); setSelectedFirm(refreshed.firms.find(row => row.id === selectedFirm.id) || null); }} onError={setError} onNotice={setNotice} />}
   </main>;

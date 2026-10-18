@@ -11,6 +11,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
-  return <SorpConversationWorkspace />;
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const query = await searchParams;
+  const adviserOrganisationId = typeof query.adviser === "string" ? query.adviser : "";
+  const charityOrganisationId = typeof query.client === "string" ? query.client : "";
+  const accountId = typeof query.account === "string" ? query.account : "";
+  const delegated = adviserOrganisationId && charityOrganisationId && accountId
+    ? { adviserOrganisationId, charityOrganisationId, accountId } : undefined;
+  return <SorpConversationWorkspace delegated={delegated} />;
 }

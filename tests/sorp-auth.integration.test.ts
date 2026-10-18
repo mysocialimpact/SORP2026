@@ -365,11 +365,9 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   assert.equal((await freePlan?.json() as { complimentary_reason: string }).complimentary_reason,
     "Synthetic partner trial");
   const access = await founderRequestClientAccess(founderId, { adviserOrganisationId: adviserOrgId,
-    charityOrganisationId: customerOrgId, permissions: { progress: true, answers: false } });
-  assert.equal(access.status, "requested");
-  await assert.rejects(founderRequestClientAccess(founderId, { adviserOrganisationId: adviserOrgId,
     charityOrganisationId: customerOrgId,
-    permissions: { progress: true, answers: true, edit: true } }), /not enabled/);
+    permissions: { progress: true, answers: true, edit: true, invitations: true } });
+  assert.equal(access.status, "requested");
   assert.equal((await post("client-assessment-read", { adviserOrganisationId: adviserOrgId,
     charityOrganisationId: customerOrgId, view: "progress" }, founderCookie)).status, 403,
   "an unapproved adviser grant cannot read customer work");
@@ -394,7 +392,7 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   assert.equal(listed.assessments[0].currentStage, 4);
   assert.equal("progress" in listed.assessments[0], false, "progress scope cannot disclose raw answers");
   assert.equal((await post("client-assessment-read", { adviserOrganisationId: adviserOrgId,
-    charityOrganisationId: customerOrgId, view: "answers" }, founderCookie)).status, 403);
+    charityOrganisationId: customerOrgId, view: "answers" }, founderCookie)).status, 200);
   assert.equal((await post("client-assessment-read", { adviserOrganisationId: adviserOrgId,
     charityOrganisationId: createdOrgId, view: "progress" }, founderCookie)).status, 403,
   "approval for one charity cannot be used to read another");
@@ -407,6 +405,15 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   assert.equal(clientPage.status, 200);
   assert.equal((await clientPage.json() as { assessments: Array<{ accountId: string }> }).assessments[0].accountId,
     customerId);
+  const delegatedLoad = await post("adviser-assessment-load", { adviserOrganisationId: adviserOrgId,
+    charityOrganisationId: customerOrgId, accountId: customerId }, founderCookie);
+  assert.equal(delegatedLoad.status, 200);
+  const delegatedSave = await post("adviser-assessment-save", { adviserOrganisationId: adviserOrgId,
+    charityOrganisationId: customerOrgId, accountId: customerId,
+    progress: { started: true, state: { currentStage: 5, completedStages: [1, 2, 3, 4] }, marker: "delegated" } }, founderCookie);
+  assert.equal(delegatedSave.status, 200);
+  assert.equal((await db.query("SELECT progress->>'marker' marker FROM sorp_auth.account_progress WHERE user_id=$1",
+    [customerId])).rows[0].marker, "delegated");
   const previousFetch = globalThis.fetch;
   const invitationLinks: string[] = [];
   globalThis.fetch = async (input, init) => {
@@ -418,6 +425,10 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   };
   try {
     approveSyntheticRecipient(customerEmail);
+    const representativeEmail = `representative-${randomUUID()}@example.invalid`;
+    approveSyntheticRecipient(representativeEmail);
+    assert.equal((await post("adviser-client-invite", { adviserOrganisationId: adviserOrgId,
+      charityOrganisationId: customerOrgId, email: representativeEmail, role: "member" }, founderCookie)).status, 201);
     const expired = await founderInviteMember(founderId, { organisationId: createdOrgId, email: customerEmail, role: "member" });
     await db.query("UPDATE sorp_auth.invitation SET expires_at=now()-interval '1 second' WHERE id=$1", [expired.id]);
     const expiredToken = new URL(invitationLinks.at(-1)!).pathname.split("/").filter(Boolean).at(-1);
@@ -473,6 +484,11 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   assert.equal((await post("adviser-client", { adviserOrganisationId: adviserOrgId,
     charityOrganisationId: customerOrgId }, founderCookie)).status, 403,
   "charity revocation denies client assessment reads immediately");
+  await assert.rejects(founderRevokeMembership(founderId,
+    { organisationId: adviserOrgId, userId: founderId }), /Promote another active owner/);
+  await db.query(`INSERT INTO sorp_auth.membership(organisation_id,user_id,role)
+    VALUES($1,$2,'owner') ON CONFLICT(organisation_id,user_id) DO UPDATE SET role='owner',status='active'`,
+  [adviserOrgId, customerId]);
   await founderRevokeMembership(founderId, { organisationId: adviserOrgId, userId: founderId });
   assert.equal((await post("client-assessment-read", { adviserOrganisationId: adviserOrgId,
     charityOrganisationId: customerOrgId, view: "progress" }, founderCookie)).status, 403,
