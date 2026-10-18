@@ -49,8 +49,8 @@ test("charity administrators manage adviser access in Settings with confirmation
 test("invitation signup preserves context and acceptance still requires authentication", () => {
   assert.match(invitation, /action:"invitation-preview"/);
   assert.match(invitation, /action:"invitation-accept"/);
-  assert.match(invitation, /Sign up to accept invitation/);
-  assert.match(invitation, /Already have an account\? Log in/);
+  assert.match(invitation, /Create my account/);
+  assert.match(invitation, /Already use SORP 2026 with/);
   assert.match(accountPortal, /params\.get\("next"\)/);
   assert.match(invitation, /get-started\/\?next=/);
   assert.doesNotMatch(accountPortal, /action: "signup"/);

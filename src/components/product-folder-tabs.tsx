@@ -45,6 +45,8 @@ export function ProductFolderTabs() {
     });
   }, [activePath]);
 
+  if (normalisedPath.startsWith("/invitation/")) return null;
+
   return (
     <div className="product-folder" data-active-product={activePath} style={{ "--folder-paper": activeFolder.tabColour } as CSSProperties}>
       <nav ref={tabStrip} className="product-folder-tabs" aria-label="SORP2026 products">

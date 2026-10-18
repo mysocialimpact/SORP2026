@@ -64,29 +64,24 @@ test("global registration uses central onboarding and the existing account servi
 
 test("a new invitee sees the organisation and returns through the existing signup", async ({ page }) => {
   const token = "a".repeat(64);
-  const writes: Record<string, unknown>[] = [];
   await page.route("**/api/readiness-account/**", async route => {
     if (route.request().method() === "GET") return route.fulfill({ json: { signedIn: false } });
     const input = route.request().postDataJSON() as Record<string, unknown>;
     if (input.action === "invitation-preview") return route.fulfill({ json: { invitation: { email:"invitee@example.org",role:"owner",status:"sent",organisationId:"fluid-adviser",organisationName:"FLUID",organisationType:"Adviser",expiresAt:"2026-10-28T12:00:00Z" } } });
-    writes.push(input);
     return route.fulfill({ status: 201, json: { account: { email:"invitee@example.org" } } });
   });
   await page.goto(`/invitation/${token}/`);
-  await expect(page.getByRole("heading", { name:"You’re invited to join FLUID." })).toBeVisible();
-  await expect(page.getByRole("link", { name:"Sign up to accept invitation →" })).toBeVisible();
-  await expect(page.getByRole("link", { name:"Already have an account? Log in" })).toBeVisible();
-  await page.getByRole("link", { name:"Sign up to accept invitation →" }).click();
-  await expect(page).toHaveURL(new RegExp(`/login/.*mode=signup`));
-  await expect(page.getByRole("main").getByLabel("Email address")).toHaveValue("invitee@example.org");
-  await expect(page.getByRole("main").getByLabel("Email address")).toHaveAttribute("readonly", "");
-  await page.getByLabel("Your name").fill("Invited Person");
-  await page.getByLabel("Your role").selectOption("ACCOUNTANT / AUDITOR / ADVISER");
-  await page.getByLabel("Password", { exact:true }).fill("Safe password 123");
-  await page.getByLabel("Confirm password").fill("Safe password 123");
-  await page.getByRole("button", { name:"Create my SORP2026 account →" }).click();
-  await expect.poll(() => writes.length).toBe(1);
-  expect(writes[0]).toMatchObject({ action:"signup",email:"invitee@example.org",invitationToken:token });
+  await expect(page.getByRole("heading", { name:"Welcome to FLUID." })).toBeVisible();
+  await expect(page.getByText("FLUID has invited you", { exact:false })).toBeVisible();
+  await expect(page.getByText("You’ll create your own secure password as part of registration.")).toBeVisible();
+  await expect(page.getByRole("link", { name:"Create my account" })).toBeVisible();
+  await expect(page.getByRole("link", { name:/Already use SORP 2026 with invitee@example.org/ })).toBeVisible();
+  await expect(page.getByRole("complementary", { name:"Page actions" })).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name:"SORP2026 products" })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze()).violations).toEqual([]);
+  await page.getByRole("link", { name:"Create my account" }).click();
+  await expect(page).toHaveURL(new RegExp(`/get-started/.*${token}`));
 });
 
 test("an existing invitee keeps invitation context through login", async ({ page }) => {
@@ -96,7 +91,7 @@ test("an existing invitee keeps invitation context through login", async ({ page
     return route.fulfill({ json:{ invitation:{ email:"member@example.org",role:"member",status:"sent",organisationId:"fluid-adviser",organisationName:"FLUID",organisationType:"Adviser",expiresAt:"2026-10-28T12:00:00Z" } } });
   });
   await page.goto(`/invitation/${token}/`);
-  const login = page.getByRole("link", { name:"Already have an account? Log in" });
+  const login = page.getByRole("link", { name:/Already use SORP 2026 with member@example.org/ });
   await expect(login).toHaveAttribute("href", new RegExp(`mode=login.*${token}`));
   await login.click();
   await expect(page.getByRole("tab", { name:"Log in" })).toHaveAttribute("aria-selected", "true");
@@ -116,7 +111,7 @@ test("the wrong signed-in email cannot accept an invitation", async ({ page }) =
   await page.goto(`/invitation/${token}/`);
   await expect(page.getByText(/signed in with a different account/)).toBeVisible();
   await expect(page.getByRole("button", { name:/Accept invitation/ })).toHaveCount(0);
-  await page.getByRole("button", { name:"Switch account securely →" }).click();
+  await page.getByRole("button", { name:"Switch to the invited account →" }).click();
   await expect.poll(() => writes).toContainEqual({ action:"logout" });
 });
 

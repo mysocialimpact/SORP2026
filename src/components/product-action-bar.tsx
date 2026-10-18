@@ -29,6 +29,8 @@ export function ProductActionBar() {
   const pathname = usePathname();
   const path = `${pathname.replace(/\/$/, "")}/`;
   const founderMode = path.startsWith("/founder/");
+  const invitationMode = path.startsWith("/invitation/");
+  const focusedMode = founderMode || invitationMode;
   const folder = folderForPath(path);
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [director, setDirector] = useState<{ completed?: boolean; started?: boolean } | null>(null);
@@ -36,7 +38,7 @@ export function ProductActionBar() {
   const readinessLanding = path === "/are-you-sorp-ready/";
 
   useEffect(() => {
-    if (founderMode) return;
+    if (focusedMode) return;
     const controller = new AbortController();
     void fetch("/api/readiness-account/", { cache: "no-store", signal: controller.signal })
       .then(async response => response.ok ? setAccount(await response.json()) : setAccount({ signedIn: false }))
@@ -51,7 +53,7 @@ export function ProductActionBar() {
         }).catch(() => undefined);
     }
     return () => controller.abort();
-  }, [founderMode, path]);
+  }, [focusedMode, path]);
 
   const action = useMemo(() => {
     if (path === "/" || path.startsWith("/are-you-sorp-ready/") || path === "/dashboard/") return readinessAction(account?.signedIn ? account.progress : undefined);
@@ -63,7 +65,7 @@ export function ProductActionBar() {
   }, [account, director, path]);
 
   useLayoutEffect(() => {
-    if (founderMode) {
+    if (focusedMode) {
       document.documentElement.style.removeProperty("--folder-action-height");
       return;
     }
@@ -72,9 +74,10 @@ export function ProductActionBar() {
     const measure = () => document.documentElement.style.setProperty("--folder-action-height", `${element.getBoundingClientRect().height}px`);
     const observer = new ResizeObserver(measure); measure(); observer.observe(element);
     return () => { observer.disconnect(); document.documentElement.style.removeProperty("--folder-action-height"); };
-  }, [founderMode]);
+  }, [focusedMode]);
 
   if (founderMode) return null;
+  if (invitationMode) return null;
   return <>
     <aside ref={bar} className={`folder-action-bar${readinessLanding ? " is-readiness" : ""}`} data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
       {readinessLanding && <Link className="folder-action-utility folder-action-presentation" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>}
