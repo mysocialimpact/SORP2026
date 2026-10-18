@@ -20,6 +20,7 @@ export function VoiceInput({
   const [state, setState] = useState<VoiceState>("ready"),
     [seconds, setSeconds] = useState(0),
     [error, setError] = useState(""),
+    [permissionDenied, setPermissionDenied] = useState(false),
     [canRetry, setCanRetry] = useState(false);
   const [levels, setLevels] = useState<number[]>(Array(18).fill(3));
   const recorder = useRef<MediaRecorder | null>(null),
@@ -121,6 +122,7 @@ export function VoiceInput({
   }
   async function start() {
     setError("");
+    setPermissionDenied(false);
     transition("permission");
     retry.current = null;
     setCanRetry(false);
@@ -210,9 +212,13 @@ export function VoiceInput({
       timeout.current = setTimeout(stop, 90000);
     } catch (e) {
       release();
+      const denied = e instanceof DOMException && e.name === "NotAllowedError";
+      setPermissionDenied(denied);
       setError(
-        e instanceof DOMException && e.name === "NotAllowedError"
-          ? "Microphone access was declined. Allow it in your browser settings, or type below."
+        denied
+          ? window.matchMedia("(display-mode: standalone)").matches
+            ? "Microphone access is blocked in this installed app. You can still type your answer below."
+            : "Microphone access was declined. You can still type your answer below."
           : e instanceof Error
             ? e.message
             : "We couldn’t open your microphone.",
@@ -261,7 +267,7 @@ export function VoiceInput({
           ) : state === "permission" ? (
             <>
               <strong>Opening your microphone</strong>
-              <span>Allow access in your browser</span>
+              <span>Allow access if prompted</span>
             </>
           ) : state === "transcript" ? (
             <>
@@ -291,7 +297,13 @@ export function VoiceInput({
       </div>
       {error && (
         <div className="voice-error" role="alert">
-          {error}{" "}
+          <p>{error}</p>
+          {permissionDenied && <>
+            <p>{window.matchMedia("(display-mode: standalone)").matches && /Macintosh/.test(navigator.userAgent)
+              ? "In this Mac app, open the ⋮ menu at the top right, then App info or Site settings, and allow Microphone. If macOS asks too, enable SORP 2026 or Google Chrome in System Settings → Privacy & Security → Microphone."
+              : "Allow Microphone for sorp2026.org in your browser or app’s site settings."}</p>
+            <button type="button" onClick={() => void start()}>Try microphone again</button>
+          </>}
           {canRetry && (
             <button
               type="button"
