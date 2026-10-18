@@ -5,7 +5,7 @@ import { interpretWithModel, ONBOARDING_MODEL, DIALOGUE_MODEL, MODEL_RESERVATION
 import { processTurn } from '../../src/lib/onboarding/engine.ts';
 import { initialConversation, applyFacts, normaliseConversation, nextQuestion, nextObjective, proposeCharity, confirmCharity, registrationReady, charityOptions } from '../../src/lib/onboarding/state.ts';
 if(process.env.SORP_LIVE_EVAL !== 'true' || !(process.env.OPEN_API_KEY || process.env.OPENAI_API_KEY)) throw new Error('Explicit live opt-in and existing credential required');
-const report = { model:ONBOARDING_MODEL, dialogueModel:DIALOGUE_MODEL, extractionReasoning:'low',dialogueReasoning:'medium', stages:2, wordingRevisions:0, startedAt:new Date().toISOString(), turns:0, apiCalls:0, inputTokens:0, outputTokens:0, estimatedUsd:0, passed:0, failed:0, journeys:[] };
+const report = { model:ONBOARDING_MODEL, dialogueModel:DIALOGUE_MODEL, extractionReasoning:'none',dialogueReasoning:'low', stages:2, wordingRevisions:0, startedAt:new Date().toISOString(), turns:0, apiCalls:0, inputTokens:0, outputTokens:0, estimatedUsd:0, passed:0, failed:0, journeys:[] };
 const selected = process.env.SORP_SOCIAL_IDS ? socialJourneys.filter(j=>process.env.SORP_SOCIAL_IDS.split(',').includes(j.id)) : socialJourneys;
 const queue=[...selected];
 let pendingBudget=0;

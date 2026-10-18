@@ -137,6 +137,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ action: string }> },
 ) {
+  const requestStarted = performance.now();
   const { action } = await params;
   try {
     sameOrigin(request);
@@ -319,7 +320,7 @@ export async function POST(
         { role: "assistant", text: nextQuestion(next) },
       ].slice(-22);
       const saved = await saveSession(reserved, next, messages);
-      return json({
+      const response = json({
         ...snapshot(saved),
         notice,
         objective: nextObjective(saved.state),
@@ -328,6 +329,8 @@ export async function POST(
             ? saved.state.charity.proposed
             : "",
       });
+      response.headers.set("server-timing", `onboarding;dur=${Math.round(performance.now() - requestStarted)}`);
+      return response;
     }
     if (action === "search") {
       if (

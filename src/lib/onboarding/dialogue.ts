@@ -22,7 +22,7 @@ export function dialogueTask(state: Conversation) {
 
 export function dialogueRequest(model: string, state: Conversation, afterConfirmation: Conversation | null, reflection: Conversation | null = null, afterReflection: Conversation | null = null, closure: Conversation | null = null) {
   return {
-    model, store: false, reasoning: { effort: "medium" }, max_output_tokens: 3000,
+    model, store: false, reasoning: { effort: "low" }, max_output_tokens: 1800,
     instructions: `You welcome people to SORP 2026, from My Social Impact and The Ideas Shed. The person is having a conversation; the software is quietly doing the paperwork. Be a perceptive, friendly professional speaking natural British English.
 
 Listen before progressing. Read the actual dialogue below and the validated facts. Interpret what the latest answer means in this exchange, not merely which field it supplies. Your private understanding identifies its conversational significance and the response it calls for. Then choose a permitted move and write the whole spoken reply. The information objective is what we need next; it must not erase the human response owed to what was just said.

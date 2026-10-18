@@ -11,12 +11,13 @@ const originalFetch = globalThis.fetch;
 let profile = "baseline", calls = [], totalCalls = 0, totalCost = 0;
 globalThis.fetch = async (url, options) => {
   if (String(url) !== "https://api.openai.com/v1/responses") return originalFetch(url, options);
-  assert.ok(++totalCalls <= 32, "Live comparison request limit reached");
+  assert.ok(++totalCalls <= 24, "Live comparison request limit reached");
   const body = JSON.parse(options.body);
   const stage = body.text.format.name === "onboarding_interpretation" ? "interpretation" : "dialogue";
-  body.reasoning = { effort: profile === "baseline" ? stage === "interpretation" ? "low" : "medium" : stage === "dialogue" && profile === "fast" ? "low" : "none" };
-  if (profile === "mini" && stage === "dialogue") body.model = "gpt-5.4-mini-2026-03-17";
-  body.max_output_tokens = profile === "baseline" ? stage === "interpretation" ? 4000 : 3000 : stage === "interpretation" ? 2500 : 1200;
+  if (profile === "baseline") {
+    body.reasoning = { effort: stage === "interpretation" ? "low" : "medium" };
+    body.max_output_tokens = stage === "interpretation" ? 4000 : 3000;
+  }
   const started = performance.now();
   const response = await originalFetch(url, { ...options, body: JSON.stringify(body) });
   const data = await response.clone().json();
@@ -33,7 +34,7 @@ const cases = [
 ];
 const results = [];
 for (const scenario of cases) {
-  for (const candidate of ["fast", "mini"]) {
+  for (const candidate of ["baseline", "fast"]) {
     profile = candidate; calls = [];
     const started = performance.now();
     const record = { id: scenario.id, profile };
@@ -50,5 +51,8 @@ for (const scenario of cases) {
     console.log("ONBOARDING_LATENCY " + JSON.stringify(record));
   }
 }
-console.log("ONBOARDING_LATENCY_SUMMARY " + JSON.stringify({ results: results.map(({ reply, ...result }) => result), totalCalls, estimatedUsd: totalCost }));
+console.log("ONBOARDING_LATENCY_SUMMARY " + JSON.stringify({ profiles: ["baseline", "fast"].map(profile => {
+  const group = results.filter(result => result.profile === profile);
+  return { profile, passed: group.every(result => result.passed), averageMs: Math.round(group.reduce((sum, result) => sum + result.ms, 0) / group.length) };
+}), totalCalls, estimatedUsd: totalCost }));
 if (results.some(result => !result.passed)) process.exitCode = 1;
