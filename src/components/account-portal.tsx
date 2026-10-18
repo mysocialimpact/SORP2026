@@ -64,7 +64,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
     </div>
     {checking ? <p className="account-checking" role="status">Checking your account…</p> : <form onSubmit={submit}>
       <label>Email address<input required type="email" maxLength={254} autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} /></label>
-      <label>Password<input required type="password" minLength={10} maxLength={200} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
+      <label>Password<input required type="password" maxLength={200} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
       {error && <div className="account-error" role="alert"><strong>We couldn’t sign you in yet.</strong><span>{error}</span></div>}
       <Link className="account-forgot" href={`/forgot-password/?return=${encodeURIComponent(destination)}`} onClick={() => rememberAccountReturn(destination)}>Forgotten your password?</Link>
       <button className="gateway-action account-submit" disabled={busy} type="submit">{busy ? "Please wait…" : "Log in to SORP2026 →"}</button>

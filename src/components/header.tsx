@@ -15,6 +15,7 @@ export function Header() {
         <span className="gateway-wordmark">SORP<span>2026</span><i aria-hidden="true" /></span>
         <span className="gateway-tagline founder-control-title">FOUNDER CONTROL CENTRE</span>
       </Link>
+      <Link className="founder-customer-link" href="/dashboard/?mode=customer">View My Dashboard <Arrow diagonal /></Link>
     </div>
   </header>;
   if (invitationMode) return <header className="header gateway-header invitation-header">

@@ -98,6 +98,32 @@ test("an existing invitee keeps invitation context through login", async ({ page
   await expect(page.getByRole("main").getByLabel("Email address")).toHaveValue("member@example.org");
 });
 
+test("an invited member can submit an existing eight-character password and return to the invitation", async ({ page }) => {
+  const token = "f".repeat(64);
+  const writes: Record<string, unknown>[] = [];
+  let signedIn = false;
+  await page.route("**/api/readiness-account/**", async route => {
+    if (route.request().method() === "GET") return route.fulfill({ json: signedIn
+      ? { signedIn: true, account: { email: "member@example.org" } }
+      : { signedIn: false } });
+    const input = route.request().postDataJSON() as Record<string, unknown>;
+    if (input.action === "invitation-preview") return route.fulfill({ json: { invitation: {
+      email: "member@example.org", role: "member", status: "sent", organisationId: "fluid-adviser",
+      organisationName: "FLUID", organisationType: "Adviser", expiresAt: "2026-10-28T12:00:00Z",
+    } } });
+    writes.push(input);
+    if (input.action === "login") signedIn = true;
+    return route.fulfill({ json: { signedIn: true, account: { email: "member@example.org" } } });
+  });
+  await page.goto(`/invitation/${token}/`);
+  await page.getByRole("link", { name: /Already use SORP 2026 with member@example.org/ }).click();
+  await page.getByLabel("Password").fill("Eight123");
+  await page.getByRole("button", { name: "Log in to SORP2026 →" }).click();
+  await expect.poll(() => writes).toContainEqual({ action: "login", email: "member@example.org", password: "Eight123" });
+  await expect(page).toHaveURL(new RegExp(`/invitation/${token}/`));
+  await expect(page.getByRole("button", { name: "Join FLUID →" })).toBeVisible();
+});
+
 test("the wrong signed-in email cannot accept an invitation", async ({ page }) => {
   const token = "c".repeat(64);
   const writes: Record<string, unknown>[] = [];

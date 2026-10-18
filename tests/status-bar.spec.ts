@@ -44,6 +44,26 @@ test("verified founder sees management destinations from public pages, without c
   await expect(tabs.locator(".is-account")).toHaveAttribute("href", "/settings/");
 });
 
+test("founder can deliberately view the customer dashboard and return to the control centre", async ({ page }) => {
+  await page.route("**/api/readiness-account/**", route => {
+    if (route.request().method() === "POST") return route.fulfill({ json: {} });
+    return route.fulfill({ json: {
+      signedIn: true,
+      account: { id: "founder-test", name: "Marcus Test", email: "founder@example.invalid", organisation: "Test CIO" },
+      platformAccess: { founder: true, memberships: [] },
+      progress: {},
+    } });
+  });
+  await page.route("**/api/impact-director/**", route => route.fulfill({ json: { progress: null } }));
+  await page.goto("/dashboard/?mode=customer");
+  await expect(page).toHaveURL(/\/dashboard\/\?mode=customer/);
+  await expect(page.getByRole("heading", { name: "Where you are." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Founder Control Centre" }).first()).toHaveAttribute("href", "/founder/");
+  await expect(page.getByRole("navigation", { name: "SORP2026 products" }).locator(".is-ready")).toHaveAttribute("href", "/are-you-sorp-ready/");
+  await page.goto("/dashboard/");
+  await expect(page).toHaveURL(/\/founder\//);
+});
+
 test("the compact iPhone status remains legible and does not wrap or overlap", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.route("**/api/readiness-account/", route => route.fulfill({ json: {
