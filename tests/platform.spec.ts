@@ -165,7 +165,7 @@ test("account settings keeps delegated access out of the dashboard and confirms 
     return route.fulfill({ json: { signedIn: true, account: { name: "Will Jones", email: "will@example.invalid", position: "CEO", organisation: "Brainstrust" }, platformAccess: { memberships: [{ organisationId: "brainstrust", name: "Brainstrust", type: "Charity", role: "owner", entitlement: { plan: "Free", payablePrice: 0 } }], activeClientAccess: [{ id: "access-1", adviserName: "FLUID", charityName: "Brainstrust", permissions: { progress: true, answers: true, edit: false, invitations: false } }] } } });
   });
   await page.goto("/settings/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Account settings.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("My Account.");
   const accessSettings = page.locator("#access");
   await expect(accessSettings.getByRole("heading", { name: "FLUID → Brainstrust" })).toBeVisible();
   await expect(accessSettings.getByText("Progress · Individual answers")).toBeVisible();

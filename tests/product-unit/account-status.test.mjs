@@ -22,7 +22,9 @@ test('verified founder permission is distinct from the subscription plan', () =>
   const status = accountStatus({ signedIn: true, platformAccess: { founder: true, memberships: [
     { type: 'Adviser', entitlement: { plan: 'Adviser', status: 'complimentary_partner', complimentaryEnd: null } },
   ] } });
-  assert.equal(status.label, 'FOUNDER · ADVISER PLAN · 3 AI questions');
+  assert.equal(status.label, 'FOUNDER · Control Centre');
+  assert.equal(status.compactLabel, 'FOUNDER · Control Centre');
+  assert.equal(status.plan, 'Adviser');
   assert.equal(status.founder, true);
 });
 

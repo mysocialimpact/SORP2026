@@ -24,7 +24,7 @@ test("founder home uses the requested operational identity and the one shared se
   assert.doesNotMatch(centre, /<h1>FOUNDER CONTROL CENTRE<\/h1>/);
   for (const label of ["Home", "Are You SORP Ready?", "Ask SORP", "Charity Impact Reports", "Social Impact Excellence", "My Impact Director"]) assert.match(productDefinitions, new RegExp(label.replace(/[?]/g, "\\?")));
   assert.equal((layout.match(/<ProductFolderTabs\b/g) || []).length, 1);
-  assert.match(productTabs, /founderMode \? `\/founder\/#\$\{founderTarget\}`/);
+  assert.match(productTabs, /founderNavigation \? `\/founder\/#\$\{founderTarget\}`/);
   assert.match(productTabs, /founderMode \? folderTabs : \[folderTabs\[0\], accountFolder, \.\.\.folderTabs\.slice\(1\)\]/);
   assert.doesNotMatch(centre, /founder-product-nav|founder-admin-nav/);
   assert.match(centre, /Search organisations or users/);

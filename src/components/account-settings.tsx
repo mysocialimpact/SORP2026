@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { loadSharedContext, type SharedContext } from "@/features/onboarding/shared-context";
 
@@ -8,19 +9,21 @@ type Permissions={progress:boolean;answers:boolean;reports?:boolean;edit:boolean
 type Membership={organisationId:string;name:string;type:"Charity"|"Adviser"|"Other";role:"owner"|"admin"|"member";entitlement?:{plan?:string;status?:string;publishedPrice?:number;payablePrice?:number;complimentaryEnd?:string|null}};
 type Access={id:string;adviserName:string;charityName:string;charityOrganisationId?:string;permissions:Permissions};
 type AdviserClient={organisationId:string;name:string;status:string;permissions:Permissions};
-type SettingsData={signedIn?:boolean;authProvider?:string;account?:{name:string;email:string;position?:string;organisation?:string};progress?:{onboarding?:{facts?:SharedContext["facts"];selected?:{name?:string}}};platformAccess?:{memberships?:Membership[];approvalRequests?:Access[];activeClientAccess?:Access[]};error?:string};
+type SettingsData={signedIn?:boolean;authProvider?:string;account?:{name:string;email:string;position?:string;organisation?:string};progress?:{onboarding?:{facts?:SharedContext["facts"];selected?:{name?:string}}};platformAccess?:{founder?:boolean;memberships?:Membership[];approvalRequests?:Access[];activeClientAccess?:Access[]};error?:string};
 
 function permissionSummary(value:Permissions){return [value.progress&&"Progress",value.answers&&"Individual answers",value.reports&&"Charity reports",value.edit&&"Editing",value.invitations&&"Invitations"].filter(Boolean).join(" · ")||"No data permissions";}
 function money(pence?:number){return typeof pence==="number"?`£${(pence/100).toLocaleString("en-GB")}/month`:"Not recorded";}
 
 export function AccountSettings(){
+  const router=useRouter();
   const [data,setData]=useState<SettingsData|null>(null);const [error,setError]=useState("");const [notice,setNotice]=useState("");const [busy,setBusy]=useState("");
   const [introduction,setIntroduction]=useState<SharedContext|null>(null);
   const [adviserClients,setAdviserClients]=useState<AdviserClient[]>([]);
   useEffect(()=>{const controller=new AbortController();void fetch("/api/readiness-account/",{cache:"no-store",signal:controller.signal}).then(async response=>{const payload=await response.json().catch(()=>({}));if(!response.ok&&response.status!==401)throw new Error(payload.error||"Settings could not be loaded.");setData(payload);}).catch(cause=>{if(!controller.signal.aborted)setError(cause instanceof Error?cause.message:"Settings could not be loaded.");});return()=>controller.abort();},[]);
-  useEffect(()=>{if(!data?.signedIn)return;const controller=new AbortController();void loadSharedContext(controller.signal).then(value=>{if(!controller.signal.aborted)setIntroduction(value);}).catch(()=>undefined);return()=>controller.abort();},[data?.signedIn]);
+  useEffect(()=>{if(data?.signedIn&&data.platformAccess?.founder===true)router.replace("/founder/#organisations");},[data,router]);
+  useEffect(()=>{if(!data?.signedIn||data.platformAccess?.founder)return;const controller=new AbortController();void loadSharedContext(controller.signal).then(value=>{if(!controller.signal.aborted)setIntroduction(value);}).catch(()=>undefined);return()=>controller.abort();},[data?.signedIn,data?.platformAccess?.founder]);
   const memberships=data?.platformAccess?.memberships||[];const adviserMembership=memberships.find(item=>item.type==="Adviser");const adviserOrganisationId=adviserMembership?.organisationId;
-  useEffect(()=>{if(!adviserOrganisationId)return;const controller=new AbortController();void fetch("/api/readiness-account/",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action:"adviser-workspace",adviserOrganisationId}),cache:"no-store",signal:controller.signal}).then(async response=>{const payload=await response.json().catch(()=>({}));if(response.ok)setAdviserClients(payload.clients||[]);}).catch(()=>undefined);return()=>controller.abort();},[adviserOrganisationId]);
+  useEffect(()=>{if(!adviserOrganisationId||data?.platformAccess?.founder)return;const controller=new AbortController();void fetch("/api/readiness-account/",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action:"adviser-workspace",adviserOrganisationId}),cache:"no-store",signal:controller.signal}).then(async response=>{const payload=await response.json().catch(()=>({}));if(response.ok)setAdviserClients(payload.clients||[]);}).catch(()=>undefined);return()=>controller.abort();},[adviserOrganisationId,data?.platformAccess?.founder]);
   async function decide(item:Access,decision:"approve"|"deny"){
     const revoking=decision==="deny"&&(data?.platformAccess?.activeClientAccess||[]).some(access=>access.id===item.id);
     if(revoking&&!window.confirm(`Revoke ${item.adviserName}’s access to ${item.charityName}? They will immediately lose the permissions shown here.`))return;
@@ -41,6 +44,7 @@ export function AccountSettings(){
   if(error&&!data)return <div className="settings-state" role="alert"><h1>Settings could not be opened.</h1><p>{error}</p><Link href="/dashboard/">Return to My Dashboard</Link></div>;
   if(!data)return <div className="settings-state" role="status"><h1>Opening Settings…</h1></div>;
   if(!data.signedIn||!data.account)return <div className="settings-state"><h1>Sign in to manage Settings.</h1><Link href="/login/?return=/settings/">Log in →</Link></div>;
+  if(data.platformAccess?.founder)return <div className="settings-state" role="status"><h1>Opening Founder Control Centre…</h1></div>;
   const approvals=data.platformAccess?.approvalRequests||[];const connections=data.platformAccess?.activeClientAccess||[];
   const facts=introduction?.facts||data.progress?.onboarding?.facts;
   const selectedCharity=introduction?.charity?.candidate?.name||data.progress?.onboarding?.selected?.name;

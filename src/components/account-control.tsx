@@ -10,7 +10,7 @@ import { useNavigationAccount } from "./navigation-account";
 export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
   const router = useRouter();
-  const { status } = useNavigationAccount();
+  const { status, founder } = useNavigationAccount();
   const inOnboarding = path === "/get-started" || path === "/get-started/";
   const destination = path === "/" || inOnboarding || path === "/login" || path === "/login/" ? "/dashboard/" : path;
 
@@ -30,8 +30,8 @@ export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
   }
 
   if (status === "signed-in") return <nav className="gateway-account-group" aria-label="Your account">
-    <Link className="gateway-account-text-link" href="/dashboard/" onClick={onNavigate}>My Dashboard</Link>
-    <Link className="gateway-account-control" href="/settings/" onClick={onNavigate}>My Account <Arrow diagonal /></Link>
+    <Link className="gateway-account-text-link" href={founder ? "/founder/" : "/dashboard/"} onClick={onNavigate}>{founder ? "Founder Dashboard" : "My Dashboard"}</Link>
+    <Link className="gateway-account-control" href={founder ? "/founder/#organisations" : "/settings/"} onClick={onNavigate}>{founder ? "Manage Accounts" : "My Account"} <Arrow diagonal /></Link>
   </nav>;
 
   return <nav className="gateway-account-group" aria-label="Account access">
