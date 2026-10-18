@@ -46,6 +46,7 @@ export function registrationExtraction(state: Conversation, text: string): Extra
 export function quickTurn(state: Conversation, text: string, skip = false): Conversation | null {
   if (skip && nextObjective(state) !== "registration") return fallbackTurn(state, text, true);
   const value = text.trim();
+  if (registrationExtraction(state, value)) return fallbackTurn(state, value);
   if (!state.facts.email && validEmail(value)) return fallbackTurn(state, value);
   if (nextObjective(state) === "charity" && state.charity.phase === "suggest" && state.charity.proposed && /^(?:yes|yes please|sure|that's right|that’s right)[.!]?$/i.test(value)) return fallbackTurn(state, value);
   return null;

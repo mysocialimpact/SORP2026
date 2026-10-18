@@ -2,7 +2,7 @@
 // Synthetic identities and an explicit fixture charity; no account/registry/DB writes.
 import assert from "node:assert/strict";
 import { interpretWithModel, MODEL_RESERVATION_USD } from "../../src/lib/onboarding/model.ts";
-import { processTurn, registrationExtraction } from "../../src/lib/onboarding/engine.ts";
+import { processTurn } from "../../src/lib/onboarding/engine.ts";
 import { initialConversation, applyFacts, confirmCharity, nextQuestion, challengeQuestion } from "../../src/lib/onboarding/state.ts";
 if (process.env.VERCEL_ENV !== "preview" || process.env.SORP_LIVE_EVAL !== "true") throw Error("Preview opt-in required");
 if (!process.env.OPENAI_API_KEY && !process.env.OPEN_API_KEY) throw Error("Existing AI connection unavailable");
@@ -12,7 +12,7 @@ async function turn(state, text) {
   if (++calls > 5 || cost + MODEL_RESERVATION_USD > 1) throw Error("Evaluation budget reached");
   const start = Date.now();
   const result = await processTurn(state, text, async (message, current) => {
-    const output = await interpretWithModel(message, current, undefined, false, registrationExtraction(current, message) || undefined);
+    const output = await interpretWithModel(message, current);
     cost += output.usage.estimatedUsd;
     assert.equal(output.notice || "", "", "A fallback is not a live AI pass");
     return output;

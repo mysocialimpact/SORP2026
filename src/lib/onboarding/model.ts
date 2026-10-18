@@ -456,14 +456,14 @@ async function callModel(request: { model: string }) {
   const text = data.output?.flatMap((o: { content?: { text?: string }[] }) => o.content || []).map((c: { text?: string }) => c.text || "").join("");
   return { parsed: JSON.parse(text || "{}"), usage };
 }
-export async function interpretWithModel(message: string, state: Conversation, observe?: (parsed: unknown) => void, skip = false, immediate?: Extraction): Promise<Extraction> {
-  const understood = immediate ? null : await callModel(modelRequest(message, state));
-  if (understood) observe?.(understood.parsed);
-  const result = immediate ? { ...immediate } : validateInterpretation(understood!.parsed, message, state);
+export async function interpretWithModel(message: string, state: Conversation, observe?: (parsed: unknown) => void, skip = false): Promise<Extraction> {
+  const understood = await callModel(modelRequest(message, state));
+  observe?.(understood.parsed);
+  const result = validateInterpretation(understood.parsed, message, state);
   // The dialogue model judges whether curiosity is warranted. Extraction only
   // classifies participation; the controller bounds professional/final follow-ups.
   if (result.topicResponse) result.topicResponse.followUp = false;
-  result.usage = understood?.usage || { input: 0, output: 0, estimatedUsd: 0 };
+  result.usage = understood.usage;
   const updated = advance(state, reconcileExtraction(message, state, result), skip);
   const reflection = canFollowUp(state, updated, result.topicResponse, skip)
     ? { ...updated, dialogue: { ...updated.dialogue, reflecting: true } } : null;
@@ -478,7 +478,7 @@ export async function interpretWithModel(message: string, state: Conversation, o
   const closure = !skip && result.topicResponse && ["uncertain", "declined"].includes(result.topicResponse.status) &&
     ["responsibilities", "discovery", "concerns"].includes(questionPlan(state).objective) && questionPlan(updated).objective !== "complete"
     ? closeOptionalConversation(updated) : null;
-  let calls = understood ? 1 : 0;
+  let calls = 1;
   const request = dialogueRequest(DIALOGUE_MODEL, updated, afterConfirmation, reflection, afterReflection, closure);
   const generate = async (input: typeof request) => {
     calls++;

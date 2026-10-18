@@ -3,26 +3,8 @@ import assert from 'node:assert/strict';
 import {initialConversation,applyFacts,advance,confirmCharity,confirmationFollowUp,closeOptionalConversation,charityOptions,nextQuestion,nextObjective,suitableDialogue,normaliseConversation} from '../../src/lib/onboarding/state.ts';
 import {dialogueRequest,decodeDialogue} from '../../src/lib/onboarding/dialogue.ts';
 import {validateInterpretation,modelRequest,interpretWithModel,MODEL_RESERVATION_USD} from '../../src/lib/onboarding/model.ts';
-import {registrationExtraction} from '../../src/lib/onboarding/engine.ts';
 const ready=()=>confirmCharity(applyFacts(initialConversation(),{name:'Marcus Warry',email:'marcus@example.invalid',role:'Trustee',organisation:'Interim Spaces',responsibilities:'Finance',discovery:'A friend'},'form'),{name:'Interim Spaces',registrationNumber:'1234567',officialUrl:'https://example.invalid/official'});
 const participation=(status='answered',followUp=false)=>({topic:'concerns',status,followUp});
-test('a grounded simple introduction uses one validated conversational request',async()=>{
- const fetch=globalThis.fetch,key=process.env.OPENAI_API_KEY;
- process.env.OPENAI_API_KEY='synthetic-test';let calls=0;
- const state=initialConversation(), message='I’m Sarah Jones, an accountant at Burton Sweet. My email is sarah@example.com.';
- globalThis.fetch=async(_url,init)=>{
-   calls++;const request=JSON.parse(init.body);
-   assert.equal(request.text.format.name,'onboarding_dialogue');
-   assert.equal(JSON.parse(request.input[0].content).facts.organisation,'Burton Sweet');
-   return Response.json({status:'completed',usage:{input_tokens:100,output_tokens:60},output:[{content:[{text:JSON.stringify({move:'progress',understanding:'A clear introduction.',reply:'Welcome, Sarah. Which charity would you like to explore?',afterCharityMove:null,afterCharity:null})}]}]});
- };
- try{
-   const result=await interpretWithModel(message,state,undefined,false,registrationExtraction(state,message));
-   assert.equal(result.notice,undefined);assert.equal(result.name,'Sarah Jones');
-   assert.equal(calls,1);assert.equal(result.usage.calls,1);
-   assert.equal(advance(state,result).charity.confirmed,null);
- }finally{globalThis.fetch=fetch;if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
-});
 test('a final-topic answer is retained verbatim rather than interpreted as a professional diagnosis',()=>{
  for(const utterance of ['Frogs.','My children.','Nothing, actually.',"I’d rather not say."]){
    const s=advance(ready(),{utterance,topicResponse:participation()});

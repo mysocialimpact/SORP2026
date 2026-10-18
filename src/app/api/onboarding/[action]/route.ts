@@ -287,8 +287,10 @@ export async function POST(
         ...session.messages,
         { role: "user", text: body.message },
       ].slice(-21);
-      // Reserve the turn and retain input, without committing unvalidated extraction.
-      const reserved = await saveSession(
+      const quick = quickTurn(before, body.message, body.skip === true);
+      // Slow interpretation reserves the turn before contacting AI. A complete
+      // local turn can save once through the same atomic revision gate.
+      const reserved = quick ? session : await saveSession(
         session,
         { ...before, turns: before.turns + 1 },
         userMessages,
@@ -296,7 +298,6 @@ export async function POST(
       let next = before,
         notice = "";
       try {
-        const quick = quickTurn(before, body.message, body.skip === true);
         if (quick) next = quick;
         else {
           const processed = await processTurn(

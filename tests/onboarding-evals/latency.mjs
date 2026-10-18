@@ -1,7 +1,7 @@
 // Real, bounded model comparison in a preview build. No accounts or database writes.
 import assert from "node:assert/strict";
 import { interpretWithModel } from "../../src/lib/onboarding/model.ts";
-import { processTurn, registrationExtraction } from "../../src/lib/onboarding/engine.ts";
+import { processTurn } from "../../src/lib/onboarding/engine.ts";
 import { initialConversation, applyFacts, confirmCharity, nextQuestion } from "../../src/lib/onboarding/state.ts";
 
 if (process.env.VERCEL_ENV !== "preview" || process.env.SORP_LIVE_EVAL !== "true") throw Error("Preview live-evaluation opt-in required");
@@ -39,7 +39,7 @@ for (const scenario of cases) {
     const started = performance.now();
     const record = { id: scenario.id, profile };
     try {
-      const result = await processTurn(scenario.state, scenario.message, (message, state) => interpretWithModel(message, state, undefined, false, profile === "fast" ? registrationExtraction(state, message) || undefined : undefined));
+      const result = await processTurn(scenario.state, scenario.message, (message, state) => interpretWithModel(message, state));
       totalCost += result.extraction.usage?.estimatedUsd || 0;
       assert.ok(totalCost < 2, "Live comparison cost limit reached");
       assert.equal(result.extraction.notice || "", "", "Fallback is not a model pass");

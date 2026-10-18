@@ -58,6 +58,11 @@ test("only complete explicit first introductions can skip duplicate interpretati
   const facts = registrationExtraction(initialConversation(), text);
   assert.equal(facts.name, "Sarah Jones");
   assert.equal(facts.organisation, "Burton Sweet");
+  const instant = quickTurn(initialConversation(), text);
+  assert.equal(instant.facts.email, "sarah@example.com");
+  assert.equal(instant.charity.confirmed, null);
+  assert.equal(nextObjective(instant), "charity");
+  assert.ok(!instant.response?.generated, "A local response must not be labelled AI-generated");
   for (const message of [text + " I used to work with Oxfam.", text + " I want to explore Interim Spaces.", "I’m Alex Jones, a trustee at Interim Spaces. My email is alex@example.com.", "I’m Sarah Jones, an accountant at Burton Sweet. My colleague’s email is sarah@example.com."]) assert.equal(registrationExtraction(initialConversation(), message), null);
   assert.equal(registrationExtraction(applyFacts(initialConversation(), { organisation: "My correction" }, "form"), text), null);
   assert.equal(registrationExtraction({ ...initialConversation(), turns: 1 }, text), null);
