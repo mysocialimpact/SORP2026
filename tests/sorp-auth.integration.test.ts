@@ -411,7 +411,8 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   assert.equal(delegatedLoad.status, 200);
   const delegatedSave = await post("adviser-assessment-save", { adviserOrganisationId: adviserOrgId,
     charityOrganisationId: customerOrgId, accountId: customerId,
-    progress: { started: true, state: { currentStage: 5, completedStages: [1, 2, 3, 4] }, marker: "delegated" } }, founderCookie);
+    progress: { started: true, state: { currentStage: 5, completedStages: [1, 2, 3, 4] },
+      marker: "delegated", confidentialAnswer: "synthetic" } }, founderCookie);
   assert.equal(delegatedSave.status, 200);
   assert.equal((await db.query("SELECT progress->>'marker' marker FROM sorp_auth.account_progress WHERE user_id=$1",
     [customerId])).rows[0].marker, "delegated");
