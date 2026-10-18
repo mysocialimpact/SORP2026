@@ -2,13 +2,14 @@
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { safeDestination } from "@/lib/onboarding/state";
-import { currentAccountDestination, registrationHref, rememberAccountReturn } from "@/lib/account-navigation";
+import { currentAccountDestination, invitationTokenFromDestination, registrationHref, rememberAccountReturn } from "@/lib/account-navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 export function AccountPortal({ returnTo, embedded = false }: { returnTo?: string; embedded?: boolean } = {}) {
   const params = useSearchParams();
   const router = useRouter();
   const destination = useMemo(() => safeDestination(returnTo ?? params.get("return") ?? params.get("next"), true), [params, returnTo]);
+  const invitationToken = useMemo(() => invitationTokenFromDestination(destination), [destination]);
   const hasExplicitDestination = Boolean(returnTo || params.get("return") || params.get("next"));
   const [checking, setChecking] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -24,6 +25,22 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
       }).catch(() => undefined).finally(() => { if (!controller.signal.aborted) setChecking(false); });
     return () => controller.abort();
   }, [destination, hasExplicitDestination]);
+  useEffect(() => {
+    if (!invitationToken) return;
+    const controller = new AbortController();
+    void fetch("/api/readiness-account/", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "invitation-preview", invitationToken }),
+      cache: "no-store", signal: controller.signal,
+    }).then(async response => {
+      const data = await response.json().catch(() => ({}));
+      const invitedEmail = data.invitation?.email;
+      if (response.ok && typeof invitedEmail === "string" && !controller.signal.aborted) {
+        setEmail(current => current || invitedEmail);
+      }
+    }).catch(() => undefined);
+    return () => controller.abort();
+  }, [invitationToken]);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
@@ -47,7 +64,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
     </div>
     {checking ? <p className="account-checking" role="status">Checking your account…</p> : <form onSubmit={submit}>
       <label>Email address<input required type="email" maxLength={254} autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} /></label>
-      <label>Password<input required type="password" minLength={10} maxLength={200} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
+      <label>Password<input required type="password" maxLength={200} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
       {error && <div className="account-error" role="alert"><strong>We couldn’t sign you in yet.</strong><span>{error}</span></div>}
       <Link className="account-forgot" href={`/forgot-password/?return=${encodeURIComponent(destination)}`} onClick={() => rememberAccountReturn(destination)}>Forgotten your password?</Link>
       <button className="gateway-action account-submit" disabled={busy} type="submit">{busy ? "Please wait…" : "Log in to SORP2026 →"}</button>

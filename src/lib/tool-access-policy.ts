@@ -21,9 +21,11 @@ export function isToolApi(pathname: string) {
     "/api/sorp-report-download", "/api/sorp-payments"].some(prefix => under(path, prefix));
 }
 
-// These are authentication operations, not tool actions. Unknown account
+// These are authentication operations, not tool actions. Invitation preview
+// is bearer-token gated by the invitation service; acceptance is deliberately
+// absent and still requires a verified matching session. Unknown account
 // actions require a session too, preventing a legacy guest action bypass.
 export const publicAccountActions = new Set([
-  "login", "signup", "logout", "request-reset", "reset-password",
+  "login", "signup", "logout", "request-reset", "reset-password", "invitation-preview",
 ]);
 

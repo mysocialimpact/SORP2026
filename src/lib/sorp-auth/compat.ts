@@ -6,7 +6,7 @@ import { openTeamResponse, removeTeamInvitation, saveTeamResponse, teamInvite,
 import { acceptOrganisationInvitation, adviserClient, adviserCreateClient, adviserInviteClientMember,
   adviserInviteMember, adviserLoadClientAssessment, adviserSaveClientAssessment,
   adviserWorkspace, createOwnOrganisation, decideClientAccess,
-  readClientAssessment } from "./admin";
+  previewOrganisationInvitation, readClientAssessment } from "./admin";
 import { listReportReviews, prepareReportUpload } from "./report-review";
 
 type Input = Record<string, unknown>;
@@ -136,6 +136,11 @@ export async function independentAccountPOST(request: Request) {
     if (!await saveProgress(created.user.id, input.progress)) return error("The assessment could not be saved.", 400);
     return json({ verificationRequired: true,
       account: { id: created.user.id, email: created.user.email, name, position } }, 202);
+  }
+
+  if (action === "invitation-preview") {
+    try { return json(await previewOrganisationInvitation({ token: input.invitationToken || input.token })); }
+    catch { return error("This invitation is invalid or unavailable.", 404); }
   }
 
   if (action === "team-response-open" || action === "team-response-save" || action === "team-response-submit") {

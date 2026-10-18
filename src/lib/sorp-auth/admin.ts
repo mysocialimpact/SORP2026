@@ -203,6 +203,34 @@ export async function founderRevokeInvitation(actorId: string, input: Input) {
   return { revoked: true };
 }
 
+/** Resolve only the onboarding details carried by a high-entropy invitation token. */
+export async function previewOrganisationInvitation(input: Input) {
+  const token = input.token;
+  if (typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token)) {
+    throw new Error("The invitation token is invalid.");
+  }
+  const digest = createHash("sha256").update(token).digest("hex");
+  const found = await sorpAuthPool().query<{
+    email: string; role: string; status: string; expires_at: Date;
+    organisation_id: string; organisation_name: string; organisation_type: string;
+  }>(`SELECT i.email,i.role,i.status,i.expires_at,i.organisation_id,
+      o.name organisation_name,o.type organisation_type
+    FROM sorp_auth.invitation i JOIN sorp_auth.organisation o ON o.id=i.organisation_id
+    WHERE i.token_hash=$1 LIMIT 1`, [digest]);
+  const invitation = found.rows[0];
+  if (!invitation) throw new Error("This invitation could not be opened.");
+  const status = invitation.status === "pending"
+    ? invitation.expires_at.getTime() <= Date.now() ? "expired" : "sent"
+    : invitation.status;
+  return { invitation: {
+    email: invitation.email, role: invitation.role, status,
+    organisationId: invitation.organisation_id,
+    organisationName: invitation.organisation_name,
+    organisationType: invitation.organisation_type,
+    expiresAt: invitation.expires_at.toISOString(),
+  } };
+}
+
 export async function acceptOrganisationInvitation(userId: string, email: string, input: Input) {
   const token = input.token;
   if (typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token)) throw new Error("The invitation token is invalid.");

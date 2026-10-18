@@ -5,5 +5,5 @@ export const metadata: Metadata = { title: "Accept invitation", robots: { index:
 
 export default async function InvitationPage({ params }:{params:Promise<{token:string}>}) {
   const { token } = await params;
-  return <main id="main" className="gateway"><div className="gateway-width"><InvitationAcceptance token={token} /></div></main>;
+  return <main id="main" className="gateway invitation-page"><div className="gateway-width"><InvitationAcceptance token={token} /></div></main>;
 }

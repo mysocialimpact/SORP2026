@@ -11,16 +11,24 @@ export function ProductFolderTabs() {
   const pathname = usePathname();
   const { status, readinessComplete, founder } = useNavigationAccount();
   const [founderView, setFounderView] = useState<FounderView>("home");
+  const [customerDashboard, setCustomerDashboard] = useState(false);
   const tabStrip = useRef<HTMLElement>(null);
   const selectedTab = useRef<HTMLAnchorElement>(null);
   const normalisedPath = pathname.endsWith("/") ? pathname : `${pathname}/`;
   const founderMode = normalisedPath.startsWith("/founder/");
-  const founderNavigation = founderMode || (status === "signed-in" && founder);
+  const founderNavigation = founderMode || (status === "signed-in" && founder && !customerDashboard);
   const founderPrimary = founderPrimaryView(founderView);
   const founderIndex = FOUNDER_PRODUCT_VIEWS.indexOf(founderPrimary);
   const activeFolder = founderMode ? folderTabs[Math.max(0, founderIndex)] : folderForPath(normalisedPath);
   const activePath = activeFolder.href;
   const visibleTabs = founderMode ? folderTabs : [folderTabs[0], accountFolder, ...folderTabs.slice(1)];
+
+  useEffect(() => {
+    const sync = () => setCustomerDashboard(normalisedPath === "/dashboard/" && new URLSearchParams(window.location.search).get("mode") === "customer");
+    sync();
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, [normalisedPath]);
 
   useEffect(() => {
     if (!founderMode) return;
@@ -44,6 +52,8 @@ export function ProductFolderTabs() {
       behavior: "auto",
     });
   }, [activePath]);
+
+  if (normalisedPath.startsWith("/invitation/")) return null;
 
   return (
     <div className="product-folder" data-active-product={activePath} style={{ "--folder-paper": activeFolder.tabColour } as CSSProperties}>
