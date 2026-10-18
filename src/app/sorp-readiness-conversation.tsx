@@ -112,6 +112,7 @@ type ReadinessResponse = {
 
 type SavedProgress = { started: boolean; state: ReadinessState; messages: Message[]; result: Result | null; intelligence: IntelligenceProvenance | null; sessionId: string; workflow: ReadinessWorkflow | null; checkpoints: ConversationCheckpoint[]; quickReviewFeedbackStep?: boolean; quickReviewFeedback?: number | null; quickReviewFeedbackComment?: string; fullReviewEntered?: boolean; fullReviewFeedbackStep?: boolean; fullReviewFeedback?: number | null; fullReviewFeedbackComment?: string };
 type ReadinessAccount = { id: string; email: string; name: string; position: string; organisation: string; currentStage: number; completedStages: number[]; createdAt: string; lastSavedAt: string };
+export type DelegatedAssessment = { adviserOrganisationId: string; charityOrganisationId: string; accountId: string };
 
 const emptySetup: AssessmentSetup = { role: "", jurisdiction: "", startDate: "", endDate: "", accounts: "", accountsReview: "", income: "", nearBoundary: false, activities: [] };
 
@@ -563,9 +564,10 @@ function SorpStageContext({ workflow, state, impactReportConfirmed, impactReport
   </>;
 }
 
-export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }: { setupOnly?: boolean; onSetupComplete?: (state: ReadinessState, workflow: ReadinessWorkflow) => void }) {
+export function SorpReadinessConversation({ setupOnly = false, onSetupComplete, delegated }: { setupOnly?: boolean; onSetupComplete?: (state: ReadinessState, workflow: ReadinessWorkflow) => void; delegated?: DelegatedAssessment }) {
   const router = useRouter();
-  const storageKey = setupOnly ? "msi-sorp-snapshot-setup-v1" : CONVERSATION_KEY;
+  const storageKey = setupOnly ? "msi-sorp-snapshot-setup-v1" : delegated
+    ? `${CONVERSATION_KEY}:${delegated.charityOrganisationId}:${delegated.accountId}` : CONVERSATION_KEY;
   const [started, setStarted] = useState(false);
   const [welcomeQuestionOpen, setWelcomeQuestionOpen] = useState(false);
   const [state, setState] = useState<ReadinessState>(() => blankState());
@@ -704,9 +706,17 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         if (!response.ok) return;
         const data = await response.json() as { signedIn?: boolean; account?: ReadinessAccount; progress?: Partial<SavedProgress> };
         if (!data.signedIn || !data.account) return;
+        let saved = data.progress;
+        if (delegated) {
+          const delegatedResponse = await fetch("/api/readiness-account", { method: "POST",
+            headers: { "content-type": "application/json" }, signal: abort.signal,
+            body: JSON.stringify({ action: "adviser-assessment-load", ...delegated }) });
+          const delegatedData = await delegatedResponse.json() as { progress?: Partial<SavedProgress>; error?: string };
+          if (!delegatedResponse.ok) throw new Error(delegatedData.error || "This client assessment is unavailable.");
+          saved = delegatedData.progress;
+        }
         setAccount(data.account);
         setSaveProfile((current) => ({ ...current, name: data.account!.name, position: data.account!.position, email: data.account!.email }));
-        const saved = data.progress;
         if (saved?.started && saved.state && saved.messages?.length) {
           setStarted(true);
           setState({ ...blankState(), ...saved.state, charityName: saved.state.charityName ?? "", contextEvidence: saved.state.contextEvidence ?? {} });
@@ -726,11 +736,14 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
           if (saved.sessionId) void trackSorpEvent(saved.sessionId, "assessment_resumed", growthContext(saved.state, saved.result ?? null));
         }
       } catch (caught) {
-        if (!abort.signal.aborted) console.error("Saved SORP account could not be restored", caught);
+        if (!abort.signal.aborted) {
+          console.error("Saved SORP account could not be restored", caught);
+          if (delegated) setError(caught instanceof Error ? caught.message : "This client assessment is unavailable.");
+        }
       }
     })();
     return () => abort.abort();
-  }, [hydrated, setupOnly]);
+  }, [hydrated, setupOnly, delegated?.adviserOrganisationId, delegated?.charityOrganisationId, delegated?.accountId]);
 
   useEffect(() => {
     if (!hydrated || (!started && !messages.length)) return;
@@ -740,10 +753,17 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
   useEffect(() => {
     if (!hydrated || !started || !account || setupOnly) return;
     const timer = window.setTimeout(() => {
-      void fetch("/api/readiness-account", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "save", progress: { started, state, messages, result, intelligence, sessionId, workflow, checkpoints, quickReviewFeedbackStep, quickReviewFeedback, quickReviewFeedbackComment, fullReviewEntered: fullReviewEntry === "open", fullReviewFeedbackStep, fullReviewFeedback, fullReviewFeedbackComment } }) });
+      void fetch("/api/readiness-account", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: delegated ? "adviser-assessment-save" : "save", ...(delegated || {}), progress: { started, state, messages, result, intelligence, sessionId, workflow, checkpoints, quickReviewFeedbackStep, quickReviewFeedback, quickReviewFeedbackComment, fullReviewEntered: fullReviewEntry === "open", fullReviewFeedbackStep, fullReviewFeedback, fullReviewFeedbackComment } }) })
+        .then(async response => {
+          if (!response.ok && delegated) {
+            const data = await response.json().catch(() => ({})) as { error?: string };
+            setError(data.error || "Your approved client edit access is no longer available. Changes were not saved.");
+            setAccount(null);
+          }
+        }).catch(() => { if (delegated) setError("The client assessment could not be saved. Keep this page open and try again."); });
     }, 900);
     return () => window.clearTimeout(timer);
-  }, [hydrated, started, account, setupOnly, state, messages, result, intelligence, sessionId, workflow, checkpoints, quickReviewFeedbackStep, quickReviewFeedback, quickReviewFeedbackComment, fullReviewEntry, fullReviewFeedbackStep, fullReviewFeedback, fullReviewFeedbackComment]);
+  }, [hydrated, started, account, setupOnly, state, messages, result, intelligence, sessionId, workflow, checkpoints, quickReviewFeedbackStep, quickReviewFeedback, quickReviewFeedbackComment, fullReviewEntry, fullReviewFeedbackStep, fullReviewFeedback, fullReviewFeedbackComment, delegated]);
 
   useEffect(() => {
     if (fullReviewEntry !== "revealing" || !result) return;
@@ -833,11 +853,11 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
     setSaveError("");
     try {
       const progress: SavedProgress = { started, state, messages, result, intelligence, sessionId, workflow, checkpoints, quickReviewFeedbackStep, quickReviewFeedback, quickReviewFeedbackComment, fullReviewEntered: fullReviewEntry === "open", fullReviewFeedbackStep, fullReviewFeedback, fullReviewFeedbackComment };
-      const action: "signup" | "login" | "save" = account ? "save" : accountMode;
+      const action: "signup" | "login" | "save" | "adviser-assessment-save" = delegated ? "adviser-assessment-save" : account ? "save" : accountMode;
       if (!account && action === "signup" && saveProfile.password !== saveProfile.confirmPassword) throw new Error("The two passwords do not match. Please re-enter them and try again.");
       const response = await fetch("/api/readiness-account", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify(action === "save" ? { action, progress } : action === "signup" ? { action, name: saveProfile.name, position: saveProfile.position, email: saveProfile.email, password: saveProfile.password, progress } : { action, email: saveProfile.email, password: saveProfile.password }),
+        body: JSON.stringify(action === "adviser-assessment-save" ? { action, ...delegated, progress } : action === "save" ? { action, progress } : action === "signup" ? { action, name: saveProfile.name, position: saveProfile.position, email: saveProfile.email, password: saveProfile.password, progress } : { action, email: saveProfile.email, password: saveProfile.password }),
       });
       const raw = await response.text();
       let data: { account?: ReadinessAccount; progress?: Partial<SavedProgress>; error?: string; verificationRequired?: boolean };
@@ -850,8 +870,8 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         setSaveError("Check your email to verify your new account, then sign in. Your assessment remains saved on this device.");
         return;
       }
-      if (!response.ok || !data.account) throw new Error(data.error || "The secure saving service could not complete the request. Your assessment is still safe on this device and nothing has been lost. Please wait a moment and try again.");
-      setAccount(data.account);
+      if (!response.ok || (!delegated && !data.account)) throw new Error(data.error || "The secure saving service could not complete the request. Your assessment is still safe on this device and nothing has been lost. Please wait a moment and try again.");
+      if (data.account) setAccount(data.account);
       if (action === "login") {
         const saved = data.progress;
         if (saved?.started && saved.state && saved.messages?.length) {
@@ -881,7 +901,9 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
         window.setTimeout(() => setSaveDialogOpen(false), 700);
       } else {
         void trackSorpEvent(sessionId, "save_and_exit", growthContext());
-        window.setTimeout(() => router.push("/are-you-sorp-ready?progress=saved"), 900);
+        window.setTimeout(() => router.push(delegated
+          ? `/adviser/?client=${encodeURIComponent(delegated.charityOrganisationId)}`
+          : "/are-you-sorp-ready?progress=saved"), 900);
       }
     } catch (caught) {
       setSaveStatus("idle");
@@ -1341,7 +1363,7 @@ export function SorpReadinessConversation({ setupOnly = false, onSetupComplete }
   const saveDialog = saveDialogOpen && <div className="sorp-save-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && saveStatus !== "saving") setSaveDialogOpen(false); }}><section className="sorp-save-dialog" role="dialog" aria-modal="true" aria-labelledby="sorp-save-title">
     <button type="button" className="sorp-save-close" onClick={() => setSaveDialogOpen(false)} disabled={saveStatus === "saving"} aria-label="Close finish another time form">×</button>
     <span>Finish another time</span><h2 id="sorp-save-title">{account ? "Save your assessment" : accountMode === "signup" ? "Create your account" : "Sign in to your account"}</h2><p>{account ? `You’re signed in as ${account.email}. Save now and your assessment will be available when you return.` : accountMode === "signup" ? "Create an account so your answers and conversation are saved securely and you can continue on this or another device." : "Sign in to reopen the assessment already saved to your account."}</p>
-    {!account ? <AccountGateway returnTo="/are-you-sorp-ready/conversation/" /> : <form onSubmit={submitSave}>
+    {!account ? delegated ? <p role="alert">Your approved adviser session is unavailable. Return to the adviser workspace and reopen this client.</p> : <AccountGateway returnTo="/are-you-sorp-ready/conversation/" /> : <form onSubmit={submitSave}>
       {!account && accountMode === "signup" && <><label htmlFor="save-name">Your name<input id="save-name" name="name" autoComplete="name" required maxLength={120} value={saveProfile.name} onChange={(event) => setSaveProfile((current) => ({ ...current, name: event.target.value }))} /></label>
       <label htmlFor="save-position">Position / role<input id="save-position" name="position" autoComplete="organization-title" required maxLength={120} value={saveProfile.position} onChange={(event) => setSaveProfile((current) => ({ ...current, position: event.target.value }))} /></label></>}
       {!account && <>

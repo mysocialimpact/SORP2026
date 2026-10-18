@@ -119,21 +119,50 @@ export async function founderSetPlan(actorId: string, input: Input) {
   finally { client.release(); }
 }
 
-export async function founderRevokeMembership(actorId: string, input: Input) {
+export async function founderUpdateMembership(actorId: string, input: Input) {
   const organisationId = String(input.organisationId || "");
   const userId = String(input.userId || "");
+  const role = String(input.role || "member");
+  const status = String(input.status || "active");
+  if (!organisationId || !userId || !["owner", "admin", "member"].includes(role) ||
+      !["active", "revoked"].includes(status)) throw new Error("The membership change is invalid.");
   const client = await sorpAuthPool().connect();
   try {
     await client.query("BEGIN");
-    const revoked = await client.query(`UPDATE sorp_auth.membership SET status='revoked',updated_at=now()
-      WHERE organisation_id=$1 AND user_id=$2 AND status='active' RETURNING id`, [organisationId, userId]);
-    if (!revoked.rowCount) throw new Error("No active membership matched.");
-    await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id)
-      VALUES($1,'membership_revoked','organisation',$2)`, [actorId, organisationId]);
+    if (!(await client.query("SELECT id FROM sorp_auth.organisation WHERE id=$1 FOR UPDATE", [organisationId])).rowCount) {
+      throw new Error("No organisation matched.");
+    }
+    const current = await client.query<{ id: string; role: string; status: string }>(`
+      SELECT id::text,role,status FROM sorp_auth.membership
+      WHERE organisation_id=$1 AND user_id=$2 FOR UPDATE`, [organisationId, userId]);
+    if (!current.rows[0]) throw new Error("No membership matched.");
+    if (current.rows[0].role === "owner" && current.rows[0].status === "active" &&
+        (role !== "owner" || status !== "active")) {
+      const otherOwners = await client.query(`SELECT 1 FROM sorp_auth.membership
+        WHERE organisation_id=$1 AND user_id<>$2 AND role='owner' AND status='active' FOR UPDATE`,
+      [organisationId, userId]);
+      if (!otherOwners.rowCount) throw new Error("Promote another active owner before changing the last owner.");
+    }
+    await client.query(`UPDATE sorp_auth.membership SET role=$3,status=$4,updated_at=now()
+      WHERE organisation_id=$1 AND user_id=$2`, [organisationId, userId, role, status]);
+    await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id,metadata)
+      VALUES($1,'membership_updated','organisation',$2,$3::jsonb)`, [actorId, organisationId,
+      JSON.stringify({ userId, before: current.rows[0], after: { role, status } })]);
     await client.query("COMMIT");
-    return { revoked: true };
+    return { updated: true, role, status };
   } catch (error) { await client.query("ROLLBACK"); throw error; }
   finally { client.release(); }
+}
+
+export async function founderRevokeMembership(actorId: string, input: Input) {
+  const organisationId = String(input.organisationId || "");
+  const userId = String(input.userId || "");
+  const current = await sorpAuthPool().query<{ role: string }>(`SELECT role FROM sorp_auth.membership
+    WHERE organisation_id=$1 AND user_id=$2 AND status='active'`, [organisationId, userId]);
+  if (!current.rows[0]) throw new Error("No active membership matched.");
+  await founderUpdateMembership(actorId, { organisationId, userId,
+    role: current.rows[0].role, status: "revoked" });
+  return { revoked: true };
 }
 
 export async function founderInviteMember(actorId: string, input: Input) {
@@ -237,10 +266,7 @@ export async function founderRequestClientAccess(actorId: string, input: Input) 
   if (!adviserId || !charityId || adviserId === charityId || !permissions || typeof permissions !== "object") {
     throw new Error("The client access request is invalid.");
   }
-  if (permissions.edit === true || permissions.invitations === true) {
-    throw new Error("Adviser editing and client invitation delegation are not enabled in the independent service.");
-  }
-  const allowed = { progress: permissions.progress === true, answers: permissions.answers === true,
+  const allowed = { progress: permissions.progress === true, answers: permissions.answers === true || permissions.edit === true,
     reports: permissions.reports === true,
     edit: permissions.edit === true, invitations: permissions.invitations === true };
   const client = await sorpAuthPool().connect();
@@ -322,14 +348,14 @@ export async function readClientAssessment(userId: string, input: Input) {
     const assessment = await client.query<{ user_id: string; name: string; position: string;
       organisation: string; current_stage: number;
       completed_stages: number[]; last_saved_at: Date | null; progress?: unknown }>(`
-      SELECT p.user_id,u.name,coalesce(profile.position,'') position,
+      SELECT m.user_id,u.name,coalesce(profile.position,'') position,
         coalesce(profile.organisation_label,'') organisation,
-        p.current_stage,p.completed_stages,p.last_saved_at
+        coalesce(p.current_stage,1) current_stage,coalesce(p.completed_stages,'[]'::jsonb) completed_stages,p.last_saved_at
         ${view === "answers" ? ",p.progress" : ""}
-      FROM sorp_auth.membership m JOIN sorp_auth.account_progress p ON p.user_id=m.user_id
+      FROM sorp_auth.membership m LEFT JOIN sorp_auth.account_progress p ON p.user_id=m.user_id
       JOIN sorp_auth."user" u ON u.id=m.user_id
       LEFT JOIN sorp_auth.profile profile ON profile.user_id=u.id
-      WHERE m.organisation_id=$1 AND m.status='active' ORDER BY p.last_saved_at DESC`, [charityId]);
+      WHERE m.organisation_id=$1 AND m.status='active' ORDER BY p.last_saved_at DESC NULLS LAST,u.name`, [charityId]);
     const reports = granted.rows[0].permissions.reports === true
       ? await client.query<{ id: string; filename: string; status: string; size_bytes: number }>(`
         SELECT id::text,filename,status,size_bytes FROM sorp_auth.report_review
@@ -342,7 +368,7 @@ export async function readClientAssessment(userId: string, input: Input) {
     return { organisationId: charityId, organisationName: granted.rows[0].charity_name,
       view, reports: reports?.rows || [], assessments: assessment.rows.map(row => ({ accountId: row.user_id,
         name: row.name, position: row.position, organisation: row.organisation,
-        status: row.completed_stages.length === 7 ? "complete" : "in_progress",
+        status: !row.last_saved_at ? "not_started" : row.completed_stages.length === 7 ? "complete" : "in_progress",
         currentStage: row.current_stage, completedStages: row.completed_stages,
         lastSavedAt: row.last_saved_at?.toISOString() || null,
         ...(view === "answers" ? { progress: row.progress } : {}) })) };
@@ -400,9 +426,136 @@ export async function adviserClient(userId: string, input: Input) {
     SELECT permissions FROM sorp_auth.adviser_client_access
     WHERE adviser_organisation_id=$1 AND charity_organisation_id=$2 AND status='active'`,
   [adviserId, charityId]);
-  const view = grant.rows[0]?.permissions.answers === true ? "answers" : "progress";
+  const view = grant.rows[0]?.permissions.answers === true || grant.rows[0]?.permissions.edit === true
+    ? "answers" : "progress";
   return readClientAssessment(userId, { adviserOrganisationId: adviserId,
     charityOrganisationId: charityId, view });
+}
+
+async function delegatedAssessmentTarget(userId: string, input: Input, permission: "edit" | "invitations") {
+  const adviserId = String(input.adviserOrganisationId || "");
+  const charityId = String(input.charityOrganisationId || "");
+  const accountId = permission === "edit" ? String(input.accountId || "") : "";
+  if (!adviserId || !charityId || adviserId === charityId || (permission === "edit" && !accountId)) {
+    throw new Error("The delegated client request is invalid.");
+  }
+  const result = await sorpAuthPool().query<{ charity_name: string; target_name: string | null }>(`
+    SELECT charity.name charity_name,target.name target_name
+    FROM sorp_auth.adviser_client_access access
+    JOIN sorp_auth.organisation adviser ON adviser.id=access.adviser_organisation_id AND adviser.type='Adviser'
+    JOIN sorp_auth.organisation charity ON charity.id=access.charity_organisation_id AND charity.type='Charity'
+    JOIN sorp_auth.membership adviser_member ON adviser_member.organisation_id=adviser.id
+      AND adviser_member.user_id=$3 AND adviser_member.status='active'
+    JOIN sorp_auth.entitlement entitlement ON entitlement.organisation_id=adviser.id
+      AND entitlement.plan IN ('Adviser','Enterprise') AND entitlement.status<>'suspended'
+      AND (entitlement.status<>'complimentary_partner' OR entitlement.complimentary_end IS NULL OR entitlement.complimentary_end>now())
+    LEFT JOIN sorp_auth.membership client_member ON client_member.organisation_id=charity.id
+      AND client_member.user_id=nullif($4::text,'') AND client_member.status='active'
+    LEFT JOIN sorp_auth."user" target ON target.id=client_member.user_id
+    WHERE access.adviser_organisation_id=$1 AND access.charity_organisation_id=$2
+      AND access.status='active' AND access.permissions->>$5='true'
+      AND ($5<>'edit' OR client_member.id IS NOT NULL)`,
+  [adviserId, charityId, userId, accountId, permission]);
+  if (result.rows.length !== 1) throw new Error("The adviser does not have this approved client permission.");
+  return { adviserId, charityId, accountId, ...result.rows[0] };
+}
+
+export async function adviserLoadClientAssessment(userId: string, input: Input) {
+  const target = await delegatedAssessmentTarget(userId, input, "edit");
+  const saved = await sorpAuthPool().query<{ progress: unknown }>(
+    "SELECT progress FROM sorp_auth.account_progress WHERE user_id=$1", [target.accountId]);
+  await sorpAuthPool().query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id,metadata)
+    VALUES($1,'client_assessment_edit_opened','user',$2,$3::jsonb)`, [userId, target.accountId,
+    JSON.stringify({ adviserOrganisationId: target.adviserId, charityOrganisationId: target.charityId })]);
+  return { accountId: target.accountId, accountName: target.target_name || "Charity participant",
+    organisationId: target.charityId, organisationName: target.charity_name,
+    progress: saved.rows[0]?.progress || null };
+}
+
+export async function adviserSaveClientAssessment(userId: string, input: Input) {
+  const target = await delegatedAssessmentTarget(userId, input, "edit");
+  const progress = input.progress;
+  if (!progress || typeof progress !== "object" || Array.isArray(progress)) {
+    throw new Error("The delegated assessment is invalid.");
+  }
+  const encoded = JSON.stringify(progress);
+  if (encoded.length > 1_500_000) throw new Error("The delegated assessment is too large.");
+  const state = (progress as Input).state;
+  const stateRecord = state && typeof state === "object" && !Array.isArray(state) ? state as Input : {};
+  const currentStage = Math.min(7, Math.max(1, Number(stateRecord.currentStage) || 1));
+  const completedStages = Array.isArray(stateRecord.completedStages)
+    ? [...new Set(stateRecord.completedStages.filter((stage): stage is number =>
+      Number.isInteger(stage) && Number(stage) >= 1 && Number(stage) <= 7))]
+    : [];
+  const client = await sorpAuthPool().connect();
+  try {
+    await client.query("BEGIN");
+    // Recheck the grant inside the write transaction so a revoked grant cannot be reused.
+    const granted = await client.query(`SELECT 1 FROM sorp_auth.adviser_client_access access
+      JOIN sorp_auth.membership adviser_member ON adviser_member.organisation_id=access.adviser_organisation_id
+        AND adviser_member.user_id=$3 AND adviser_member.status='active'
+      JOIN sorp_auth.entitlement entitlement ON entitlement.organisation_id=access.adviser_organisation_id
+        AND entitlement.plan IN ('Adviser','Enterprise') AND entitlement.status<>'suspended'
+        AND (entitlement.status<>'complimentary_partner' OR entitlement.complimentary_end IS NULL OR entitlement.complimentary_end>now())
+      JOIN sorp_auth.membership client_member ON client_member.organisation_id=access.charity_organisation_id
+        AND client_member.user_id=$4 AND client_member.status='active'
+      WHERE access.adviser_organisation_id=$1 AND access.charity_organisation_id=$2
+        AND access.status='active' AND access.permissions->>'edit'='true'
+      FOR SHARE OF access,adviser_member,entitlement,client_member`,
+    [target.adviserId, target.charityId, userId, target.accountId]);
+    if (!granted.rowCount) throw new Error("The adviser does not have approved client edit permission.");
+    await client.query(`INSERT INTO sorp_auth.account_progress
+      (user_id,progress,current_stage,completed_stages,last_saved_at)
+      VALUES($1,$2::jsonb,$3,$4::jsonb,now()) ON CONFLICT(user_id) DO UPDATE SET
+      progress=excluded.progress,current_stage=excluded.current_stage,
+      completed_stages=excluded.completed_stages,last_saved_at=now(),updated_at=now()`,
+    [target.accountId, encoded, currentStage, JSON.stringify(completedStages)]);
+    await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id,metadata)
+      VALUES($1,'client_assessment_saved','user',$2,$3::jsonb)`, [userId, target.accountId,
+      JSON.stringify({ adviserOrganisationId: target.adviserId, charityOrganisationId: target.charityId })]);
+    await client.query("COMMIT");
+    return { saved: true, accountId: target.accountId };
+  } catch (error) { await client.query("ROLLBACK"); throw error; }
+  finally { client.release(); }
+}
+
+export async function adviserInviteClientMember(userId: string, input: Input) {
+  const target = await delegatedAssessmentTarget(userId, input, "invitations");
+  const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
+  const role = String(input.role || "member");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 ||
+      !["admin", "member"].includes(role)) throw new Error("The client invitation is invalid.");
+  const token = randomBytes(32).toString("hex");
+  const invitationId = randomUUID();
+  const client = await sorpAuthPool().connect();
+  try {
+    await client.query("BEGIN");
+    const granted = await client.query(`SELECT 1 FROM sorp_auth.adviser_client_access access
+      JOIN sorp_auth.membership adviser_member ON adviser_member.organisation_id=access.adviser_organisation_id
+        AND adviser_member.user_id=$3 AND adviser_member.status='active'
+      JOIN sorp_auth.entitlement entitlement ON entitlement.organisation_id=access.adviser_organisation_id
+        AND entitlement.plan IN ('Adviser','Enterprise') AND entitlement.status<>'suspended'
+        AND (entitlement.status<>'complimentary_partner' OR entitlement.complimentary_end IS NULL OR entitlement.complimentary_end>now())
+      WHERE access.adviser_organisation_id=$1 AND access.charity_organisation_id=$2
+        AND access.status='active' AND access.permissions->>'invitations'='true'
+      FOR SHARE OF access,adviser_member,entitlement`, [target.adviserId, target.charityId, userId]);
+    if (!granted.rowCount) throw new Error("The adviser does not have approved client invitation permission.");
+    const existing = await client.query(`SELECT 1 FROM sorp_auth.membership m
+      JOIN sorp_auth."user" u ON u.id=m.user_id WHERE m.organisation_id=$1
+      AND lower(u.email)=$2 AND m.status='active'`, [target.charityId, email]);
+    if (existing.rowCount) throw new Error("That account already belongs to the charity.");
+    await client.query(`INSERT INTO sorp_auth.invitation
+      (id,organisation_id,email,role,token_hash,invited_by,expires_at)
+      VALUES($1,$2,$3,$4,$5,$6,now()+interval '7 days')`, [invitationId, target.charityId,
+      email, role, createHash("sha256").update(token).digest("hex"), userId]);
+    await sendSorpInvitationEmail(email, `${process.env.SORP_AUTH_BASE_URL}/invitation/${token}/`);
+    await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id,metadata)
+      VALUES($1,'adviser_client_member_invited','invitation',$2,$3::jsonb)`, [userId, invitationId,
+      JSON.stringify({ adviserOrganisationId: target.adviserId, charityOrganisationId: target.charityId })]);
+    await client.query("COMMIT");
+    return { id: invitationId, sent: true, expiresInDays: 7 };
+  } catch (error) { await client.query("ROLLBACK"); throw error; }
+  finally { client.release(); }
 }
 
 const managerSql = `SELECT 1 FROM sorp_auth.membership m
@@ -456,9 +609,8 @@ export async function adviserCreateClient(userId: string, input: Input) {
   const permissions = input.permissions as Input | undefined;
   if (!adviserId || name.length < 2 || name.length > 200 ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 ||
-      !permissions || permissions.progress !== true ||
-      permissions.edit === true || permissions.invitations === true) {
-    throw new Error("The client invitation must request read-only access and a valid charity owner.");
+      !permissions || permissions.progress !== true) {
+    throw new Error("The client invitation must request valid permissions and a valid charity owner.");
   }
   const charityId = randomUUID();
   const invitationId = randomUUID();
@@ -475,9 +627,9 @@ export async function adviserCreateClient(userId: string, input: Input) {
     const grant = await client.query<{ id: string }>(`INSERT INTO sorp_auth.adviser_client_access
       (adviser_organisation_id,charity_organisation_id,permissions,status,requested_by)
       VALUES($1,$2,$3::jsonb,'requested',$4) RETURNING id`,
-    [adviserId, charityId, JSON.stringify({ progress: true, answers: permissions.answers === true,
+    [adviserId, charityId, JSON.stringify({ progress: true, answers: permissions.answers === true || permissions.edit === true,
       reports: permissions.reports === true,
-      edit: false, invitations: false }), userId]);
+      edit: permissions.edit === true, invitations: permissions.invitations === true }), userId]);
     await client.query(`INSERT INTO sorp_auth.invitation
       (id,organisation_id,email,role,token_hash,invited_by,expires_at)
       VALUES($1,$2,$3,'owner',$4,$5,now()+interval '7 days')`,

@@ -2,7 +2,7 @@ import "server-only";
 import { sorpAuthPool } from "./auth";
 import { founderQuery } from "@/lib/founder/db";
 import { founderCreateOrganisation, founderInviteMember, founderRequestClientAccess,
-  founderRevokeInvitation, founderSetPlan } from "./admin";
+  founderRevokeInvitation, founderSetPlan, founderUpdateMembership } from "./admin";
 import { complimentaryAccessEnd } from "@/lib/founder/complimentary-access";
 
 type Input = Record<string, unknown>;
@@ -142,7 +142,7 @@ async function organisationDetail(id: string) {
   const db = sorpAuthPool();
   const [orgs, members, clients, history, directory] = await Promise.all([
     organisations(),
-    db.query(`SELECT m.id,u.email,m.role,m.status,m.created_at,m.updated_at
+    db.query(`SELECT m.id,m.user_id,u.name,u.email,m.role,m.status,m.created_at,m.updated_at
       FROM sorp_auth.membership m JOIN sorp_auth."user" u ON u.id=m.user_id
       WHERE m.organisation_id=$1 ORDER BY m.created_at`, [id]),
     db.query(`SELECT a.id::text,a.status,a.permissions,c.name charity_name
@@ -157,7 +157,10 @@ async function organisationDetail(id: string) {
   const productRows = directory.products;
   return organisation ? { organisation, memberships: members.rows, clients: clients.rows,
     history: history.rows, activity: history.rows,
-    users: directory.users.filter(row => row.organisationId === id),
+    users: members.rows.map(member => ({ id: member.user_id, name: member.name,
+      email: member.email, organisationId: id, organisationName: organisation.name,
+      role: member.role, status: member.status, createdAt: member.created_at,
+      lastActivity: member.updated_at })),
     products: { readiness: productRows.readiness.filter(row => row.organisationId === id),
       excellence: productRows.excellence.filter(row => row.organisationId === id),
       impactReports: productRows.impactReports.filter(row => row.organisationId === id),
@@ -236,6 +239,10 @@ export async function independentFounderPOST(actor: { id?: string }, resource: s
     const invitation = await founderInviteMember(actor.id, { organisationId: id,
       email: body.email, role: body.role });
     return json({ ...invitation, delivery: "sent" }, 201);
+  }
+  if (resource === "organisation" && id && action === "membership") {
+    return json(await founderUpdateMembership(actor.id, { organisationId: id,
+      userId: body.userId, role: body.role, status: body.status }));
   }
   if (resource === "clients" && (id === "link" || action === "link")) {
     return json(await founderRequestClientAccess(actor.id, body), 201);

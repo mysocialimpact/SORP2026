@@ -84,7 +84,7 @@ test("founder shell has one product navigation, one persistent administration ro
   await expect(administration.getByRole("link")).toHaveCount(5);
   expect(await page.locator(".platform-sticky-navigation").evaluate(element => getComputedStyle(element).position)).toBe("sticky");
 
-  await expect(page.getByRole("link", { name: /View My Dashboard/ })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /View My Dashboard/ })).toHaveAttribute("href", "/dashboard/?mode=customer");
   await expect(page.getByRole("link", { name: /Our Mission|Find Accountants/ })).toHaveCount(0);
   await expect(page.getByText("Where you are.")).toHaveCount(0);
   await expect(page.locator(".shared-hello,.gateway-footer,.folder-action-bar")).toHaveCount(0);

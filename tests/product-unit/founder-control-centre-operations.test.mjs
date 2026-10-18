@@ -39,10 +39,11 @@ test("founder administration navigation is persistent, complete and hash-synchro
   assert.match(centre, /FOUNDER_VIEW_EVENT/);
 });
 
-test("founder shell removes customer chrome while public shell remains intact", () => {
+test("founder shell keeps its management chrome distinct while public shell remains intact", () => {
   assert.match(header, /founder-mode-header/);
   assert.match(header, /founder-control-title/);
-  assert.doesNotMatch(header, /View My Dashboard|founder-mode-indicator/);
+  assert.match(header, /href="\/dashboard\/\?mode=customer">View My Dashboard/);
+  assert.doesNotMatch(header, /founder-mode-indicator/);
   for (const publicLabel of ["Our Mission", "Find Accountants", "Talk to Us"]) assert.match(header, new RegExp(publicLabel));
   assert.match(footer, /startsWith\("\/founder\/"\)\) return null/);
   assert.match(sayHello, /if \(founderMode\) return null/);

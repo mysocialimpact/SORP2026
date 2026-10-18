@@ -26,10 +26,11 @@ type OrganisationProps = {
   onRevokeComplimentary: () => void;
   onClientAccess: (event: FormEvent<HTMLFormElement>) => void;
   onOpenUser: (userId: string) => void;
+  onMembershipChange: (userId: string, role: string, status: string) => void;
   onRefresh: () => Promise<void>;
 };
 
-export function OrganisationDrawer({ organisation, detail, data, busy, invitationFeedback, onClose, onPlan, onInvite, onRevokeInvitation, onResendInvitation, onRevokeComplimentary, onClientAccess, onOpenUser, onRefresh }: OrganisationProps) {
+export function OrganisationDrawer({ organisation, detail, data, busy, invitationFeedback, onClose, onPlan, onInvite, onRevokeInvitation, onResendInvitation, onRevokeComplimentary, onClientAccess, onOpenUser, onMembershipChange, onRefresh }: OrganisationProps) {
   const inviteForm = useRef<HTMLFormElement>(null);
   const refreshAction = useRef(onRefresh);
   const [refreshing, setRefreshing] = useState(false);
@@ -78,7 +79,7 @@ export function OrganisationDrawer({ organisation, detail, data, busy, invitatio
       <h4>Registered people</h4>
       {detail?.users.length ? <div className="founder-table-wrap"><table className="founder-table">
         <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last activity</th><th>Action</th></tr></thead>
-        <tbody>{detail.users.map(user => <tr key={user.id}><td><button className="founder-link" onClick={() => onOpenUser(user.id)}>{user.name}</button></td><td>{user.email}</td><td>{label(user.role)}</td><td>{label(user.status)}</td><td>{displayDate(user.lastActivity, true)}</td><td><button className="founder-link" onClick={() => onOpenUser(user.id)}>View user</button></td></tr>)}</tbody>
+        <tbody>{detail.users.map(user => <tr key={user.id}><td><button className="founder-link" onClick={() => onOpenUser(user.id)}>{user.name}</button></td><td>{user.email}</td><td><select aria-label={`Role for ${user.email}`} value={user.role || "member"} disabled={busy || user.status === "revoked"} onChange={event => onMembershipChange(user.id, event.target.value, "active")}><option value="owner">Owner</option><option value="admin">Administrator</option><option value="member">Member</option></select></td><td>{label(user.status)}</td><td>{displayDate(user.lastActivity, true)}</td><td><button className="founder-link" onClick={() => onOpenUser(user.id)}>View user</button> <button className={`founder-link${user.status === "active" ? " founder-link--danger" : ""}`} disabled={busy} onClick={() => onMembershipChange(user.id, user.role || "member", user.status === "active" ? "revoked" : "active")}>{user.status === "active" ? "Revoke" : "Reactivate"}</button></td></tr>)}</tbody>
       </table></div> : <p className="founder-muted">No registered users are associated with this organisation.</p>}
       </div>
       <div className="founder-people-block">
@@ -134,9 +135,9 @@ export function OrganisationDrawer({ organisation, detail, data, busy, invitatio
       <form className="founder-form-grid" onSubmit={onClientAccess}>
         <label className="founder-span">Charity<select name="charity" required defaultValue=""><option value="" disabled>Choose a charity</option>{data.organisations.filter(row => row.type === "Charity").map(row => <option key={row.id} value={row.id}>{row.name}</option>)}</select></label>
         <label className="founder-check"><input type="checkbox" name="answers" /> View individual answers</label>
-        {data.metrics.source.startsWith("Independent SORP") && <label className="founder-check"><input type="checkbox" name="reports" /> View uploaded charity reports</label>}
-        {!data.metrics.source.startsWith("Independent SORP") && <><label className="founder-check"><input type="checkbox" name="edit" /> Contribute to assessments</label>
-        <label className="founder-check"><input type="checkbox" name="invitations" /> Manage client invitations</label></>}
+        <label className="founder-check"><input type="checkbox" name="reports" /> View uploaded charity reports</label>
+        <label className="founder-check"><input type="checkbox" name="edit" /> Contribute to assessments</label>
+        <label className="founder-check"><input type="checkbox" name="invitations" /> Manage client invitations</label>
         <button disabled={busy}>Request charity approval</button>
       </form>
       <p className="founder-note">An Adviser plan never grants automatic access to confidential charity data.</p>

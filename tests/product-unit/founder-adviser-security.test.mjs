@@ -15,6 +15,9 @@ const consoleAuth = await readFile(new URL("../../src/lib/console/auth.ts", impo
 const directoryControls = await readFile(new URL("../../src/lib/console/directory-controls.ts", import.meta.url), "utf8");
 const directoryData = await readFile(new URL("../../src/lib/directory-data.ts", import.meta.url), "utf8");
 const accountDrawers = await readFile(new URL("../../src/components/founder/account-drawers.tsx", import.meta.url), "utf8");
+const independentAdmin = await readFile(new URL("../../src/lib/sorp-auth/admin.ts", import.meta.url), "utf8");
+const independentCompat = await readFile(new URL("../../src/lib/sorp-auth/compat.ts", import.meta.url), "utf8");
+const readinessConversation = await readFile(new URL("../../src/app/sorp-readiness-conversation.tsx", import.meta.url), "utf8");
 
 test("the founder page requires the server-issued platform founder role", () => {
   assert.match(founderAuth, /data\.platformAccess\?\.founder !== true/);
@@ -31,6 +34,29 @@ test("the adviser UI uses the permission-enforcing account actions", () => {
   assert.match(adviser, /action:"adviser-client"/);
   assert.match(adviser, /status!=="active"/);
   assert.match(adviser, /No assessment data is visible yet/);
+});
+
+test("delegated assessment writes recheck an active grant, adviser membership, entitlement and charity member", () => {
+  assert.match(independentAdmin, /access\.permissions->>'edit'='true'/);
+  assert.match(independentAdmin, /client_member\.user_id=\$4 AND client_member\.status='active'/);
+  assert.match(independentAdmin, /entitlement\.plan IN \('Adviser','Enterprise'\)/);
+  assert.match(independentAdmin, /client_assessment_saved/);
+  assert.match(independentCompat, /action === "adviser-assessment-load"/);
+  assert.match(independentCompat, /action === "adviser-assessment-save"/);
+  assert.match(readinessConversation, /action: delegated \? "adviser-assessment-save" : "save"/);
+});
+
+test("client invitations require their own approved permission", () => {
+  assert.match(independentAdmin, /access\.permissions->>'invitations'='true'/);
+  assert.match(independentAdmin, /adviser_client_member_invited/);
+  assert.match(independentCompat, /action === "adviser-client-invite"/);
+  assert.match(adviser, /selected\.permissions\.invitations&&<form/);
+});
+
+test("founder membership controls preserve a last active owner", () => {
+  assert.match(independentAdmin, /Promote another active owner before changing the last owner/);
+  assert.match(independentAdmin, /membership_updated/);
+  assert.match(accountDrawers, /onMembershipChange/);
 });
 
 test("expired or revoked adviser entitlements do not expose the adviser workspace", () => {
