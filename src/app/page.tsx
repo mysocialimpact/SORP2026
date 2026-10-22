@@ -139,22 +139,6 @@ export default function Home() {
                 </p>
               </figcaption>
             </figure>
-            <figure>
-              <Image
-                src="/images/nicholas-demeter.webp"
-                alt="Nicholas Demeter"
-                width={1023}
-                height={1537}
-                sizes="(max-width: 700px) 44vw, 240px"
-              />
-              <figcaption>
-                <h3>Nicholas Demeter</h3>
-                <p>
-                  Monitoring &amp; evaluation
-                  <br />USAID &amp; international development
-                </p>
-              </figcaption>
-            </figure>
           </div>
         </section>
       </div>

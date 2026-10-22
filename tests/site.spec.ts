@@ -29,12 +29,7 @@ test("homepage, product destinations and accessible mobile navigation", async ({
     page.getByRole("heading", { name: "Our team", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("img", { name: "Gareth Murphy" })).toBeVisible();
-  await expect(page.getByRole("img", { name: "Nicholas Demeter" })).toBeVisible();
-  const nicholasProfile = page.getByRole("figure").filter({
-    has: page.getByRole("heading", { name: "Nicholas Demeter" }),
-  });
-  await expect(nicholasProfile).toContainText("Monitoring & evaluation");
-  await expect(nicholasProfile).toContainText("USAID & international development");
+  await expect(page.getByRole("img", { name: "Nicholas Demeter" })).toHaveCount(0);
   await expect(page.locator('.product-folder-tab[href="/social-impact-excellence/"]')).toContainText("Social Impact Excellence");
   expect(
     await page.evaluate(

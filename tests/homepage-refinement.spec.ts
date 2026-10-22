@@ -11,7 +11,7 @@ test("sticky navigation and compact homepage retain access and team order", asyn
   await expect(nav.locator(".product-folder-tab")).toHaveCount(7);
   await expect(page.locator(".homepage-audience-options button").first()).toContainText("Trustees · CEOs · Finance teams · Staff · Volunteers");
   await expect(page.locator(".homepage-audience-options button").nth(1)).toContainText("Accountants · Auditors · Lawyers · Consultants · Funders");
-  await expect(page.locator(".gateway-portraits h3")).toHaveText(["Marcus Warry ACA", "Dr Chris Arnold", "Gareth Murphy", "Nicholas Demeter"]);
+  await expect(page.locator(".gateway-portraits h3")).toHaveText(["Marcus Warry ACA", "Dr Chris Arnold", "Gareth Murphy"]);
   const portraits = page.locator(".gateway-portraits");
   const sizes = await portraits.evaluate(el => ({ width: el.clientWidth, scroll: el.scrollWidth, ys: [...el.children].map(child => child.getBoundingClientRect().y) }));
   expect(new Set(sizes.ys).size).toBe(1);
