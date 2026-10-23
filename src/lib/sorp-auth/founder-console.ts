@@ -5,7 +5,7 @@ import { founderCreateOrganisation, founderInviteMember, founderRequestClientAcc
   founderRevokeInvitation, founderSetPlan, founderUpdateMembership } from "./admin";
 import { complimentaryAccessEnd } from "@/lib/founder/complimentary-access";
 import { EXCELLENCE_PILLARS, EXCELLENCE_STAGES, baselineOnlyAccess,
-  normaliseAccess } from "@/lib/excellence/access-policy";
+  maturityProgress, normaliseAccess, pillarProgress } from "@/lib/excellence/access-policy";
 
 type Input = Record<string, unknown>;
 const json = (data: unknown, status = 200) => Response.json(data,
@@ -142,7 +142,7 @@ async function dashboard(actor: { email: string; name?: string }) {
 
 async function organisationDetail(id: string) {
   const db = sorpAuthPool();
-  const [orgs, members, clients, history, directory] = await Promise.all([
+  const [orgs, members, clients, history, directory, excellenceRecords] = await Promise.all([
     organisations(),
     db.query(`SELECT m.id,m.user_id,u.name,u.email,m.role,m.status,m.created_at,m.updated_at
       FROM sorp_auth.membership m JOIN sorp_auth."user" u ON u.id=m.user_id
@@ -154,12 +154,26 @@ async function organisationDetail(id: string) {
       FROM sorp_auth.audit_event a LEFT JOIN sorp_auth."user" u ON u.id=a.actor_user_id
       WHERE a.target_id=$1 ORDER BY a.created_at DESC LIMIT 30`, [id]),
     directoryData(),
+    db.query<{ data: Record<string, unknown>; updated_at: Date }>(`SELECT p.data,p.updated_at
+      FROM sorp_auth.product_progress p JOIN sorp_auth.membership m ON m.user_id=p.user_id
+      WHERE m.organisation_id=$1 AND m.status='active'
+        AND p.product_id='social-impact-excellence' ORDER BY p.updated_at DESC`, [id]),
   ]);
   const organisation = orgs.find(row => row.id === id);
   const productRows = directory.products;
+  const records = excellenceRecords.rows;
+  const maturity = records.length ? maturityProgress(records[0].data) : maturityProgress(null);
+  const pillars = Object.fromEntries(EXCELLENCE_PILLARS.map(pillar => {
+    const progress = records.map(row => pillarProgress(row.data, pillar));
+    return [pillar, progress.find(row => row.status === "completed") ||
+      progress.find(row => row.status === "in_progress") ||
+      { status: "not_recorded", percentage: null, score: null }];
+  }));
   return organisation ? { organisation, memberships: members.rows, clients: clients.rows,
     excellenceAccess: normaliseAccess(organisation.excellence_access) || baselineOnlyAccess,
     excellenceLegacy: false,
+    excellenceProgress: { maturity, pillars,
+      lastActivity: records[0]?.updated_at.toISOString() || null },
     history: history.rows, activity: history.rows,
     users: members.rows.map(member => ({ id: member.user_id, name: member.name,
       email: member.email, organisationId: id, organisationName: organisation.name,

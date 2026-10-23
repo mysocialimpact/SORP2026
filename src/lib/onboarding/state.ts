@@ -268,7 +268,7 @@ export function extractImmediate(
     /(?:\b(?:accountant|auditor|director|manager|CEO)\s+(?:at|for)|\bI work (?:professionally )?(?:at|for))\s+([\p{Lu}][\p{L}\d'’&-]*(?:\s+[\p{Lu}][\p{L}\d'’&-]*){0,5})/u,
   )?.[1];
   if (organisation) result.organisation = organisation;
-  if (/\bI (?:work independently|am (?:independent|self-employed|freelance))\b/i.test(text)) result.organisation = "Independent";
+  if (/\bI (?:work|volunteer) independently\b|\bI(?:[’']m| am) volunteering independently\b|\bI(?:[’']m| am) (?:an? )?(?:independent|self-employed|freelance)(?:\s+(?:adviser|advisor|consultant|volunteer))?\b/i.test(text)) result.organisation = "Independent";
   const discovery = text.match(
     /(?:found you|heard about (?:you|SORP(?: 2026)?)|came across (?:you|SORP(?: 2026)?))(?:\s+(?:on|via|through|from))?\s+([^.!?]+)/i,
   )?.[1];

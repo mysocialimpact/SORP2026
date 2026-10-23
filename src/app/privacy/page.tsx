@@ -7,7 +7,7 @@ export default function Privacy() {
     <Article
       title="A thoughtful, accessible experience."
       eyebrow="PRIVACY & ACCESSIBILITY"
-      lead="The public information pages need no account. Are You SORP Ready stores your work in your browser and uses the details you choose to provide to deliver its assessment and report."
+      lead="The public information pages and sample need no account. Are You SORP Ready can keep in-progress work in your browser; saved account progress is held by the account service. The details you provide are used to deliver the assessment and report."
     >
       <section>
         <h2>Privacy on this website</h2>

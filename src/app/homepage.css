@@ -574,3 +574,8 @@
 @media (prefers-reduced-motion: reduce) {
   .homepage-plan-track { scroll-behavior: auto; }
 }
+.sample-entry { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+.sample-entry a { display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border:1px solid #263b35; color:#263b35; text-decoration:none; font-weight:700; }
+.sample-entry a:first-child { background:#d8ff52; }
+.sample-entry a:hover { text-decoration:underline; }
+.sample-entry a:focus-visible { outline:3px solid #f44312; outline-offset:3px; }

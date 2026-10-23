@@ -89,10 +89,10 @@ test("directory shows ten, loads more, filters, and preserves three-firm shortli
   await expect(page.getByRole('button',{name:/Shortlist & compare/})).toContainText('3/3');
   await expect(page.locator('.directory-notice')).toContainText('holds three');
   await page.getByRole('button',{name:/Shortlist & compare/}).click();
-  await expect(page.locator('dialog')).toBeVisible();
+  await expect(page.locator('.directory-comparison')).toBeVisible();
   await expect(page.locator('.directory-compare-grid article')).toHaveCount(3);
   await page.keyboard.press('Escape');
-  await expect(page.locator('dialog')).not.toBeVisible();
+  await expect(page.locator('.directory-comparison')).not.toBeVisible();
   await page.reload();
   await expect(page.getByRole('button',{name:/Shortlist & compare/})).toContainText('3/3');
   await page.getByLabel('Find a charity accountant',{exact:true}).fill('Burton Sweet');
@@ -208,16 +208,16 @@ test("redesign retains a visible real map, all five spotlights and one search", 
 });
 
 
-test("human verification stays explicit and Burton is only a preview", async ({ page }) => {
+test("human verification stays separate from Burton Sweet's featured placement", async ({ page }) => {
   await page.goto(path);
   await expect(page.locator('.adviser-hero')).not.toContainText('£39');
   await expect(page.locator('[data-verification="approved"]')).toHaveCount(0);
-  await expect(page.locator('.adviser-spotlight [data-verification="preview"]')).toContainText('Design preview · not awarded');
+  await expect(page.locator('.adviser-spotlight')).toContainText('Any paid promotion is labelled; check suitability directly.');
   await page.getByLabel('Find a charity accountant', { exact: true }).fill('Burton Sweet');
   if (await page.getByRole('button', {name:'List',exact:true}).isVisible()) await page.getByRole('button', {name:'List',exact:true}).click();
-  await expect(page.locator('.directory-result [data-verification="preview"]')).toContainText('has not been awarded');
+  await expect(page.locator('.directory-result')).toContainText('Featured placement');
   await page.goto(`${path}burton-sweet/`);
-  await expect(page.locator('[data-verification="preview"]')).toContainText('Design preview · not awarded');
+  await expect(page.locator('.directory-profile-small')).toContainText('Placement is clearly labelled and does not change the independent evidence score.');
   await expect(page.locator('[data-verification="approved"]')).toHaveCount(0);
   await page.goto(`${path}partners/`);
   await expect(page.locator('main')).not.toContainText('£39');

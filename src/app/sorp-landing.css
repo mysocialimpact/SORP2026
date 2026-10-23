@@ -39,6 +39,8 @@ body:has(.sr-story) { max-width: 100%; overflow-x: clip; }
 .sr-hero h1 span { color: #fff5ef; }
 .sr-hero-lead { max-width: 720px; margin: 34px 0 0; font-size: clamp(24px, 2.25vw, 34px); font-weight: 600; line-height: 1.08; letter-spacing: -.035em; }
 .sr-hero-intro { padding: 28px 0 4px; border-top: 1px solid rgba(36,35,41,.5); }
+.sr-sample-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.sr-sample-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; }
 .sr-hero-intro > p { margin-bottom: 20px; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.48; }
 .sr-hero-intro > strong { display: block; font-size: 15px; letter-spacing: .02em; }
 .sr-hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }

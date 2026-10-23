@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
+import Link from "next/link";
 import { MsiBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
 import { ExperienceCloud } from "@/components/experience-cloud";
@@ -50,6 +51,7 @@ export default function Home() {
               We’re a UK-based social enterprise initiative helping charities and their advisers
               navigate SORP 2026 and achieve greater impact.
             </p>
+            <div className="sample-entry"><Link href="/sample-charity/">Explore a sample charity →</Link><Link href="/sample-charity/#request-demo">Request a free demo →</Link></div>
           </div>
           <div className="gateway-intro-aside">
             <p className="homepage-editorial">SORP is the requirement.<br /><strong>Better impact is the opportunity.</strong></p>
@@ -66,7 +68,7 @@ export default function Home() {
         <HomepageAudience />
         <HomepageManifesto />
         <section className="gateway-sorp-section" aria-labelledby="sorp-tools-title" id="products">
-          <p className="gateway-kicker">This is where most people start.</p>
+          <p className="gateway-kicker">Your first step in the live journey.</p>
           <div className="homepage-start">
             <h2 id="sorp-tools-title">Are You SORP Ready?</h2>
             <div className="homepage-start-action">

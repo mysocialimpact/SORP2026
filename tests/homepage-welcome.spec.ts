@@ -127,14 +127,14 @@ test("pricing is free-first, honest about planned plans and leads directly into 
   await expect(plans.nth(2)).toContainText("Planned");
   await expect(pricing).not.toContainText("exclude VAT where applicable");
   await expect(pricing).toContainText("Free early beta access");
-  await expect(pricing).toContainText("We’re testing Plus and Advisor with a small group of charities, accountants and advisers.");
+  await expect(pricing).toContainText("We’re testing Plus and Adviser with a small group of charities, accountants and advisers.");
   await expect(plans.getByRole("link")).toHaveCount(0);
   const track = pricing.locator(".homepage-plan-track");
   const geometry = await track.evaluate(element => ({ left: element.scrollLeft, width: element.clientWidth, scroll: element.scrollWidth }));
   expect(geometry.left).toBe(0);
   expect(geometry.scroll).toBeGreaterThan(geometry.width);
   await plans.first().getByText("See everything included").click();
-  await expect(plans.first()).toContainText("No numeric allowance is currently published");
+  await expect(plans.first()).toContainText("Ask three free SORP questions with official references.");
   await expect(plans.nth(1)).toContainText("Everything in Free.");
   await expect(plans.nth(2)).toContainText("Everything planned for Plus.");
   await expect(plans.locator("details[open]")).toHaveCount(4);

@@ -93,6 +93,9 @@ body:has(.sf-presentation) .global-build-stamp {
   display: flex;
   flex-direction: column;
   gap: 1.15cqw;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 .sf-scene p,
 .sf-scene h1,
@@ -642,6 +645,10 @@ body:has(.sf-presentation) .global-build-stamp {
   .sf-scene {
     inset: 11% 6% 9%;
     gap: 2.8cqw;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 3cqw;
+    scrollbar-width: thin;
   }
   .sf-scene h1,
   .sf-scene h2 {
