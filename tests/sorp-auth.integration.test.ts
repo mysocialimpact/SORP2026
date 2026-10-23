@@ -48,7 +48,12 @@ function approveSyntheticRecipient(email: string) {
     .filter(Boolean).join(",");
 }
 
-before(async () => { await db.query('DELETE FROM sorp_auth."rateLimit"'); });
+// These tests share a database with the security suite, which runs in parallel.
+// Clear only this file's fixed client IPs so its setup cannot reset another test's limiter.
+before(async () => {
+  await db.query('DELETE FROM sorp_auth."rateLimit" WHERE split_part(key, $1, 1) = ANY($2::text[])',
+    ["|", ["192.0.2.10", "192.0.2.11", "192.0.2.12", "192.0.2.13", "192.0.2.44", "192.0.2.48"]]);
+});
 
 async function post(action: string, body: Record<string, unknown>, cookie = "", ip = "192.0.2.10") {
   return independentAccountPOST(new Request("http://localhost:3000/api/sorp-auth-compat", {
