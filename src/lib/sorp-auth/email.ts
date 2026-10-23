@@ -4,8 +4,7 @@ import { previewMailEnabled, assertPreviewRecipient, deliverPreviewMail } from "
 const FROM = "SORP 2026 <accounts@sorp2026.org>";
 const REPLY_TO = "marcus@mysocialimpact.org";
 
-function assertRecipientReleased(to: string) {
-  if (previewMailEnabled()) { assertPreviewRecipient(to); return; }
+export function assertSorpRecipientNotBlocked(to: string) {
   const recipient = to.trim().toLowerCase();
   const domain = recipient.split("@")[1];
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
@@ -19,6 +18,12 @@ function assertRecipientReleased(to: string) {
       blocked.includes(recipient)) {
     throw new Error("Brainstrust account email requires Marcus's explicit approval and a code review.");
   }
+}
+
+export function assertSorpSignupRecipient(to: string) {
+  assertSorpRecipientNotBlocked(to);
+  if (previewMailEnabled()) { assertPreviewRecipient(to); return; }
+  const recipient = to.trim().toLowerCase();
   if (process.env.SORP_AUTH_EMAIL_DELIVERY_ENABLED !== "true") {
     throw new Error("SORP account email is disabled for this recipient.");
   }
@@ -45,7 +50,7 @@ export function authMailConfigured() {
 
 /** Sends account links through SORP's verified Resend domain after provisioning. */
 export async function sendSorpAuthEmail(kind: MessageKind, to: string, link: string) {
-  assertRecipientReleased(to);
+  assertSorpSignupRecipient(to);
   const key = process.env.RESEND_API_KEY;
   if (!key && !previewMailEnabled()) throw new Error("SORP transactional email is not configured.");
   const configuredBase = process.env.SORP_AUTH_BASE_URL;
@@ -76,7 +81,7 @@ export async function sendSorpAuthEmail(kind: MessageKind, to: string, link: str
 }
 
 export async function sendSorpInvitationEmail(to: string, link: string) {
-  assertRecipientReleased(to);
+  assertSorpSignupRecipient(to);
   const key = process.env.RESEND_API_KEY;
   const base = process.env.SORP_AUTH_BASE_URL;
   if (!key || !base) throw new Error("SORP invitation email is not configured.");

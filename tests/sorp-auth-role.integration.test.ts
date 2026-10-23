@@ -11,6 +11,11 @@ test("SORP runtime role cannot alter audit history or read another schema", asyn
   const db = new Pool({ connectionString: url });
   const client = await db.connect();
   try {
+    const role = await client.query<{ safe: boolean }>(`SELECT
+      rolcanlogin AND NOT (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)
+        AND NOT EXISTS (SELECT 1 FROM pg_auth_members WHERE member=pg_roles.oid) AS safe
+      FROM pg_roles WHERE rolname='sorp_auth_runtime'`);
+    assert.equal(role.rows[0]?.safe, true, "the web runtime role must have no inherited admin rights");
     await client.query("CREATE SCHEMA IF NOT EXISTS research_console");
     await client.query("CREATE TABLE IF NOT EXISTS research_console.private_fixture(secret text)");
     const actorId = randomUUID();

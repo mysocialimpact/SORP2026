@@ -60,6 +60,17 @@ try {
   const created = await post("/api/founder/organisations", { name: "Synthetic HTTP charity", type: "Charity" }, founderCookie);
   assert.equal(created.status, 201, await created.clone().text());
   organisationId = (await created.json() as { id: string }).id;
+  const excellenceDenied = await post(`/api/founder/organisation/${organisationId}/excellence-access`,
+    { category: "pillar", key: "purpose", enabled: true }, currentCookie);
+  assert.ok(excellenceDenied.status >= 400, "the old session cannot change product access");
+  const excellenceEnabled = await post(`/api/founder/organisation/${organisationId}/excellence-access`,
+    { category: "pillar", key: "purpose", enabled: true }, founderCookie);
+  assert.equal(excellenceEnabled.status, 200, await excellenceEnabled.clone().text());
+  const excellenceDetail = await fetch(`${origin}/api/founder/organisation/${organisationId}`, {
+    headers: { cookie: founderCookie },
+  });
+  assert.equal((await excellenceDetail.json() as { excellenceAccess: { pillars: { purpose: boolean } } })
+    .excellenceAccess.pillars.purpose, true);
   const plan = await post(`/api/founder/organisation/${organisationId}/plan`, { plan: "Plus", complimentary: true,
     duration: "30", reason: "Synthetic HTTP plan test" }, founderCookie);
   assert.equal(plan.status, 200, await plan.clone().text());
