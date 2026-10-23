@@ -4,13 +4,15 @@ import { founderQuery } from "@/lib/founder/db";
 import { founderCreateOrganisation, founderInviteMember, founderRequestClientAccess,
   founderRevokeInvitation, founderSetPlan, founderUpdateMembership } from "./admin";
 import { complimentaryAccessEnd } from "@/lib/founder/complimentary-access";
+import { EXCELLENCE_PILLARS, EXCELLENCE_STAGES, baselineOnlyAccess,
+  normaliseAccess } from "@/lib/excellence/access-policy";
 
 type Input = Record<string, unknown>;
 const json = (data: unknown, status = 200) => Response.json(data,
   { status, headers: { "cache-control": "private, no-store", "x-robots-tag": "noindex, nofollow" } });
 
 async function organisations() {
-  const result = await sorpAuthPool().query(`SELECT o.id,o.id platform_organisation_id,o.name,o.type,
+  const result = await sorpAuthPool().query(`SELECT o.id,o.id platform_organisation_id,o.name,o.type,o.excellence_access,
     CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now() THEN 'Free' ELSE e.plan END plan,
     CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now() THEN 0 ELSE e.published_price_pence / 100.0 END published_price,
     CASE WHEN e.status='complimentary_partner' AND e.complimentary_end<=now() THEN 0 ELSE e.payable_price_pence / 100.0 END payable_price,
@@ -156,6 +158,8 @@ async function organisationDetail(id: string) {
   const organisation = orgs.find(row => row.id === id);
   const productRows = directory.products;
   return organisation ? { organisation, memberships: members.rows, clients: clients.rows,
+    excellenceAccess: normaliseAccess(organisation.excellence_access) || baselineOnlyAccess,
+    excellenceLegacy: false,
     history: history.rows, activity: history.rows,
     users: members.rows.map(member => ({ id: member.user_id, name: member.name,
       email: member.email, organisationId: id, organisationName: organisation.name,
@@ -223,6 +227,34 @@ export async function independentFounderPOST(actor: { id?: string }, resource: s
   if (resource === "organisations") {
     const created = await founderCreateOrganisation(actor.id, body);
     return json((await organisationDetail(created.id))!.organisation, 201);
+  }
+  if (resource === "organisation" && id && action === "excellence-access") {
+    const category = body.category === "stage" ? "stages" : body.category === "pillar" ? "pillars" : null;
+    const key = String(body.key || "");
+    if (!category || !(category === "stages" ? EXCELLENCE_STAGES : EXCELLENCE_PILLARS).some(item => item === key) ||
+        typeof body.enabled !== "boolean") return json({ error: "Choose a valid access setting." }, 400);
+    const client = await sorpAuthPool().connect();
+    try {
+      await client.query("BEGIN");
+      const found = await client.query<{ excellence_access: unknown }>(
+        "SELECT excellence_access FROM sorp_auth.organisation WHERE id=$1 FOR UPDATE", [id]);
+      if (!found.rowCount) { await client.query("ROLLBACK"); return json({ error: "Organisation not found." }, 404); }
+      const current = normaliseAccess(found.rows[0].excellence_access);
+      if (!current) { await client.query("ROLLBACK"); return json({ error: "Review this organisation's access settings." }, 409); }
+      const before = category === "stages" ? current.stages[key as keyof typeof current.stages]
+        : current.pillars[key as keyof typeof current.pillars];
+      const next = { stages: { ...current.stages }, pillars: { ...current.pillars } };
+      if (category === "stages") next.stages[key as keyof typeof next.stages] = body.enabled;
+      else next.pillars[key as keyof typeof next.pillars] = body.enabled;
+      await client.query("UPDATE sorp_auth.organisation SET excellence_access=$2::jsonb,updated_at=now() WHERE id=$1",
+        [id, JSON.stringify(next)]);
+      await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id,metadata)
+        VALUES($1,'excellence_access_changed','organisation',$2,$3::jsonb)`,
+        [actor.id, id, JSON.stringify({ category, key, before, enabled: body.enabled })]);
+      await client.query("COMMIT");
+      return json({ access: next, category, key, enabled: body.enabled });
+    } catch (error) { await client.query("ROLLBACK").catch(() => undefined); throw error; }
+    finally { client.release(); }
   }
   if (resource === "organisation" && id && action === "plan") {
     const complimentary = body.complimentary === true;

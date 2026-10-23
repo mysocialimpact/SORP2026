@@ -1,6 +1,6 @@
 # SORP independent authentication release runbook
 
-Status: revised on 15 October 2026. Production cutover is **not authorised**.
+Status: revised on 23 October 2026. Production cutover is **not authorised**.
 No Brainstrust email has been sent by this work.
 
 ## Controls that must stay off
@@ -41,21 +41,37 @@ usable. The production project currently has no `SORP_AUTH_DATABASE_URL`,
 
 ## Independent staging and data protection
 
-1. Preserve the existing Cow service and D1 records. Verify a complete D1
-   export and restore or an owner-authorised recovery path for Brainstrust's
-   assessment before any change that could make the old records inaccessible.
-   The Sites row reader truncates the assessment and is not a backup. Defer the
-   account and assessment migration; do not migrate old passwords or sessions.
-2. Back up the target Neon database through a direct connection and restore it
-   to an isolated branch. Verify row counts, auth IDs, permissions and report
-   bytes. Neon history observed was six hours, so retain a separate backup.
+On 23 October a Neon snapshot restore with `finalize: true` unexpectedly
+replaced the production branch mapping. The active production compute
+`ep-proud-wave-auuym3pa` now points to `br-bold-fire-au0lio9b`; the former
+production branch `br-dark-block-audwtcnr` is retained as
+`sorp-auth-staging-20261023 (1)`. All 31 `research_console` tables had matching
+row counts and content digests across the branches immediately after the swap,
+and live smoke checks passed. Do not delete either branch or assume this is a
+durable backup. The only manual snapshot, `snap-blue-cherry-aun2mi1o`, expires
+on 30 October 2026. Resolve the branch mapping and arrange a separate retained
+backup before cutover.
+
+1. Preserve the existing Cow service and D1 records. Legacy account and data
+   migration is deferred; do not contact Brainstrust. Keep the old service
+   accessible until its owner separately verifies complete recovery. A truncated
+   table view does not prove the assessment is recoverable.
+2. Back up the target Neon database and restore it to an isolated branch. Verify
+   data counts and digests. A Neon snapshot is temporary and the observed history
+   window was six hours, so arrange a separately retained backup before cutover.
+   **When restoring a snapshot for testing, pass `finalize: false`.** Finalizing
+   swaps the production branch and its compute, even when a new branch is requested.
 3. Apply `008_sorp_auth_provider.sql`, `009_sorp_auth_application.sql`,
-   `010_sorp_report_ownership.sql`, then `011_sorp_auth_audit_integrity.sql` to
+   `010_sorp_report_ownership.sql`, `011_sorp_auth_audit_integrity.sql`, then
+   `012_sorp_excellence_access.sql` to
    a fresh isolated staging database. These migrations passed from scratch in
-   local PostgreSQL; no production migration has run. Create a distinct
-   `sorp_auth_runtime` login, apply `scripts/provision-sorp-auth-runtime.sql`
-   with a direct owner connection, and verify it cannot read `research_console`
-   or modify audit history. Use only its pooled URL for application traffic.
+   local PostgreSQL; no production migration has run. Create the distinct
+   `sorp_auth_runtime` login with SQL as the schema owner, with no role
+   memberships or admin attributes. Neon's role-creation API adds
+   `neon_superuser` membership, so it cannot provision this web role. Apply
+   `scripts/provision-sorp-auth-runtime.sql` with a direct owner connection,
+   then verify it cannot read `research_console` or modify audit history. Use
+   only its pooled URL for application traffic.
 4. Set the SORP auth database URL, a new secret of at least 32 characters,
    `SORP_AUTH_BASE_URL`, and the SORP-only Resend key in protected staging
    settings. Explicitly enable account mail for a finite allowlist of approved
@@ -63,21 +79,15 @@ usable. The production project currently has no `SORP_AUTH_DATABASE_URL`,
    reused links, delivery failures, forwarding and replies. Confirm Resend
    domain verification, SPF, DKIM and DMARC. Review known Brainstrust addresses
    outside its domain for the blocklist. Do not expose credentials in logs or artifacts.
-5. Confirm the founder's intended original account ID/email, verify ownership,
-   set a new credential, enroll TOTP, and run `grant-sorp-founder.ts` first as a
-   dry run. Apply the grant only after the exact ID, email and new MFA session
-   are verified. Do not merge with the separate `public.users` identity by email.
-6. Reconcile the founder identity and FLUID membership from current records.
-   The private local manifests in `/workspace/sorp-migration-private/` are
-   working evidence, not a full production backup. Keep Brainstrust's legacy
-   account and assessment in the old system for a separate later transition;
-   do not create its new account or assign an adviser grant now. Record how the
-   owner can later recover the work without an unverified email/name match.
-7. Inventory existing MSI Charity Impact Report objects and any account-linked
-   product records; migrate by immutable owner ID with count and digest checks.
-   Test a 15 MB PDF, owner listing, founder download, denial to another account,
-   backup/restore, and Neon storage capacity. The independent path stores PDFs
-   in Postgres and does not provision a new bucket.
+5. Verify the founder's identity independently, create a new credential, enroll
+   TOTP, and run `grant-sorp-founder.ts` first as a dry run. Grant only the exact
+   verified new account ID after MFA is confirmed; an email match is insufficient.
+6. Test at least two synthetic charities and two advisers, including invitation,
+   explicit consent, immediate revocation and cross-organisation denial. Do not
+   create a Brainstrust account or transfer its legacy work during this release.
+7. Test new Charity Impact Report work: a 15 MB PDF, owner listing, founder
+   download, denial to another account, backup/restore and Neon storage capacity.
+   The independent path stores PDFs in Postgres and does not provision a bucket.
 
 ## Cutover gate and rollback
 

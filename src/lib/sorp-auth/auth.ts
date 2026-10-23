@@ -5,7 +5,7 @@ import { twoFactor } from "better-auth/plugins";
 import { PostgresDialect } from "kysely";
 import { Pool } from "pg";
 import { attachDatabasePool } from "@vercel/functions";
-import { authMailConfigured, sendSorpAuthEmail } from "./email";
+import { assertSorpSignupRecipient, authMailConfigured, sendSorpAuthEmail } from "./email";
 import { assertPreviewRecipient, previewMailEnabled } from "./preview-mail";
 
 let instance: ReturnType<typeof createAuth> | undefined;
@@ -41,6 +41,7 @@ function createAuth() {
     databaseHooks: {
       user: { create: { before: async (user) => {
         // Apply before writing an account, including direct auth API requests.
+        assertSorpSignupRecipient(user.email);
         if (previewMailEnabled()) assertPreviewRecipient(user.email);
         return { data: user };
       } } },

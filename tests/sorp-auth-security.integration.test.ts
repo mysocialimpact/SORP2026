@@ -73,7 +73,23 @@ test("registration attempts are throttled before they can trigger unlimited mail
       statuses.push(response.status);
     }
     assert.ok(statuses.includes(429), `Expected registration throttling; saw ${statuses.join(",")}`);
+    const created = await db.query('SELECT count(*)::int n FROM sorp_auth."user" WHERE email LIKE $1',
+      [`${prefix}%@example.invalid`]);
+    assert.equal(created.rows[0].n, 0, "disabled account mail must not leave unverified accounts");
   } finally {
     await db.query('DELETE FROM sorp_auth."user" WHERE email LIKE $1', [`${prefix}%@example.invalid`]);
   }
+});
+
+test("a blocked Brainstrust address cannot create an unverified account", async () => {
+  const blockedEmail = `will+synthetic-${randomUUID()}@brainstrust.org.uk`;
+  const response = await independentAccountPOST(new Request(`${origin}/api/readiness-account`, {
+    method: "POST", headers: { "content-type": "application/json", origin,
+      "x-forwarded-for": "203.0.113.218" },
+    body: JSON.stringify({ action: "signup", name: "Synthetic applicant", position: "Trustee",
+      email: blockedEmail, password, progress: { state: { currentStage: 1 } } }),
+  }));
+  assert.ok(response.status >= 400, `Expected a blocked signup; saw ${response.status}`);
+  const result = await db.query('SELECT count(*)::int n FROM sorp_auth."user" WHERE email=$1', [blockedEmail]);
+  assert.equal(result.rows[0].n, 0);
 });
