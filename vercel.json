@@ -1,8 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/internal/console-backup/",
-      "schedule": "0 17 * * *"
+      "path": "/api/internal/console-backup-retry/",
+      "schedule": "0 18 * * *"
     },
     {
       "path": "/api/internal/charity-preparation/",
