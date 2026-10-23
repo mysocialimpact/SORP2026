@@ -15,15 +15,23 @@ export async function restoreBackupForTest(backup: Backup) {
     throw new Error("Complete application backup is required for recovery testing.");
 
   const client = new Client({ connectionString: destination, statement_timeout: 30000 });
-  await client.connect();
+  let phase = "connect";
+  let currentTable = "";
+  let connected = false;
   try {
+    await client.connect();
+    connected = true;
+    phase = "begin";
     await client.query("BEGIN");
     await client.query("SELECT pg_advisory_xact_lock(hashtext('console-backup-restore-test'))");
+    phase = "schema";
     await client.query("CREATE SCHEMA IF NOT EXISTS console_backup_restore");
     let restoredTables = 0;
     for (const [schema, tables] of Object.entries(backup.tables)) {
       if (!identifier.test(schema)) throw new Error("Invalid recovery schema.");
       for (const [table, rows] of Object.entries(tables)) {
+        phase = "table";
+        currentTable = `${schema}.${table}`;
         if (!identifier.test(table) || `${schema}__${table}`.length > 63 || !Array.isArray(rows))
           throw new Error("Invalid recovery table.");
         const restored = `console_backup_restore.${schema}__${table}`;
@@ -35,6 +43,8 @@ export async function restoreBackupForTest(backup: Backup) {
         restoredTables++;
       }
     }
+    phase = "relationships";
+    currentTable = "";
     const foreignKeys = (await client.query(`
       SELECT ns.nspname source_schema, src.relname source_table,
         nd.nspname target_schema, dst.relname target_table,
@@ -54,6 +64,7 @@ export async function restoreBackupForTest(backup: Backup) {
     let relationshipsChecked = 0;
     for (const key of foreignKeys) {
       const {source_schema, source_table, target_schema, target_table, source_columns, target_columns} = key;
+      currentTable = `${source_schema}.${source_table}`;
       if (!backup.tables[source_schema]?.[source_table] || !backup.tables[target_schema]?.[target_table]) continue;
       if (![source_schema, source_table, target_schema, target_table, ...source_columns, ...target_columns].every((value: string) => identifier.test(value)))
         throw new Error("Invalid recovery relationship.");
@@ -64,12 +75,18 @@ export async function restoreBackupForTest(backup: Backup) {
       if (broken.rowCount) throw new Error(`Broken restored relationship: ${source_schema}.${source_table}`);
       relationshipsChecked++;
     }
+    phase = "commit";
+    currentTable = "";
     await client.query("COMMIT");
     return { restored: true, restoredTables, relationshipsChecked };
   } catch (error) {
-    await client.query("ROLLBACK");
+    const code = error && typeof error === "object" && "code" in error ? String(error.code) : "unknown";
+    const message = error instanceof Error ? error.message : "Unknown restore error";
+    console.error("Isolated backup restore failed", { phase, table: currentTable, code,
+      target: target.hostname, message: message.replace(/postgres(?:ql)?:\/\/\S+/gi, "[database URL]").slice(0, 240) });
+    if (connected) await client.query("ROLLBACK");
     throw error;
   } finally {
-    await client.end();
+    if (connected) await client.end();
   }
 }
