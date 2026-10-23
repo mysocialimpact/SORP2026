@@ -68,6 +68,9 @@ body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigat
   .platform-sticky-navigation .gateway-brand-lockup { grid-column: 1; grid-row: 1; }
   .platform-sticky-navigation .gateway-account-group { grid-column: 1; grid-row: 2; justify-self: start; }
   .platform-sticky-navigation .gateway-directory-nav { grid-column: 1; grid-row: 3; }
+  body .platform-sticky-navigation[data-compact="true"] .gateway-header-inner { row-gap: 2px; padding-block: 2px; }
+  .platform-sticky-navigation[data-compact="true"] .gateway-tagline { margin-top: 1px; }
+  body .platform-sticky-navigation[data-compact="true"] .product-folder-tabs { padding-top: 4px; }
 }
 @media (max-width: 600px) {
   .gateway-footer .gateway-footer-partnership { grid-template-columns: 1fr; gap: 24px; }
