@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/internal/console-backup/",
-      "schedule": "30 16 * * *"
+      "schedule": "0 17 * * *"
     },
     {
       "path": "/api/internal/charity-preparation/",

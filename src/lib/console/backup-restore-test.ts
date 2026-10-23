@@ -25,7 +25,11 @@ export async function restoreBackupForTest(backup: Backup) {
     await client.query("BEGIN");
     await client.query("SELECT pg_advisory_xact_lock(hashtext('console-backup-restore-test'))");
     phase = "schema";
-    await client.query("CREATE SCHEMA IF NOT EXISTS console_backup_restore");
+    const schema = await client.query(
+      "SELECT 1 FROM pg_namespace WHERE nspname='console_backup_restore'",
+    );
+    if (!schema.rowCount)
+      throw new Error("The isolated recovery schema must be provisioned before backup verification.");
     let restoredTables = 0;
     for (const [schema, tables] of Object.entries(backup.tables)) {
       if (!identifier.test(schema)) throw new Error("Invalid recovery schema.");

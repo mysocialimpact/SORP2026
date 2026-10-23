@@ -12,6 +12,7 @@ if (!sourceUrl || !sourceUrl.includes("127.0.0.1:5433"))
 const source = new Client({ connectionString: sourceUrl });
 const databaseName = `sorp_backup_test_${randomUUID().replaceAll("-", "")}`;
 const readerRole = `sorp_backup_${randomUUID().replaceAll("-", "")}`;
+const restoreRole = `sorp_restore_${randomUUID().replaceAll("-", "")}`;
 const targetUrl = new URL(sourceUrl);
 targetUrl.pathname = `/${databaseName}`;
 const target = new Client({ connectionString: targetUrl.href });
@@ -44,7 +45,15 @@ try {
     await source.query(`GRANT SELECT ON public.backup_fixture_child TO ${readerRole}`);
     const consoleExport = await completeBackup(["research_console"]);
     assert.equal(consoleExport.tables.public, undefined, "console export must not include other customer records");
-    process.env.CONSOLE_BACKUP_RESTORE_DATABASE_URL = targetUrl.href;
+    await source.query(`CREATE ROLE ${restoreRole} LOGIN`);
+    await target.query(`CREATE SCHEMA console_backup_restore AUTHORIZATION ${restoreRole}`);
+    await target.query(`GRANT USAGE ON SCHEMA public,research_console TO ${restoreRole}`);
+    await target.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public,research_console TO ${restoreRole}`);
+    assert.equal((await target.query("SELECT has_database_privilege($1,current_database(),'CREATE') allowed", [restoreRole])).rows[0].allowed, false,
+      "the isolated restore role must not be able to create schemas or databases");
+    const restoreUrl = new URL(targetUrl.href);
+    restoreUrl.username = restoreRole;
+    process.env.CONSOLE_BACKUP_RESTORE_DATABASE_URL = restoreUrl.href;
     const restored = await restoreBackupForTest(backup);
     assert.ok(restored.restored && restored.restoredTables >= 3);
     assert.ok(restored.relationshipsChecked >= 1);
@@ -58,6 +67,7 @@ try {
 } finally {
   await source.query("DROP TABLE IF EXISTS public.backup_fixture_child, public.backup_fixture_parent");
   await source.query(`DROP DATABASE IF EXISTS ${databaseName}`);
+  await source.query(`DROP ROLE IF EXISTS ${restoreRole}`);
   await source.end();
 }
 }
