@@ -33,9 +33,15 @@ export async function excellenceContext(cookie: string) {
   const identity = await platformIdentity(cookie);
   const memberships = identity.memberships.filter(row => row && typeof row.organisationId === "string" && row.organisationId);
   const [rows, product] = await Promise.all([
-    memberships.length ? founderQuery<{ id: string; name: string; platform_organisation_id: string; excellence_access: unknown }>(
-      "SELECT id,name,platform_organisation_id,excellence_access FROM research_console.founder_organisations WHERE platform_organisation_id = ANY($1::text[])",
-      [memberships.map(row => row.organisationId)]) : Promise.resolve([]),
+    memberships.length ? independentAuthCutover()
+      ? (await import("@/lib/sorp-auth/auth")).sorpAuthPool().query<{
+          id: string; name: string; platform_organisation_id: string; excellence_access: unknown
+        }>(`SELECT id,name,id platform_organisation_id,excellence_access
+          FROM sorp_auth.organisation WHERE id = ANY($1::text[])`,
+          [memberships.map(row => row.organisationId)]).then(result => result.rows)
+      : founderQuery<{ id: string; name: string; platform_organisation_id: string; excellence_access: unknown }>(
+          "SELECT id,name,platform_organisation_id,excellence_access FROM research_console.founder_organisations WHERE platform_organisation_id = ANY($1::text[])",
+          [memberships.map(row => row.organisationId)]) : Promise.resolve([]),
     savedProduct(cookie, identity.account.id),
   ]);
   // Product progress is keyed by person, not organisation. A multi-organisation
