@@ -6,6 +6,9 @@ archive from `research_console` alone to the current application schemas:
 in the same production database). The archive is encrypted, downloaded and
 decrypted for verification, then restored into a separate recovery database.
 The console's manual export remains limited to `research_console`.
+The founder dashboard shows backup protection as working only for a recent,
+download-verified, recovery-verified version 2 run; earlier partial archives
+continue to raise an alert.
 
 The new `SORP_BACKUP_DATABASE_URL` production secret uses the dedicated
 `sorp_backup_reader` role. On 23 October it could SELECT all 55 current

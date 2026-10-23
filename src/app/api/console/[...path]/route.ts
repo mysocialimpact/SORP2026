@@ -74,7 +74,7 @@ async function handle(
           last:
             (
               await query(
-                "SELECT status,completed_at FROM research_console.backup_runs ORDER BY started_at DESC LIMIT 1",
+                "SELECT status,completed_at,(status='verified' AND details->>'formatVersion'='2' AND details->>'downloadVerified'='true' AND details->>'retentionEnabled'='true' AND completed_at>now()-interval '36 hours') complete FROM research_console.backup_runs ORDER BY started_at DESC LIMIT 1",
               )
             )[0] ?? null,
         },

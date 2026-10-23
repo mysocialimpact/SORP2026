@@ -348,6 +348,10 @@ ok(unknown.status===200&&!unknown.data.configured&&unknown.data.message.includes
 ok((await call('dashboard/')).data.benchmark.label.includes('12,000'),'Authoritative benchmark is separate from pending baseline');
 const portable=(await call('export/?format=backup')).data;
 ok(portable.version===2&&!portable.tables.public&&portable.tables.research_console.evidence.length>0&&portable.tables.research_console.assessments.length>0&&portable.tables.research_console.history.length>0&&portable.tables.research_console.imports.length>0,'Private console export contains console evidence and audit history without other customer records');
+await client.query("INSERT INTO research_console.backup_runs(status,completed_at,details) VALUES('verified',now(),'{\"formatVersion\":1,\"downloadVerified\":true,\"retentionEnabled\":true}'::jsonb)");
+ok((await call('status/')).data.backup.last.complete===false&&(await call('dashboard/')).data.backup.needs_attention===true,'Old partial archives cannot mark backup protection as working');
+await client.query("INSERT INTO research_console.backup_runs(status,completed_at,details) VALUES('verified',now(),'{\"formatVersion\":2,\"downloadVerified\":true,\"retentionEnabled\":true}'::jsonb)");
+ok((await call('status/')).data.backup.last.complete===true&&(await call('dashboard/')).data.backup.needs_attention===false,'Complete verified archives clear the backup alert');
 ok((await fetch(base+'/api/internal/console-backup/')).status===401,'Scheduled backup rejects unauthenticated requests');
 const browser = await chromium.launch({
   executablePath: fs.existsSync("/usr/bin/chromium")
