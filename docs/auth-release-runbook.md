@@ -43,14 +43,31 @@ usable. The production project currently has no `SORP_AUTH_DATABASE_URL`,
 
 On 23 October a Neon snapshot restore with `finalize: true` unexpectedly
 replaced the production branch mapping. The active production compute
-`ep-proud-wave-auuym3pa` now points to `br-bold-fire-au0lio9b`; the former
-production branch `br-dark-block-audwtcnr` is retained as
-`sorp-auth-staging-20261023 (1)`. All 31 `research_console` tables had matching
-row counts and content digests across the branches immediately after the swap,
-and live smoke checks passed. Do not delete either branch or assume this is a
-durable backup. The only manual snapshot, `snap-blue-cherry-aun2mi1o`, expires
-on 30 October 2026. Resolve the branch mapping and arrange a separate retained
-backup before cutover.
+`ep-proud-wave-auuym3pa` points to `br-bold-fire-au0lio9b`; the former
+production branch `br-dark-block-audwtcnr` is retained. A nonexpiring recovery
+branch `br-young-rice-au97l3xe` matched all 55 application tables and row
+digests, and an additional snapshot was restored into isolated branch
+`br-muddy-tree-auqzp4li` with `finalize: false`. The production branch/compute
+mapping remained unchanged. Keep all of these branches. The manual snapshot
+`snap-blue-cherry-aun2mi1o` expires on 30 October 2026 and is not a durable
+offsite backup.
+
+The scheduled S3 backup had covered only `research_console`; its last verified
+run was 19 October and the 20–23 October runs failed. PR #107 merged the revised
+backup code on 23 October, with independent auth still disabled. The archive now
+includes `public`, `research_console`, `msi_products` and, when provisioned,
+`sorp_auth`. It is encrypted, downloaded for decryption verification and first
+restored into the separate recovery database; the job records its failure stage
+and uploaded object key. A 20-table local restore with 19 relationship checks
+passed. The recovery branch's current application table definitions match
+production. A dedicated `sorp_backup_reader` login has SELECT on all 55 current
+production application tables and no write/admin grants; its URL is stored only
+as the production `SORP_BACKUP_DATABASE_URL` secret. The console's manual export
+remains restricted to research-console records. **Do not count the revised backup as verified until a production
+run uploads and restores the new format, and an operator confirms the S3 object
+and successful status.** The archive restores data against matching schema
+definitions; retain the repository migrations and recovery branch for schema
+reconstruction.
 
 1. Preserve the existing Cow service and D1 records. Legacy account and data
    migration is deferred; do not contact Brainstrust. Keep the old service
@@ -64,14 +81,22 @@ backup before cutover.
 3. Apply `008_sorp_auth_provider.sql`, `009_sorp_auth_application.sql`,
    `010_sorp_report_ownership.sql`, `011_sorp_auth_audit_integrity.sql`, then
    `012_sorp_excellence_access.sql` to
-   a fresh isolated staging database. These migrations passed from scratch in
-   local PostgreSQL; no production migration has run. Create the distinct
+   a fresh isolated staging database. On 23 October these migrations were
+   applied to the separate `sorp_auth_validation` database on recovery-test
+   branch `br-quiet-sunset-auboqwdc`; no production migration has run. Create the distinct
    `sorp_auth_runtime` login with SQL as the schema owner, with no role
    memberships or admin attributes. Neon's role-creation API adds
    `neon_superuser` membership, so it cannot provision this web role. Apply
    `scripts/provision-sorp-auth-runtime.sql` with a direct owner connection,
-   then verify it cannot read `research_console` or modify audit history. Use
-   only its pooled URL for application traffic.
+   then verify it cannot read `research_console` or modify audit history. The
+   staging login has no admin flags or memberships, can use `sorp_auth` but
+   cannot create there or update/delete audit records. A direct login query
+   succeeded through Neon's role-aware connector. The PR #104 preview has this
+   restricted URL and a synthetic configuration key, but account email delivery
+   is explicitly disabled. Real Resend mail and founder sign-in remain untested.
+   Use only its pooled URL for application traffic. When adding `sorp_auth` to production, grant the
+   `sorp_backup_reader` role USAGE on the new schema and SELECT on every new
+   table, then verify the next full backup includes those tables before cutover.
 4. Set the SORP auth database URL, a new secret of at least 32 characters,
    `SORP_AUTH_BASE_URL`, and the SORP-only Resend key in protected staging
    settings. Explicitly enable account mail for a finite allowlist of approved
