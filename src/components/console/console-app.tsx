@@ -1255,7 +1255,7 @@ function FeatureStatus() {
     backup: {
       configured: boolean;
       missing: string[];
-      last: { status: string; completed_at: string } | null;
+      last: { status: string; completed_at: string; complete: boolean } | null;
     };
   }>("status");
   const usage = useData<{
@@ -1310,13 +1310,9 @@ function FeatureStatus() {
     ],
     [
       "Encrypted off-site backups",
-      data?.backup.last?.status === "failed"
-        ? "Needs attention"
-        : data?.backup.last?.status === "verified"
-          ? "Working"
-          : "Needs configuration",
-      data?.backup.last?.status === "verified"
-        ? "Encrypted snapshots are stored privately in the existing Neon project. Each backup is downloaded and checked; recovery tests use an isolated environment. See backup history below."
+      data?.backup.last?.complete ? "Working" : data?.backup.last ? "Needs attention" : "Needs configuration",
+      data?.backup.last?.complete
+        ? "The encrypted off-site archive covers application tables, has been downloaded and checked, and passed an isolated recovery test."
         : data?.backup.configured
           ? "Storage is connected; a complete backup/recovery check must succeed before this is marked working."
           : "Off-site backups: awaiting storage configuration. " +
@@ -1399,7 +1395,7 @@ function FeatureStatus() {
           href="/api/console/export/?format=backup"
           download
         >
-          Download complete private backup →
+          Download research-console export →
         </a>
         <Form
           label="Run and verify an encrypted backup"

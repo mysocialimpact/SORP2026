@@ -7,6 +7,8 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { createHash } from "node:crypto";
+import { Pool } from "pg";
+import { attachDatabasePool } from "@vercel/functions";
 import { database, query } from "./db";
 import { encryptBackup, decryptBackup, encryptionKey } from "./backup-crypto";
 import {restoreBackupForTest} from './backup-restore-test';
@@ -17,6 +19,7 @@ const required = [
   "CONSOLE_BACKUP_SECRET_ACCESS_KEY",
   "CONSOLE_BACKUP_ENCRYPTION_KEY",
   "CONSOLE_BACKUP_RESTORE_DATABASE_URL",
+  "SORP_BACKUP_DATABASE_URL",
 ];
 export function backupConfiguration() {
   return {
@@ -24,28 +27,45 @@ export function backupConfiguration() {
     missing: required.filter((k) => !process.env[k]),
   };
 }
-export async function completeBackup() {
-  const c = await database().connect();
+const applicationSchemas = ["public", "research_console", "sorp_auth", "msi_products"] as const;
+let backupPool: Pool | undefined;
+
+function backupDatabase() {
+  if (!process.env.SORP_BACKUP_DATABASE_URL) throw new Error("The full application backup reader needs connecting.");
+  if (!backupPool) {
+    backupPool = new Pool({ connectionString: process.env.SORP_BACKUP_DATABASE_URL,
+      max: 1, connectionTimeoutMillis: 10000, idleTimeoutMillis: 10000, statement_timeout: 30000 });
+    attachDatabasePool(backupPool);
+  }
+  return backupPool;
+}
+
+export async function completeBackup(schemas: readonly (typeof applicationSchemas)[number][] = applicationSchemas) {
+  if (!schemas.includes("research_console")) throw new Error("Research console backup status is required.");
+  const c = await (schemas.length === 1 ? database() : backupDatabase()).connect();
   try {
     await c.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
-    const tables: Record<string, unknown[]> = {};
+    const tables: Record<string, Record<string, unknown[]>> = {};
     const names = (
       await c.query(
-        "SELECT table_name FROM information_schema.tables WHERE table_schema='research_console' AND table_type='BASE TABLE' ORDER BY table_name",
+        "SELECT n.nspname table_schema,c.relname table_name FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=ANY($1::text[]) AND c.relkind IN ('r','p') ORDER BY n.nspname,c.relname",
+        [schemas],
       )
     ).rows;
-    for (const { table_name: name } of names) {
-      if (!/^[a-z_]+$/.test(name))
+    if (!names.some(({table_schema,table_name}) => table_schema === "research_console" && table_name === "backup_runs"))
+      throw new Error("Research console backup status table is missing.");
+    for (const { table_schema: schema, table_name: name } of names) {
+      if (!/^[a-z_]+$/.test(schema) || !/^[a-z_]+$/.test(name))
         throw new Error("Unsupported table identifier.");
-      tables[name] = (
-        await c.query(`SELECT to_jsonb(t) row FROM research_console.${name} t`)
+      tables[schema] ??= {};
+      tables[schema][name] = (
+        await c.query(`SELECT to_jsonb(t) row FROM ${schema}.${name} t`)
       ).rows.map((r) => r.row);
     }
     await c.query("COMMIT");
     return {
-      version: 1,
+      version: 2 as const,
       createdAt: new Date().toISOString(),
-      schema: "research_console",
       tables,
     };
   } catch (e) {
@@ -82,17 +102,20 @@ export async function runBackup() {
   const [run] = await query<{ id: string }>(
     "INSERT INTO research_console.backup_runs(status) VALUES('running') RETURNING id",
   );
+  let key: string | undefined;
+  let stage = "export";
   try {
     const backup = await completeBackup();
     const plaintext = Buffer.from(JSON.stringify(backup));
     const sha = createHash("sha256").update(plaintext).digest("hex");
-    const encrypted = encryptBackup(plaintext, secret),
-      key =
+    const encrypted = encryptBackup(plaintext, secret);
+    key =
         prefix +
         new Date().toISOString().replaceAll(":", "-") +
         "-" +
         run.id +
         ".json.enc";
+    stage = "upload";
     await s3.send(
       new PutObjectCommand({
         Bucket: bucket,
@@ -101,6 +124,7 @@ export async function runBackup() {
         ContentType: "application/octet-stream",
       }),
     );
+    stage = "download";
     const returned = await s3.send(
       new GetObjectCommand({ Bucket: bucket, Key: key }),
     );
@@ -111,11 +135,14 @@ export async function runBackup() {
         .digest("hex") !== sha
     )
       throw new Error("Backup download/decryption verification failed.");
-    const previousRestore=(await query("SELECT completed_at FROM research_console.backup_runs WHERE status='verified' AND details->>'restoreVerified'='true' AND completed_at>now()-interval '7 days' ORDER BY completed_at DESC LIMIT 1"))[0];
+    stage = "restore";
+    const previousRestore=(await query("SELECT completed_at FROM research_console.backup_runs WHERE status='verified' AND details->>'restoreVerified'='true' AND details->>'formatVersion'='2' AND completed_at>now()-interval '7 days' ORDER BY completed_at DESC LIMIT 1"))[0];
     const restore=(!previousRestore||new Date().getUTCDay()===0)?await restoreBackupForTest(JSON.parse(decryptBackup(downloaded,secret).toString())):null;
     const details = {
+      formatVersion: 2,
       tables: Object.fromEntries(
-        Object.entries(backup.tables).map(([k, v]) => [k, v.length]),
+        Object.entries(backup.tables).flatMap(([schema, tables]) =>
+          Object.entries(tables).map(([name, rows]) => [`${schema}.${name}`, rows.length])),
       ),
       bytes: encrypted.length,
       encrypted: true,
@@ -130,6 +157,7 @@ export async function runBackup() {
       "UPDATE research_console.backup_runs SET status='verified',completed_at=now(),object_key=$2,sha256=$3,details=$4 WHERE id=$1",
       [run.id, key, sha, JSON.stringify(details)],
     );
+    stage = "retention";
     // Activation follows an isolated restore check. Only this job's exact prefix and envelope names are eligible.
     if (details.retentionEnabled) {
       let token: string | undefined;
@@ -159,17 +187,19 @@ export async function runBackup() {
     return { id: run.id, status: "verified", key, sha256: sha, ...details };
   } catch (error) {
     await query(
-      "UPDATE research_console.backup_runs SET status='failed',completed_at=now(),details=$2 WHERE id=$1",
+      "UPDATE research_console.backup_runs SET status='failed',completed_at=now(),object_key=$2,details=$3 WHERE id=$1",
       [
         run.id,
+        stage === "export" || stage === "upload" ? null : key,
         JSON.stringify({
-          message: "Backup failed; inspect private server logs and retry.",
+          message: "Backup failed; inspect private server logs and retry.", stage,
         }),
       ],
     );
     console.error(
       "Console backup failed",
       run.id,
+      stage,
       error instanceof Error ? error.name : "Error",
     );
     throw new Error(

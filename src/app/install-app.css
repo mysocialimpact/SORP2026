@@ -44,6 +44,9 @@
   .platform-sticky-navigation .install-app-trigger { grid-column: 1 / -1; grid-row: 3; justify-self: end; min-height: 32px; padding: 5px 10px; font-size: 10px; }
   .platform-sticky-navigation .gateway-account-group { grid-column: 2; grid-row: 1; }
 }
+@media (max-width: 430px) and (min-width: 361px) {
+  .platform-sticky-navigation .install-app-trigger { grid-column: 2; grid-row: 2; }
+}
 @media (max-width: 360px) {
   .platform-sticky-navigation .gateway-account-group { grid-column: 1; grid-row: 2; }
   .platform-sticky-navigation .gateway-directory-nav { grid-column: 1; grid-row: 3; }
