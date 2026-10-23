@@ -63,11 +63,15 @@ passed. The recovery branch's current application table definitions match
 production. A dedicated `sorp_backup_reader` login has SELECT on all 55 current
 production application tables and no write/admin grants; its URL is stored only
 as the production `SORP_BACKUP_DATABASE_URL` secret. The console's manual export
-remains restricted to research-console records. **Do not count the revised backup as verified until a production
-run uploads and restores the new format, and an operator confirms the S3 object
-and successful status.** The archive restores data against matching schema
+remains restricted to research-console records. On 23 October at 18:17 UTC,
+protected run `a2c2faee-d265-4f95-93d1-a9c015dbfb9c` verified an encrypted
+55-table archive, download and isolated restore. The private 689,634-byte
+object was independently listed in Neon Object Storage and no current source
+table was missing from the recovery branch. See `docs/full-backup-release.md`
+for the run evidence. The archive restores data against matching schema
 definitions; retain the repository migrations and recovery branch for schema
-reconstruction.
+reconstruction. Storage and database are in one Neon project, so
+separate-provider recovery and proactive failure notification remain open.
 
 1. Preserve the existing Cow service and D1 records. Legacy account and data
    migration is deferred; do not contact Brainstrust. Keep the old service
