@@ -73,6 +73,7 @@ jobs:
             sleep 1
           done
           node tests/console-flow.mjs
+      - run: NODE_OPTIONS=--conditions=react-server npx tsx tests/console-full-backup.integration.test.ts
       - run: NODE_OPTIONS=--conditions=react-server npx tsx tests/console-discovery-flow.ts
   independent-auth:
     runs-on: ubuntu-latest

@@ -30,8 +30,8 @@ export function AccountControl({ onNavigate }: { onNavigate?: () => void }) {
   }
 
   if (status === "signed-in") return <nav className="gateway-account-group" aria-label="Your account">
-    <Link className="gateway-account-text-link" href={founder ? "/founder/" : "/dashboard/"} onClick={onNavigate}>{founder ? "Founder Dashboard" : "My Dashboard"}</Link>
-    <Link className="gateway-account-control" href={founder ? "/founder/#organisations" : "/settings/"} onClick={onNavigate}>{founder ? "Manage Accounts" : "My Account"} <Arrow diagonal /></Link>
+    <Link className="gateway-account-text-link" href={founder ? "/founder/" : "/dashboard/"} aria-label={founder ? "Founder Dashboard" : "My Dashboard"} onClick={onNavigate}><span className="gateway-account-label-full">{founder ? "Founder Dashboard" : "My Dashboard"}</span><span className="gateway-account-label-mobile" aria-hidden="true">Dashboard</span></Link>
+    <Link className="gateway-account-control" href={founder ? "/founder/#organisations" : "/settings/"} aria-label={founder ? "Manage Accounts" : "My Account"} onClick={onNavigate}><span className="gateway-account-label-full">{founder ? "Manage Accounts" : "My Account"}</span><span className="gateway-account-label-mobile" aria-hidden="true">{founder ? "Accounts" : "Account"}</span> <Arrow diagonal /></Link>
   </nav>;
 
   return <nav className="gateway-account-group" aria-label="Account access">

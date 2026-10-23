@@ -108,7 +108,7 @@ async function handle(
       );
     if (get && resource === "export") {
       if (url.searchParams.get("format") === "backup")
-        return new Response(JSON.stringify(await completeBackup()), {
+        return new Response(JSON.stringify(await completeBackup(["research_console"])), {
           headers: {
             "Cache-Control": "private, no-store",
             "Content-Type": "application/json",
