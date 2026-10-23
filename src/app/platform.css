@@ -18,6 +18,7 @@
 .gateway-account-group .gateway-account-control:hover { background: #d6e3d3; }
 .gateway-account-placeholder { display: inline-flex; align-items: center; min-height: 44px; color: #575e58; font-size: 12px; }
 .gateway-account-group.is-checking { min-width: 184px; justify-content: flex-end; }
+.gateway-account-label-mobile { display: none; }
 
 /* The shared product shell: stationery dividers in one SORP2026 folder. */
 .product-folder {

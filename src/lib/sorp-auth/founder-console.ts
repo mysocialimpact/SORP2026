@@ -245,26 +245,26 @@ export async function independentFounderPOST(actor: { id?: string }, resource: s
   if (resource === "organisation" && id && action === "excellence-access") {
     const category = body.category === "stage" ? "stages" : body.category === "pillar" ? "pillars" : null;
     const key = String(body.key || "");
-    if (!category || !(category === "stages" ? EXCELLENCE_STAGES : EXCELLENCE_PILLARS).some(item => item === key)
-      || typeof body.enabled !== "boolean")
-      return json({ error: "Choose a valid stage or pillar and access setting." }, 400);
+    if (!category || !(category === "stages" ? EXCELLENCE_STAGES : EXCELLENCE_PILLARS).some(item => item === key) ||
+        typeof body.enabled !== "boolean") return json({ error: "Choose a valid access setting." }, 400);
     const client = await sorpAuthPool().connect();
     try {
       await client.query("BEGIN");
       const found = await client.query<{ excellence_access: unknown }>(
         "SELECT excellence_access FROM sorp_auth.organisation WHERE id=$1 FOR UPDATE", [id]);
-      if (!found.rows[0]) { await client.query("ROLLBACK"); return json({ error: "Organisation not found." }, 404); }
+      if (!found.rowCount) { await client.query("ROLLBACK"); return json({ error: "Organisation not found." }, 404); }
       const current = normaliseAccess(found.rows[0].excellence_access);
-      if (!current) { await client.query("ROLLBACK"); return json({ error: "This organisation's access settings need review." }, 409); }
+      if (!current) { await client.query("ROLLBACK"); return json({ error: "Review this organisation's access settings." }, 409); }
+      const before = category === "stages" ? current.stages[key as keyof typeof current.stages]
+        : current.pillars[key as keyof typeof current.pillars];
       const next = { stages: { ...current.stages }, pillars: { ...current.pillars } };
       if (category === "stages") next.stages[key as keyof typeof next.stages] = body.enabled;
       else next.pillars[key as keyof typeof next.pillars] = body.enabled;
-      await client.query("UPDATE sorp_auth.organisation SET excellence_access=$1::jsonb,updated_at=now() WHERE id=$2",
-        [JSON.stringify(next), id]);
+      await client.query("UPDATE sorp_auth.organisation SET excellence_access=$2::jsonb,updated_at=now() WHERE id=$1",
+        [id, JSON.stringify(next)]);
       await client.query(`INSERT INTO sorp_auth.audit_event(actor_user_id,action,target_type,target_id,metadata)
         VALUES($1,'excellence_access_changed','organisation',$2,$3::jsonb)`,
-        [actor.id, id, JSON.stringify({ category, key,
-          before: (current[category] as Record<string, boolean>)[key], enabled: body.enabled })]);
+        [actor.id, id, JSON.stringify({ category, key, before, enabled: body.enabled })]);
       await client.query("COMMIT");
       return json({ access: next, category, key, enabled: body.enabled });
     } catch (error) { await client.query("ROLLBACK").catch(() => undefined); throw error; }

@@ -15,9 +15,9 @@ test("forgot-password link is present on direct sign-in, request acknowledgement
     }
     return route.fulfill({ json: { signedIn: false } });
   });
-  await page.goto("/are-you-sorp-ready/review/?entry=login");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("WELCOME BACK.");
-  await page.getByRole("link", { name: "Forgot password?" }).click();
+  await page.goto("/login/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Your work.");
+  await page.getByRole("link", { name: "Forgotten your password?" }).click();
   await expect(page.getByRole("main").getByLabel("Email address")).toHaveValue(saved.email);
   await page.getByRole("button", { name: "Send reset link" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Request received.");
@@ -46,7 +46,7 @@ test("reset uses the fragment token once, requires matching passwords and leaves
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Password changed.");
   expect(sent).toEqual([{ action: "reset-password", token, password: "New secure password" }]);
   expect(await page.evaluate(KEY => localStorage.getItem(KEY), KEY)).toBe(JSON.stringify(saved));
-  await expect(page.getByRole("link", { name: "Back to sign in" })).toHaveAttribute("href", "/are-you-sorp-ready/review/?entry=login");
+  await expect(page.getByRole("link", { name: "Back to sign in" })).toHaveAttribute("href", "/login/?return=%2Fdashboard%2F");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
 });
 
@@ -68,24 +68,23 @@ test("unconfigured backend fails closed without offering a pretend email send", 
   await expect(page.getByRole("button", { name: "Send reset link" })).toHaveCount(0);
 });
 
-test("fresh-device sign-in can restore saved work after a reset without repeating charity selection", async ({ page }) => {
+test("fresh-device sign-in opens the dashboard with server-saved assessment progress", async ({ page }) => {
   let signedIn = false;
   await page.route("**/api/**", route => {
     const r = route.request();
     if (r.url().includes("readiness-account") && r.method() === "POST" && r.postDataJSON().action === "login") {
       signedIn = true;
-      return route.fulfill({ json: { account: { name: "Person", email: saved.email, position: "Trustee" }, progress: { ...saved, step: "find" } } });
+      return route.fulfill({ json: { account: { name: "Person", email: saved.email, position: "Trustee" }, progress: { ...saved, step: "homework" } } });
     }
-    if (r.url().includes("readiness-account") && signedIn) return route.fulfill({ json: { signedIn: true, account: { name: "Person", email: saved.email, position: "Trustee", organisation: "Example Charity" }, progress: { ...saved, step: "find" } } });
+    if (r.url().includes("readiness-account") && signedIn) return route.fulfill({ json: { signedIn: true, account: { name: "Person", email: saved.email, position: "Trustee", organisation: "Example Charity" }, progress: { ...saved, step: "homework" } } });
     return route.fulfill({ json: { signedIn: false } });
   });
-  await page.goto("/are-you-sorp-ready/review/?entry=login");
+  await page.goto("/login/");
   await page.getByRole("main").getByLabel("Email address", { exact: true }).fill(saved.email);
   await page.getByLabel("Password", { exact: true }).fill("New secure password");
-  await page.getByRole("button", { name: "SIGN IN AND CONTINUE" }).click();
+  await page.getByRole("button", { name: "Log in to SORP2026" }).click();
   await expect(page).toHaveURL(/\/dashboard\/$/);
-  await expect(page.getByRole("status")).toContainText("You’re in, Person.");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Welcome back, Person");
-  await expect.poll(() => page.evaluate(KEY => JSON.parse(localStorage.getItem(KEY) || "{}").sessionId, KEY)).toBe(saved.sessionId);
-  expect(await page.evaluate(KEY => JSON.parse(localStorage.getItem(KEY)!).comments, KEY)).toEqual(saved.comments);
+  await expect(page.getByRole("main")).toContainText("Example Charity");
+  await expect(page.getByRole("main")).toContainText("In progress");
 });

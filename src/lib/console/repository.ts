@@ -75,7 +75,7 @@ export async function dashboard(actor?: string) {
     recent,
     baseline: baseline[0] || null,
     method,
-    backup:(await query("SELECT status,started_at,completed_at,(status='failed' OR coalesce(completed_at,started_at)<now()-interval '36 hours') needs_attention FROM research_console.backup_runs ORDER BY started_at DESC LIMIT 1"))[0]??null,
+    backup:(await query("SELECT status,started_at,completed_at,NOT(status='verified' AND details->>'formatVersion'='2' AND details->>'downloadVerified'='true' AND details->>'retentionEnabled'='true' AND completed_at>now()-interval '36 hours') needs_attention FROM research_console.backup_runs ORDER BY started_at DESC LIMIT 1"))[0]??null,
   };
 }
 // Name discovery needs an identity match, not directory matches on a town,

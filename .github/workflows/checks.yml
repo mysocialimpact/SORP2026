@@ -73,6 +73,7 @@ jobs:
             sleep 1
           done
           node tests/console-flow.mjs
+      - run: NODE_OPTIONS=--conditions=react-server npx tsx tests/console-full-backup.integration.test.ts
       - run: NODE_OPTIONS=--conditions=react-server npx tsx tests/console-discovery-flow.ts
   independent-auth:
     runs-on: ubuntu-latest
@@ -103,7 +104,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --input-type=module -e 'import {Pool} from "pg"; import {readFileSync} from "node:fs"; const db=new Pool({connectionString:process.env.SORP_AUTH_DATABASE_URL}); for(const file of ["008_sorp_auth_provider.sql","009_sorp_auth_application.sql","010_sorp_report_ownership.sql","011_sorp_auth_audit_integrity.sql"]) await db.query(readFileSync(`migrations/${file}`,"utf8")); await db.query("CREATE ROLE sorp_auth_runtime LOGIN"); await db.query(readFileSync("scripts/provision-sorp-auth-runtime.sql","utf8")); await db.end()'
+      - run: node --input-type=module -e 'import {Pool} from "pg"; import {readFileSync} from "node:fs"; const db=new Pool({connectionString:process.env.SORP_AUTH_DATABASE_URL}); for(const file of ["008_sorp_auth_provider.sql","009_sorp_auth_application.sql","010_sorp_report_ownership.sql","011_sorp_auth_audit_integrity.sql","012_sorp_excellence_access.sql"]) await db.query(readFileSync(`migrations/${file}`,"utf8")); await db.query("CREATE ROLE sorp_auth_runtime LOGIN"); await db.query(readFileSync("scripts/provision-sorp-auth-runtime.sql","utf8")); await db.end()'
       - run: npx tsx --test tests/sorp-auth-role.integration.test.ts
       - run: npx tsx --test tests/sorp-auth-email.test.ts tests/sorp-auth-export.test.ts tests/sorp-auth-security.integration.test.ts tests/sorp-auth.integration.test.ts tests/sorp-reconciliation.integration.test.ts tests/sorp-report-upload.integration.test.ts
         env:

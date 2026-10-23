@@ -17,6 +17,7 @@ import { teamWorkspace } from "../src/lib/sorp-auth/team";
 import { founderForRequest, founderInviteMember, founderOverview,
   founderRequestClientAccess, founderRevokeMembership, founderSetPlan } from "../src/lib/sorp-auth/admin";
 import { independentFounderGET, independentFounderPOST } from "../src/lib/sorp-auth/founder-console";
+import { excellenceContext } from "../src/lib/excellence/access-server";
 
 const url = process.env.SORP_AUTH_DATABASE_URL || "";
 if (!/^postgres(?:ql)?:\/\/[^@]+@127\.0\.0\.1:55432\/sorp_test$/.test(url)) {
@@ -26,6 +27,8 @@ const db = new Pool({ connectionString: url });
 const auth = sorpAuth();
 const founderId = randomUUID();
 const adviserOrgId = randomUUID();
+const secondAdviserId = randomUUID();
+const secondAdviserOrgId = randomUUID();
 const customerId = randomUUID();
 const exportUserId = randomUUID();
 const customerOrgId = randomUUID();
@@ -75,6 +78,9 @@ after(async () => {
   await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id=$1", [customerOrgId]);
   await db.query("DELETE FROM sorp_auth.organisation WHERE id=$1", [customerOrgId]);
   await db.query("DELETE FROM sorp_auth.founder_grant WHERE user_id=$1", [founderId]);
+  await db.query("DELETE FROM sorp_auth.membership WHERE organisation_id=$1", [secondAdviserOrgId]);
+  await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id=$1", [secondAdviserOrgId]);
+  await db.query("DELETE FROM sorp_auth.organisation WHERE id=$1", [secondAdviserOrgId]);
   await db.query("DELETE FROM sorp_auth.membership WHERE organisation_id=$1", [adviserOrgId]);
   await db.query("DELETE FROM sorp_auth.invitation WHERE organisation_id=$1", [adviserOrgId]);
   await db.query("DELETE FROM sorp_auth.entitlement WHERE organisation_id=$1", [adviserOrgId]);
@@ -91,6 +97,7 @@ after(async () => {
     await db.query("DELETE FROM sorp_auth.organisation WHERE id=$1", [id]);
   }
   await db.query('DELETE FROM sorp_auth."user" WHERE id=$1', [founderId]);
+  await db.query('DELETE FROM sorp_auth."user" WHERE id=$1', [secondAdviserId]);
   await db.query('DELETE FROM sorp_auth."user" WHERE id=$1', [customerId]);
   await db.query("DELETE FROM sorp_auth.account_import WHERE user_id=$1", [exportUserId]);
   await db.query('DELETE FROM sorp_auth."user" WHERE id=$1', [exportUserId]);
@@ -296,6 +303,19 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   await db.query("INSERT INTO sorp_auth.organisation(id,name,type) VALUES ($1,'Synthetic adviser','Adviser')", [adviserOrgId]);
   await db.query("INSERT INTO sorp_auth.entitlement(organisation_id,plan) VALUES ($1,'Adviser')", [adviserOrgId]);
   await db.query("INSERT INTO sorp_auth.membership(organisation_id,user_id,role) VALUES ($1,$2,'owner')", [adviserOrgId, founderId]);
+  const secondAdviserEmail = `second-adviser-${secondAdviserId}@example.invalid`;
+  await db.query('INSERT INTO sorp_auth."user"(id,name,email,"emailVerified") VALUES($1,$2,$3,true)',
+    [secondAdviserId, "Synthetic second adviser", secondAdviserEmail]);
+  await db.query('INSERT INTO sorp_auth."account"(id,"accountId","providerId","userId",password,"updatedAt") VALUES($1,$2,$3,$4,$5,now())',
+    [randomUUID(), secondAdviserId, "credential", secondAdviserId, await hashPassword(password)]);
+  await db.query("INSERT INTO sorp_auth.organisation(id,name,type) VALUES($1,'Synthetic second adviser firm','Adviser')",
+    [secondAdviserOrgId]);
+  await db.query("INSERT INTO sorp_auth.entitlement(organisation_id,plan) VALUES($1,'Adviser')", [secondAdviserOrgId]);
+  await db.query("INSERT INTO sorp_auth.membership(organisation_id,user_id,role) VALUES($1,$2,'owner')",
+    [secondAdviserOrgId, secondAdviserId]);
+  const secondAdviserLogin = await post("login", { email: secondAdviserEmail, password }, "", "192.0.2.48");
+  assert.equal(secondAdviserLogin.status, 200);
+  const secondAdviserCookie = secondAdviserLogin.headers.get("set-cookie")?.split(";")[0] || "";
   await assert.rejects(db.query("INSERT INTO sorp_auth.founder_grant(user_id,granted_at,grant_reason) VALUES ($1,now(),'synthetic test')", [founderId]), /verified second factor/);
   const bootstrap = { userId: founderId, email, operator: "Synthetic operator",
     reason: "Isolated integration verification", databaseUrl: url };
@@ -386,6 +406,23 @@ test("founder access needs verified MFA and a new session, and revocation is imm
   const approved = await post("client-access-decide", { accessId: access.id, decision: "approve" }, customerCookie);
   assert.equal(approved.status, 200, await approved.clone().text());
   assert.equal((await db.query("SELECT status FROM sorp_auth.adviser_client_access WHERE id=$1", [access.id])).rows[0].status, "active");
+  assert.equal((await post("client-assessment-read", { adviserOrganisationId: secondAdviserOrgId,
+    charityOrganisationId: customerOrgId, view: "answers" }, secondAdviserCookie)).status, 403,
+  "another paid adviser identity cannot reuse the first firm's charity approval");
+  const previousCutover = process.env.SORP_AUTH_CUTOVER_ENABLED;
+  process.env.SORP_AUTH_CUTOVER_ENABLED = "true";
+  try {
+    assert.equal((await excellenceContext(customerCookie)).access.pillars.purpose, false);
+    const changed = await independentFounderPOST({ id: founderId }, "organisation", customerOrgId,
+      "excellence-access", { category: "pillar", key: "purpose", enabled: true });
+    assert.equal(changed?.status, 200);
+    assert.equal((await excellenceContext(customerCookie)).access.pillars.purpose, true);
+    assert.equal((await excellenceContext(secondAdviserCookie)).access.pillars.purpose, false,
+      "one charity's access must not enable another organisation");
+  } finally {
+    if (previousCutover === undefined) delete process.env.SORP_AUTH_CUTOVER_ENABLED;
+    else process.env.SORP_AUTH_CUTOVER_ENABLED = previousCutover;
+  }
   const clientProgress = await post("client-assessment-read", { adviserOrganisationId: adviserOrgId,
     charityOrganisationId: customerOrgId, view: "progress" }, founderCookie);
   assert.equal(clientProgress.status, 200);
