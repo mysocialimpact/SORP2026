@@ -137,7 +137,7 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
     <div className="directory-mobile-toggle" role="group" aria-label="Choose results view"><button aria-pressed={mode === "list"} onClick={() => setMode("list")}>List</button><button aria-pressed={mode === "map"} onClick={() => setMode("map")}>Map</button></div>
     <div className={`directory-workspace is-${mode}`}>
       <div className="directory-results" ref={list} role="region" aria-label="Accountant results">
-        {origin && <p className="directory-distance-note">Straight-line miles from postcode centres. Nearest first; featured status does not override distance.</p>}
+        {origin && <p className="directory-distance-note">Straight-line miles from your postcode to each firm’s one listed charity-team office postcode. A different office of the same firm may be nearer. Nearest listed office first; featured status does not override distance.</p>}
         {area && <button className="directory-text-button" onClick={() => { setArea(null); changeFilters(); }}>Clear map area ×</button>}
         {!results.length && <div className="directory-empty"><h2>A little further afield?</h2><p>No firms match these filters. Try a different area or fewer services.</p><button onClick={nationwide}>Show all firms</button></div>}
         {results.slice(0,limit).map(({ firm, distance }) => <article id={`firm-${firm.slug}`} key={firm.slug} className={`directory-result${selected === firm.slug ? " is-active" : ""}${firm.featured ? " is-featured" : ""}`}>

@@ -17,7 +17,7 @@ const plans = [
     ],
     details: [
       "Complete the full SORP readiness journey and keep your result in your account.",
-      "Ask evidence-led SORP questions with official references, subject to reasonable fair use. No numeric allowance is currently published.",
+      "Ask three free SORP questions with official references.",
       "Receive an initial automated review of published charity reporting evidence where the readiness journey supports it.",
       "Use the introductory Social Impact Excellence maturity assessment and its guidance.",
       "Save progress and see available products through one basic platform account.",
@@ -154,7 +154,7 @@ export function HomepagePricing() {
         <div className="homepage-beta-invitation">
           <div>
             <p className="gateway-kicker">Free early beta access</p>
-            <h3>We’re testing Plus and Advisor with a small group of charities, accountants and advisers. We’d love to hear from you if you’d like to get involved and help us make these tools better.</h3>
+            <h3>We’re testing Plus and Adviser with a small group of charities, accountants and advisers. We’d love to hear from you if you’d like to get involved and help us make these tools better.</h3>
           </div>
           <a
             href="#say-hello"

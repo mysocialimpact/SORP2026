@@ -167,6 +167,12 @@ test('explicit independent working status populates the shared organisation fiel
    const patch=validateInterpretation({intent:'inform',organisationNature:'working_arrangement',facts:{organisation:{value,quote:value,period:'current',correction:false}}},`I am an ${value} consultant`,initialConversation());
    assert.equal(patch.organisation,'Independent');
  }
+ const volunteer=validateInterpretation({intent:'inform',organisationNature:'working_arrangement',facts:{}},'I am volunteering independently',initialConversation());
+ assert.equal(volunteer.organisation,'Independent');
+ const next=advance(initialConversation(),volunteer);
+ assert.equal(next.facts.organisation,'Independent');
+ const misclassified=validateInterpretation({intent:'inform',organisationNature:'none',facts:{}},'I am volunteering independently',initialConversation());
+ assert.equal(misclassified.organisation,'Independent');
 });
 test('one bounded wording revision preserves extraction and accounts for every successful call',async()=>{
  const original=globalThis.fetch,key=process.env.OPENAI_API_KEY;

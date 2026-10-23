@@ -29,6 +29,8 @@ export default function AskSorp() {
           <p className="ask-hero-lead">SORP 2026 can be complex. We’ve built Ask SORP to make understanding the requirements simpler, faster and more accessible.</p>
           <p className="ask-hero-support">Ask questions in plain English, explore the relevant guidance and see where the answers come from.</p>
           <ToolLink className="ask-primary-action" href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></ToolLink>
+          <p><Link href="/sample-charity/#ask">Explore a sample charity answer →</Link></p>
+          <p><Link href="/sample-charity/#request-demo">Request a free demo →</Link></p>
           <p className="ask-reassurance">Relevant references. Uncertainty made clear. Professional judgement where it matters.</p>
         </div>
         <div className="ask-hero-visual" aria-hidden="true">

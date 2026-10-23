@@ -50,6 +50,9 @@ export function SorpReadyPage() {
               <StartReview />
               <Link className="sr-play" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>
             </div>
+            <p className="sr-scope-note">This review covers impact and sustainability reporting readiness. It is not a full accounting review or SORP compliance assurance.</p>
+            <Link href="/sample-charity/">Explore a sample charity →</Link>
+            <p><Link href="/sample-charity/#request-demo">Request a free demo →</Link></p>
           </div>
         </FolderHero>
 

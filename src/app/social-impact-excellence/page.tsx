@@ -79,6 +79,8 @@ export default function ExcellencePage() {
           <ToolLink className="gateway-action" href="/social-impact-excellence/assessment/">Get started with Social Impact Excellence <Arrow /></ToolLink>
           <p className="excellence-access-note">The Social Impact Maturity Assessment is available inside your registered SORP2026 account.</p>
           <Link className="excellence-login-link" href="/login/?return=/social-impact-excellence/">Already registered? Log in <Arrow /></Link>
+          <p><Link href="/sample-charity/#maturity">Explore a sample charity baseline →</Link></p>
+          <p><Link href="/sample-charity/#request-demo">Request a free demo →</Link></p>
         </div>
       </section>
 

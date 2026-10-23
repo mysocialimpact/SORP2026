@@ -48,9 +48,10 @@ body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigat
   .platform-sticky-navigation .gateway-account-text-link { font-size: 11px; }
   .platform-sticky-navigation .gateway-account-group .gateway-account-control { padding: 7px 10px!important; font-size: 11px; min-height: 36px; }
   .platform-sticky-navigation .gateway-account-group.is-checking { min-width: 120px; }
-  .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; gap: clamp(6px, 2.5vw, 14px); min-width: 0; overflow-x: auto; font-size: 10px; scrollbar-width: none; }
+  .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; gap: clamp(6px, 2.5vw, 14px); min-width: 0; overflow-x: auto; font-size: 10px; scrollbar-width: none; }
   .platform-sticky-navigation .gateway-directory-nav::-webkit-scrollbar { display: none; }
-  .platform-sticky-navigation .gateway-directory-nav a { flex: 0 0 auto; min-height: 36px; padding-block: 6px; }
+  .platform-sticky-navigation .gateway-directory-nav a { flex: 0 0 auto; min-height: 32px; padding-block: 4px; }
+  .platform-sticky-navigation .install-app-trigger { display:none; }
   .platform-sticky-navigation .product-folder-tabs { padding-top: 6px; }
   .platform-sticky-navigation .product-folder-tab { min-height: 60px; width: 168px; flex-basis: 168px; padding: 8px 12px; }
   .platform-sticky-navigation .product-folder-tab strong { font-size: 13px; }

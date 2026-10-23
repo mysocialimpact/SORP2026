@@ -50,6 +50,7 @@ async function post(action: string, body: unknown) {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(action === "search" ? 15000 : 30000),
   });
   const data = await response.json();
   if (!response.ok)
@@ -377,7 +378,8 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
       setSearched(true);
       setLookupSuggested(false);
     } catch (e) {
-      recover(e);
+      recover(e instanceof DOMException && e.name === "TimeoutError" ? new Error("Charity lookup timed out. Try the registration number or retry the name; your details are still here.") :
+        e instanceof TypeError ? new Error("The charity search service is unavailable. Try again, or use the registration number; your details are still here.") : e);
     } finally {
       lock.current = false;
       setBusy(false);
@@ -575,6 +577,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
                         ))}
                       </div>
                     )}
+                    <p>We confirm an official charity record so your saved work and report are attached to the right organisation. The public sample and free demo do not need confirmation.</p>
                     <div className="charity-search">
                       <label htmlFor="charity-lookup">
                         Charity name or registration number
@@ -585,12 +588,13 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
                           value={query}
                           onChange={(e) => setQuery(e.target.value)}
                           maxLength={160}
-                          placeholder="Find your starting charity"
+                          placeholder="Name or registration number (for example 202918)"
                           onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); void search(); } }}
                         />
                         <button type="button" disabled={busy || !query.trim()} onClick={() => void search()}>Find →</button>
                       </div>
                     </div>
+                    <p>Names can be ambiguous. If a name fails, enter the charity’s registration number above. Your other details will stay in place.</p>
                     {searched && !candidates.length && (
                       <p>
                         No reliable registry match yet. Try the charity number

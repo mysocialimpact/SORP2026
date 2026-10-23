@@ -332,7 +332,13 @@ export function validateInterpretation(
   if (p.organisationNature && p.organisationNature !== "named_organisation") {
     delete extracted.organisation;
     delete extracted.organisationKind;
-    if (p.organisationNature === "working_arrangement" && /\bI(?:[’']m| am| work) (?:an? )?(?:independent(?:ly)?|freelance|self-employed)\b/i.test(message)) extracted.organisation = "Independent";
+    if (p.organisationNature === "working_arrangement" && /\bI (?:work|volunteer) independently\b|\bI(?:[’']m| am) volunteering independently\b|\bI(?:[’']m| am) (?:an? )?(?:independent|freelance|self-employed)(?:\s+(?:adviser|advisor|consultant|volunteer))?\b/i.test(message)) extracted.organisation = "Independent";
+  }
+  // A model can acknowledge this answer yet classify volunteering as a relationship.
+  // Keep the form and progress in step when the person explicitly says they work alone.
+  if (["inform", "correct"].includes(String(p.intent)) && !extracted.organisation &&
+      !state.facts.organisation && /\bI(?:[’']m| am) volunteering independently\b|\bI volunteer independently\b/i.test(message)) {
+    extracted.organisation = "Independent";
   }
   if (p.concernKind && p.concernKind !== "professional") delete extracted.concerns;
   for (const key of ["charityChoice", "reference"] as const)
