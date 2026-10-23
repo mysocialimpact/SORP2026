@@ -63,7 +63,7 @@ body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigat
   .platform-sticky-navigation .gateway-account-group { gap: 6px; }
   .platform-sticky-navigation .gateway-account-group .gateway-account-control { padding-inline: 8px!important; font-size: 10px; }
 }
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .platform-sticky-navigation .gateway-header-inner { grid-template-columns: 1fr; }
   .platform-sticky-navigation .gateway-brand-lockup { grid-column: 1; grid-row: 1; }
   .platform-sticky-navigation .gateway-account-group { grid-column: 1; grid-row: 2; justify-self: start; }
