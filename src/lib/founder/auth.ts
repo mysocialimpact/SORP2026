@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AccessError } from "@/lib/access-error";
 import { independentIdentity } from "@/lib/sorp-auth/identity";
 import { independentAuthCutover } from "@/lib/sorp-auth/switch";
+import { isIsolatedCustomerIdentity } from "@/lib/customer-isolation";
 
 type FounderIdentity = { id?: string; email: string; name?: string };
 
@@ -12,6 +13,7 @@ export async function founderIdentity(cookie?: string): Promise<FounderIdentity>
     if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
     const identity = await independentIdentity(new Headers({ cookie }));
     if (!identity) throw new AccessError(401, "Please log in again.");
+    if (isIsolatedCustomerIdentity(identity)) throw new AccessError(403, "This legacy customer is not active in SORP 2026.");
     if (!identity.platformAccess.founder) throw new AccessError(403,
       "This control centre is private to authorised platform administrators.");
     return { id: identity.account.id, email: identity.account.email.toLowerCase(), name: identity.account.name };
@@ -25,6 +27,7 @@ export async function founderIdentity(cookie?: string): Promise<FounderIdentity>
   } catch { throw new AccessError(503, "The sign-in service could not be reached."); }
   if (!response.ok) throw new AccessError(401, "Please log in again.");
   const data = await response.json();
+  if (isIsolatedCustomerIdentity(data)) throw new AccessError(403, "This legacy customer is not active in SORP 2026.");
   const account = data.account;
   if (data.signedIn !== true || !account || typeof account.email !== "string") throw new AccessError(401, "Please log in again.");
   if (typeof account.id !== "string" || data.platformAccess?.founder !== true) throw new AccessError(403, "This control centre is private to authorised platform administrators.");

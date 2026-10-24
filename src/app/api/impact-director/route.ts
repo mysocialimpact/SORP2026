@@ -2,6 +2,7 @@ import { database } from "@/lib/console/db";
 import { validDraft } from "@/features/director/model";
 import { independentIdentity } from "@/lib/sorp-auth/identity";
 import { independentAuthCutover } from "@/lib/sorp-auth/switch";
+import { isIsolatedCustomerIdentity } from "../../../lib/customer-isolation.ts";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const json = (body: unknown, status = 200) =>
@@ -13,6 +14,7 @@ async function account(request: Request) {
   if (!request.headers.get("cookie")) return null;
   if (independentAuthCutover()) {
     const identity = await independentIdentity(request.headers);
+    if (isIsolatedCustomerIdentity(identity)) return null;
     return identity ? { id: identity.account.id, name: identity.account.name,
       organisation: identity.account.organisation } : null;
   }
@@ -33,6 +35,7 @@ async function account(request: Request) {
   if (response.status === 401) return null;
   if (!response.ok) throw new Error("Account service unavailable");
   const result = await response.json();
+  if (isIsolatedCustomerIdentity(result)) return null;
   return result.signedIn === true && typeof result.account?.id === "string"
     ? {
         id: result.account.id as string,

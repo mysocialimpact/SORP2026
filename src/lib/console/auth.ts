@@ -4,12 +4,14 @@ import { redirect } from "next/navigation";
 import { AccessError } from "@/lib/access-error";
 import { independentIdentity } from "@/lib/sorp-auth/identity";
 import { independentAuthCutover } from "@/lib/sorp-auth/switch";
+import { isIsolatedCustomerIdentity } from "@/lib/customer-isolation";
 export { AccessError } from "@/lib/access-error";
 export async function authenticate(cookie: string) {
   if (independentAuthCutover()) {
     if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
     const identity = await independentIdentity(new Headers({ cookie }));
     if (!identity) throw new AccessError(401, "Please log in again.");
+    if (isIsolatedCustomerIdentity(identity)) throw new AccessError(403, "This legacy customer is not active in SORP 2026.");
     if (!identity.platformAccess.founder) throw new AccessError(403,
       "This console is private to authorised platform founders.");
     return identity.account.email.toLowerCase();
@@ -31,6 +33,7 @@ export async function authenticate(cookie: string) {
   }
   if (!response.ok) throw new AccessError(401, "Please log in again.");
   const data = await response.json();
+  if (isIsolatedCustomerIdentity(data)) throw new AccessError(403, "This legacy customer is not active in SORP 2026.");
   if (
     data.signedIn !== true ||
     typeof data.account?.id !== "string" ||

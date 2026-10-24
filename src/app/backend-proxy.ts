@@ -1,3 +1,10 @@
+import {
+  containsIsolatedCustomerReference,
+  excludeIsolatedCustomerRows,
+  isIsolatedCustomerIdentity,
+  isolatedCustomerResponse,
+} from "../lib/customer-isolation.ts";
+
 const backendOrigin = () => process.env.SORP_BACKEND_ORIGIN || "";
 
 export async function proxyExistingSorpBackend(request: Request, pathname: string) {
@@ -19,6 +26,25 @@ export async function proxyExistingSorpBackend(request: Request, pathname: strin
     if (value) headers.set(name, value);
   }
 
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    const contentType = request.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const body = await request.clone().json().catch(() => null);
+      if (containsIsolatedCustomerReference(body)) return isolatedCustomerResponse();
+    }
+  }
+  const cookie = request.headers.get("cookie");
+  if (cookie && pathname !== "/api/readiness-account") {
+    try {
+      const identityResponse = await fetch(new URL("/api/readiness-account", origin), {
+        headers: { cookie, "x-sorp-destination": "sorp2026.org" },
+        cache: "no-store", redirect: "manual", signal: AbortSignal.timeout(10_000),
+      });
+      const identity = await identityResponse.json().catch(() => ({}));
+      if (isIsolatedCustomerIdentity(identity)) return isolatedCustomerResponse();
+    } catch { /* The destination request retains its existing availability handling. */ }
+  }
+
   try {
     const response = await fetch(target, {
       method: request.method,
@@ -37,6 +63,18 @@ export async function proxyExistingSorpBackend(request: Request, pathname: strin
     if (setCookies.length) for (const cookie of setCookies) responseHeaders.append("set-cookie", cookie);
     else if (response.headers.get("set-cookie")) responseHeaders.set("set-cookie", response.headers.get("set-cookie")!);
     responseHeaders.set("cache-control", responseHeaders.get("cache-control") || "no-store");
+    const responseType = response.headers.get("content-type") || "";
+    if (responseType.includes("application/json")) {
+      const payload = await response.json().catch(() => null);
+      if (isIsolatedCustomerIdentity(payload)) return isolatedCustomerResponse();
+      if (containsIsolatedCustomerReference(payload)) {
+        return Response.json(excludeIsolatedCustomerRows(payload), {
+          status: response.status,
+          headers: responseHeaders,
+        });
+      }
+      return Response.json(payload, { status: response.status, headers: responseHeaders });
+    }
     return new Response(response.body, { status: response.status, headers: responseHeaders });
   } catch {
     return Response.json({ error: "The existing SORP service could not be reached. Please try again." }, { status: 502 });
