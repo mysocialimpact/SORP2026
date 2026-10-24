@@ -1,17 +1,22 @@
 import { proxyExistingSorpBackend } from "../../backend-proxy.ts";
 import { independentAuthCutover } from "../../../lib/sorp-auth/switch.ts";
+import { containsIsolatedCustomerReference, isIsolatedCustomerIdentity,
+  isolatedCustomerResponse } from "../../../lib/customer-isolation.ts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   if (independentAuthCutover()) {
     const { independentAccountGET } = await import("../../../lib/sorp-auth/compat.ts");
-    return independentAccountGET(request);
+    const response = await independentAccountGET(request);
+    const payload = await response.clone().json().catch(() => null);
+    return isIsolatedCustomerIdentity(payload) ? isolatedCustomerResponse() : response;
   }
   return proxyExistingSorpBackend(request, "/api/readiness-account");
 }
 export async function POST(request: Request) {
   const payload = await request.clone().json().catch(() => ({}));
+  if (containsIsolatedCustomerReference(payload)) return isolatedCustomerResponse();
   if (String(payload.action || "").trim() === "save" || String(payload.productId || "").trim() === "social-impact-excellence") {
     const { guardExcellenceMutation } = await import("../../../lib/excellence/mutation-guard.ts");
     const blocked = await guardExcellenceMutation(request, payload);
@@ -40,7 +45,14 @@ export async function POST(request: Request) {
   }
   if (independentAuthCutover()) {
     const { independentAccountPOST } = await import("../../../lib/sorp-auth/compat.ts");
-    return independentAccountPOST(request);
+    const response = await independentAccountPOST(request);
+    const result = await response.clone().json().catch(() => null);
+    return isIsolatedCustomerIdentity(result) ? isolatedCustomerResponse() : response;
+  }
+  if (request.headers.get("cookie") && !["login", "signup", "logout", "create-report-upload"].includes(String(payload.action || ""))) {
+    const accountRequest = new Request(request.url, { method: "GET", headers: request.headers });
+    const accountResponse = await proxyExistingSorpBackend(accountRequest, "/api/readiness-account");
+    if (accountResponse.status === 403) return accountResponse;
   }
   if (payload.action === "create-report-upload") {
     const accountRequest = new Request(request.url, { method: "GET", headers: request.headers });

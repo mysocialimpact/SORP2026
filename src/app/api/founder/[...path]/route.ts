@@ -9,6 +9,8 @@ import { complimentaryAccessEnd } from "@/lib/founder/complimentary-access";
 import { founderDatabase } from "@/lib/founder/db";
 import { EXCELLENCE_PILLARS, EXCELLENCE_STAGES, baselineOnlyAccess, legacyAccess,
   maturityProgress, normaliseAccess, pillarProgress } from "@/lib/excellence/access-policy";
+import { containsIsolatedCustomerReference, excludeIsolatedCustomerRows,
+  isIsolatedCustomerEmail, isIsolatedCustomerOrganisation } from "@/lib/customer-isolation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,6 +27,7 @@ class PlatformActionError extends Error {
 }
 
 async function platformAction(request: Request, body: Record<string, unknown>) {
+  if (containsIsolatedCustomerReference(body)) throw new PlatformActionError(404, "Organisation not found.");
   if (independentAuthCutover()) throw new PlatformActionError(503,
     "This founder action must use independent SORP account records.");
   const origin = process.env.SORP_BACKEND_ORIGIN;
@@ -39,7 +42,7 @@ async function platformAction(request: Request, body: Record<string, unknown>) {
   } catch { throw new PlatformActionError(503, "The secure account service could not be reached."); }
   const payload = await response.json().catch(() => ({})) as Record<string, unknown>;
   if (!response.ok) throw new PlatformActionError(response.status, typeof payload.error === "string" ? payload.error : "The account service could not complete this request.");
-  return payload;
+  return excludeIsolatedCustomerRows(payload) as Record<string, unknown>;
 }
 
 function platformOrganisationId(row: Record<string, unknown>) {
@@ -67,7 +70,7 @@ async function reconcileLiveOrganisations(rows: unknown) {
     const name = String(row.name || "").trim();
     const type = ["Charity", "Adviser", "Other"].includes(String(row.type)) ? String(row.type) : "Other";
     const plan = String(row.plan || "Free") in plans ? String(row.plan || "Free") : "Free";
-    if (!platformId || name.length < 2) continue;
+    if (!platformId || name.length < 2 || isIsolatedCustomerOrganisation(platformId) || isIsolatedCustomerOrganisation(name)) continue;
     const published = Number(row.published_price || 0) / 100;
     const payable = Number(row.payable_price || 0) / 100;
     const complimentary = String(row.entitlement_status || "").startsWith("complimentary");
@@ -93,7 +96,7 @@ async function reconcileLiveMemberships(users: unknown) {
     const row = candidate as Record<string, unknown>;
     const platformOrganisationId = cleanText(row.organisationId, 120);
     const memberEmail = cleanEmail(row.email);
-    if (!platformOrganisationId || !memberEmail) continue;
+    if (!platformOrganisationId || !memberEmail || isIsolatedCustomerOrganisation(platformOrganisationId) || isIsolatedCustomerEmail(memberEmail)) continue;
     const organisation = (await founderQuery<{ id:string }>("SELECT id FROM research_console.founder_organisations WHERE platform_organisation_id=$1", [platformOrganisationId]))[0];
     if (!organisation) continue;
     const role = ["owner", "admin", "member"].includes(String(row.role)) ? String(row.role) : "member";
@@ -131,6 +134,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     const path = await context.params;
     const [resource, id, action] = path.path;
     const url = new URL(request.url);
+    if (isIsolatedCustomerOrganisation(id)) return json({ error: "Organisation not found." }, 404);
     if (request.method === "GET") {
       if (independentAuthCutover()) {
         const independent = await independentFounderGET(actor, resource, id, url);
@@ -138,7 +142,9 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       }
       if (resource === "dashboard") {
         const [membershipCount, invitations, auditRows, live, feedbackAttention, enquiryAttention, directorRows] = await Promise.all([
-          founderQuery<{ count: string }>("SELECT count(*) FROM research_console.founder_memberships WHERE status='active'"),
+          founderQuery<{ count: string }>(`SELECT count(*) FROM research_console.founder_memberships m
+            JOIN research_console.founder_organisations o ON o.id=m.organisation_id
+            WHERE m.status='active' AND coalesce(o.platform_organisation_id,'') <> 'brainstrust'`),
           founderQuery("SELECT * FROM research_console.founder_invitations ORDER BY created_at DESC LIMIT 20"),
           founderQuery("SELECT * FROM research_console.founder_audit_log ORDER BY created_at DESC LIMIT 30"),
           platformAction(request, { action: "founder-overview" }),
@@ -151,7 +157,9 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
         const storedOrganisations = await founderQuery<Record<string, unknown>>(`SELECT o.*,
           (SELECT email FROM research_console.founder_memberships m WHERE m.organisation_id=o.id ORDER BY (m.role='owner') DESC,m.created_at LIMIT 1) primary_email,
           (SELECT count(*)::int FROM research_console.founder_memberships m WHERE m.organisation_id=o.id) member_count
-          FROM research_console.founder_organisations o ORDER BY o.updated_at DESC`);
+          FROM research_console.founder_organisations o
+          WHERE coalesce(o.platform_organisation_id,'') <> 'brainstrust'
+          ORDER BY o.updated_at DESC`);
         const liveMetrics = live.metrics && typeof live.metrics === "object" ? live.metrics as Record<string, unknown> : {};
         const liveProducts = live.products && typeof live.products === "object" ? live.products as Record<string, unknown> : {};
         const readiness = Array.isArray(liveProducts.readiness) ? liveProducts.readiness as Record<string, unknown>[] : [];
@@ -179,12 +187,12 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
         return json({
           founder: { email: actor.email, name: actor.name || "Founder" },
           metrics: {
-            organisations: Number(liveMetrics.organisations || organisations.length), activeUsers: Number(liveMetrics.activeUsers || 0),
-            registeredUsers: Number(liveMetrics.registeredUsers || membershipCount[0]?.count || 0),
+            organisations: organisations.length, activeUsers: Number(liveMetrics.activeUsers || 0),
+            registeredUsers: Number(membershipCount[0]?.count || users.length),
             newOrganisationsThisWeek: Number(liveMetrics.newOrganisationsThisWeek || 0), recentlyActiveOrganisations: Number(liveMetrics.recentlyActiveOrganisations || 0),
             organisationsAssessing: Number(liveMetrics.organisationsAssessing || 0),
-            complimentaryAccounts: Number(liveMetrics.complimentaryAccounts || organisations.filter(row => row.complimentary).length),
-            pendingInvitations: Number(liveMetrics.pendingInvitations || pendingInvitations.length),
+            complimentaryAccounts: organisations.filter(row => row.complimentary).length,
+            pendingInvitations: pendingInvitations.length,
             activeSubscriptions: organisations.filter(row => Number(row.payable_price) > 0).length,
             planCounts, source: "Live platform identities plus Founder commercial records.",
           },
@@ -204,9 +212,9 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
           unavailable: ["Verified billing revenue", "Billing discounts and promotions", "Ask SORP topic analytics and token cost"],
         });
       }
-      if (resource === "organisations") return json(await founderQuery("SELECT * FROM research_console.founder_organisations ORDER BY name"));
+      if (resource === "organisations") return json(await founderQuery("SELECT * FROM research_console.founder_organisations WHERE coalesce(platform_organisation_id,'') <> 'brainstrust' ORDER BY name"));
       if (resource === "organisation" && id) {
-        const organisation = (await founderQuery("SELECT * FROM research_console.founder_organisations WHERE id=$1", [id]))[0];
+        const organisation = (await founderQuery("SELECT * FROM research_console.founder_organisations WHERE id=$1 AND coalesce(platform_organisation_id,'') <> 'brainstrust'", [id]))[0];
         if (!organisation) return json({ error: "Organisation not found." }, 404);
         const live = await platformAction(request, { action:"founder-overview" });
         await reconcileLiveMemberships(live.users);
@@ -260,7 +268,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
         const q = (url.searchParams.get("q") || "").trim().toLowerCase();
         const live = await platformAction(request, { action:"founder-overview" });
         await reconcileLiveOrganisations(live.organisations); await reconcileLiveMemberships(live.users);
-        const organisations = await founderQuery("SELECT * FROM research_console.founder_organisations ORDER BY name");
+        const organisations = await founderQuery("SELECT * FROM research_console.founder_organisations WHERE coalesce(platform_organisation_id,'') <> 'brainstrust' ORDER BY name");
         const orgResults = organisations.filter(row=>!q||[row.name,row.primary_email].some(value=>String(value||"").toLowerCase().includes(q))).slice(0,50).map(row=>({kind:"organisation",...row}));
         const userResults = (Array.isArray(live.users)?live.users:[]).filter((row:Record<string,unknown>)=>!q||[row.name,row.email,row.organisationName].some(value=>String(value||"").toLowerCase().includes(q))).slice(0,50).map((row:Record<string,unknown>)=>({kind:"user",...row}));
         return json([...orgResults,...userResults].slice(0,50));
@@ -346,6 +354,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       const name = String(body.name || "").trim();
       const type = ["Charity", "Adviser", "Other"].includes(body.type) ? body.type : "Other";
       if (name.length < 2 || name.length > 200) return json({ error: "Enter an organisation name." }, 400);
+      if (isIsolatedCustomerOrganisation(name)) return json({ error: "That legacy customer is not active in SORP 2026." }, 409);
       const row = (await founderQuery("INSERT INTO research_console.founder_organisations(name,type,platform_organisation_id) VALUES($1,$2,gen_random_uuid()::text) RETURNING *", [name, type]))[0] as Record<string, unknown> & { id: string };
       await syncOrganisation(request, row);
       await audit(actor.email, "organisation_created", "organisation", row.id, null, row);
@@ -401,6 +410,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     if (resource === "organisation" && id && action === "invite") {
       const email = cleanEmail(body.email);
       if (!/^\S+@\S+\.\S+$/.test(email)) return json({ error: "Enter a valid email address." }, 400);
+      if (isIsolatedCustomerEmail(email)) return json({ error: "That legacy customer is not active in SORP 2026." }, 409);
       const role = ["owner", "admin", "member"].includes(body.role) ? body.role : "member";
       const organisation = (await founderQuery<Record<string, unknown>>("SELECT * FROM research_console.founder_organisations WHERE id=$1", [id]))[0];
       if (!organisation) return json({ error: "Organisation not found." }, 404);

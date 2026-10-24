@@ -2,6 +2,7 @@ import "server-only";
 import { AccessError } from "@/lib/access-error";
 import { independentIdentity } from "@/lib/sorp-auth/identity";
 import { independentAuthCutover } from "@/lib/sorp-auth/switch";
+import { isIsolatedCustomerIdentity } from "@/lib/customer-isolation";
 
 export type PlatformMembership = {
   organisationId: string;
@@ -22,6 +23,7 @@ export async function platformIdentity(cookie: string): Promise<PlatformIdentity
     if (!cookie) throw new AccessError(401, "Please log in to SORP2026.");
     const identity = await independentIdentity(new Headers({ cookie }));
     if (!identity) throw new AccessError(401, "Please log in again.");
+    if (isIsolatedCustomerIdentity(identity)) throw new AccessError(403, "This legacy customer is not active in SORP 2026.");
     return { account: identity.account, founder: identity.platformAccess.founder,
       memberships: identity.platformAccess.memberships as PlatformMembership[] };
   }
@@ -34,6 +36,7 @@ export async function platformIdentity(cookie: string): Promise<PlatformIdentity
   } catch { throw new AccessError(503, "The sign-in service could not be reached."); }
   if (!response.ok) throw new AccessError(response.status === 401 ? 401 : 503, response.status === 401 ? "Please log in again." : "Your account permissions could not be loaded.");
   const data = await response.json();
+  if (isIsolatedCustomerIdentity(data)) throw new AccessError(403, "This legacy customer is not active in SORP 2026.");
   const account = data.account;
   if (data.signedIn !== true || !account || typeof account.id !== "string" || typeof account.email !== "string") throw new AccessError(401, "Please log in again.");
   const memberships = Array.isArray(data.platformAccess?.memberships) ? data.platformAccess.memberships.filter((item: unknown) => item && typeof item === "object") as PlatformMembership[] : [];
