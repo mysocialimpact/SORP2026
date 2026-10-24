@@ -1,0 +1,45 @@
+# SORP 2026 — CISO Phase 1 closure and handover
+
+**As at 24 October 2026 (Africa/Kampala).** This closes the focused remediation phase, not the security review or commercial approval. No authentication cutover, customer migration, or production change is authorised by this document.
+
+## Baseline and current judgement
+
+The original CISO assessment gave a **provisional 41/100**. Its principal concerns were the unintended SORP → My Social Impact (MSI) → Cow account chain; vulnerable dependencies; unverified email ownership and founder MFA; weak assurance over tenant, charity and adviser permissions; database privilege and audit integrity; incomplete backup/recovery; and gaps in monitoring, secret separation, file handling and UK data governance. The full original scoring worksheet is not retained here, so the comparison is a professional estimate, not a repeat of the original audit.
+
+**Current live maturity: provisional 55/100.** SORP's vulnerable Next.js release was replaced and its complete Neon application backup has been restored in isolation. Focused security tests improved. The larger authentication and permission redesign earns little *production* credit while cutover is off. Live login still depends on MSI/Cow, and the live MSI broker has an unpatched critical-rated Next.js dependency. This score is a prioritisation aid, not certification or evidence of safe commercial expansion.
+
+**CISO decision:** Phase 1 development can pause for UX/UI work **only with an urgent, separately owned MSI broker dependency patch**. Leaving that finding unowned while pausing security work would be irresponsible. No exploit or breach was demonstrated. SORP is not CISO-approved for independent authentication or full commercial launch.
+
+## Evidence ledger: production versus prepared
+
+| Control | Evidence and present state |
+| --- | --- |
+| SORP dependency patch | PR [#106](https://github.com/mysocialimpact/SORP2026/pull/106) is in production. The live SORP deployment `dpl_FpLtKJSefEc9LHWpDhwwogMaeQJg` serves commit `5bd4e011`; its lockfile pins Next.js **16.4.2**. A 24 October production-dependency audit reported **zero critical**, but **five high** and two moderate findings requiring separate applicability review. |
+| Independent authentication | PR [#71](https://github.com/mysocialimpact/SORP2026/pull/71) and hardening PR [#104](https://github.com/mysocialimpact/SORP2026/pull/104) are merged and deployed as **dormant code**. Better Auth, verified email, recovery, revocable database sessions, durable login limits and an independent `sorp_auth` schema were built. Production has no SORP auth or Resend configuration; `SORP_AUTH_CUTOVER_ENABLED` is absent. Current users still authenticate through MSI/Cow. |
+| Founder, charity and adviser permissions | New server-side founder TOTP/grants, organisation membership, invitation and adviser consent/revocation checks, tenant isolation, and account-owned Charity Impact Report upload/list/download passed synthetic PostgreSQL, route and focused browser tests. These paths are **not live controls** until cutover. Founder identity and MFA have not been accepted in a production-equivalent end-to-end journey. |
+| Audit and database roles | New founder/audit integrity rules and a restricted `sorp_auth_runtime` role were tested on an isolated database. Production auth migrations and role are not installed. The separate production `sorp_backup_reader` was verified read-only across the 55 current Neon application tables. |
+| Recovery | PRs [#107](https://github.com/mysocialimpact/SORP2026/pull/107), [#109](https://github.com/mysocialimpact/SORP2026/pull/109) and [#112](https://github.com/mysocialimpact/SORP2026/pull/112) are live. Backup `a2c2faee-d265-4f95-93d1-a9c015dbfb9c` on 23 October encrypted, downloaded and restored all 55 current Neon application tables on an isolated branch, with row and relationship verification. The next scheduled run `4d81ff7b-c96f-40bd-aad3-458057c3305e` on 24 October was encrypted and download-verified; its `restoreVerified=false` reuses the **23 October** restore as the last recovery test. Normal protected cron is back at 06:00 UTC (09:00 Kampala); execution may be delayed by Vercel. Backup object storage and database share one Neon provider/project, and this archive does **not** include Cow D1. Proactive failure notification remains unverified. |
+| CI and assurance | PR [#110](https://github.com/mysocialimpact/SORP2026/pull/110) removed a shared-test race. On PR #112 the focused `independent-auth` and `research-console` jobs passed; broad `validate` was **cancelled**, so full browser assurance is not green. Local synthetic tests are not live customer acceptance or an external penetration test. |
+
+## Immediate live concern — separate MSI broker
+
+The **live MSI** Vercel deployment `dpl_7TngkNVn7PzU8MYbPfCuCV8GrGiE`, aliased to `mysocialimpact.org`, serves commit `6ed22007`. Its package and lockfile both pin Next.js **16.2.6**, unlike SORP's patched 16.4.2. A 24 October `npm audit --omit=dev` of that exact lockfile reported **one critical and four high** production dependency findings. The Next.js critical advisory set includes unauthenticated image-optimisation RCE ([GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw)) and other conditional RCE paths. MSI sets `images.unoptimized: true`; no `next/og` or `use cache` use was found in the inspected source, and Vercel is not Windows-hosted. These observations reduce or rule out some exploit paths but **do not establish that every live route is safe**. No live exploit test was attempted.
+
+**Smallest safe correction:** the MSI owner should separately update its pinned Next.js and lockfile to at least the audited fixed **16.4.3**, run a production dependency audit plus focused broker login, recovery, session and image-route regression tests, then release and verify the exact MSI production commit. This document makes **no MSI code or production change**. Until that patch is verified, treat the broker dependency as an urgent live risk and avoid claiming a clean security pause.
+
+## Open findings and cutover gate
+
+**High / must resolve before independent auth cutover or material customer growth**
+
+1. Patch and verify the live MSI broker as above. Triage SORP's five current high-rated dependency findings against reachable use, then patch applicable ones without broad product rewrites.
+2. Finish SORP-owned Resend domain/key and approved-address delivery, forwarding, reply and failure tests. Apply production auth migrations with least-privilege roles; ensure the full backup includes `sorp_auth` after installation. Reconcile the founder's exact identity, organisation memberships and grants; enrol and test real TOTP MFA.
+3. Complete production-equivalent founder, charity, trustee/team and adviser browser/API checks: cross-tenant denial, invitation expiry, consent, immediate revocation, audit integrity, session expiry, report upload/list/download and rollback. Resolve or explicitly isolate the cancelled broad CI suite.
+4. Keep Cow D1 and the MSI/Cow login path available. Brainstrust's full legacy assessment has not been exported or restored from Cow D1; preserve its records and a verified recovery route before any switch could strand them. Historic migration is deferred. **No email to Will or anyone at Brainstrust without the founder's explicit approval.**
+
+**Medium / planned follow-up:** add a separate-provider retained backup and verified alert delivery; review SORP's remaining moderate dependencies, runtime privilege, preview/production secret separation, Ask SORP spending and data leakage controls, sensitive browser storage, CSP, retention/deletion, incident response and UK data-processing arrangements. These are not all UX/UI blockers, but unresolved exposure should be tracked.
+
+## Technical due diligence handover and final approval
+
+The current production identity path remains **SORP → MSI broker → Cow account service/D1**. Other SORP routes use MSI for booking, payments, public readiness research, transcription, report delivery and Ask SORP; `growth-click` can call Cow directly. Some Ideas Shed branding/assets and links are externally referenced. The new due-diligence thread must inventory each runtime and data dependency, ownership, credentials, processor exposure, failure mode and transfer route before calling SORP self-contained. Do not remove shared credentials or infrastructure during authentication preparation.
+
+Return for final CISO approval only after the urgent MSI patch is verified, independent auth is configured and tested end to end with approved addresses, founder MFA and tenant/permission gates pass in production-equivalent conditions, Neon and Cow recovery paths protect existing work, critical CI/browser checks pass, a controlled rollback is rehearsed, and the founder explicitly authorises cutover. An independent penetration test and UK privacy/legal review remain separate assurance steps. Preserve Cow/MSI records throughout.
