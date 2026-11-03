@@ -502,7 +502,7 @@ export function SorpCandidateReview() {
             return;
           }
           if (context?.charity?.status === "ready" && !report) { useExistingJourney = true; break; }
-          if (["failed", "partial"].includes(context?.charity?.status || "")) throw new Error("We couldn’t complete the published report. You can retry or upload a copy.");
+          if (["failed", "partial"].includes(context?.charity?.status || "")) { useExistingJourney = true; break; }
           await pause(2000);
         }
         if (!useExistingJourney) throw new Error("The report is still being prepared. You can come back or upload a copy.");
