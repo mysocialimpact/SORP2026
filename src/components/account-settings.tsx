@@ -41,6 +41,16 @@ export function AccountSettings(){
     try{const response=await fetch("/api/readiness-account/",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action:"update-profile",position:form.get("position"),organisation:form.get("organisation")})});const payload=await response.json().catch(()=>({}));if(!response.ok||!payload.account)throw new Error(payload.error||"Your details could not be saved.");setData(current=>current?{...current,account:{...current.account,...payload.account}}:current);setNotice("Your role and organisation have been saved.");}
     catch(cause){setError(cause instanceof Error?cause.message:"Your details could not be saved.");}finally{setBusy("");}
   }
+  async function logOut(){
+    if(busy)return;
+    setBusy("logout");setError("");setNotice("");
+    try{
+      const response=await fetch("/api/readiness-account/",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action:"logout"})});
+      if(!response.ok)throw new Error("Log out did not complete.");
+      // Reload after server sign-out so all account and navigation state is cleared.
+      window.location.replace("/");
+    }catch{setError("Log out did not complete. Please try again.");setBusy("");}
+  }
   if(error&&!data)return <div className="settings-state" role="alert"><h1>Settings could not be opened.</h1><p>{error}</p><Link href="/dashboard/">Return to My Dashboard</Link></div>;
   if(!data)return <div className="settings-state" role="status"><h1>Opening Settings…</h1></div>;
   if(!data.signedIn||!data.account)return <div className="settings-state"><h1>Sign in to manage Settings.</h1><Link href="/login/?return=/settings/">Log in →</Link></div>;
@@ -50,7 +60,7 @@ export function AccountSettings(){
   const selectedCharity=introduction?.charity?.candidate?.name||data.progress?.onboarding?.selected?.name;
   const canManageAccess=(access:Access)=>memberships.some(item=>item.type==="Charity"&&["owner","admin"].includes(item.role)&&(access.charityOrganisationId?item.organisationId===access.charityOrganisationId:item.name===access.charityName));
   return <div className="settings-shell">
-    <header className="settings-header"><div><p className="gateway-kicker">My SORP2026</p><h1>My Account.</h1><p>Your saved details, organisation, plan and consent-based access in one place.</p></div><Link href="/dashboard/">← Back to My Dashboard</Link></header>
+    <header className="settings-header"><div><p className="gateway-kicker">My SORP2026</p><h1>My Account.</h1><p>Your saved details, organisation, plan and consent-based access in one place.</p></div><div className="settings-account-actions"><Link href="/dashboard/">← Back to My Dashboard</Link><button type="button" onClick={()=>void logOut()} disabled={Boolean(busy)} aria-busy={busy==="logout"} aria-live="polite">{busy==="logout"?"Logging out…":"Log out"}</button></div></header>
     <nav className="settings-nav" aria-label="Account sections"><a href="#organisation">Your details</a><a href="#introduction">Your introduction</a><a href="#people">Users and team</a><a href="#advisers">Accountants and advisers</a><a href="#access">Access &amp; permissions</a><a href="#subscription">Subscription &amp; billing</a></nav>
     {notice&&<p className="settings-notice" role="status">{notice}</p>}{error&&<p className="settings-error" role="alert">{error}</p>}
     <section id="organisation" className="settings-section"><header><span>01</span><div><p className="gateway-kicker">Organisation details</p><h2>{data.account.organisation||memberships[0]?.name||"Your account"}</h2></div></header><dl><div><dt>Account holder</dt><dd>{data.account.name}</dd></div><div><dt>Role</dt><dd>{data.account.position||"Not recorded"}</dd></div><div><dt>Email</dt><dd>{data.account.email}</dd></div>{memberships.map(item=><div key={item.organisationId}><dt>{item.type} workspace</dt><dd>{item.name} · {item.role}</dd></div>)}</dl>
