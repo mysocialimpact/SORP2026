@@ -90,7 +90,7 @@ export default function AskSorp() {
             <p>We’re currently testing Plus and Adviser with a small group of charities, accountants and advisers.</p>
             <p>We’re offering free access to selected beta participants and would love to hear from you if you’d like to get involved.</p>
           </div>
-          <a href="#say-hello">Request free beta access <Arrow /></a>
+          <a href="/contact/?interest=beta#say-hello">Request free beta access <Arrow /></a>
         </div>
       </section>
 

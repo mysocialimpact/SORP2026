@@ -1,4 +1,7 @@
 /* Deliberately outside the sticky navigation; scrolls with normal content. */
+.public-beta-bar { text-align: center; justify-items: center; grid-template-columns: 1fr !important; background: #d8ff52 !important; color: #242329 !important; gap: 1px !important; }
+.public-beta-bar strong { font-size: 10px; letter-spacing: .07em; }
+.public-beta-bar > span { font-size: 11px; }
 .build-information-bar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

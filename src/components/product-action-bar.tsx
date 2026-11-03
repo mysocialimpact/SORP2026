@@ -84,7 +84,7 @@ export function ProductActionBar() {
       {readinessLanding && <Link className="folder-action-utility folder-action-presentation" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>}
       <ToolLink className="folder-action-primary" href={action.href}>{path === "/" && account?.signedIn === false ? "Let’s Get Started" : readinessLanding && !account?.signedIn ? "Start Free Review" : action.label} <span aria-hidden="true">→</span></ToolLink>
       <a className="folder-action-utility folder-action-feedback" href="#page-feedback">Give feedback <span aria-hidden="true">→</span></a>
-      <a className="folder-action-secondary" href="#say-hello">Talk to us <span aria-hidden="true">→</span></a>
+      <a className="folder-action-secondary" href="/contact/">Contact Us <span aria-hidden="true">→</span></a>
     </aside>
     <div className="folder-action-clearance" aria-hidden="true" />
   </>;

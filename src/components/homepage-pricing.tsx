@@ -157,7 +157,7 @@ export function HomepagePricing() {
             <h3>We’re testing Plus and Adviser with a small group of charities, accountants and advisers. We’d love to hear from you if you’d like to get involved and help us make these tools better.</h3>
           </div>
           <a
-            href="#say-hello"
+            href="/contact/?interest=beta#say-hello"
             onClick={() => window.dispatchEvent(new CustomEvent("sorp2026:contact-intent", { detail: { message: "I’d like to request free early beta access." } }))}
           >
             Request free beta access →
