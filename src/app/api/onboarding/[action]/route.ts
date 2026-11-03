@@ -38,7 +38,7 @@ import {
 } from "@/lib/onboarding/intelligence";
 import type { Candidate } from "@/app/sorp-public-model";
 export const runtime = "nodejs";
-export const maxDuration = 180;
+export const maxDuration = 300;
 const snapshot = (session: Awaited<ReturnType<typeof getSession>>) =>
   session
     ? {

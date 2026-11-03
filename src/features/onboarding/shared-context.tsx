@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import type { Candidate } from "@/app/sorp-public-model";
+import type { Candidate, Intelligence, Lens } from "@/app/sorp-public-model";
 import type { Facts } from "@/lib/onboarding/state";
 import "./shared-context.css";
 export type SharedContext = {
   account: { name: string; email: string };
   facts?: Facts;
-  charity?: { candidate: Candidate; status: string };
+  charity?: { candidate: Candidate; status: string; profile?: { preparedReport?: { candidate: Candidate; state: unknown; intelligence: Intelligence; lens: Lens; sourceUrl: string } } };
   documents?: { title: string; source_url: string; status: string }[];
 };
 export async function loadSharedContext(
