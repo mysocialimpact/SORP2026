@@ -23,12 +23,24 @@ const organisations = [
 ];
 
 const colours = [[35, 77, 59], [173, 57, 32], [112, 80, 139], [48, 81, 109]];
+const featured = ["Diageo", "Starbucks", "Sainsbury’s", "Great Ormond Street Hospital", "ActionAid", "Greenpeace", "Comic Relief"];
+const crawlOrganisations = [...featured, ...organisations.filter(name => !featured.includes(name))];
+const crawlLines = crawlOrganisations.reduce<string[]>((lines, name) => {
+  const last = lines.length - 1;
+  if (last >= 0 && lines[last].length + name.length + 3 <= 34) lines[last] += ` · ${name}`;
+  else lines.push(name);
+  return lines;
+}, []);
 const slots = 12;
+const openingLine = 5;
 export function ExperienceCloud() {
   const stage = useRef<HTMLDivElement>(null);
   const progress = useRef(0);
-  const firstName = useRef(0);
+  const firstLine = useRef(openingLine);
+  const audio = useRef<AudioContext | null>(null);
+  const cueTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [paused, setPaused] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -36,6 +48,10 @@ export function ExperienceCloud() {
     const update = () => setReduced(motion.matches);
     update(); motion.addEventListener("change", update);
     return () => motion.removeEventListener("change", update);
+  }, []);
+  useEffect(() => () => {
+    if (cueTimer.current) clearTimeout(cueTimer.current);
+    void audio.current?.close();
   }, []);
   useEffect(() => {
     const root = stage.current;
@@ -54,18 +70,18 @@ export function ExperienceCloud() {
         const journey = progress.current + i / slots;
         const distance = journey % 1;
         const cycle = Math.floor(journey);
-        const index = ((firstName.current - i + cycle * slots) % organisations.length + organisations.length) % organisations.length;
-        const name = organisations[index];
+        const index = ((firstLine.current - i + cycle * slots) % crawlLines.length + crawlLines.length) % crawlLines.length;
+        const line = crawlLines[index];
         const near = 1 - distance;
-        const scale = (mobile ? .58 : .5) + (mobile ? .42 : .5) * Math.pow(near, 1.4);
+        const scale = (mobile ? .65 : .56) + (mobile ? .35 : .44) * Math.pow(near, 1.4);
         const y = 32 + near * (height - 64);
         const colour = colours[index % colours.length];
         const blend = Math.pow(near, .7);
-        item.textContent = name;
+        item.textContent = line;
         item.style.transform = `translate(-50%, -50%) translateY(${y}px) scale(${scale})`;
         item.style.color = `rgb(${colour.map((channel, c) => Math.round([112,117,112][c] * (1-blend) + channel * blend)).join(",")})`;
         item.style.opacity = String(Math.min(1, distance * slots * 3, (1-distance) * slots * 3) * (.8 + .2 * near));
-        const baseSize = mobile ? (name.length > 26 ? 17 : name.length > 16 ? 20 : 30) : (name.length > 36 ? 30 : 40);
+        const baseSize = mobile ? (line.length > 34 ? 15 : line.length > 26 ? 18 : line.length > 19 ? 22 : 30) : (line.length > 34 ? 32 : line.length > 25 ? 37 : 44);
         item.style.fontSize = `${Math.max(baseSize, (mobile ? 14 : 18) / scale)}px`;
         item.style.maxHeight = `${pitch - 4}px`;
       });
@@ -75,25 +91,78 @@ export function ExperienceCloud() {
     return () => { cancelAnimationFrame(frame); observer.disconnect(); };
   }, [paused, reduced]);
   function explore(index: number) {
-    firstName.current = index;
+    firstLine.current = crawlLines.findIndex(line => line.split(" · ").includes(organisations[index])) + openingLine;
     progress.current = .04;
     setSelected(index);
     setPaused(true);
   }
+  async function toggleCue() {
+    if (audio.current) {
+      if (cueTimer.current) clearTimeout(cueTimer.current);
+      void audio.current.close();
+      audio.current = null;
+      setPlaying(false);
+      return;
+    }
+    const context = new AudioContext();
+    audio.current = context;
+    try {
+      await context.resume();
+      const master = context.createGain();
+      master.gain.value = 0.28;
+      master.connect(context.destination);
+      const start = context.currentTime + 0.05;
+      const chords = [
+        [146.83, 174.61, 220, 329.63],
+        [116.54, 174.61, 233.08, 293.66],
+        [130.81, 174.61, 220, 261.63],
+        [130.81, 164.81, 196, 261.63],
+      ];
+      const note = (frequency: number, at: number, duration: number, level: number, kind: OscillatorType) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = kind;
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.001, at);
+        gain.gain.linearRampToValueAtTime(level, at + Math.min(0.7, duration / 4));
+        gain.gain.setValueAtTime(level, at + duration - 0.8);
+        gain.gain.exponentialRampToValueAtTime(0.001, at + duration);
+        oscillator.connect(gain).connect(master);
+        oscillator.start(at);
+        oscillator.stop(at + duration + 0.02);
+      };
+      chords.forEach((chord, passage) => {
+        const at = start + passage * 4;
+        chord.forEach((frequency, index) => note(frequency, at, 4.3, index === 0 ? 0.11 : 0.055, "sine"));
+        [0, 2, 1, 3, 2, 1].forEach((index, beat) => note(chord[index] * 2, at + beat * 0.58, 1.1, 0.035, "triangle"));
+      });
+      setPlaying(true);
+      cueTimer.current = setTimeout(() => {
+        void context.close();
+        if (audio.current === context) audio.current = null;
+        setPlaying(false);
+      }, 17500);
+    } catch {
+      void context.close();
+      audio.current = null;
+      setPlaying(false);
+    }
+  }
   return <section className="experience-cloud experience-crawl" id="home-experience" aria-labelledby="experience-title">
     <div className="gateway-width crawl-heading">
-      <div><p className="gateway-kicker">Different perspectives. Shared experience.</p>
-      <h2 id="experience-title">Experience across our team</h2>
-      <p className="crawl-introduction">A world of organisations. A wealth of experience to draw on.</p></div>
+      <div><p className="gateway-kicker">Experience across our team.</p>
+      <h2 id="experience-title">Creativity strikes back.</h2>
+      <p className="crawl-introduction">Our team has worked in global agencies and with major brands. Now we bring that strategic and creative thinking within reach of charities and organisations of every size.</p></div>
       <div className="crawl-controls">
         <button type="button" onClick={() => { if (reduced) return; setPaused(value => !value); }} aria-pressed={paused || reduced} disabled={reduced}>{reduced ? "Motion reduced" : paused ? "Resume movement" : "Pause movement"}</button>
+        <button type="button" onClick={() => void toggleCue()} aria-pressed={playing}>{playing ? "Stop original cue" : "Play original cue ♪"}</button>
         <a href="#experience-collection" onClick={() => setPaused(true)}>Explore the names ↓</a>
       </div>
     </div>
     <div className="crawl-frame">
       <div className="crawl-plane" aria-hidden="true" />
       <div className="crawl-space" ref={stage} aria-hidden="true">
-        {Array.from({length: slots}, (_, i) => <span className="crawl-name" key={i} style={{ top: 0, transform: `translate(-50%, -50%) translateY(${32 + (1-i/slots)*576}px) scale(${.64+.36*(1-i/slots)**2})` }}>{organisations[(slots-i)%slots]}</span>)}
+        {Array.from({length: slots}, (_, i) => <span className="crawl-name" key={i} style={{ top: 0, transform: `translate(-50%, -50%) translateY(${32 + (1-i/slots)*576}px) scale(${.64+.36*(1-i/slots)**2})` }}>{crawlLines[((openingLine-i)%crawlLines.length+crawlLines.length)%crawlLines.length]}</span>)}
       </div>
     </div>
     <div className="gateway-width crawl-explore" id="experience-collection">
