@@ -36,7 +36,7 @@ function freshId() {
 export function PageFeedback() {
   const pathname = usePathname();
   const founderMode = pathname === "/founder" || pathname.startsWith("/founder/");
-  if (founderMode) return null;
+  if (founderMode || pathname.replace(/\/$/, "") === "/contact") return null;
   return <PageFeedbackForm key={pathname} pathname={pathname} />;
 }
 

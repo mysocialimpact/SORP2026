@@ -569,6 +569,16 @@
 }
 .compact-contact { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-block: 24px; border-top: 1px solid #24232920; }
 .compact-contact a { font-weight: 650; min-height: 44px; display: inline-flex; align-items: center; }
+.contact-invitation { margin-top: 0; padding: 0; background: #efc5d4; }
+.contact-invitation::before { display: none; }
+.contact-invitation-link { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 30px; text-decoration: none; }
+.contact-invitation-link > span { display: grid; gap: 7px; }
+.contact-invitation-link strong { font-size: clamp(20px, 2vw, 28px); font-weight: 600; letter-spacing: -.035em; }
+.contact-invitation-link > span > span { font-size: 14px; line-height: 1.5; color: #574650; }
+.contact-invitation-link b { display: flex; align-items: center; gap: 24px; flex-shrink: 0; min-height: 44px; border-bottom: 1px solid #755469; font-size: 16px; }
+.contact-invitation-link:hover b { border-color: #242329; }
+.contact-invitation-link:focus-visible { outline: 3px solid #493b72; outline-offset: -5px; }
+@media(max-width:700px) { .contact-invitation-link { flex-direction: column; align-items: flex-start; gap: 14px; padding-block: 26px; } }
 .contact-demo-option { margin: 30px 0; padding: 20px 0; border-block: 1px solid #24232925; }
 .contact-demo-option summary { cursor: pointer; font-size: 18px; min-height: 44px; }
 .contact-demonstration { padding: clamp(24px,4vw,48px); background: #e8eddf; border-radius: 6px; margin-top: 24px; }

@@ -1,89 +1,50 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { DemoRequest } from "@/components/demo-request";
-import "../sample-charity/sample-charity.css";
-import { MsiBrand, IdeasBrand } from "@/components/brand";
-import { Arrow } from "@/components/ui";
+import { SayHello } from "@/components/say-hello";
 import { site } from "@/lib/site";
 import { SupportingBreadcrumb } from "@/components/supporting-breadcrumb";
+import { Arrow } from "@/components/ui";
+import "./contact.css";
+
 export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Talk to Marcus Warry at My Social Impact about SORP readiness and creating greater social impact.",
+  title: "Contact Us",
+  description: "Talk to Marcus Warry at My Social Impact about SORP readiness and creating greater social impact.",
   ...(site.live ? { alternates: { canonical: "/contact/" } } : {}),
 };
+
+const locations = [
+  { city: "Somerset, UK", place: "The Offices", lines: ["10 Marketplace", "Shepton Mallet", "Somerset BA4 5AZ"] },
+  { city: "London, UK", place: "PopHub Leicester Square", lines: ["Floors 1 & 2, 41 Whitcomb Street", "London WC2H 7DT"] },
+  { city: "Kampala, Uganda", place: "The Wild Ones", lines: ["Tank Hill Road", "Muyenga, Kampala"] },
+];
+
 export default function Contact() {
-  return (
-    <main id="main" className="gateway gateway-contact">
-      <div className="gateway-width">
-        <SupportingBreadcrumb current="Contact" />
-        <section className="gateway-contact-hero">
-          <div>
-            <p className="gateway-kicker">
-              A real person. A useful conversation.
-            </p>
-            <h1>
-              Let’s talk
-              <br />
-              <span>impact.</span>
-            </h1>
-            <p>
-              A question about the tools, your reporting or what comes next? Get
-              in touch with Marcus.
-            </p>
-            <a
-              className="gateway-email"
-              href="mailto:marcus@mysocialimpact.org"
-            >
-              marcus@mysocialimpact.org <Arrow diagonal />
-            </a>
-            <div className="gateway-contact-caption">
-              <strong>Marcus Warry ACA</strong>
-              <span>
-                Chartered Accountant & social impact consultant
-                <br />
-                Co-founder, My Social Impact
-              </span>
-            </div>
+  return <main id="main" className="gateway contact-page">
+    <div className="gateway-width">
+      <SupportingBreadcrumb current="Contact Us" />
+      <div className="contact-main">
+        <section className="contact-introduction" aria-labelledby="contact-title">
+          <p className="gateway-kicker">A real person. A useful conversation.</p>
+          <h1 id="contact-title">Let’s talk <em>impact.</em></h1>
+          <p className="contact-lead">A question about SORP 2026, our tools or what comes next? I’d love to hear from you.</p>
+          <div className="contact-person">
+            <Image src="/images/marcus-outdoor-original.jpg" alt="Marcus Warry smiling outdoors" width={144} height={176} priority sizes="(max-width: 800px) 104px, 144px" />
+            <div><h2>Marcus Warry ACA</h2><p>Chartered Accountant<br />Social Impact Consultant</p><p>Co-founder, My Social Impact</p></div>
           </div>
-          <Image
-            className="gateway-contact-portrait"
-            src="/images/marcus-outdoor-original.jpg"
-            alt="Marcus Warry, co-founder of My Social Impact"
-            width={480}
-            height={520}
-            priority
-            sizes="(max-width: 700px) 90vw, 420px"
-          />
+          <a className="contact-email" href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org <Arrow diagonal /></a>
+          <p className="contact-self-guided">Prefer a quick look first? <Link href="/sample-charity/">Explore our fictional charity demo →</Link><span>No account needed.</span></p>
         </section>
-        <section className="contact-demonstration" aria-labelledby="contact-demo-heading">
-          <p className="gateway-kicker">Explore at your own pace</p>
-          <h2 id="contact-demo-heading">A little context. A clearer picture.</h2>
-          <p>Meet Harbourlight Neighbours, a fictional charity created for our demonstration. Follow its example readiness review, reporting and impact journey without creating an account.</p>
-          <Link href="/sample-charity/">See SORP 2026 in action →</Link>
-        </section>
-        <details className="contact-demo-option"><summary>Request a free personal demo →</summary><DemoRequest compact /></details>
-        <section
-          className="gateway-organisations"
-          aria-label="The organisations behind the tools"
-        >
-          <div>
-            <MsiBrand attribution="The thinking behind the tools" />
-            <p>
-              My Social Impact develops approaches and tools that help charities
-              and other organisations improve their social impact.
-            </p>
-          </div>
-          <div>
-            <IdeasBrand />
-            <p>
-              The Ideas Shed builds imaginative, practical technology and tools
-              that help turn those ideas into reality.
-            </p>
-          </div>
-        </section>
+        <SayHello embedded />
       </div>
-    </main>
-  );
+      <section className="contact-locations" aria-labelledby="locations-title">
+        <header><h2 id="locations-title">Where we work.</h2><p>Our working bases, in the UK and Uganda.<br />Please get in touch before planning a visit.</p></header>
+        <div className="contact-location-grid">{locations.map((location, index) => <article key={location.city}>
+          <span className="contact-location-number" aria-hidden="true">0{index + 1}</span>
+          <h3>{location.city}</h3>
+          <address><strong>{location.place}</strong>{location.lines.map(line => <span key={line}>{line}</span>)}</address>
+        </article>)}</div>
+      </section>
+    </div>
+  </main>;
 }
