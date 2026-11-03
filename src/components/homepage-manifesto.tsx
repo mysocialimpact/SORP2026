@@ -87,7 +87,18 @@ export function HomepageManifesto() {
               <circle className={styles.convergence} cx="303" cy="90" r="4" fill="#476C62" stroke="none"/>
             </g>
           </svg>
-          <Image className={styles.marcus} src="/images/marcus-outdoor-original.jpg" alt="Marcus Warry" width={960} height={1280} sizes="(max-width: 700px) 48vw, 320px" unoptimized />
+          <svg className={styles.graffiti} viewBox="0 0 600 420" fill="none" aria-hidden="true">
+            <g strokeLinecap="round">
+              <path className={styles.paintSweep} pathLength="1" d="M-35 230L196 20M-12 300L320 15M190 410L630 36" stroke="#d8ff52" strokeWidth="44" />
+              <path className={styles.paintLoop} pathLength="1" d="M-20 95C120-30 285 3 352 74S465 183 627 69M361 326C450 245 570 252 640 289" stroke="#cfddcf" strokeWidth="18" />
+              <path className={styles.paintAccent} pathLength="1" d="M19 53L102 29M487 164L610 119M534 176V232M42 310V355" stroke="#f0a7c1" strokeWidth="7" />
+              <path className={styles.paintAccent} pathLength="1" d="M259 52L294 22M278 19L279 57M557 335L605 303" stroke="#ff633b" strokeWidth="5" />
+            </g>
+            <g className={styles.paintSpeckles} fill="#d8ff52">
+              {Array.from({ length: 65 }, (_, i) => <circle key={i} cx={(i * 97 + 19) % 600} cy={(i * 53 + 11) % 420} r={i % 4 === 0 ? 2.6 : 1.1} opacity={.25 + (i % 4) * .15} />)}
+            </g>
+          </svg>
+          <Image className={styles.marcus} src="/images/marcus-warry-cutout.webp" alt="Marcus Warry" width={1205} height={1306} sizes="(max-width: 700px) 48vw, 320px" />
           <Image className={styles.chris} src="/images/chris-vision.webp" alt="Dr Chris Arnold" width={600} height={534} sizes="(max-width: 700px) 48vw, 320px" />
         </div>
         <div className={styles.founderProfiles}>
