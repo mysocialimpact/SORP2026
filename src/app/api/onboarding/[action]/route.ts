@@ -416,14 +416,11 @@ export async function POST(
         },
       ].slice(-22);
       const saved = await saveSession(session, next, messages);
+      // Persist the confirmed charity before responding, so the existing
+      // worker can recover the job if this function ends or the visitor leaves.
+      const identity = await queueCharity(selected);
       // No lookup or inferred entity can enqueue public research. Only this explicit confirmation does.
       after(async () => {
-        const current = await getSession(request);
-        if (
-          current?.state.charity.confirmed?.officialUrl !== selected.officialUrl
-        )
-          return;
-        const identity = await queueCharity(selected);
         await prepareCharity(identity).catch(() => undefined);
       });
       return json({ ...snapshot(saved), preparation: "queued" });
