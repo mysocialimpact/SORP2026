@@ -452,7 +452,7 @@ export async function POST(
         )
           throw new Error("This introduction belongs to another account.");
         await c.query(
-          `INSERT INTO research_console.onboarding_profiles(account_id,facts,messages,charity_identity,attribution) VALUES($1,$2,$3,$4,$5) ON CONFLICT(account_id) DO NOTHING`,
+          `INSERT INTO research_console.onboarding_profiles(account_id,facts,messages,charity_identity,attribution) VALUES($1,$2,$3,$4,$5) ON CONFLICT(account_id) DO UPDATE SET facts=EXCLUDED.facts,messages=EXCLUDED.messages WHERE $6::boolean`,
           [
             identity.account.id,
             JSON.stringify({
@@ -466,6 +466,7 @@ export async function POST(
             JSON.stringify(session.messages),
             charity,
             JSON.stringify(session.attribution),
+            locked.account_id === identity.account.id,
           ],
         );
         await c.query(

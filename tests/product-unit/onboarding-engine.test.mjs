@@ -95,7 +95,7 @@ const fact = (
   period = "current",
   correction = false,
 ) => ({ field, value, quote, period, correction });
-test("history shapes the missing-role question without populating current employer", () => {
+test("historic employment stays separate while registration asks only for essentials", () => {
   const s = advance(initialConversation(), {
     name: "Marcus Worrey",
     email: "marcus@example.invalid",
@@ -108,8 +108,8 @@ test("history shapes the missing-role question without populating current employ
   });
   assert.equal(s.facts.organisation, "");
   assert.equal(s.facts.role, "");
-  assert.match(nextQuestion(s), /Blue Cross.*previously.*now/);
-  assert.equal(s.response.generated, true);
+  assert.match(nextQuestion(s), /email address|charity/i);
+  assert.equal(s.response, null);
   const corrected = applyFacts(s, { name: "Marcus Warry" }, "form");
   assert.equal(corrected.facts.name, "Marcus Warry");
   assert.match(nextQuestion(corrected), /Blue Cross/);
@@ -377,7 +377,7 @@ test("historical work requires a present-focused role question, not merely a gen
     },
   });
   assert.equal(s.response, null);
-  assert.match(nextQuestion(s), /Blue Cross.*previously.*now/);
+  assert.match(nextQuestion(s), /email address|charity/i);
 });
 test("rejection without an active choice cannot imply an arbitrary charity selection", () => {
   const s = advance(ready(), {

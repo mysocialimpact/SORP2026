@@ -1,6 +1,7 @@
 import type { Candidate } from "../../app/sorp-public-model";
 /** Public, serialisable facts. No credentials, permissions or inferred identity. */
 export const fieldKeys = ["name", "email", "role", "organisation"] as const;
+export const essentialKeys = ["name", "email"] as const;
 export type FieldKey = (typeof fieldKeys)[number];
 export const optionalKeys = ["responsibilities", "discovery", "concerns"] as const;
 export const editableKeys = [...fieldKeys, ...optionalKeys] as const;
@@ -143,9 +144,7 @@ export const validEmail = (v: string) =>
   v.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 export const registrationReady = (f: Facts) =>
   validEntity(f.name, "name") &&
-  validEmail(f.email) &&
-  validEntity(f.role, "role") &&
-  validEntity(f.organisation, "organisation");
+  validEmail(f.email);
 export const accountReady = (s: Conversation) => registrationReady(s.facts) && !!s.charity.confirmed;
 export const OPTIONAL_TURN_CAP = 6;
 export const TOTAL_TURN_CAP = 10;
@@ -1048,16 +1047,7 @@ function fallbackQuestion(s: Conversation): string {
       const missing = [
         !validEntity(s.facts.name, "name") && "your name",
         !validEmail(s.facts.email) && "your email address",
-        !validEntity(s.facts.role, "role") && "what you do",
-        !validEntity(s.facts.organisation, "organisation") && "your employer or firm (or whether you work independently)",
       ].filter(Boolean);
-      const historical = s.professional.find((r) => r.period === "past");
-      if (
-        missing.length === 1 &&
-        !validEntity(s.facts.role, "role") &&
-        historical
-      )
-        return `${relationshipLead(historical)}What sort of work are you doing now?`;
       const acknowledgement = s.charity.proposed
         ? `I’ve noted ${s.charity.proposed} as a possible starting charity. `
         : "";
@@ -1065,7 +1055,7 @@ function fallbackQuestion(s: Conversation): string {
         !Object.values(s.facts).some(
           (v) => typeof v === "string" && v && v !== "unknown",
         )
-        ? "Tell me a little about yourself. What’s your name, email, role and organisation? If you’re helping a charity, which one?"
+        ? "What’s your name, email address and the charity you’d like to explore?"
         : `${acknowledgement}Thank you${s.facts.name ? `, ${s.facts.name.split(" ")[0]}` : ""}. Could you tell me ${missing.join(" and ")}?`;
     }
     case "charity": {
@@ -1200,7 +1190,7 @@ export function mergeProfessional(
   return result.slice(-12);
 }
 export function missingRegistration(s: Conversation): FieldKey[] {
-  return fieldKeys.filter(
+  return essentialKeys.filter(
     (k) => !validEntity(s.facts[k], k),
   );
 }
@@ -1209,12 +1199,7 @@ export function questionPlan(s: Conversation) {
   const missing = missingRegistration(s);
   const fields =
     objective === "registration"
-      ? [
-          ...missing,
-          ...(!s.facts.organisation && missing.includes("role")
-            ? ["organisation"]
-            : []),
-        ]
+      ? missing
       : objective === "charity"
         ? ["charity"]
         : ["responsibilities", "discovery", "concerns"].includes(objective)

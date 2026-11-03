@@ -3,7 +3,7 @@ import { questionPlan, suitableDialogue, charityOptions, challengeQuestion, type
 export function dialogueTask(state: Conversation) {
   const plan = questionPlan(state);
   switch (plan.objective) {
-    case "registration": return `Ask for the genuinely missing registration fields in progressPlan. ${plan.context?.period === "past" && plan.fields.includes("role") ? `They just told you about past work involving ${plan.context.entity}. Acknowledge that specific former relationship as the bridge into asking what they do now. It is not their current employer.` : "Build on relevant professional background they have just shared."} Ask for their professional employer/firm or explicit independent status if missing. Trusteeships and clients are separate from employment.`;
+    case "registration": return "Ask only for the missing name or email in progressPlan. Professional roles and employers are optional. Preserve the distinction between employment, trusteeships and clients. Invite the charity name if not yet supplied.";
     case "charity": return ["remind", "disagree"].includes(state.lastIntent) && !state.charity.candidates.length
       ? "Receive the reminder without defending your previous question or correcting their frustration. Retain the known organisation. If one candidate is now unambiguous, the next step is finding its official record using the visible Find button, so they can check it. Briefly describe that next step without asking for the name or the same permission again. The record has not been found or confirmed yet. Only if the choice remains genuinely ambiguous, explain that and ask which candidate they mean."
       : state.charity.candidates.length

@@ -261,7 +261,7 @@ test("semantic interpretation supersedes incidental lexical matches instead of r
   assert.equal(next.facts.name, "Alex Jones");
   assert.equal(next.facts.role, "");
   assert.equal(next.facts.organisation, "");
-  assert.match(nextQuestion(next), /what you do/);
+  assert.doesNotMatch(nextQuestion(next), /what you do/);
 });
 test("manual typing retains word separators while validation remains deterministic", () => {
   let s = applyFacts(initialConversation(), { name: "David " }, "form");
