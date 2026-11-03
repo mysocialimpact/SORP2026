@@ -117,7 +117,8 @@ export function VoiceInput({
   function stop() {
     if (recorder.current?.state === "recording") {
       recorder.current.stop();
-      release();
+      // Keep the stream alive until the final dataavailable event has been read.
+      transition("transcribing");
     }
   }
   async function start() {
@@ -176,52 +177,52 @@ export function VoiceInput({
         setError("Recording stopped unexpectedly. Please try again.");
         transition("error");
       };
-      const context = new AudioContext();
-      audio.current = context;
-      await context.resume();
-      const analyser = context.createAnalyser();
-      analyser.fftSize = 128;
-      context.createMediaStreamSource(media).connect(analyser);
-      // A short audible activation cue. The waveform itself uses real microphone samples.
-      const oscillator = context.createOscillator(),
-        gain = context.createGain();
-      oscillator.frequency.value = 620;
-      gain.gain.setValueAtTime(0.025, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.09);
-      oscillator.connect(gain);
-      gain.connect(context.destination);
-      oscillator.start();
-      oscillator.stop(context.currentTime + 0.09);
-      const data = new Uint8Array(analyser.frequencyBinCount);
-      let last = 0;
-      const draw = (time: number) => {
-        if (time - last > 70) {
-          analyser.getByteFrequencyData(data);
-          setLevels(
-            Array.from({ length: 18 }, (_, i) => 3 + (data[i * 2] / 255) * 32),
-          );
-          last = time;
-        }
-        frame.current = requestAnimationFrame(draw);
-      };
-      frame.current = requestAnimationFrame(draw);
       current.start(250);
       setSeconds(0);
       transition("recording");
       timer.current = setInterval(() => setSeconds((s) => s + 1), 1000);
       timeout.current = setTimeout(stop, 90000);
+      // AudioContext is only a display aid. Browsers may block it separately
+      // from microphone permission; recording must still continue.
+      try {
+        const Context = window.AudioContext;
+        if (Context) {
+          const context = new Context();
+          audio.current = context;
+          await context.resume();
+          const analyser = context.createAnalyser();
+          analyser.fftSize = 128;
+          context.createMediaStreamSource(media).connect(analyser);
+          const data = new Uint8Array(analyser.frequencyBinCount);
+          let last = 0;
+          const draw = (time: number) => {
+            if (current.state !== "recording") return;
+            if (time - last > 70) {
+              analyser.getByteFrequencyData(data);
+              setLevels(Array.from({ length: 18 }, (_, i) => 3 + (data[i * 2] / 255) * 32));
+              last = time;
+            }
+            frame.current = requestAnimationFrame(draw);
+          };
+          frame.current = requestAnimationFrame(draw);
+        }
+      } catch {
+        void audio.current?.close().catch(() => undefined);
+        audio.current = null;
+      }
     } catch (e) {
       release();
-      const denied = e instanceof DOMException && e.name === "NotAllowedError";
+      const name = e instanceof Error ? e.name : "";
+      const denied = name === "NotAllowedError" || name === "PermissionDeniedError";
       setPermissionDenied(denied);
       setError(
         denied
           ? window.matchMedia("(display-mode: standalone)").matches
-            ? "Microphone access is blocked in this installed app. You can still type your answer below."
-            : "Microphone access was declined. You can still type your answer below."
-          : e instanceof Error
-            ? e.message
-            : "We couldn’t open your microphone.",
+            ? "Microphone access is blocked in this installed app. You can still type below."
+            : "Microphone access was declined. You can still type below."
+          : name === "NotFoundError" ? "We couldn’t find a microphone. Connect one or type your answer."
+          : name === "NotReadableError" ? "Another app may be using your microphone. Close it and try again, or type your answer."
+          : "We couldn’t start recording. Please try again or type your answer.",
       );
       transition("error");
     }
