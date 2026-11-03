@@ -14,13 +14,36 @@ try {
     });
     await page.getByRole('heading', { name: 'Creativity strikes back.' }).waitFor();
     await page.waitForTimeout(250);
-    await page.waitForFunction(() => [...document.querySelectorAll('.crawl-name')].some(line => line.textContent.includes(' · ')));
-    assert.equal(await page.locator('.crawl-name').filter({ hasText: 'Diageo · Starbucks · Sainsbury’s' }).count(), 1);
+    await page.waitForFunction(() => [...document.querySelectorAll('.crawl-organisation')].some(name => name.textContent === 'Diageo'));
+    assert.equal(await page.locator('#experience-collection li').count(), 62);
+    const inspect = async phase => {
+      const result = await page.evaluate(() => {
+        const frame = document.querySelector('.crawl-space').getBoundingClientRect();
+        const names = [...document.querySelectorAll('.crawl-name')].flatMap(row =>
+          Number(getComputedStyle(row).opacity) < .2 ? [] : [...row.children].filter(name => !name.hidden).map(name => ({
+            text: name.textContent, rect: name.getBoundingClientRect().toJSON(), fits: name.scrollWidth <= name.clientWidth + 1,
+          })));
+        const visible = names.filter(name => name.rect.top >= frame.top && name.rect.bottom <= frame.bottom);
+        const collision = visible.some((a, i) => visible.slice(i + 1).some(b =>
+          a.rect.left < b.rect.right - 1 && a.rect.right > b.rect.left + 1 &&
+          a.rect.top < b.rect.bottom - 1 && a.rect.bottom > b.rect.top + 1));
+        return { names: visible.length, collision, clipped: visible.filter(name => !name.fits).map(name => name.text), height: frame.height, width: frame.width, overflow: document.documentElement.scrollWidth > innerWidth };
+      });
+      assert.equal(result.collision, false, `${width}px ${phase}: names collide`);
+      assert.deepEqual(result.clipped, [], `${width}px ${phase}: names clip`);
+      assert.equal(result.overflow, false, `${width}px ${phase}: horizontal overflow`);
+      assert.ok(result.height <= 380, `${width}px ${phase}: crawl is too tall`);
+      if (width > 700) { assert.ok(result.names >= 10, `${phase}: only ${result.names} desktop names visible`); assert.ok(result.width >= 1200, 'desktop crawl is too narrow'); }
+      await page.locator('.crawl-frame').screenshot({ path: `/tmp/experience-crawl-${width}-${phase}.png` });
+    };
+    await inspect('start');
     const before = await page.locator('.crawl-name').first().evaluate(line => line.style.transform);
     await page.waitForTimeout(250);
     assert.notEqual(await page.locator('.crawl-name').first().evaluate(line => line.style.transform), before, `${width}px crawl must move when visible`);
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${width}px horizontal overflow`);
-    await page.screenshot({ path: `/tmp/experience-crawl-${width}.png` });
+    await page.waitForTimeout(7500);
+    await inspect('middle');
+    await page.waitForTimeout(7500);
+    await inspect('later');
     const play = page.getByRole('button', { name: /Play original cue/ });
     await play.click();
     assert.equal(await page.getByRole('button', { name: /Stop original cue/ }).getAttribute('aria-pressed'), 'true');

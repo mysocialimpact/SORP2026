@@ -25,13 +25,22 @@ const organisations = [
 const colours = [[35, 77, 59], [173, 57, 32], [112, 80, 139], [48, 81, 109]];
 const featured = ["Diageo", "Starbucks", "Sainsbury’s", "Great Ormond Street Hospital", "ActionAid", "Greenpeace", "Comic Relief"];
 const crawlOrganisations = [...featured, ...organisations.filter(name => !featured.includes(name))];
-const crawlLines = crawlOrganisations.reduce<string[]>((lines, name) => {
-  const last = lines.length - 1;
-  if (last >= 0 && lines[last].length + name.length + 3 <= 34) lines[last] += ` · ${name}`;
-  else lines.push(name);
-  return lines;
-}, []);
-const slots = 12;
+function makeRows(mobile: boolean) {
+  const rows: string[][] = [];
+  for (const name of crawlOrganisations) {
+    const last = rows.at(-1);
+    const length = last?.reduce((total, item) => total + item.length, 0) || 0;
+    const canJoin = mobile
+      ? last && last.length < 2 && length + name.length <= 25
+      : last && (last.length < 3 || last.length < 4 && length + name.length <= 56 && name.length <= 22);
+    if (canJoin && last) last.push(name);
+    else rows.push([name]);
+  }
+  return rows;
+}
+const desktopRows = makeRows(false);
+const mobileRows = makeRows(true);
+const slots = 6;
 const openingLine = 5;
 export function ExperienceCloud() {
   const stage = useRef<HTMLDivElement>(null);
@@ -60,30 +69,35 @@ export function ExperienceCloud() {
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
     observer.observe(root);
     const render = (time: number) => {
-      if (previous && visible && !paused && !reduced && !document.hidden) progress.current += Math.min(time - previous, 40) / 72000;
+      if (previous && visible && !paused && !reduced && !document.hidden) progress.current += Math.min(time - previous, 40) / 16000;
       previous = time;
       const height = root.clientHeight;
       const mobile = root.clientWidth < 700;
-      const pitch = (height - 64) / slots;
+      const rows = mobile ? mobileRows : desktopRows;
+      const pitch = (height - 72) / slots;
       Array.from(root.children).forEach((node, i) => {
         const item = node as HTMLElement;
         const journey = progress.current + i / slots;
         const distance = journey % 1;
         const cycle = Math.floor(journey);
-        const index = ((firstLine.current - i + cycle * slots) % crawlLines.length + crawlLines.length) % crawlLines.length;
-        const line = crawlLines[index];
+        const index = ((firstLine.current - i + cycle * slots) % rows.length + rows.length) % rows.length;
+        const row = rows[index];
         const near = 1 - distance;
-        const scale = (mobile ? .65 : .56) + (mobile ? .35 : .44) * Math.pow(near, 1.4);
-        const y = 32 + near * (height - 64);
+        const scale = (mobile ? .78 : .72) + (mobile ? .22 : .28) * Math.pow(near, 1.4);
+        const y = 36 + near * (height - 72);
         const colour = colours[index % colours.length];
         const blend = Math.pow(near, .7);
-        item.textContent = line;
         item.style.transform = `translate(-50%, -50%) translateY(${y}px) scale(${scale})`;
         item.style.color = `rgb(${colour.map((channel, c) => Math.round([112,117,112][c] * (1-blend) + channel * blend)).join(",")})`;
         item.style.opacity = String(Math.min(1, distance * slots * 3, (1-distance) * slots * 3) * (.8 + .2 * near));
-        const baseSize = mobile ? (line.length > 34 ? 15 : line.length > 26 ? 18 : line.length > 19 ? 22 : 30) : (line.length > 34 ? 32 : line.length > 25 ? 37 : 44);
-        item.style.fontSize = `${Math.max(baseSize, (mobile ? 14 : 18) / scale)}px`;
-        item.style.maxHeight = `${pitch - 4}px`;
+        item.style.height = `${pitch}px`;
+        Array.from(item.children).forEach((child, position) => {
+          const name = row[position] || "";
+          const label = child as HTMLElement;
+          if (label.textContent !== name) label.textContent = name;
+          label.hidden = !name;
+          label.style.fontSize = `${mobile ? name.length > 30 ? 13 : name.length > 22 ? 15 : name.length > 14 ? 18 : 23 : name.length > 34 ? 15 : name.length > 25 ? 18 : name.length > 18 ? 21 : 25}px`;
+        });
       });
       frame = requestAnimationFrame(render);
     };
@@ -91,7 +105,8 @@ export function ExperienceCloud() {
     return () => { cancelAnimationFrame(frame); observer.disconnect(); };
   }, [paused, reduced]);
   function explore(index: number) {
-    firstLine.current = crawlLines.findIndex(line => line.split(" · ").includes(organisations[index])) + openingLine;
+    const rows = stage.current && stage.current.clientWidth < 700 ? mobileRows : desktopRows;
+    firstLine.current = rows.findIndex(row => row.includes(organisations[index])) + openingLine;
     progress.current = .04;
     setSelected(index);
     setPaused(true);
@@ -162,7 +177,7 @@ export function ExperienceCloud() {
     <div className="crawl-frame">
       <div className="crawl-plane" aria-hidden="true" />
       <div className="crawl-space" ref={stage} aria-hidden="true">
-        {Array.from({length: slots}, (_, i) => <span className="crawl-name" key={i} style={{ top: 0, transform: `translate(-50%, -50%) translateY(${32 + (1-i/slots)*576}px) scale(${.64+.36*(1-i/slots)**2})` }}>{crawlLines[((openingLine-i)%crawlLines.length+crawlLines.length)%crawlLines.length]}</span>)}
+        {Array.from({length: slots}, (_, i) => <span className="crawl-name" key={i} style={{ top: 0 }}>{Array.from({length: 4}, (_, position) => <span className="crawl-organisation" key={position}>{desktopRows[((openingLine-i)%desktopRows.length+desktopRows.length)%desktopRows.length][position] || ""}</span>)}</span>)}
       </div>
     </div>
     <div className="gateway-width crawl-explore" id="experience-collection">
