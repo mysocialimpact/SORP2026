@@ -38,7 +38,7 @@ import {
 } from "@/lib/onboarding/intelligence";
 import type { Candidate } from "@/app/sorp-public-model";
 export const runtime = "nodejs";
-export const maxDuration = 180;
+export const maxDuration = 300;
 const snapshot = (session: Awaited<ReturnType<typeof getSession>>) =>
   session
     ? {
@@ -89,11 +89,17 @@ export async function GET(
       );
       if (!profile) return json({ account: identity.account, charity: null });
       const [charity] = profile.charity_identity
-        ? await query(
-            `SELECT identity,candidate,status,profile,updated_at FROM research_console.charity_intelligence WHERE identity=$1`,
+        ? await query<{ identity: string; status: string; attempts: number; next_attempt_at: string; lease_until: string | null }>(
+            `SELECT identity,candidate,status,profile,updated_at,attempts,next_attempt_at,lease_until FROM research_console.charity_intelligence WHERE identity=$1`,
             [profile.charity_identity],
           )
         : [];
+      if (charity && charity.attempts < 3 &&
+        (charity.status === "queued" || charity.status === "failed" || charity.status === "partial" ||
+          (charity.status === "running" && charity.lease_until && Date.parse(charity.lease_until) < Date.now())) &&
+        Date.parse(charity.next_attempt_at) <= Date.now()) {
+        after(async () => { await prepareCharity(charity.identity).catch(() => undefined); });
+      }
       const documents = profile.charity_identity
         ? await query(
             `SELECT source_url,kind,title,publication_date,retrieved_at,status FROM research_console.charity_documents WHERE charity_identity=$1`,
@@ -416,14 +422,11 @@ export async function POST(
         },
       ].slice(-22);
       const saved = await saveSession(session, next, messages);
+      // Persist the confirmed charity before responding, so the existing
+      // worker can recover the job if this function ends or the visitor leaves.
+      const identity = await queueCharity(selected);
       // No lookup or inferred entity can enqueue public research. Only this explicit confirmation does.
       after(async () => {
-        const current = await getSession(request);
-        if (
-          current?.state.charity.confirmed?.officialUrl !== selected.officialUrl
-        )
-          return;
-        const identity = await queueCharity(selected);
         await prepareCharity(identity).catch(() => undefined);
       });
       return json({ ...snapshot(saved), preparation: "queued" });

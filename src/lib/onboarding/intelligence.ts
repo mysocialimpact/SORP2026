@@ -17,6 +17,8 @@ import {
   agent,
 } from "@/lib/console/fetch-public";
 import type { Candidate } from "@/app/sorp-public-model";
+import { verifiedCanonicalTar, type Intelligence, type Lens } from "@/app/sorp-public-model";
+import { randomUUID } from "node:crypto";
 export function charityIdentity(candidate: Candidate) {
   const url = safeResearchUrl(candidate.officialUrl);
   const regulator =
@@ -41,7 +43,12 @@ export function charityIdentity(candidate: Candidate) {
 export async function queueCharity(candidate: Candidate) {
   const identity = charityIdentity(candidate);
   await query(
-    `INSERT INTO research_console.charity_intelligence(identity,candidate) VALUES($1,$2) ON CONFLICT(identity) DO NOTHING`,
+    `INSERT INTO research_console.charity_intelligence(identity,candidate) VALUES($1,$2)
+     ON CONFLICT(identity) DO UPDATE SET candidate=EXCLUDED.candidate,status='queued',attempts=0,next_attempt_at=now(),profile='{}'::jsonb,updated_at=now()
+     WHERE (research_console.charity_intelligence.status <> 'running' OR research_console.charity_intelligence.lease_until < now())
+       AND (research_console.charity_intelligence.updated_at < now()-interval '7 days'
+       OR research_console.charity_intelligence.profile->>'analysisPerformed' IS DISTINCT FROM 'true'
+       OR (EXCLUDED.candidate->>'reportUrl' <> '' AND research_console.charity_intelligence.candidate->>'reportUrl' IS DISTINCT FROM EXCLUDED.candidate->>'reportUrl'))`,
     [identity, JSON.stringify(candidate)],
   );
   return identity;
@@ -134,7 +141,7 @@ function storage() {
 }
 export async function prepareCharity(
   identity: string,
-  dependencies = { fetchPublic, checkRobots, fetchDocument, storage },
+  dependencies: { fetchPublic: typeof fetchPublic; checkRobots: typeof checkRobots; fetchDocument: typeof fetchDocument; storage: typeof storage; prepareReport?: (candidate: Candidate, identity: string) => Promise<{ candidate: Candidate; state: unknown; intelligence: Intelligence; lens: Lens; sourceUrl: string }> } = { fetchPublic, checkRobots, fetchDocument, storage, prepareReport: preparePublishedReport },
 ) {
   const [job] = await query<{ candidate: Candidate }>(
     `UPDATE research_console.charity_intelligence SET status='running',attempts=attempts+1,lease_until=now()+interval '5 minutes' WHERE identity=$1 AND attempts<3 AND next_attempt_at<=now() AND (status IN ('queued','failed','partial') OR (status='running' AND lease_until<now())) RETURNING candidate`,
@@ -149,6 +156,12 @@ export async function prepareCharity(
     text: string;
   }[] = [];
   const limitations: string[] = [];
+  let preparedReport: { candidate: Candidate; state: unknown; intelligence: Intelligence; lens: Lens; sourceUrl: string } | null = null;
+  // Start the actual published-report pipeline before the slower background
+  // website crawl. Keep its rejection handled while the other research runs.
+  const reportPromise = c.entityType === "registered_charity" && dependencies.prepareReport
+    ? dependencies.prepareReport(c, identity).then(value => ({ value }), () => ({ value: null }))
+    : null;
   const documents = new Map<
     string,
     { kind: string; title: string; publicationDate: string | null }
@@ -269,16 +282,26 @@ export async function prepareCharity(
       limitations.push(
         "Document storage is not connected; source links are retained.",
       );
+    // The existing public review service performs the complete PDF extraction,
+    // identity validation and canonical assessment. Its cache is keyed by the
+    // source and methodology; this worker persists a verified hand-off as well.
+    if (reportPromise) {
+      preparedReport = (await reportPromise).value;
+      if (!preparedReport) {
+        limitations.push("The published report is not yet fully read and validated. The assessment can retry or accept an upload.");
+      }
+    }
     await query(
       `UPDATE research_console.charity_intelligence SET status=$2,profile=$3,lease_until=null,next_attempt_at=now()+interval '1 hour',updated_at=now() WHERE identity=$1`,
       [
         identity,
-        sources.length ? (limitations.length ? "partial" : "ready") : "failed",
+        preparedReport ? "ready" : sources.length ? "partial" : "failed",
         JSON.stringify({
           sources,
           limitations,
           preparedAt: new Date().toISOString(),
-          analysisPerformed: false,
+          analysisPerformed: !!preparedReport,
+          preparedReport,
         }),
       ],
     );
@@ -293,6 +316,24 @@ export async function prepareCharity(
       [identity],
     );
   }
+}
+
+async function preparePublishedReport(candidate: Candidate, identity: string) {
+  const endpoint = new URL("/api/published-review", process.env.SORP_READINESS_API_URL || "https://sorp2026.mysocialimpact.org/api/readiness");
+  const sessionId = randomUUID();
+  const call = async (payload: Record<string, unknown>) => {
+    const response = await fetch(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...payload, sessionId }), signal: AbortSignal.timeout(145000) });
+    const result = await response.json();
+    if (!response.ok || result.error) throw new Error("Public report preparation failed");
+    return result;
+  };
+  const profile = await call({ operation: "profile", candidate });
+  if (charityIdentity(profile.candidate) !== identity) throw new Error("Charity identity changed during preparation");
+  const prepared = await call({ operation: "prepare-tar", methodologyVersion: "1.0", candidate: profile.candidate, state: profile.state, intelligencePin: profile.intelligence });
+  if (!prepared.preparedDocument?.id) throw new Error("The published report was not prepared");
+  const assessed = await call({ operation: "assess-tar", methodologyVersion: "1.0", preparedDocumentId: prepared.preparedDocument.id, candidate: profile.candidate, state: profile.state, intelligencePin: profile.intelligence });
+  if (!verifiedCanonicalTar(assessed.lens)) throw new Error("The complete report was not validated");
+  return { candidate: profile.candidate as Candidate, state: profile.state as unknown, intelligence: profile.intelligence as Intelligence, lens: assessed.lens as Lens, sourceUrl: assessed.lens.sourceUrl as string };
 }
 
 /** Read public cached bytes only for the charity linked to the verified account. */

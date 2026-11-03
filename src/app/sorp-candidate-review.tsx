@@ -36,7 +36,7 @@ import "./assessment-mode.css";
 type Step = "scope" | "public-methodology" | "intro" | "benefits" | "find" | "confirmation" | "account" | "homework" | "assessment" | "quick-generating" | "tar-recovery" | "quick-ready" | "quick" | "quick-feedback" | "method" | "criterion" | "complete" | "generating" | "report-ready" | "report" | "email-ready" | "final-feedback" | "support" | "before-go" | "next" | "help" | "done" | "non-sorp";
 type Correction = { answer?: CanonicalAnswer; context: string; savedContext?: string; reviewed: boolean; widerSource?: string; widerNote?: string };
 type HomeworkFailure = { reason: string; incidentId: string | null; recovery: "retry" | "upload-report"; diagnostic?: { stage?: string; source?: string; httpStatus?: number | null; contentType?: string | null; attemptCount?: number; pageCount?: number; pagesProcessed?: number; validation?: string } };
-type Saved = { sharedCharityConfirmed?: boolean; sessionId: string; step: Step; query: string; research: Research | null; candidate: Candidate | null; state: unknown; intelligence: Intelligence | null; verifiedTar: Lens | null; preparedDocument?: PreparedDocument | null; walkthroughSeen?: boolean; report: Report | null; homeworkFailure?: HomeworkFailure | null; email: string; emailConfirm: string; name: string; role: string; roleOther: string; criterion: number; corrections: Record<string, Correction>; reportView: number; emailSent: boolean; supportPaid: boolean; quickRating: number; quickComment: string; finalRating: number; finalComment: string };
+type Saved = { sharedCharityConfirmed?: boolean; earlyPrepared?: boolean; sessionId: string; step: Step; query: string; research: Research | null; candidate: Candidate | null; state: unknown; intelligence: Intelligence | null; verifiedTar: Lens | null; preparedDocument?: PreparedDocument | null; walkthroughSeen?: boolean; report: Report | null; homeworkFailure?: HomeworkFailure | null; email: string; emailConfirm: string; name: string; role: string; roleOther: string; criterion: number; corrections: Record<string, Correction>; reportView: number; emailSent: boolean; supportPaid: boolean; quickRating: number; quickComment: string; finalRating: number; finalComment: string };
 type ReadinessAccount = { name: string; email: string; position: string };
 type ReviewLocation = Pick<Saved, "step" | "criterion" | "reportView">;
 type ReviewHistory = { past: ReviewLocation[]; current: ReviewLocation; future: ReviewLocation[] };
@@ -339,7 +339,13 @@ export function SorpCandidateReview() {
         });
         // Reuse the confirmed shared charity only for a fresh review; never replace saved work.
         const shared = await loadSharedContext(abort.signal).catch(() => null);
-        if (shared?.charity?.candidate && !abort.signal.aborted) setSaved(current => current.candidate || current.query ? current : { ...current, sharedCharityConfirmed: true, query: shared.charity!.candidate.registrationNumber || shared.charity!.candidate.name, research: { status: "confirmed", candidates: [shared.charity!.candidate], selected: shared.charity!.candidate, query: shared.charity!.candidate.name }, candidate: shared.charity!.candidate });
+        if (shared?.charity?.candidate && !abort.signal.aborted) setSaved(current => {
+          if (current.candidate || current.query) return current;
+          const candidate = shared.charity!.candidate;
+          const prepared = shared.charity!.profile?.preparedReport;
+          const usable = shared.charity!.status === "ready" && prepared && prepared.candidate.registrationNumber === candidate.registrationNumber && prepared.sourceUrl === prepared.lens.sourceUrl && verifiedCanonicalTar(prepared.lens);
+          return { ...current, sharedCharityConfirmed: true, earlyPrepared: !!usable, query: candidate.registrationNumber || candidate.name, research: { status: "confirmed", candidates: [candidate], selected: candidate, query: candidate.name }, candidate: usable ? prepared.candidate : candidate, state: usable ? prepared.state : null, intelligence: usable ? prepared.intelligence : null, verifiedTar: usable ? prepared.lens : null };
+        });
         event("account_signed_in");
       } catch (caught) {
         if (!abort.signal.aborted) console.error("Saved SORP account could not be restored", caught);
@@ -373,6 +379,12 @@ export function SorpCandidateReview() {
     });
   }, [saved, loaded]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [saved.step, saved.criterion, saved.reportView]);
+  useEffect(() => {
+    if (saved.step !== "homework" || !saved.earlyPrepared || !verifiedCanonicalTar(saved.verifiedTar) || !homeworkStarted || busy) return;
+    const timer = window.setTimeout(() => { void review(); }, Math.max(0, 3000 - (Date.now() - homeworkStarted)));
+    return () => window.clearTimeout(timer);
+    // The verified report and entry timestamp define this one-time handoff.
+  }, [saved.step, saved.earlyPrepared, saved.verifiedTar, homeworkStarted, busy]);
   useEffect(() => { if (!milestone) return; const timer = window.setTimeout(() => setMilestone(""), 1800); return () => window.clearTimeout(timer); }, [milestone]);
   useEffect(() => {
     if (!loaded || trackedStage.current === saved.step) return;
@@ -475,7 +487,30 @@ export function SorpCandidateReview() {
   }
   async function startHomework() {
     if (!saved.candidate || busy) return;
-    if (validPreparedDocument(saved.preparedDocument) || verifiedCanonicalTar(saved.verifiedTar)) { go("homework"); return; }
+    if (validPreparedDocument(saved.preparedDocument) || verifiedCanonicalTar(saved.verifiedTar)) { setHomeworkStarted(Date.now()); go("homework"); return; }
+    if (saved.sharedCharityConfirmed) {
+      const expectedNumber = saved.candidate.registrationNumber;
+      let useExistingJourney = false;
+      setHomeworkStarted(Date.now()); go("homework"); setBusy("profile"); setError("");
+      try {
+        for (let attempt = 0; attempt < 60; attempt++) {
+          const context = await loadSharedContext();
+          const report = context?.charity?.profile?.preparedReport;
+          if (context?.charity?.candidate.registrationNumber !== expectedNumber) throw new Error("The selected charity has changed. Please confirm it again.");
+          if (context?.charity?.status === "ready" && report && report.candidate.registrationNumber === expectedNumber && report.sourceUrl === report.lens.sourceUrl && verifiedCanonicalTar(report.lens)) {
+            setSaved(current => ({ ...current, candidate: report.candidate, state: report.state, intelligence: report.intelligence, verifiedTar: report.lens, earlyPrepared: true, homeworkFailure: null }));
+            return;
+          }
+          if (context?.charity?.status === "ready" && !report) { useExistingJourney = true; break; }
+          if (["failed", "partial"].includes(context?.charity?.status || "")) throw new Error("We couldn’t complete the published report. You can retry or upload a copy.");
+          await pause(2000);
+        }
+        if (!useExistingJourney) throw new Error("The report is still being prepared. You can come back or upload a copy.");
+      } catch (cause) {
+        setSaved(current => ({ ...current, step: "tar-recovery", homeworkFailure: { reason: cause instanceof Error ? cause.message : "The report could not be prepared.", incidentId: null, recovery: "upload-report" } }));
+      } finally { setBusy(""); }
+      if (!useExistingJourney) return;
+    }
     const candidate = saved.candidate;
     go("homework");
     const started = Date.now();
@@ -709,7 +744,7 @@ export function SorpCandidateReview() {
         {["find", "confirmation"].includes(saved.step) && <div className="si-progress"><span>FIND CHARITY · {saved.step === "find" ? 1 : 2} OF 2</span><span className="si-progress-dots" aria-hidden="true"><i className={saved.step === "find" ? "is-active" : "is-past"} /><i className={saved.step === "confirmation" ? "is-active" : ""} /></span></div>}
         {saved.step === "find" && <><div className="sd-find-hero"><SorpScreenHero><p className="scr-kicker">YOUR ORGANISATION. YOUR STARTING POINT.</p><h1>Let’s find{" "}your charity.</h1></SorpScreenHero><p>Enter your registered charity name or charity number. We’ll confirm we’ve found the right organisation before reviewing anything.</p><form id="scr-find-form" onSubmit={find} className="scr-find"><label htmlFor="scr-query">Charity name or number</label><input id="scr-query" value={saved.query} onChange={e => setSaved(state => ({ ...state, query: e.target.value, research: null, candidate: null, sharedCharityConfirmed: false, state: null }))} placeholder="e.g. Interim Spaces or 1165694"/><button type="submit" disabled={!!busy || !saved.query.trim() || !!saved.research}>{busy ? "FINDING YOUR CHARITY…" : "FIND MY CHARITY →"}</button></form></div>{busy && <div className="scr-search-progress" role="status"><h2>FINDING YOUR CHARITY…</h2><EvidenceChecklist candidate={saved.candidate} research={saved.research} tier={reportingTier} busy phase="identity" /></div>}{saved.candidate && saved.research && !busy && <div className="scr-search-progress" role="status"><h2>WE FOUND A MATCH ✓</h2><EvidenceChecklist candidate={saved.candidate} research={saved.research} tier={reportingTier} busy={false} phase="identity" /></div>}{saved.research && !saved.candidate && !busy && <div className="scr-results"><h2>{saved.research.candidates.length ? "Choose the right registered organisation" : "We need one more clue."}</h2>{saved.research.candidates.map(candidate => <article key={`${candidate.registrationNumber}-${candidate.name}`}><div><strong>{candidate.name}</strong><p>{candidate.locality} · {candidate.registrationNumber || candidate.entityType}</p></div><button type="button" onClick={() => confirmCandidate(candidate)}>VIEW THIS CHARITY →</button></article>)}{!saved.research.candidates.length && <p>Try the registered name, charity number or a location.</p>}</div>}<section className="sd-tiers" aria-label="SORP reporting tiers"><div className="sd-tier-intro"><p className="scr-kicker">GOOD TO KNOW</p><p>Your tier affects which SORP reporting requirements apply.</p></div><div className="sd-tier"><span>TIER 1</span><strong>£500k or less</strong><i aria-hidden="true" /></div><div className="sd-tier"><span>TIER 2</span><strong>Over £500k to £15m</strong><i aria-hidden="true" /></div><div className="sd-tier"><span>TIER 3</span><strong>Over £15m</strong><i aria-hidden="true" /></div></section></>}
         {saved.step === "confirmation" && saved.candidate && <><div className="sd-found"><SorpScreenHero><p className="scr-kicker"><span className="sd-found-mark" aria-hidden="true">✓</span> WE FOUND YOU ✓</p><h1>{saved.candidate.name}</h1></SorpScreenHero><SorpIdentityPreview key={saved.candidate.website} website={saved.candidate.website} name={saved.candidate.name} /></div><div className="sd-identity-facts"><div className="scr-fact"><span>Charity number</span><strong>{saved.candidate.registrationNumber || "Not established"}</strong></div><div className="scr-fact"><span>Charity Commission record</span><strong>{safeLink(saved.candidate.officialUrl) ? <a href={saved.candidate.officialUrl} target="_blank" rel="noreferrer">VIEW OFFICIAL RECORD ↗</a> : "Not available"}</strong></div><div className="scr-fact"><span>Official website</span><strong>{safeLink(saved.candidate.website) ? <a href={saved.candidate.website} target="_blank" rel="noreferrer">VIEW WEBSITE ↗</a> : "Not found"}</strong></div>{saved.candidate.locality && <div className="scr-fact"><span>Location</span><strong>{saved.candidate.locality}</strong></div>}</div><p className="sd-confirm-prompt">Check the details to confirm we’ve found the right charity.</p></>}
-        {saved.step === "homework" && <><SorpHomeworkExperience key={homeworkStarted} candidate={saved.state ? saved.candidate : null} tier={saved.state ? reportingTier : "Not yet confirmed"} document={validPreparedDocument(saved.preparedDocument) ? saved.preparedDocument! : null} lens={verifiedCanonicalTar(saved.verifiedTar) ? saved.verifiedTar : null} waiting={!!busy} startedAt={homeworkStarted} sessionId={saved.sessionId} />{homeworkComplete && !busy && <div className="scr-account-confirmed"><strong>✓ PROGRESS SAVED TO {saved.email}</strong><span>Your personalised report will be sent here when the journey is complete.</span></div>}</>}
+        {saved.step === "homework" && <><SorpHomeworkExperience key={homeworkStarted} candidate={saved.state ? saved.candidate : null} tier={saved.state ? reportingTier : "Not yet confirmed"} document={validPreparedDocument(saved.preparedDocument) ? saved.preparedDocument! : null} lens={verifiedCanonicalTar(saved.verifiedTar) ? saved.verifiedTar : null} waiting={!!busy} startedAt={homeworkStarted} sessionId={saved.sessionId} replay={!!saved.earlyPrepared} />{homeworkComplete && !busy && <div className="scr-account-confirmed"><strong>✓ PROGRESS SAVED TO {saved.email}</strong><span>Your personalised report will be sent here when the journey is complete.</span></div>}</>}
         {saved.step === "assessment" && <SorpAssessmentExperience key={homeworkStarted} lens={verifiedCanonicalTar(saved.verifiedTar) ? saved.verifiedTar : null} waiting={busy === "tar"} startedAt={homeworkStarted} sessionId={saved.sessionId} resumed={Boolean(saved.walkthroughSeen)} onReady={() => setSaved(state => ({ ...state, walkthroughSeen: true }))}/>}
 
         {saved.step === "quick-generating" && <SnapshotBuilding verified={verifiedCanonicalTar(saved.verifiedTar)}/>}

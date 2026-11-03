@@ -3,7 +3,7 @@ import { enabled } from "@/lib/onboarding/server";
 import { query } from "@/lib/console/db";
 import { prepareCharity } from "@/lib/onboarding/intelligence";
 export const runtime = "nodejs";
-export const maxDuration = 180;
+export const maxDuration = 300;
 export async function GET(request: Request) {
   const expected = Buffer.from(`Bearer ${process.env.CRON_SECRET || ""}`),
     supplied = Buffer.from(request.headers.get("authorization") || "");

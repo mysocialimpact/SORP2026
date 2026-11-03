@@ -23,6 +23,10 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 try {
   for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
     const context = await browser.newContext({ viewport, reducedMotion: viewport.width < 700 ? 'reduce' : 'no-preference' });
+    if (process.env.SORP_TEST_PREVIEW === 'true') {
+      const response = await context.request.post(base + '/api/readiness-account/', { data: { action: 'login', email: 'synthetic@example.invalid', password: 'synthetic-pass-2026' }, headers: { origin: base } });
+      assert.equal(response.status(), 200, 'Isolated preview login must establish a synthetic server-verified session');
+    }
     const page = await context.newPage();
     page.setDefaultTimeout(20000);
     page.on('pageerror', error => console.error('Browser error:', error.message));
@@ -51,8 +55,10 @@ try {
     });
     await page.addInitScript(({ key, initial }) => { if (!sessionStorage.getItem('qa-seeded')) { localStorage.setItem(key, JSON.stringify(initial)); sessionStorage.setItem('qa-seeded','true'); } }, { key, initial });
     await page.goto(base + '/are-you-sorp-ready/review');
+    assert.equal(new URL(page.url()).pathname.replace(/\/$/,''),'/are-you-sorp-ready/review','Synthetic preview account must reach the protected review');
     await page.locator('.scr-assessment-header').waitFor();
     assert.equal(await page.locator('.platform-sticky-navigation').isVisible(), false);
+    await page.locator('.scr-top nav li').first().waitFor();
     assert.equal(await page.locator('.scr-top nav li').count(), 8);
     assert.match(await page.locator('.scr-top [aria-current=step]').textContent(), /Published report/i);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
@@ -124,6 +130,21 @@ try {
     await page.getByRole('button', {name:'SKIP FOR NOW',exact:true}).waitFor();
     assert.equal(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).report.tar.findings.length,key),19);
     assert.equal(emailRequests,1);
+    // A confirmed charity whose report was prepared during onboarding reuses
+    // the validated result. The four existing stages reveal before proceeding.
+    const operationsBeforeReuse = operations.length;
+    await page.evaluate(({key,initial,lens}) => localStorage.setItem(key,JSON.stringify({...initial,step:'confirmation',sharedCharityConfirmed:true,earlyPrepared:true,verifiedTar:lens,preparedDocument:null,report:null})),{key,initial,lens});
+    await page.reload();
+    const handoffStarted=Date.now();
+    await page.locator('.scr-top nav li').first().waitFor();
+    assert.equal(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).step,key),'confirmation');
+    await page.getByRole('button',{name:/YES, THIS IS MY CHARITY/}).click();
+    await page.locator('.sj-milestones').waitFor();
+    await expect.poll(()=>page.locator('.sj-milestones .is-complete').count()).toBeGreaterThan(0);
+    await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).step,key),{timeout:10000}).toBe('assessment');
+    const handoffMs=Date.now()-handoffStarted;
+    assert.ok(handoffMs>=2700 && handoffMs<8000,`Completed-stage handoff took ${handoffMs}ms`);
+    assert.equal(operations.length,operationsBeforeReuse,'The early validated report is reused without another service call');
     await context.close();
     console.log(`${viewport.width}px: document checkpoint, evidence walkthrough, all 19 answers, report generation, priorities, mocked PDF email deduplication and account-only report restoration passed`);
   }
