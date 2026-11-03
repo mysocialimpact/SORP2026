@@ -40,7 +40,7 @@ test("B: partial first answer delivers a name without invented registration deta
   assert.equal(s.facts.name, "David");
   assert.equal(s.facts.email, "");
   assert.equal(s.facts.role, "");
-  assert.match(nextQuestion(s), /email address and what you do/);
+  assert.match(nextQuestion(s), /email address/);
 });
 test("one bare name is enough for the first reward", () => {
   assert.equal(answer(initialConversation(), "Sarah").facts.name, "Sarah");

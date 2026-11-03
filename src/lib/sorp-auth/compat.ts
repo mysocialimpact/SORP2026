@@ -122,7 +122,7 @@ export async function independentAccountPOST(request: Request) {
     }
     const name = input.name.trim().slice(0, 120);
     const position = input.position.trim().slice(0, 120);
-    if (name.length < 2 || position.length < 2) return error("Add your name and role.", 400);
+    if (name.length < 2) return error("Add your full name.", 400);
     if (JSON.stringify(input.progress).length > 1_500_000) return error("The assessment is too large to save.", 413);
     const response = await callProvider(request, "sign-up/email", {
       email: input.email.trim().toLowerCase(), password: input.password, name,

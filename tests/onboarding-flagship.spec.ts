@@ -8,7 +8,7 @@ test.use({ launchOptions: { executablePath: "/usr/bin/chromium", args: ["--no-sa
 // not real AI, registry, email or account creation. Live model checks run separately.
 const intro = "I’m Sarah Jones, an accountant at Burton Sweet. My email is sarah@example.com.";
 const charity = { name: "Interim Spaces (synthetic fixture)", registrationNumber: "1234569", jurisdiction: "England and Wales", entityType: "registered_charity", website: "https://example.invalid", officialUrl: "https://register-of-charities.charitycommission.gov.uk/charity-search/-/charity-details/1234569" } as Candidate;
-async function fixture(page: Page, delay = 0) {
+async function fixture(page: Page, delay = 0, verificationRequired = true) {
   let state = initialConversation();
   let signedIn = false;
   let registration: Record<string, unknown> | undefined;
@@ -22,7 +22,7 @@ async function fixture(page: Page, delay = 0) {
         if (body.action === "signup") {
           if (!accountReady(state)) return route.fulfill({ status: 422, json: { error: "Confirm the charity first" } });
           registration = body; signedIn = true;
-          return route.fulfill({ status: 202, json: { verificationRequired: true } });
+          return route.fulfill({ status: verificationRequired ? 202 : 201, json: { verificationRequired } });
         }
       }
       return route.fulfill({ json: { signedIn, platformAccess: { founder: false, memberships: [] } } });
@@ -67,9 +67,63 @@ async function choose(page: Page) {
   await page.getByLabel("Charity name or registration number").fill("Interim Spaces");
   await page.getByRole("button", { name: "Find →", exact: true }).click();
   await expect(page.getByRole("link", { name: "Official register" })).toHaveAttribute("href", charity.officialUrl);
-  await page.getByRole("button", { name: "Yes, this is the charity" }).click();
+  await page.getByRole("button", { name: "Yes, that’s my charity!" }).click();
   await expect(page.locator(".confirmed-charity")).toContainText(charity.name);
 }
+test("three essentials allow registration without any optional details and celebrate only on success", async ({ page }, info) => {
+  const service = await fixture(page, 0, false); await open(page); await form(page);
+  await page.locator('input[name=name]').fill("Alex Rowan");
+  await page.locator('input[name=email]').fill("alex@example.com");
+  await expect(page.locator('.profile-count')).toContainText('2/3');
+  await expect(page.locator('.profile-next button')).toBeDisabled();
+  await choose(page);
+  await expect(page.locator('.profile-count')).toContainText('3/3');
+  await expect(page.locator('input[name=role]')).toHaveValue('');
+  await expect(page.locator('input[name=organisation]')).toHaveValue('');
+  await expect(page.locator('.onboarding-celebration')).toHaveCount(0);
+  await page.locator('.profile-next button').click();
+  await page.getByLabel('Choose a password', { exact: false }).fill('Synthetic-pass-123');
+  await page.getByLabel('Confirm your password').fill('Synthetic-pass-123');
+  await page.getByRole('button', { name: 'Show password', exact: true }).click();
+  await expect(page.getByLabel('Choose a password', { exact: false })).toHaveAttribute('type','text');
+  await page.getByRole('button', { name: 'Create my account' }).click();
+  await expect(page.locator('.onboarding-celebration')).toContainText('Brilliant!');
+  expect(service.registration()).toMatchObject({position:'', organisation:''});
+  await expect(page.locator('.onboarding-celebration a')).toHaveAttribute('href','/ask-sorp/workspace/');
+  await page.locator('.onboarding-celebration').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `test-results/three-essentials-${info.project.name}-success.png`, fullPage: true });
+  await page.locator('input[name=role]').fill('Volunteer');
+  await page.locator('input[name=role]').blur();
+  await expect.poll(() => service.actions().filter(action => action === 'complete').length).toBeGreaterThan(1);
+});
+
+test("charity search shows real waiting, ambiguous results, and recoverable no-match and errors", async ({ page }, info) => {
+  await fixture(page); await open(page); await form(page);
+  let outcome: 'multiple' | 'empty' | 'error' = 'multiple';
+  await page.route('**/api/onboarding/search/', async route => {
+    await new Promise(resolve => setTimeout(resolve, 900));
+    if (outcome === 'error') return route.fulfill({status:503,json:{error:'The register is temporarily unavailable. Please try again.'}});
+    const state = initialConversation();
+    state.charity.candidates = outcome === 'empty' ? [] : [charity, {...charity,name:'Interim Spaces North (synthetic fixture)',registrationNumber:'1234570',officialUrl:charity.officialUrl+'0'}];
+    state.charity.phase = 'confirm';
+    return route.fulfill({json:{state,messages:[]}});
+  });
+  await page.getByLabel('Charity name or registration number').fill('Interim Spaces');
+  await page.getByRole('button',{name:'Find →',exact:true}).click();
+  await expect(page.locator('.charity-discovery-progress')).toContainText('Searching the official charity register');
+  await page.screenshot({path:`test-results/three-essentials-${info.project.name}-discovery.png`,fullPage:true});
+  await expect(page.locator('.charity-match')).toHaveCount(2);
+  await expect(page.locator('.confirmed-charity')).toHaveCount(0);
+  outcome = 'empty';
+  await page.getByRole('button',{name:'Find →',exact:true}).click();
+  await expect(page.locator('.charity-discovery')).toContainText('No reliable registry match yet');
+  outcome = 'error';
+  await page.getByRole('button',{name:'Find →',exact:true}).click();
+  await expect(page.getByText('The register is temporarily unavailable. Please try again.',{exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Find →',exact:true})).toBeEnabled();
+  await expect(page.locator('.charity-discovery-progress')).toHaveCount(0);
+});
+
 test("a slow saved-draft response does not override the visitor's manual mode", async ({ page }) => {
   await fixture(page);
   await open(page);
@@ -97,7 +151,7 @@ test("first answer renders immediately during a slow response; all eight fields 
   await expect(page.locator(".conversation-activity")).toBeVisible();
   await expect(page.locator(".field-arrived")).toHaveCount(4);
   await expect(page.locator(".conversation-reward.has-reward")).toContainText("4 details captured");
-  await expect(page.locator(".profile-milestones .achieved")).toHaveCount(4);
+  await expect(page.locator(".profile-milestones .achieved")).toHaveCount(2);
   if (info.project.name === "mobile") {
     await expect(page.locator(".mobile-profile-reward")).toBeVisible();
     await expect(page.locator(".onboarding-mobile-summary")).toBeInViewport();
@@ -127,18 +181,18 @@ test("first answer renders immediately during a slow response; all eight fields 
   await page.locator(".profile-next button").click();
   const passwordField = page.getByLabel("Choose a password");
   const confirmationField = page.getByLabel("Confirm your password");
-  await expect(page.locator(".onboarding-account-dialog")).toContainText("At least 8 characters");
+  await expect(page.locator(".onboarding-account-dialog")).toContainText("At least 10 characters");
   await passwordField.fill("Seven77");
   await confirmationField.fill("Seven77");
   expect(await passwordField.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
   expect(await confirmationField.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
-  await passwordField.fill("Eight888");
-  await confirmationField.fill("Eight888");
+  await passwordField.fill("TenChars10");
+  await confirmationField.fill("TenChars10");
   expect(await passwordField.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
   expect(await confirmationField.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
   await page.getByRole("button", { name: "Create my account" }).click();
   await expect(page.locator(".onboarding-account-dialog")).toContainText("Check your inbox");
-  expect(service.registration()?.password).toBe("Eight888");
+  expect(service.registration()?.password).toBe("TenChars10");
   expect(service.registration()?.name).toBe("Sarah Jones ACA");
   const onboarding = (service.registration()?.progress as {onboarding:{facts:{discovery:string};selected:Candidate}}).onboarding;
   expect(onboarding.facts.discovery).toBe("A colleague at a conference.");

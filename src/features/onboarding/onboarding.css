@@ -74,7 +74,7 @@ body:has(.onboarding-page) > .platform-sticky-navigation { position:relative; to
 .profile-count small { font-size:15px; color:var(--muted); margin-left:3px; }
 .profile-progress { height:4px; border-radius:3px; background:#e7e3de; margin-bottom:10px; overflow:hidden; }
 .profile-progress > span { display:block; height:100%; background:linear-gradient(90deg,#b83c1b,#f38b4b); transition:width .55s cubic-bezier(.2,.85,.2,1); }
-.profile-milestones { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; margin-bottom:23px; }
+.profile-milestones { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; margin-bottom:23px; }
 .profile-milestones span { display:flex; flex-direction:column; align-items:center; gap:5px; color:var(--muted); font-size:9px; line-height:1.2; text-align:center; overflow-wrap:anywhere; }
 .profile-milestones span::before { content:""; width:7px; height:7px; border:1px solid #b9b1aa; border-radius:50%; background:#fcfbf9; transition:background .3s,border-color .3s,transform .3s,box-shadow .3s; }
 .profile-milestones span.achieved { color:var(--accent); font-weight:600; }
@@ -194,6 +194,21 @@ body:has(.onboarding-page) > .platform-sticky-navigation { position:relative; to
 .voice-wave i { width:3px; border-radius:5px; background:linear-gradient(#f8aa54,#e9512a); transition:height .08s linear; }
 .voice-error { background:#fff2ec; border-left:3px solid #b83c1b; border-radius:3px; padding:10px 12px; }
 @keyframes recording-glow { 50% { box-shadow:0 0 0 7px #c3442018,0 0 0 14px #c3442008; } }
+.charity-discovery-progress { padding:18px; margin-bottom:16px; background:#f0e7f7; border:1px solid #d2bce0; border-radius:12px; }
+.charity-discovery-progress strong { font-size:14px; display:block; margin-top:10px; }
+.charity-discovery-progress p { font-size:12px; line-height:1.5; margin:8px 0 0; }
+.discovery-orbit { display:block; width:28px; height:28px; border:2px solid #d2bce0; border-top-color:#755697; border-radius:50%; animation:discovery-spin 1s linear infinite; }
+.charity-match { animation:reply-arrives .4s ease both; padding:18px; border:1px solid #cfbca1; border-radius:10px; background:#fffdf8; }
+.charity-preparation-note { color:#61594e; }
+.onboarding-celebration { padding:clamp(24px,4vw,48px); margin-bottom:24px; background:linear-gradient(110deg,#e1efc9,#f7edcf 55%,#f4ddcf); border:1px solid #c9d5b7; border-radius:16px; animation:reward-arrives .6s ease both; }
+.onboarding-celebration > span { font-size:42px; color:#b83c1b; }
+.onboarding-celebration h2 { font-size:clamp(28px,4vw,46px); letter-spacing:-.04em; margin:10px 0; }
+.onboarding-celebration p { line-height:1.5; }
+.onboarding-celebration button { margin-left:20px; }
+.onboarding-next-bar { position:sticky; bottom:0; z-index:4; display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:20px; padding:16px 20px max(16px,env(safe-area-inset-bottom)); border:1px solid #ccc7bd; border-radius:12px; background:#f4f0e6f5; backdrop-filter:blur(12px); font-size:14px; }
+.onboarding-next-bar > span { line-height:1.4; }
+@keyframes discovery-spin { to { transform:rotate(360deg); } }
+@media(max-width:700px) { .onboarding-next-bar { flex-wrap:wrap; padding:14px; font-size:12px; } .onboarding-celebration button { display:block; margin-left:0; } }
 @media(max-width:700px) {
   .onboarding-page { background:linear-gradient(175deg,#faf6ee,#e9eee4); }
   .onboarding-shell { padding-inline:14px; }

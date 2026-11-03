@@ -38,6 +38,10 @@ export async function POST(request: Request) {
       }
       // Use the canonical selection, not a charity object supplied by the browser.
       payload.progress.onboarding.selected = session.state.charity.confirmed;
+      // The legacy account service requires a non-empty display position.
+      // This explicit absence marker grants no role or permissions; optional
+      // professional facts remain blank in the saved onboarding profile.
+      if (!independentAuthCutover() && !f.role.trim()) payload.position = "Not supplied";
       request = new Request(request, { body: JSON.stringify(payload) });
     } catch {
       return Response.json({ error: "We couldn’t verify your saved introduction. Please try again." }, { status: 503 });
