@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/internal/charity-preparation/",
-      "schedule": "*/5 * * * *"
+      "schedule": "15 6 * * *"
     }
   ],
   "git": {
