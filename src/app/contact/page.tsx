@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { DemoRequest } from "@/components/demo-request";
 import "../sample-charity/sample-charity.css";
 import { MsiBrand, IdeasBrand } from "@/components/brand";
@@ -56,7 +57,13 @@ export default function Contact() {
             sizes="(max-width: 700px) 90vw, 420px"
           />
         </section>
-        <details className="contact-demo-option"><summary>Would you like a free personal demonstration? →</summary><DemoRequest compact /></details>
+        <section className="contact-demonstration" aria-labelledby="contact-demo-heading">
+          <p className="gateway-kicker">Explore at your own pace</p>
+          <h2 id="contact-demo-heading">A little context. A clearer picture.</h2>
+          <p>Meet Harbourlight Neighbours, a fictional charity created for our demonstration. Follow its example readiness review, reporting and impact journey without creating an account.</p>
+          <Link href="/sample-charity/">See SORP 2026 in action →</Link>
+        </section>
+        <details className="contact-demo-option"><summary>Request a free personal demo →</summary><DemoRequest compact /></details>
         <section
           className="gateway-organisations"
           aria-label="The organisations behind the tools"

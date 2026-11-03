@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { FolderHero } from "@/components/folder-hero";
-import { ToolLink } from "@/components/tool-link";
-import Link from "next/link";
 import { MsiBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
 import { ExperienceCloud } from "@/components/experience-cloud";
@@ -51,7 +49,7 @@ export default function Home() {
               We’re a UK-based social enterprise initiative helping charities and their advisers
               navigate SORP 2026 and achieve greater impact.
             </p>
-            <p className="homepage-beta-note"><strong>Now in public beta.</strong> Charities and advisers can create a free account, start their readiness review and help shape what comes next.</p><div className="sample-entry"><ToolLink href="/are-you-sorp-ready/review/">Get started free →</ToolLink><Link href="/sample-charity/">See SORP 2026 in action →</Link></div>
+            <p className="homepage-beta-note"><strong>Now in public beta.</strong> Charities and advisers can create a free account, start their readiness review and help shape what comes next.</p>
           </div>
           <div className="gateway-intro-aside">
             <p className="homepage-editorial">SORP is the requirement.<br /><strong>Better impact is the opportunity.</strong></p>
