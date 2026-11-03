@@ -567,3 +567,10 @@
   .continuous-rating button { transition: none; }
   .continuous-celebration-stars span { animation: none; }
 }
+.compact-contact { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-block: 24px; border-top: 1px solid #24232920; }
+.compact-contact a { font-weight: 650; min-height: 44px; display: inline-flex; align-items: center; }
+.contact-demo-option { margin: 30px 0; padding: 20px 0; border-block: 1px solid #24232925; }
+.contact-demo-option summary { cursor: pointer; font-size: 18px; min-height: 44px; }
+.homepage-beta-note { font-size: 16px; line-height: 1.55; max-width: 580px; }
+.homepage-beta-note strong { color: #335346; }
+@media(max-width:700px) { .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; margin-right: 0; justify-content: space-between; } }

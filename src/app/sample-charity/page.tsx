@@ -15,6 +15,7 @@ const pillars = [
 
 export default function SampleCharity() {
   return <main id="main" className="sample-page">
+    <div className="gateway-width" style={{ paddingBlock: 18 }}><Link href="/">← Back to website</Link></div>
     <header className="sample-hero"><div className="gateway-width"><p className="gateway-kicker">Read-only example · Fictional organisation</p><h1>Meet Harbourlight Neighbours<span>.</span></h1><p>A small, fictional charity helping older neighbours connect through weekly activities and volunteer visits. Explore how one shared journey turns reporting questions into practical decisions.</p><div className="sample-hero-links"><a href="#dashboard">Explore the dashboard ↓</a><Link href="/get-started/">Start with your own charity →</Link></div></div></header>
     <nav className="sample-nav gateway-width" aria-label="Sample journey"><a href="#starting-point">Starting point</a><a href="#readiness">Readiness</a><a href="#ask">Ask SORP</a><a href="#report">Impact report</a><a href="#maturity">Maturity</a><a href="#stages">Next stages</a><a href="#adviser">Adviser view</a></nav>
     <div className="gateway-width sample-content"><p className="sample-disclaimer">All names, figures, answers and documents below are synthetic illustrations. They are not results generated for a real charity, an accounting assurance opinion or live account data.</p>

@@ -14,6 +14,12 @@ export function SayHello() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [feedback, setFeedback] = useState("");
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (pathname.replace(/\/$/, "") === "/contact" && new URLSearchParams(window.location.search).get("interest") === "beta") setMessage("I’d like to request free early beta access.");
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pathname]);
 
   useEffect(() => {
     if (founderMode) return;
@@ -89,6 +95,7 @@ export function SayHello() {
   }
 
   if (founderMode) return null;
+  if (pathname.replace(/\/$/, "") !== "/contact") return <div className="compact-contact gateway-width" id="say-hello"><span>A question or an idea?</span><a href="/contact/">Contact Us →</a></div>;
 
   return <section className="shared-hello" id="say-hello" aria-labelledby="say-hello-title">
     <div className="gateway-width shared-hello-layout">

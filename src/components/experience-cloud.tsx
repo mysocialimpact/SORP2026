@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import "./experience-cloud.css";
+import { useEffect, useRef, useState } from "react";
+import "./experience-orbit.css";
 
 const organisations = [
   "ActionAid", "STOP THE TRAFFIK", "Great Ormond Street Hospital", "Blue Cross", "Farm Africa",
@@ -21,90 +21,79 @@ const organisations = [
   "AgriEvolve", "Ashima", "Tonight Change", "The Wild Ones Kampala",
 ];
 
-const featured = [
-  ["ActionAid", "Hackney Council", "Great Ormond Street Hospital", "RSPB", "Comic Relief"],
-  ["Greenpeace", "CARE International", "Westminster Council", "RSPCA", "Blue Cross"],
-  ["Médecins Sans Frontières", "Crouch End Festival", "STOP THE TRAFFIK", "Docklands Light Railway", "Haringey Council"],
-];
-const featuredNames = new Set(featured.flat());
-const collectionOnly = new Set(["Diageo", "Starbucks", "Sainsbury’s", "Brewers Decorating Centres", "AgriEvolve", "Ashima"]);
-const remaining = organisations.filter(name => !featuredNames.has(name) && !collectionOnly.has(name));
-const rows = featured.map((names, row) => [...names, ...remaining.filter((_, i) => i % 3 === row)]);
-const logos: Record<string, string> = { Greenpeace: "/experience/greenpeace.svg", Starbucks: "/experience/starbucks.svg" };
-
-function ExperienceRow({ names, index, paused }: { names: string[]; index: number; paused: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const interacting = useRef(false);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let frame = 0;
-    let previous = 0;
-    let position = element.scrollLeft;
-    let visible = false;
-    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
-    observer.observe(element);
-    const tick = (time: number) => {
-      if (previous && visible && !document.hidden && !paused && !reduced.matches && !interacting.current) {
-        position += Math.min(time - previous, 40) * (index === 1 ? .012 : .016);
-        const group = element.firstElementChild as HTMLElement;
-        if (position >= group.offsetWidth) position -= group.offsetWidth;
-        element.scrollLeft = position;
-      } else position = element.scrollLeft;
-      previous = time;
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
-  }, [paused, index]);
-  return <div ref={ref} className="experience-lane" tabIndex={0} role="region" aria-label={`Organisation collection ${index + 1}; scroll to explore`}
-    onPointerEnter={() => { interacting.current = true; }} onPointerLeave={() => { interacting.current = false; }}
-    onTouchStart={() => { interacting.current = true; }} onFocus={() => { interacting.current = true; }} onBlur={() => { interacting.current = false; }}>
-    {[0, 1].map(copy => <div className="experience-lane-group" key={copy} aria-hidden={copy === 1 ? true : undefined}>
-      {names.map((name, i) => <span key={name} className={`experience-tile ${featuredNames.has(name) ? "is-featured" : ""} ${logos[name] ? "has-logo" : ""} tone-${(i + index) % 4}`}
-        style={{ "--reveal-delay": `${logos[name] ? -35 : -((i * 7 + index * 11) % 43)}s` } as CSSProperties}>
-        <span className="experience-tile-name">{name}</span>
-        {logos[name] && <span className="experience-logo" aria-hidden="true"><img src={logos[name]} alt="" width={180} height={70} /></span>}
-      </span>)}
-    </div>)}
-  </div>;
-}
-
+const colours = ["#faf9f6", "#d8ff52", "#f0a7c1", "#c8dbed"];
+const slots = 6;
 export function ExperienceCloud() {
+  const stage = useRef<HTMLDivElement>(null);
+  const angle = useRef(0);
   const [paused, setPaused] = useState(false);
-  return (
-    <section className="experience-cloud experience-landscape" id="home-experience" data-paused={paused} aria-labelledby="experience-title">
-      <div className="gateway-width experience-cloud-head">
-        <h2 id="experience-title">Experience across our team</h2>
+  const [selected, setSelected] = useState(0);
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const motion = matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(motion.matches);
+    update(); motion.addEventListener("change", update);
+    return () => motion.removeEventListener("change", update);
+  }, []);
+  useEffect(() => {
+    const root = stage.current;
+    if (!root) return;
+    let frame = 0, previous = 0, visible = false;
+    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
+    observer.observe(root);
+    const render = (time: number) => {
+      if (previous && visible && !paused && !reduced && !document.hidden) angle.current += Math.min(time - previous, 40) * .000055;
+      previous = time;
+      const width = root.clientWidth;
+      Array.from(root.children).forEach((node, i) => {
+        const item = node as HTMLElement;
+        const phase = angle.current + i * Math.PI * 2 / slots;
+        const depth = (Math.cos(phase) + 1) / 2;
+        const scale = .24 + Math.pow(depth, 4) * .76;
+        const x = Math.sin(phase) * width * .36;
+        const y = -Math.cos(phase) * -75;
+        const lap = Math.floor((phase + Math.PI) / (Math.PI * 2));
+        const index = ((i - lap * slots) % organisations.length + organisations.length) % organisations.length;
+        item.textContent = organisations[index];
+        item.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
+        item.style.opacity = String(.2 + Math.pow(depth, 3) * .8);
+        item.style.filter = `grayscale(${1-depth}) blur(${(1-depth)*1.3}px)`;
+        item.style.zIndex = String(Math.round(depth*100));
+        item.style.color = colours[index % colours.length];
+      });
+      frame = requestAnimationFrame(render);
+    };
+    frame = requestAnimationFrame(render);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
+  }, [paused, reduced]);
+  function step(direction: number) {
+    setPaused(true);
+    const next = Math.round(-angle.current / (Math.PI * 2 / slots)) + direction;
+    angle.current = -next * Math.PI * 2 / slots;
+    setSelected(((next % organisations.length) + organisations.length) % organisations.length);
+  }
+  return <section className="experience-cloud experience-orbit" id="home-experience" aria-labelledby="experience-title">
+    <div className="gateway-width">
+      <p className="gateway-kicker">Different perspectives. Shared experience.</p>
+      <h2 id="experience-title">Experience across our team</h2>
+      <p className="orbit-introduction">A world of organisations. A wealth of experience to draw on.</p>
+      <div className="orbit-controls">
+        <button type="button" onClick={() => step(-1)} aria-label="Previous organisation">←</button>
+        <button type="button" onClick={() => { if (!paused) step(0); else setPaused(false); }} aria-pressed={paused}>{paused ? "Play orbit" : "Pause orbit"}</button>
+        <button type="button" onClick={() => step(1)} aria-label="Next organisation">→</button>
       </div>
-      <div className="gateway-width experience-controls">
-        <button
-          type="button"
-          aria-pressed={paused}
-          aria-label={paused ? "Resume movement" : "Pause movement"}
-          title={paused ? "Resume movement" : "Pause movement"}
-          onClick={() => setPaused(!paused)}
-        >
-          <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16">
-            {paused
-              ? <path d="M6 4.5 15 10l-9 5.5z" fill="currentColor" />
-              : <><path d="M6 4h3v12H6z" fill="currentColor" /><path d="M12 4h3v12h-3z" fill="currentColor" /></>}
-          </svg>
-        </button>
-      </div>
-      <div className="experience-landscape-stage">
-        {rows.map((names, index) => <ExperienceRow key={index} names={names} index={index} paused={paused} />)}
-      </div>
-      <div className="gateway-width experience-explore">
-        <span className="experience-swipe">Swipe or scroll to explore ↔</span>
-        <details onToggle={event => { if (event.currentTarget.open) setPaused(true); }}>
-          <summary>Explore all organisations <span>{organisations.length} names +</span></summary>
-          <p className="experience-collection-note">Historical experience across our team; no endorsement of SORP2026 is implied.</p>
-          <ul>{organisations.map(name => <li key={name}>{name}</li>)}</ul>
-        </details>
-      </div>
-    </section>
-  );
+    </div>
+    <div className="orbit-space" ref={stage} aria-hidden="true">
+      {Array.from({length: slots}, (_, i) => <span className="orbit-name" key={i}>{organisations[i]}</span>)}
+    </div>
+    <div className="gateway-width orbit-explore">
+      {paused && <p className="orbit-selected" aria-live="polite">{organisations[selected]}</p>}
+      <details open={reduced || undefined} onToggle={event => { if (event.currentTarget.open) setPaused(true); }}>
+        <summary>Explore all {organisations.length} organisations <span>+</span></summary>
+        <p>Historical experience across our team; no endorsement of SORP2026 is implied.</p>
+        <ul>{organisations.map((name, i) => <li key={name}><button type="button" onClick={() => { angle.current = -i * Math.PI * 2 / slots; setSelected(i); setPaused(true); }}>{name}{name === "Greenpeace" && <img src="/experience/greenpeace.svg" alt="" width={90} height={30} />}{name === "Starbucks" && <img src="/experience/starbucks.svg" alt="" width={35} height={35} />}</button></li>)}</ul>
+      </details>
+    </div>
+  </section>;
 }
 

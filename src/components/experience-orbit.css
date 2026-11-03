@@ -1,0 +1,18 @@
+.experience-orbit { background: #242329; color: #faf9f6; padding: 64px 0 48px; overflow: hidden; }
+.experience-orbit h2 { font-size: clamp(38px,5vw,72px); line-height: 1.05; letter-spacing: -.055em; max-width: 850px; margin: 0; }
+.orbit-introduction { color: #cfddcf; font-size: 18px; }
+.orbit-controls { display: flex; justify-content: flex-end; gap: 10px; }
+.orbit-controls button { min-height: 44px; min-width: 44px; border: 1px solid #ffffff55; border-radius: 30px; padding: 10px 18px; color: inherit; background: transparent; cursor: pointer; }
+.orbit-space { position: relative; height: 400px; max-width: 1500px; margin: 0 auto; isolation: isolate; }
+.orbit-space::before { content: ''; position: absolute; left: 12%; top: 24%; width: 76%; height: 55%; border: 1px solid #cfddcf20; border-radius: 50%; box-shadow: 0 35px 65px #0002; }
+.orbit-name { position: absolute; top: 46%; left: 50%; width: min(30vw, 380px); text-align: center; font-size: clamp(26px,3.5vw,49px); font-weight: 650; line-height: 1.04; letter-spacing: -.04em; will-change: transform; text-wrap: balance; }
+.orbit-explore details { border-top: 1px solid #ffffff30; }
+.orbit-explore summary { cursor: pointer; padding: 24px 0; display: flex; justify-content: space-between; font-size: 18px; }
+.orbit-explore summary span { color: #d8ff52; }
+.orbit-explore p { color: #cfddcf; }
+.orbit-explore ul { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px 25px; list-style: none; padding: 0; }
+.orbit-explore li button { color: inherit; background: transparent; border: 0; border-bottom: 1px solid #ffffff20; text-align: left; padding: 12px 0; width: 100%; min-height: 44px; cursor: pointer; }
+.orbit-selected { font-size: 28px; color: #d8ff52 !important; }
+.experience-orbit button:focus-visible, .experience-orbit summary:focus-visible { outline: 2px solid #d8ff52; outline-offset: 4px; }
+@media(max-width:700px) { .experience-orbit { padding: 38px 0; } .orbit-space { height: 310px; } .orbit-name { width: 61vw; font-size: 32px; } .orbit-explore ul { grid-template-columns: 1fr 1fr; } .orbit-controls { justify-content: flex-start; } }
+@media(prefers-reduced-motion:reduce) { .orbit-name { will-change: auto; } }

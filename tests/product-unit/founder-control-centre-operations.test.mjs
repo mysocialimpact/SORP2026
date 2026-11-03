@@ -44,7 +44,7 @@ test("founder shell keeps its management chrome distinct while public shell rema
   assert.match(header, /founder-control-title/);
   assert.match(header, /href="\/dashboard\/\?mode=customer">View My Dashboard/);
   assert.doesNotMatch(header, /founder-mode-indicator/);
-  for (const publicLabel of ["Our Mission", "Find Accountants", "Talk to Us"]) assert.match(header, new RegExp(publicLabel));
+  for (const publicLabel of ["Our Mission", "Find Accountants", "Contact Us"]) assert.match(header, new RegExp(publicLabel));
   assert.match(footer, /startsWith\("\/founder\/"\)\) return null/);
   assert.match(sayHello, /if \(founderMode\) return null/);
   assert.match(actionBar, /if \(founderMode\) return null/);

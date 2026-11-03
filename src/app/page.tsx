@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { FolderHero } from "@/components/folder-hero";
-import Image from "next/image";
+import { ToolLink } from "@/components/tool-link";
 import Link from "next/link";
 import { MsiBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
@@ -51,7 +51,7 @@ export default function Home() {
               We’re a UK-based social enterprise initiative helping charities and their advisers
               navigate SORP 2026 and achieve greater impact.
             </p>
-            <div className="sample-entry"><Link href="/sample-charity/">Explore a sample charity →</Link><Link href="/sample-charity/#request-demo">Request a free demo →</Link></div>
+            <p className="homepage-beta-note"><strong>Now in public beta.</strong> Charities and advisers can create a free account, start their readiness review and help shape what comes next.</p><div className="sample-entry"><ToolLink href="/are-you-sorp-ready/review/">Get started free →</ToolLink><Link href="/sample-charity/">See SORP 2026 in action →</Link></div>
           </div>
           <div className="gateway-intro-aside">
             <p className="homepage-editorial">SORP is the requirement.<br /><strong>Better impact is the opportunity.</strong></p>
@@ -80,70 +80,6 @@ export default function Home() {
         </section>
       </div>
       <ExperienceCloud />
-      <div className="gateway-width">
-        <section className="gateway-people" id="home-team" aria-labelledby="people-title">
-          <div className="gateway-people-intro">
-            <h2 id="people-title">Our team</h2>
-            <p>
-              Developed by My Social Impact, combining financial rigour,
-              monitoring and evaluation, technology, practical charity
-              experience and creative thinking.
-            </p>
-          </div>
-          <div className="gateway-portraits" role="region" aria-label="Our team portraits" tabIndex={0}>
-            <figure>
-              <Image
-                src="/images/marcus-warry.webp"
-                alt="Marcus Warry"
-                width={480}
-                height={520}
-                sizes="(max-width: 700px) 44vw, 240px"
-              />
-              <figcaption>
-                <h3>
-                  Marcus Warry <span>ACA</span>
-                </h3>
-                <p>
-                  Chartered Accountant
-                  <br />& social impact consultant
-                </p>
-              </figcaption>
-            </figure>
-            <figure>
-              <Image
-                src="/images/chris-arnold.webp"
-                alt="Dr Chris Arnold"
-                width={480}
-                height={520}
-                sizes="(max-width: 700px) 44vw, 240px"
-              />
-              <figcaption>
-                <h3>Dr Chris Arnold</h3>
-                <p>
-                  Social impact strategist
-                  <br />& creative campaign specialist
-                </p>
-              </figcaption>
-            </figure>
-            <figure>
-              <Image
-                src="/images/gareth-murphy.webp"
-                alt="Gareth Murphy"
-                width={1123}
-                height={1401}
-                sizes="(max-width: 700px) 44vw, 240px"
-              />
-              <figcaption>
-                <h3>Gareth Murphy</h3>
-                <p>
-                  Data, systems
-                  <br />& technology
-                </p>
-              </figcaption>
-            </figure>
-          </div>
-        </section>
-      </div>
       <HomepageContribution />
       <HomepagePricing />
     </main>

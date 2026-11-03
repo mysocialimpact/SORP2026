@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { DemoRequest } from "@/components/demo-request";
+import "../sample-charity/sample-charity.css";
 import { MsiBrand, IdeasBrand } from "@/components/brand";
 import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
@@ -46,7 +48,7 @@ export default function Contact() {
           </div>
           <Image
             className="gateway-contact-portrait"
-            src="/images/marcus-warry.webp"
+            src="/images/marcus-outdoor-original.jpg"
             alt="Marcus Warry, co-founder of My Social Impact"
             width={480}
             height={520}
@@ -54,6 +56,7 @@ export default function Contact() {
             sizes="(max-width: 700px) 90vw, 420px"
           />
         </section>
+        <details className="contact-demo-option"><summary>Would you like a free personal demonstration? →</summary><DemoRequest compact /></details>
         <section
           className="gateway-organisations"
           aria-label="The organisations behind the tools"
