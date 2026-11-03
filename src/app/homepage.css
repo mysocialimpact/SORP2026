@@ -22,13 +22,14 @@
 .homepage-story .gateway-portraits img { width: 100%; aspect-ratio: 1 / 1.12; height: auto; object-fit: cover; }
 .homepage-story .gateway-portraits h3 { font-size: 23px; }
 .homepage-story .gateway-portraits p { font-size: 15px; }
-.homepage-story .gateway-contribution { padding-block: 44px; }
+.homepage-story .gateway-contribution { padding-block: 36px; }
 .homepage-story .gateway-contribution-inner { grid-template-columns: 1.4fr 1fr; gap: 50px; padding-block: 0; }
 .homepage-story .gateway-contribution-copy h2 { font-size: clamp(40px, 4.6vw, 64px); }
-.homepage-story .gateway-contribution-copy p { font-size: 17px; margin-top: 18px; }
+.homepage-story .gateway-contribution-copy p { font-size: 17px; margin-top: 14px; }
 .homepage-story .gateway-contribution-copy .gateway-quiet-link { margin-top: 20px; }
 .homepage-story .gateway-contribution-panel { padding: 24px; }
 .homepage-story .gateway-contribution-panel h3 { font-size: 25px; }
+.homepage-story .gateway-contribution-amounts { margin: 20px 0 16px; }
 .homepage-story .gateway-contribution-panel p { font-size: 14px; }
 .homepage-story .gateway-contribution-amounts button { padding: 10px; min-height: 44px; }
 .homepage-story .homepage-hello { padding: 30px 0 34px; background: #efc5d4; }
