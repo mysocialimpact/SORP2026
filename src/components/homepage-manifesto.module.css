@@ -24,10 +24,12 @@
 .vision h2 { margin: 0; font-size: clamp(24px, 2.35vw, 34px); line-height: 1.16; letter-spacing: -.035em; font-weight: 400; text-wrap: pretty; }
 .founders { grid-area: founders; align-self: center; min-width: 0; margin: 0; }
 .portraits { position: relative; isolation: isolate; aspect-ratio: 10 / 7; overflow: hidden; background: #e9dfd2; border-radius: 3px; }
-.artwork { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.artwork { display: none; }
+.graffiti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; background: #242329; }
+.portraits::after { content: ""; position: absolute; inset: auto 0 0; height: 18%; z-index: 2; background: linear-gradient(transparent, #242329); pointer-events: none; }
 .portraits img { position: absolute; bottom: 0; display: block; height: auto; z-index: 1; }
-.marcus { left: -1%; width: 53%; mask: url('/images/marcus-outdoor-silhouette.svg') center / 100% 100% no-repeat; }
-.chris { right: -7%; width: 60%; }
+.marcus { left: -6%; width: 51%; }
+.chris { right: -9%; width: 68%; }
 .digital { opacity: .8; }
 .creative { opacity: .9; }
 .connection { opacity: 1; }
@@ -38,6 +40,11 @@
 .founderProfiles span { display: block; font-size: 10px; letter-spacing: .035em; color: #cfddcf; }
 .founders figcaption { margin-top: 16px; padding-top: 13px; border-top: 1px solid #cfddcf45; font-size: 10px; line-height: 1.4; letter-spacing: .08em; text-transform: uppercase; color: #cfddcf; }
 @media (prefers-reduced-motion: no-preference) {
+  .portraits[data-portrait-motion="waiting"] .graffiti > g { opacity: 0; }
+  .portraits[data-portrait-motion="playing"] .paintSweep { animation: connect 1.3s ease-out both; }
+  .portraits[data-portrait-motion="playing"] .paintLoop { animation: connect 1.4s .25s ease-out both; }
+  .portraits[data-portrait-motion="playing"] .paintAccent { animation: connect .8s .8s ease-out both; }
+  .portraits[data-portrait-motion="playing"] .paintSpeckles { animation: emerge .8s .6s ease-out both; }
   .portraits[data-portrait-motion="waiting"] .artwork > g { opacity: 0; }
   .portraits[data-portrait-motion="playing"] .digital { animation: data-arrives 1.4s ease-out both; }
   .portraits[data-portrait-motion="playing"] .creative { animation: paint-arrives 1.6s .25s cubic-bezier(.2,.65,.3,1) both; }
