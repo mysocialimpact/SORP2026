@@ -22,7 +22,7 @@ export function FounderAdminNavigation() {
     };
   }, [founderMode]);
 
-  if (!founderMode) return null;
+  if (!founderMode || pathname.startsWith("/founder/growth")) return null;
   return <nav className="founder-admin-navigation" aria-label="Founder administration">
     <div className="gateway-width founder-admin-navigation-track">
       {FOUNDER_ADMIN_NAV.map(item => <a key={item.key} href={`/founder/#${item.key}`} className={active === item.key ? "is-active" : ""} aria-current={active === item.key ? "page" : undefined} onClick={() => { setActive(item.key); announceFounderView(item.key); }}>{item.label}</a>)}
