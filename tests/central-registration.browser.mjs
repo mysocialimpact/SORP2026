@@ -66,10 +66,8 @@ async function run(viewport) {
     await expect(page.locator('.profile-next button')).toBeDisabled();
     await page.locator('.onboarding-profile input[name=email]').fill('synthetic@example.invalid');
     await page.locator('.onboarding-profile input[name=organisation]').fill('');
-    await expect(page.locator('.profile-next button')).toBeDisabled();
-    await page.getByLabel('I work independently', { exact: true }).check();
     await expect(page.locator('.profile-next button')).toBeEnabled();
-    await expect(page.locator('.profile-count')).toContainText('5/5');
+    await expect(page.locator('.profile-count')).toContainText('3/3');
    }
    await page.locator('.profile-next button').click();
    await page.getByLabel('Choose a password').fill('Synthetic-Test-Password-123');
