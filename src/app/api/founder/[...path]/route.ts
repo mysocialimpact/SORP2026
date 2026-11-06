@@ -152,8 +152,12 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
           optionalFounderQuery<{ count:string }>("SELECT count(*) FROM research_console.founder_contact_enquiries WHERE status='new'"),
           optionalFounderQuery("SELECT account_id,data,revision,updated_at FROM msi_products.impact_director ORDER BY updated_at DESC"),
         ]);
-        await reconcileLiveOrganisations(live.organisations);
-        await reconcileLiveMemberships(live.users);
+        // Growth reads the same authenticated account feed without refreshing the
+        // commercial ledger as a side effect of opening an analytics page.
+        if (url.searchParams.get("purpose") !== "growth-metrics") {
+          await reconcileLiveOrganisations(live.organisations);
+          await reconcileLiveMemberships(live.users);
+        }
         const storedOrganisations = await founderQuery<Record<string, unknown>>(`SELECT o.*,
           (SELECT email FROM research_console.founder_memberships m WHERE m.organisation_id=o.id ORDER BY (m.role='owner') DESC,m.created_at LIMIT 1) primary_email,
           (SELECT count(*)::int FROM research_console.founder_memberships m WHERE m.organisation_id=o.id) member_count

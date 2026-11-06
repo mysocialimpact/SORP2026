@@ -19,13 +19,13 @@ export async function protectPlatformRequest(request: Request) {
   return identity;
 }
 
-export async function protectAdviserPage() {
+export async function protectAdviserPage(allowEmpty = false) {
   try {
     const identity = await platformIdentity((await cookies()).toString());
     const advisers = identity.memberships.filter(membership =>
       membership.type === "Adviser" && ["Adviser", "Enterprise"].includes(membership.entitlement?.plan || "")
     );
-    if (!advisers.length) redirect("/dashboard/?adviser=unavailable");
+    if (!advisers.length && !allowEmpty) redirect("/dashboard/?adviser=unavailable");
     return { ...identity, advisers };
   } catch (error) {
     if (error instanceof AccessError && error.status === 401) redirect("/login/?next=/adviser/");

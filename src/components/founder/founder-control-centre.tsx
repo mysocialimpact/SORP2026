@@ -47,7 +47,18 @@ export function FounderControlCentre() {
   useEffect(() => {
     let active = true;
     void founderCall<Dashboard>("dashboard")
-      .then(result => { if (active) setData(result); })
+      .then(async result => {
+        if (!active) return;
+        setData(result);
+        const organisationId = new URLSearchParams(window.location.search).get("organisation");
+        const linked = organisationId ? result.organisations.find(row => row.id === organisationId) : undefined;
+        if (organisationId && !linked) setError("That organisation is no longer available in the founder directory.");
+        if (linked) {
+          setSelectedOrganisation(linked);
+          const detail = await founderCall<OrganisationDetail>(`organisation/${encodeURIComponent(linked.id)}`);
+          if (active) setOrganisationDetail(detail);
+        }
+      })
       .catch((caught: unknown) => { if (active) setError(message(caught, "Unable to open the control centre.")); });
     return () => { active = false; };
   }, []);

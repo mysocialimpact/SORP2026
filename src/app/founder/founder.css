@@ -228,3 +228,14 @@ button.founder-stat:hover { background:#36343d; }
   .platform-sticky-navigation .founder-mode-header .gateway-brand-lockup { gap:7px; }
   .platform-sticky-navigation .founder-mode-header .founder-control-title { padding-left:7px; font-size:8px; letter-spacing:.02em; }
 }
+
+.founder-header-actions { display:flex; align-items:center; gap:14px; margin-left:auto; }
+.founder-workspace-switch { position:relative; font-size:13px; }
+.founder-workspace-switch summary { cursor:pointer; color:var(--founder-ink); font-weight:800; border:1px solid var(--founder-line); background:white; padding:7px 10px; white-space:nowrap; }
+.founder-workspace-switch nav { position:absolute; right:0; top:calc(100% + 4px); z-index:6; width:min(270px,85vw); padding:8px; background:white; border:1px solid var(--founder-line); box-shadow:0 8px 25px #24232922; }
+.founder-workspace-switch nav a,.founder-workspace-switch nav small { display:block; padding:8px; color:var(--founder-ink); }
+.founder-workspace-switch a:hover,.founder-workspace-switch a[aria-current] { background:var(--founder-green-soft); }
+@media(max-width:600px) {
+  .founder-header-actions { gap:6px; }
+  .founder-workspace-switch { font-size:11px; }
+}
