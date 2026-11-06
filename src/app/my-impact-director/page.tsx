@@ -34,14 +34,6 @@ export default function MyImpactDirectorPage() {
           <p className={s.heroPrinciple}>
             Because social impact deserves to be taken as seriously as financial performance.
           </p>
-          <div className={s.heroActions}>
-            <ToolLink className={s.primary} href="/my-impact-director/workspace/#assessment">
-              Start your free assessment ↗
-            </ToolLink>
-            <a className={s.textLink} href="#director-conversation">
-              Talk to an Impact Director →
-            </a>
-          </div>
           <p className={s.small}>
             Human-led today. AI-enabled. Built around your organisation.
           </p>
@@ -70,8 +62,8 @@ export default function MyImpactDirectorPage() {
       </FolderHero>
       <section id="assessment" className={s.assessment} aria-label="My Impact Director assessment introduction">
         <div className={s.invitation}>
-          <div><p className={s.kicker}>Free assessment · 21 star-rating questions · about 8 minutes</p><h2>How tech-savvy is<br /> <em>your organisation?</em></h2><p>Discover how you’re already using technology, data and AI, and where you could do more. No technical knowledge required.</p></div>
-          <div><span className={s.bigStar} aria-hidden="true">✳</span><ToolLink className={s.primary} href="/my-impact-director/workspace/#assessment">Start your free assessment ↗</ToolLink><p className={s.small}>Your report, practical recommendations and conversation agenda are free.</p></div>
+          <div><p className={s.kicker}>Free assessment · 21 star-rating questions · about 8 minutes</p><h2>How AI-savvy is<br /> <em>your organisation?</em></h2><p>Discover how you’re already using technology, data and AI, and where you could do more. No technical knowledge required.</p></div>
+          <div><span className={s.bigStar} aria-hidden="true">✳</span><ToolLink className={s.primary} href="/my-impact-director/workspace/#assessment">Find out how AI-savvy your organisation is →</ToolLink><p className={s.small}>Your report, practical recommendations and conversation agenda are free.</p></div>
         </div>
       </section>
       <section id="director-support" className={s.service}>
@@ -280,10 +272,6 @@ export default function MyImpactDirectorPage() {
           and businesses making a greater positive difference to social and
           environmental problems.
         </p>
-        <div className={s.closingActions}>
-          <ToolLink className={s.primary} href="/my-impact-director/workspace/#assessment">Start your free assessment ↗</ToolLink>
-          <a className={s.textLink} href="#director-conversation">Talk to an Impact Director →</a>
-        </div>
       </section>
     </main>
   );
