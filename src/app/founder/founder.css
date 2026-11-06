@@ -238,5 +238,4 @@ button.founder-stat:hover { background:#36343d; }
 @media(max-width:600px) {
   .founder-header-actions { gap:6px; }
   .founder-workspace-switch { font-size:11px; }
-  .platform-sticky-navigation .founder-mode-header .founder-control-title { display:none; }
 }
