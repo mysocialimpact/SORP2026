@@ -2,6 +2,8 @@
 .public-beta-bar { text-align: center; justify-items: center; grid-template-columns: 1fr !important; background: #d8ff52 !important; color: #242329 !important; gap: 1px !important; }
 .public-beta-bar strong { font-size: 10px; letter-spacing: .07em; }
 .public-beta-bar > span { font-size: 11px; }
+.public-beta-bar-home { padding-block: calc(5px + env(safe-area-inset-top, 0px)) 5px; background: #e8ede4 !important; border-bottom-color: #d4ddd0; }
+.public-beta-bar-home strong { font-size: 10px; line-height: 1.35; }
 .build-information-bar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

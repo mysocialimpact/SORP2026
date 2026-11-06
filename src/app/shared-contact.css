@@ -585,6 +585,7 @@
 .contact-demonstration h2 { font-size: clamp(28px,3vw,44px); line-height: 1.12; letter-spacing: -.035em; margin: 10px 0 20px; }
 .contact-demonstration p { max-width: 680px; line-height: 1.6; }
 .contact-demonstration a { display: inline-flex; padding: 14px 0; min-height: 44px; font-weight: 650; text-underline-offset: 5px; }
-.homepage-beta-note { font-size: 16px; line-height: 1.55; max-width: 580px; }
+.homepage-beta-note { max-width: 620px; margin-top: 32px; padding: 14px 18px; border: 1px solid #c9d7ca; border-radius: 4px; background: #e8efe8; color: #304238; font-size: 16px; line-height: 1.5; }
 .homepage-beta-note strong { color: #335346; }
+@media(max-width:700px) { .homepage-beta-note { margin-top: 26px; padding: 13px 15px; font-size: 15px; } }
 @media(max-width:700px) { .platform-sticky-navigation .gateway-directory-nav { grid-column: 1 / -1; margin-right: 0; justify-content: space-between; } }
