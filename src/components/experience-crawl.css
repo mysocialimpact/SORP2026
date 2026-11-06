@@ -2,6 +2,7 @@
 .crawl-heading { display: flex; align-items: end; justify-content: space-between; gap: 28px; }
 .experience-crawl h2 { font-size: clamp(36px,4.5vw,64px); line-height: 1.05; letter-spacing: -.055em; max-width: 740px; margin: 0; }
 .crawl-introduction { color: #476354; font-size: 17px; line-height: 1.5; margin-bottom: 0; max-width: 670px; }
+.crawl-context { color: #686e66; font-size: 13px; line-height: 1.4; margin: 10px 0 0; max-width: 670px; }
 .crawl-controls { display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; gap: 8px; }
 .crawl-controls button { min-height: 44px; padding: 10px 18px; background: transparent; border: 1px solid #47635455; border-radius: 30px; color: inherit; cursor: pointer; }
 .crawl-controls a { padding: 10px 0; min-height: 44px; font-size: 13px; text-underline-offset: 4px; }
