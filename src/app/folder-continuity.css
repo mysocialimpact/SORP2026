@@ -73,6 +73,14 @@
 }
 .folder-action-bar.is-readiness .folder-action-secondary { padding-inline: 13px 2px; }
 .folder-action-utility:hover { border-color: var(--action-accent, #cfddcf); color: var(--action-accent, #cfddcf); }
+.folder-action-bar.is-director { grid-template-columns: minmax(190px, 1fr) minmax(190px, 1fr) auto auto; }
+.folder-action-bar.is-director .folder-action-primary { min-width: 0; }
+.folder-action-bar.is-director button {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 44px; background: transparent; font: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; text-align: left;
+}
+.folder-action-bar.is-director button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .folder-action-clearance { height: var(--folder-action-height, 76px); background: #242428; }
 /* Task controls take precedence while completing the inline assessment or typing. */
 body:has(#assessment [data-mode]) .folder-action-bar[data-action-page="/my-impact-director/"],
@@ -92,6 +100,8 @@ body:has(form:focus-within, .directory-app :focus) .folder-action-bar { visibili
   .folder-action-secondary { flex-shrink: 0; }
   .folder-action-bar.is-readiness { gap: 5px; }
   .folder-action-bar.is-readiness a { min-width: 0; padding-inline: 9px; }
+  .folder-action-bar.is-director { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto; }
+  .folder-action-bar.is-director button { font-size: 12px; }
 }
 @media (max-width: 620px) {
   .folder-action-bar:not(.is-readiness) {
@@ -126,6 +136,11 @@ body:has(form:focus-within, .directory-app :focus) .folder-action-bar { visibili
   }
   .folder-action-bar.is-readiness a span { display: none; }
   .folder-action-bar.is-readiness .folder-action-secondary { padding-inline: 5px; }
+  .folder-action-bar.is-director { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .folder-action-bar.is-director > :nth-child(-n+2) { min-height: 48px; padding: 7px 10px; }
+  .folder-action-bar.is-director > :nth-child(n+3) { min-height: 27px; padding: 2px 8px; font-size: 10px; }
+  .folder-action-bar.is-director button { min-width: 0; justify-content: center; font-size: 10px; line-height: 1.12; text-align: center; text-wrap: balance; }
+  .folder-action-bar.is-director button span { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .platform-sticky-navigation, .platform-sticky-navigation * { transition: none; animation: none; }

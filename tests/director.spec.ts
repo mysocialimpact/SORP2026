@@ -323,35 +323,64 @@ test("legacy guest handoff is explicit and signed-in saving survives reopening",
 test("existing free booking flow confirms only a successful response", async ({
   page,
 }) => {
-  await page.route("**/api/booking/availability/**", (route) =>
-    route.fulfill({
+  await mockAccount(page);
+  let availabilityChecks = 0;
+  await page.route("**/api/booking/availability/**", (route) => {
+    availabilityChecks++;
+    return route.fulfill({
       json: {
-        slots: [{ start: "2026-10-20T09:00:00Z", end: "2026-10-20T09:10:00Z" }],
+        slots: [{ start: "2027-01-20T09:00:00Z", end: "2027-01-20T09:10:00Z" }],
       },
-    }),
-  );
+    });
+  });
   let submitted: Record<string, unknown> = {};
+  let bookingRequests = 0;
   await page.route("**/api/booking/free/**", (route) => {
+    bookingRequests++;
     submitted = route.request().postDataJSON();
     return route.fulfill({
-      json: { ok: true, start: "2026-10-20T09:00:00Z", invitationSent: true },
+      json: { ok: true, start: "2027-01-20T09:00:00Z", invitationSent: true },
     });
   });
   await page.goto(path);
-  await page
-    .getByRole("button", { name: "See introductory meeting times" })
-    .click();
-  await page.getByLabel("Your name", { exact: true }).fill("QA Visitor");
-  await page.getByLabel("Email", { exact: true }).fill("qa@example.invalid");
-  await page
-    .getByLabel("Organisation", { exact: true })
-    .fill("QA organisation");
-  await page.getByRole("combobox").selectOption("2026-10-20T09:00:00Z");
+  await expect(page.getByRole("heading", { name: "How AI-savvy is your organisation?" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Find out how AI-savvy your organisation is/ })).toHaveAttribute("href", "/my-impact-director/workspace/#assessment");
+  await expect(page.locator(".folder-action-bar").getByRole("link", { name: /Check your AI readiness/ })).toHaveAttribute("href", "/my-impact-director/workspace/#assessment");
+  await expect(page.locator(".folder-action-bar").getByRole("button", { name: /Book a 10-minute chat/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Start your free assessment/ })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const bar = await page.locator(".folder-action-bar").boundingBox();
+  expect(bar && bar.y + bar.height <= page.viewportSize()!.height + 1).toBe(true);
+  await page.locator(".folder-action-bar").getByRole("button", { name: /Book a 10-minute chat/ }).click();
+  const panel = page.locator("#director-booking-panel");
+  await expect(panel).toBeVisible();
+  await panel.getByRole("button", { name: /Close/ }).click();
+  await expect(panel).toHaveCount(0);
+  await page.locator(".folder-action-bar").getByRole("button", { name: /Book a 10-minute chat/ }).click();
+  await expect(panel).toBeVisible();
+  await page.waitForTimeout(350);
+  for (const action of await page.locator(".folder-action-bar > *").all()) {
+    const box = await action.boundingBox();
+    expect(box && box.y + box.height <= page.viewportSize()!.height + 1).toBe(true);
+  }
+  await page.screenshot({ path: `/tmp/director-booking-${test.info().project.name}.png` });
+  await expect(panel.getByLabel("Your name", { exact: true })).toHaveValue("QA Visitor");
+  await expect(panel.getByLabel("Email", { exact: true })).toHaveValue("qa@example.invalid");
+  await expect(panel.getByLabel("Organisation", { exact: true })).toHaveValue("QA charity");
+  await panel.getByLabel("What would you like to discuss?").fill("Our impact measurement plan.");
+  await panel.getByRole("combobox").selectOption("2027-01-20T09:00:00Z");
+  await panel.getByRole("button", { name: /Close/ }).click();
+  await page.locator(".folder-action-bar").getByRole("button", { name: /Book a 10-minute chat/ }).click();
+  await expect(panel.getByLabel("What would you like to discuss?")).toHaveValue("Our impact measurement plan.");
+  await expect(panel.getByRole("combobox")).toHaveValue("2027-01-20T09:00:00Z");
   await page.getByRole("button", { name: "Book my free introduction" }).click();
   await expect(
     page.getByRole("heading", { name: "You’re booked." }),
   ).toBeVisible();
   expect(submitted.serviceId).toBe("free");
   expect(submitted.source).toBe("my-impact-director");
+  expect(submitted.evidence).toBe("My Impact Director introduction: Our impact measurement plan.");
   expect(String(submitted.idempotencyKey).length).toBeGreaterThan(16);
+  expect(availabilityChecks).toBe(1);
+  expect(bookingRequests).toBe(1);
 });

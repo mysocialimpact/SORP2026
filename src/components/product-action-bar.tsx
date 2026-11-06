@@ -15,7 +15,7 @@ function defaultAction(path: string): Action {
   if (path.startsWith("/ask-sorp/")) return { label: "Ask SORP a question", href: "/ask-sorp/workspace/" };
   if (path.startsWith("/charity-impact-reports/")) return { label: "Get your report reviewed", href: "/charity-impact-reports/review/" };
   if (path.startsWith("/social-impact-excellence/")) return { label: "Explore Social Impact Excellence", href: "/social-impact-excellence/#excellence-start" };
-  if (path.startsWith("/my-impact-director/")) return { label: "Start your free assessment", href: "/my-impact-director/workspace/#assessment" };
+  if (path.startsWith("/my-impact-director/")) return { label: "Check your AI readiness", href: "/my-impact-director/workspace/#assessment" };
   if (path.startsWith("/accountants-advisers/")) return { label: "Find an accountant", href: "/accountants-advisers/" };
   return { label: "Start your free SORP review", href: "/are-you-sorp-ready/review/?entry=intro" };
 }
@@ -37,6 +37,7 @@ export function ProductActionBar() {
   const [director, setDirector] = useState<{ completed?: boolean; started?: boolean } | null>(null);
   const bar = useRef<HTMLElement>(null);
   const readinessLanding = path === "/are-you-sorp-ready/";
+  const directorLanding = path === "/my-impact-director/";
 
   useEffect(() => {
     if (focusedMode) return;
@@ -58,12 +59,12 @@ export function ProductActionBar() {
 
   const action = useMemo(() => {
     if (path === "/" || path.startsWith("/are-you-sorp-ready/") || path === "/dashboard/") return readinessAction(account?.signedIn ? account.progress : undefined);
-    if (path.startsWith("/my-impact-director/") && director) {
+    if (path.startsWith("/my-impact-director/") && !directorLanding && director) {
       if (director.completed) return { label: "View your Impact Director report", href: "/my-impact-director/workspace/#assessment" };
       if (director.started) return { label: "Continue your free assessment", href: "/my-impact-director/workspace/#assessment" };
     }
     return defaultAction(path);
-  }, [account, director, path]);
+  }, [account, director, directorLanding, path]);
 
   useLayoutEffect(() => {
     if (focusedMode) {
@@ -80,9 +81,10 @@ export function ProductActionBar() {
   if (founderMode) return null;
   if (invitationMode) return null;
   return <>
-    <aside ref={bar} className={`folder-action-bar${readinessLanding ? " is-readiness" : ""}`} data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
+    <aside ref={bar} className={`folder-action-bar${readinessLanding ? " is-readiness" : ""}${directorLanding ? " is-director" : ""}`} data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
       {readinessLanding && <Link className="folder-action-utility folder-action-presentation" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>}
       <ToolLink className="folder-action-primary" href={action.href}>{path === "/" && account?.signedIn === false ? "Let’s Get Started" : readinessLanding && !account?.signedIn ? "Start Free Review" : action.label} <span aria-hidden="true">→</span></ToolLink>
+      {directorLanding && <button type="button" className="folder-action-utility folder-action-booking" onClick={() => window.dispatchEvent(new Event("director-booking-open"))}>Book a 10-minute chat <span aria-hidden="true">→</span></button>}
       <a className="folder-action-utility folder-action-feedback" href={path === "/contact/" ? "/#page-feedback" : "#page-feedback"}>Give feedback <span aria-hidden="true">→</span></a>
       <a className="folder-action-secondary" href="/contact/">Contact Us <span aria-hidden="true">→</span></a>
     </aside>
