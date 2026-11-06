@@ -23,7 +23,7 @@ const organisations = [
 ];
 
 const colours = [[35, 77, 59], [173, 57, 32], [112, 80, 139], [48, 81, 109]];
-const featured = ["Diageo", "Starbucks", "Sainsbury’s", "Great Ormond Street Hospital", "ActionAid", "Greenpeace", "Comic Relief"];
+const featured = ["Great Ormond Street Hospital", "ActionAid", "Greenpeace", "Comic Relief", "Blue Cross", "Farm Africa", "CARE International", "Friends of the Earth", "Interim Spaces"];
 const crawlOrganisations = [...featured, ...organisations.filter(name => !featured.includes(name))];
 function makeRows(mobile: boolean) {
   const rows: string[][] = [];
@@ -166,8 +166,9 @@ export function ExperienceCloud() {
   return <section className="experience-cloud experience-crawl" id="home-experience" aria-labelledby="experience-title">
     <div className="gateway-width crawl-heading">
       <div><p className="gateway-kicker">Experience across our team.</p>
-      <h2 id="experience-title">Creativity strikes back.</h2>
-      <p className="crawl-introduction">Our team has worked in global agencies and with major brands. Now we bring that strategic and creative thinking within reach of charities and organisations of every size.</p></div>
+      <h2 id="experience-title">Impact strikes back.</h2>
+      <p className="crawl-introduction">A new era of charity reporting is taking shape. Measuring and reporting impact matters more than ever, and we’re excited to help charities turn that change into greater impact.</p>
+      <p className="crawl-context">Some of the charities and other organisations Marcus and our team have worked with over the years.</p></div>
       <div className="crawl-controls">
         <button type="button" onClick={() => { if (reduced) return; setPaused(value => !value); }} aria-pressed={paused || reduced} disabled={reduced}>{reduced ? "Motion reduced" : paused ? "Resume movement" : "Pause movement"}</button>
         <button type="button" onClick={() => void toggleCue()} aria-pressed={playing}>{playing ? "Stop original cue" : "Play original cue ♪"}</button>

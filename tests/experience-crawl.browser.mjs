@@ -12,9 +12,10 @@ try {
       const section = document.querySelector('#home-experience');
       window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - 190, behavior: 'instant' });
     });
-    await page.getByRole('heading', { name: 'Creativity strikes back.' }).waitFor();
+    await page.getByRole('heading', { name: 'Impact strikes back.' }).waitFor();
+    await page.getByText('Some of the charities and other organisations Marcus and our team have worked with over the years.').waitFor();
     await page.waitForTimeout(250);
-    await page.waitForFunction(() => [...document.querySelectorAll('.crawl-organisation')].some(name => name.textContent === 'Diageo'));
+    await page.waitForFunction(() => [...document.querySelectorAll('.crawl-organisation')].some(name => name.textContent === 'ActionAid'));
     assert.equal(await page.locator('#experience-collection li').count(), 62);
     const inspect = async phase => {
       const result = await page.evaluate(() => {
@@ -37,6 +38,7 @@ try {
       await page.locator('.crawl-frame').screenshot({ path: `/tmp/experience-crawl-${width}-${phase}.png` });
     };
     await inspect('start');
+    await page.locator('#home-experience').screenshot({ path: `/tmp/experience-section-${width}.png` });
     const before = await page.locator('.crawl-name').first().evaluate(line => line.style.transform);
     await page.waitForTimeout(250);
     assert.notEqual(await page.locator('.crawl-name').first().evaluate(line => line.style.transform), before, `${width}px crawl must move when visible`);
