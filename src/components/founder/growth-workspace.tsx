@@ -116,7 +116,7 @@ export function GrowthWorkspace({ view, search = {} }: { view:Kind|"overview"|"d
 
 function Overview({data}:{data:Data|null}) {
   const [registrations,setRegistrations] = useState<number|null>(null);
-  useEffect(()=>{let active=true;void founderCall<Dashboard>("dashboard").then(d=>{
+  useEffect(()=>{let active=true;void founderCall<Dashboard>("dashboard?purpose=growth-metrics").then(d=>{
     if (active && Array.isArray(d.users)) setRegistrations(new Set(d.users.filter(user=>user.createdAt && Date.parse(user.createdAt)>=Date.now()-30*86400000).map(user=>user.id)).size);
   }).catch(()=>undefined);return()=>{active=false;};},[]);
   const total = (kind:Kind, stage?:string) => data?.counts?.filter(row=>row.kind===kind&&(!stage||row.stage===stage)).reduce((sum,row)=>sum+row.total,0) ?? null;
@@ -331,7 +331,7 @@ function Digital() {
   const [days,setDays]=useState(30);
   useEffect(()=>{
     let active=true;
-    void Promise.all([founderCall<Dashboard>("dashboard"),growthRequest<Data>({view:"overview"}).catch(()=>null)]).then(([dashboard,growth])=>{
+    void Promise.all([founderCall<Dashboard>("dashboard?purpose=growth-metrics"),growthRequest<Data>({view:"overview"}).catch(()=>null)]).then(([dashboard,growth])=>{
       if(active)setData({dashboard,enquiries:growth?.enquiries??null,now:Date.now()});
     }).catch(caught=>{if(active)setError(getError(caught));});
     return()=>{active=false;};
