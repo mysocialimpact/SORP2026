@@ -367,7 +367,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
       lock.current = false;
       setBusy(false);
       void persistEdits().catch(() => undefined);
-      if (!validEntity(currentState.current.facts.organisation, "organisation") || !registrationReady(currentState.current.facts))
+      if (!registrationReady(currentState.current.facts))
         draftRef.current?.focus({ preventScroll: true });
     }
   }
@@ -770,7 +770,6 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
               <fieldset id="onboarding-optional" className="profile-optional">
                 <legend>A little more about you <small>Entirely optional</small></legend>
                 <div className="profile-fields">{(["role", "organisation"] as const).map(key => <label className={`profile-field${changed.includes(key) ? " field-arrived" : ""}`} key={key}><span>{labels[key]}</span><input name={key} autoComplete={autocomplete[key]} maxLength={fieldLimit(key)} value={state.facts[key]} onChange={e => edit(key, e.target.value)} /></label>)}</div>
-                <label className="onboarding-independent"><input type="checkbox" checked={state.facts.organisation === "Independent"} onChange={e => edit("organisation", e.target.checked ? "Independent" : "")} /> I work independently</label>
                 {optionalKeys.map(key => <label key={key} className={`profile-field${changed.includes(key) ? " field-arrived" : ""}${state.facts[key] ? " has-value" : ""}`}>
                   <span>{labels[key]}{state.facts[key] && <i aria-hidden="true">✓</i>}</span>
                   <textarea name={key} rows={key === "concerns" ? 3 : 2} maxLength={fieldLimit(key)} value={state.facts[key]} placeholder="In your own words…" onChange={e => edit(key, e.target.value)} />

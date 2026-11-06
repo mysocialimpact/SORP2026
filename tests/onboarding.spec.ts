@@ -132,7 +132,6 @@ test("B: partial details remain editable; all five requirements precede early ex
     .locator(".onboarding-profile input[name=name]")
     .fill("David Smith");
   await expect(page.locator(".profile-next button")).toBeDisabled();
-  await page.getByLabel("I work independently", { exact: true }).check();
   await page.getByLabel("Charity name or registration number").fill("Brainstrust");
   await page.getByRole("button", { name: "Find →", exact: true }).click();
   await page.getByRole("button", { name: "Yes, this is the charity" }).click();
@@ -169,7 +168,6 @@ test("traditional form, secure validation and verification handoff", async ({
     .fill("alex-verify@example.com");
   await page.locator(".onboarding-profile input[name=role]").fill("Trustee");
   await expect(page.locator(".profile-next button")).toBeDisabled();
-  await page.getByLabel("I work independently", { exact: true }).check();
   await page.getByLabel("Charity name or registration number").fill("Brainstrust");
   await page.getByRole("button", { name: "Find →", exact: true }).click();
   await page.getByRole("button", { name: "Yes, this is the charity" }).click();

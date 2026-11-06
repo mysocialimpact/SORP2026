@@ -80,6 +80,7 @@ test("three essentials allow registration without any optional details and celeb
   await expect(page.locator('.profile-count')).toContainText('3/3');
   await expect(page.locator('input[name=role]')).toHaveValue('');
   await expect(page.locator('input[name=organisation]')).toHaveValue('');
+  await expect(page.getByLabel('I work independently')).toHaveCount(0);
   await expect(page.locator('.onboarding-celebration')).toHaveCount(0);
   await page.locator('.profile-next button').click();
   await page.getByLabel('Choose a password', { exact: false }).fill('Synthetic-pass-123');
@@ -234,8 +235,8 @@ test("manual route requires charity, allows optional blanks, preserves return ro
   await fixture(page); await open(page); await form(page);
   for (const [key, value] of Object.entries({ name: "Alex Rowan", email: "alex@example.com", role: "Trustee", organisation: "Cedar Advisory" })) await page.locator(`#onboarding-profile-form input[name=${key}]`).fill(value);
   await expect(page.locator(".profile-next button")).toBeDisabled();
-  await page.getByLabel("I work independently").check();
-  await expect(page.locator("input[name=organisation]")).toHaveValue("Independent");
+  await page.locator("input[name=organisation]").fill("");
+  await expect(page.locator("input[name=organisation]")).toHaveValue("");
   await choose(page);
   await expect(page.locator(".profile-next button")).toBeEnabled();
   await expect(page.locator("textarea[name=concerns]")).toHaveValue("");
