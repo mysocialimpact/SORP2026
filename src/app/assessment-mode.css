@@ -200,6 +200,14 @@ body .scr-page .scr-bottom {
 
 body .scr-page .scr-bottom button { min-height: 44px; }
 body .scr-page .scr-bottom .scr-back,
+body .scr-screen--assessment .scr-assessment-continue,
+body .scr-page--quick .scr-bottom > div:last-child > button,
+body .scr-page--quick-feedback .scr-bottom > div:last-child > button:not(.is-secondary) { text-transform: none; }
+body .scr-screen--assessment .scr-assessment-continue { min-height: 48px; font-size: 13px; font-weight: 700; letter-spacing: 0; }
+@media (max-width: 760px) {
+  body .scr-screen--assessment .scr-assessment-continue { font-size: 11px; }
+}
+body .scr-page .scr-bottom .scr-back,
 body .scr-page .scr-bottom .scr-forward { border-color: rgba(17, 16, 15, .32); }
 body .scr-page.scr-page--tar-recovery .scr-workspace { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
 body .scr-page.scr-page--tar-recovery .scr-bottom { position: fixed; }

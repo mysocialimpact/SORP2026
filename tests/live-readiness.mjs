@@ -83,12 +83,12 @@ try {
   console.log("LIVE public report retrieval and preparation passed");
   await page
     .getByRole("button", {
-      name: /SKIP EXPLANATION & VIEW SNAPSHOT|VIEW MY HISTORICAL SNAPSHOT/,
+      name: /Continue to Historical Snapshot/i,
     })
     .click({ timeout: 300000 });
   console.log("LIVE historical report assessment and snapshot passed");
   await page
-    .getByRole("button", { name: /CONTINUE TO CURRENT READINESS/ })
+    .getByRole("button", { name: /Continue to Current Readiness/i })
     .click();
   await page.getByRole("button", { name: "SKIP FOR NOW", exact: true }).click();
   await page
