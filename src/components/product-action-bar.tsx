@@ -13,7 +13,7 @@ type AccountResponse = { signedIn?: boolean; progress?: ReadinessProgress };
 function defaultAction(path: string): Action {
   if (path.startsWith("/sample-charity/")) return { label: "Request a free demo", href: "/sample-charity/#request-demo" };
   if (path.startsWith("/ask-sorp/")) return { label: "Ask SORP a question", href: "/ask-sorp/workspace/" };
-  if (path.startsWith("/charity-impact-reports/")) return { label: "Get your report reviewed", href: "/charity-impact-reports/review/" };
+  if (path.startsWith("/charity-impact-reports/")) return { label: "Get your free report assessment", href: "/charity-impact-reports/review/" };
   if (path.startsWith("/social-impact-excellence/")) return { label: "Explore Social Impact Excellence", href: "/social-impact-excellence/#excellence-start" };
   if (path.startsWith("/my-impact-director/")) return { label: "Check your AI readiness", href: "/my-impact-director/workspace/#assessment" };
   if (path.startsWith("/accountants-advisers/")) return { label: "Find an accountant", href: "/accountants-advisers/" };

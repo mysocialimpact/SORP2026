@@ -35,10 +35,10 @@ export default function CharityImpactReportsPage() {
       <div className="gateway-width reports-hero-grid">
         <div className="reports-hero-copy">
           <p className="gateway-kicker">Charity Impact Reports</p>
-          <h1>Go beyond SORP.<br/><span>Tell the full story of your impact.</span></h1>
-          <p className="reports-hero-lead">SORP 2026 asks charities to explain the difference they make. Your impact report gives you room to go further, with powerful stories, compelling pictures, stronger evidence and the methodology behind your results.</p>
+          <h1>Get a free assessment of<br/><span>your charity’s impact report.</span></h1>
+          <p className="reports-hero-lead">Register, select your charity and review its published report against two My Social Impact frameworks: the Social Impact Claims Code and Social Impact Excellence. Discover strengths, evidence gaps and practical improvements.</p>
           <div className="reports-hero-actions">
-            <ToolLink className="gateway-action" href="/charity-impact-reports/review/">Get started with your report <Arrow /></ToolLink>
+            <ToolLink className="gateway-action" href="/charity-impact-reports/review/">Get my free report assessment <Arrow /></ToolLink>
             <Link className="reports-login-link" href="/login/?return=/charity-impact-reports/review/">Already registered? Log in</Link>
             <Link className="reports-login-link" href="/sample-charity/#report">Explore a sample charity review →</Link>
             <Link className="reports-login-link" href="/sample-charity/#request-demo">Request a free demo →</Link>
@@ -69,7 +69,7 @@ export default function CharityImpactReportsPage() {
 
     <section id="reports-review" className="reports-review gateway-width">
       <div><p className="gateway-kicker">Expert human support</p><h2>Make a good report stronger.</h2></div>
-      <div><p>My Social Impact can review your existing charity impact report and help you make it stronger.</p><p className="reports-review-gate">With a shared account, you can upload your PDF securely for free; no payment is taken on upload. The offered £100 service includes a human review, written feedback and a 60-minute discussion. Online payment is currently paused, so arrange this with Marcus before any charge or review begins.</p><Link className="gateway-action" href="/charity-impact-reports/review/">Open report review <Arrow /></Link></div>
+      <div><p>Start with a free automated preliminary review of your report’s claims and evidence. Then discuss an independent expert review, improving next year’s report or turning your existing report into a mobile-friendly website through The Ideas Shed, from £250.</p><p className="reports-review-gate">The automated review assesses published information. It does not verify underlying evidence, assess undisclosed internal practices or provide audit assurance or certification.</p><Link className="gateway-action" href="/charity-impact-reports/review/">Open report review <Arrow /></Link></div>
     </section>
 
     <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow /></Link></nav>

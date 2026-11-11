@@ -1,4 +1,5 @@
 "use client";
+import { ImpactReportActivity } from "./impact-report-activity";
 
 import { useEffect, useState } from "react";
 
@@ -138,6 +139,7 @@ export function FounderFeedbackWorkspace() {
   }
 
   return <section className="founder-feedback-workspace" aria-labelledby="founder-feedback-title">
+    {tab === "enquiries" && <ImpactReportActivity />}
     <header className="founder-feedback-heading"><div><p className="founder-kicker">Continuous improvement</p><h2 id="founder-feedback-title">Errors &amp; Feedback</h2><p>Listen, act, and show people what changed. Contact enquiries stay separate from product feedback.</p></div><nav aria-label="Errors and feedback views"><button className={tab === "feedback" ? "is-active" : ""} onClick={() => { setTab("feedback"); setStatus(""); }}>Feedback inbox</button><button className={tab === "enquiries" ? "is-active" : ""} onClick={() => { setTab("enquiries"); setStatus(""); }}>Marcus enquiries</button><button className={tab === "improvements" ? "is-active" : ""} onClick={() => setTab("improvements")}>You Said. We Did.</button></nav></header>
     {notice && <p className="founder-notice" role="status">{notice}</p>}{error && <p className="founder-error" role="alert">{error}</p>}
     {metrics && <><div className="founder-feedback-metrics" aria-label="Feedback overview"><div><strong>{metrics.summary.new_feedback || 0}</strong><span>New feedback</span></div><div><strong>{metrics.summary.outstanding_problems || 0}</strong><span>Outstanding problems</span></div><div><strong>{metrics.summary.average_rating || "N/A"}</strong><span>Average star rating</span></div><div><strong>{metrics.summary.resolved || 0}</strong><span>Resolved</span></div><div><strong>{metrics.summary.last_30_days || 0}</strong><span>Last 30 days</span></div></div>{metrics.recurring.length > 0 && <div className="founder-recurring"><strong>Recurring open problems</strong>{metrics.recurring.map(item => <span key={item.label}>{item.label} · {item.submissions}</span>)}</div>}</>}
