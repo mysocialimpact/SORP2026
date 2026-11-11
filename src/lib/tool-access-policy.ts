@@ -16,7 +16,7 @@ export function isToolPage(pathname: string) {
 
 export function isToolApi(pathname: string) {
   const path = normaliseToolPath(pathname);
-  return ["/api/ask-sorp", "/api/readiness", "/api/published-review",
+  return ["/api/impact-report-review", "/api/ask-sorp", "/api/readiness", "/api/published-review",
     "/api/impact-director", "/api/sorp-report-file", "/api/sorp-report-upload",
     "/api/sorp-report-download", "/api/sorp-payments"].some(prefix => under(path, prefix));
 }

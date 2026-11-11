@@ -34,7 +34,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "robots-parser": "^3.0.1",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "unpdf": "^1.4.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",

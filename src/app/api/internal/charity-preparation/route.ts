@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { enabled } from "@/lib/onboarding/server";
 import { query } from "@/lib/console/db";
 import { prepareCharity } from "@/lib/onboarding/intelligence";
+import { drainImpactReviews } from "@/lib/impact-review/service";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 export async function GET(request: Request) {
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
     "SELECT identity FROM research_console.charity_intelligence WHERE attempts<3 AND next_attempt_at<=now() AND (status IN ('queued','failed','partial') OR (status='running' AND lease_until<now())) ORDER BY next_attempt_at LIMIT 1",
   );
   for (const job of jobs) await prepareCharity(job.identity);
+  await drainImpactReviews();
   await query(
     "DELETE FROM research_console.onboarding_sessions WHERE expires_at<now()",
   );
