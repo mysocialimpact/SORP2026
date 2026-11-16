@@ -1,0 +1,2 @@
+390px: six public heroes, beta CTAs, directory search/photo/email, adviser registration, blank optional fields, saved charity, signed-in CTAs and login return passed. Synthetic services; not live AI or database verification.
+1440px: six public heroes, beta CTAs, directory search/photo/email, charity registration, blank optional fields, saved charity, signed-in CTAs and login return passed. Synthetic services; not live AI or database verification.

@@ -1,0 +1,6 @@
+(node:12883) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/impact-review/rubric.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+1440px: confirmation, both frameworks, saved-result switching, return, enquiry and overflow checks passed (controlled responses).
+390px: confirmation, both frameworks, saved-result switching, return, enquiry and overflow checks passed (controlled responses).

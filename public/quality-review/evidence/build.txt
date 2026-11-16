@@ -1,0 +1,144 @@
+
+> sorp2026@0.1.0 build
+> node scripts/prepare-build.mjs && next build
+
+Local development build
+▲ Next.js 16.4.2 (Turbopack)
+✓ Running next.config.ts took 102ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.6s
+  Running TypeScript ...
+  Finished TypeScript in 6.2s ...
+  Collecting page data using 4 workers ...
+⚠ The Edge Runtime is deprecated. You can use the "nodejs" runtime instead. Learn more: https://nextjs.org/docs/messages/edge-runtime-deprecated
+⚠ The "preferredRegion" route segment config is deprecated. Learn more: https://nextjs.org/docs/messages/preferred-region-deprecated
+⚠ Using edge runtime on a page currently disables static generation for that page
+  Generating static pages using 4 workers (0/89) ...
+  Generating static pages using 4 workers (22/89) 
+  Generating static pages using 4 workers (44/89) 
+  Generating static pages using 4 workers (66/89) 
+✓ Generating static pages using 4 workers (89/89) in 1357ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ƒ /accountants-advisers
+├ ƒ /accountants-advisers/[slug]
+├ ○ /accountants-advisers/partners
+├ ƒ /adviser
+├ ƒ /api/ask-sorp
+├ ƒ /api/ask-sorp/continuation
+├ ƒ /api/booking/availability
+├ ƒ /api/booking/free
+├ ƒ /api/booking/google/callback
+├ ƒ /api/booking/google/start
+├ ƒ /api/booking/payment/create
+├ ƒ /api/booking/payment/finalise
+├ ƒ /api/console/[...path]
+├ ƒ /api/continuous-improvement
+├ ƒ /api/demo-request
+├ ƒ /api/directory/postcode
+├ ƒ /api/excellence-access
+├ ƒ /api/founder/[...path]
+├ ƒ /api/founder/growth
+├ ƒ /api/growth-click
+├ ƒ /api/growth-event
+├ ƒ /api/hello
+├ ƒ /api/impact-director
+├ ƒ /api/impact-report-review
+├ ƒ /api/internal/charity-preparation
+├ ƒ /api/internal/console-backup
+├ ƒ /api/onboarding/[action]
+├ ƒ /api/onboarding/transcribe
+├ ƒ /api/published-review
+├ ƒ /api/readiness
+├ ƒ /api/readiness-account
+├ ƒ /api/readiness-account/google/start
+├ ƒ /api/readiness/problem
+├ ƒ /api/readiness/report
+├ ƒ /api/readiness/report-email
+├ ƒ /api/readiness/review-report-email
+├ ƒ /api/readiness/transcribe
+├ ƒ /api/sorp-account-export
+├ ƒ /api/sorp-auth-admin
+├ ƒ /api/sorp-auth-compat
+├ ƒ /api/sorp-auth-preview
+├ ƒ /api/sorp-auth/[...all]
+├ ƒ /api/sorp-payments/checkout
+├ ƒ /api/sorp-payments/status
+├ ƒ /api/sorp-report-download/[id]
+├ ƒ /api/sorp-report-file
+├ ƒ /api/sorp-report-upload
+├ ○ /are-you-sorp-ready
+├ ƒ /are-you-sorp-ready/advanced
+├ ○ /are-you-sorp-ready/basic
+├ ○ /are-you-sorp-ready/conversation
+├ ○ /are-you-sorp-ready/payment/return
+├ ○ /are-you-sorp-ready/presentation
+├ ○ /are-you-sorp-ready/results
+├ ○ /are-you-sorp-ready/review
+├ ƒ /are-you-sorp-ready/review/booking
+├ ○ /are-you-sorp-ready/snapshot
+├ ○ /ask-sorp
+├ ƒ /ask-sorp/workspace
+├ ○ /charity-impact-reports
+├ ○ /charity-impact-reports/review
+├ ○ /charity-impact-reports/review/human
+├ ƒ /console/[[...view]]
+├ ƒ /console/login
+├ ○ /console/unauthorised
+├ ○ /contact
+├ ƒ /dashboard
+├ ○ /for-advisers
+├ ○ /for-charities
+├ ○ /forgot-password
+├ ƒ /founder
+├ ƒ /founder/growth
+├ ƒ /founder/growth/[channel]
+├ ○ /get-started
+├ ○ /icon.svg
+├ ƒ /invitation/[token]
+├ ƒ /login
+├ ○ /manifest.webmanifest
+├ ○ /my-impact-director
+├ ○ /my-impact-director/workspace
+├ ○ /our-mission
+├ ○ /privacy
+├ ○ /readiness
+├ ○ /reset-password
+├ ○ /robots.txt
+├ ○ /sample-charity
+├ ○ /settings
+├ ○ /sitemap.xml
+├ ○ /social-impact-excellence
+├ ƒ /social-impact-excellence/assessment
+├ ○ /social-impact-excellence/communications
+├ ƒ /social-impact-excellence/communications/assessment
+├ ƒ /social-impact-excellence/communications/evidence
+├ ○ /social-impact-excellence/data
+├ ƒ /social-impact-excellence/data/assessment
+├ ƒ /social-impact-excellence/data/evidence
+├ ○ /social-impact-excellence/delivery
+├ ƒ /social-impact-excellence/delivery/assessment
+├ ƒ /social-impact-excellence/delivery/evidence
+├ ○ /social-impact-excellence/journey
+├ ○ /social-impact-excellence/leadership
+├ ƒ /social-impact-excellence/leadership/assessment
+├ ƒ /social-impact-excellence/leadership/evidence
+├ ○ /social-impact-excellence/purpose
+├ ƒ /social-impact-excellence/purpose/assessment
+├ ƒ /social-impact-excellence/purpose/evidence
+├ ○ /social-impact-excellence/results
+├ ○ /social-impact-excellence/team
+├ ○ /social-impact-excellence/team/respond
+└ ○ /understanding-sorp
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -8,7 +8,7 @@ await mkdir(output,{recursive:true});
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
 const results=[];
 try {
- for(const width of [375,430,768,900,1024,1440,1920]) {
+ for(const width of [375,430,768,900,1024,1280,1440,1920]) {
   const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce'});
   const page=await context.newPage();
   await page.goto(base+'/');

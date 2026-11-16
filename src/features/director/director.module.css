@@ -776,6 +776,7 @@
 }
 .bookingClosed { grid-template-columns: 1fr; }
 .bookingClosed > div:first-child { max-width: 700px; }
+.booking > div:first-child > .primary { margin-top: 24px; }
 .booking h2 {
   margin: 22px 0;
 }

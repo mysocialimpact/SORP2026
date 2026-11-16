@@ -1,0 +1,13 @@
+
+> sorp2026@0.1.0 lint
+> eslint .
+
+
+/workspace/SORP2026/public/design-preview/accountants-advisers/preview.js
+  14:3  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+/workspace/SORP2026/scripts/verify-central-preview.mjs
+  2:10  warning  'mkdir' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 2 problems (0 errors, 2 warnings)
+

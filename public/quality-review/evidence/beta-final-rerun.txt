@@ -1,0 +1,22 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'Failed to load Stripe.js'
++ ]
+- []
+
+    at file:///workspace/SORP2026/tests/public-beta.browser.mjs:93:12 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [ 'Failed to load Stripe.js' ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

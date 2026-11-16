@@ -1,0 +1,454 @@
+
+> sorp2026@0.1.0 test:product-unit
+> node --experimental-strip-types --test tests/product-unit/*.test.mjs
+
+(node:11431) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/account-status.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ visitor status states the actual public Ask SORP allowance (1.968208ms)
+✔ the highest active subscription is shown without inferring it from organisation type (0.769316ms)
+✔ verified founder permission is distinct from the subscription plan (0.159999ms)
+✔ every published plan keeps the same currently enforced AI allowance (0.415826ms)
+✔ suspended and expired complimentary entitlements do not overstate access (0.264437ms)
+(node:11432) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/api/ask-sorp/route.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Ask SORP proxy sends a bounded request to the established MSI service (49.446426ms)
+✔ Ask SORP proxy rejects invalid sessions before contacting MSI (1.192407ms)
+(node:11438) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/backend-proxy.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ the destination reuses the existing SORP backend without receiving its secrets (47.024206ms)
+✔ the destination fails closed when no existing backend is configured (0.666135ms)
+✔ the destination rejects browser mutations from another origin before contacting the backend (1.412575ms)
+(node:11452) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/account-navigation.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ central gateway and sign in retain /are-you-sorp-ready/review/?client=one#report (2.42719ms)
+✔ central gateway and sign in retain /ask-sorp/workspace/?question=reporting%20requirements#answers (0.266041ms)
+✔ central gateway and sign in retain /charity-impact-reports/review/?draft=synthetic#upload (0.127059ms)
+✔ central gateway and sign in retain /social-impact-excellence/assessment/?question=12#baseline (0.160626ms)
+✔ central gateway and sign in retain /my-impact-director/?view=report#assessment (0.158658ms)
+✔ central gateway and sign in retain /invitation/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/ (0.180011ms)
+✔ reject unsafe or looping return https://evil.invalid/ (0.110353ms)
+✔ reject unsafe or looping return //evil.invalid (0.077972ms)
+✔ reject unsafe or looping return /\evil.invalid (0.096127ms)
+✔ reject unsafe or looping return /api/checkout/ (0.822196ms)
+✔ reject unsafe or looping return /login/?next=//evil.invalid (0.115001ms)
+✔ reject unsafe or looping return /get-started/?next=/get-started/ (0.088327ms)
+✔ client return context keeps the current query and anchor (0.652816ms)
+✔ build timestamp uses UK time across BST and GMT, not the browser clock (22.905155ms)
+✔ deployment ledger result is immutable and cannot reset to the old build sequence (4.178732ms)
+✔ unconnected previews identify the real deployment without inventing a build number (0.265337ms)
+✔ invitation-aware signup retains only a validated invitation token (0.292726ms)
+✔ password recovery remembers a safe workflow address without persisting credentials (1.64878ms)
+(node:11461) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/founder/complimentary-access.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ complimentary access supports founder-selected days and weeks (1.770947ms)
+✔ calendar months clamp to the final valid day of the target month (0.264735ms)
+✔ a chosen expiry remains active through the selected date (0.34374ms)
+✔ indefinite and non-complimentary plans do not receive an expiry (0.153444ms)
+✔ invalid, past and excessive durations are rejected (0.915725ms)
+(node:11467) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/console/identity-evidence.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ actual PwC research accepts supported roles across bold formatting, never invented qualifications (19.647057ms)
+✔ actual failed PwC search supports the UK identity through consulted official sources (1.408191ms)
+✔ directory and government evidence cannot become the official firm website (0.372031ms)
+✔ uncompleted searches, arbitrary prose URLs and unsafe URLs are not identity sources (0.475801ms)
+(node:11475) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/console/extract-page.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ cited evidence remains bound to its paragraph and provider annotation (4.579453ms)
+✔ unsafe citation links and invalid annotation offsets cannot become evidence (0.504722ms)
+✔ extraction rejects unsupported people, qualifications, identity and references (1.183635ms)
+✔ crawler discovers relevant resources and staff links before removing navigation (10.70013ms)
+✔ named staff and offices are extracted without inferring specialist qualifications (3.864689ms)
+✔ generic charity factsheets do not earn dedicated service-page points (2.38614ms)
+✔ AI paraphrases are honestly labelled in criterion awards (1.968017ms)
+✔ mixed-source paragraphs cannot attribute every claim to either source (0.344331ms)
+✔ technical charity articles do not masquerade as dedicated service pages (0.846994ms)
+✔ testimonials and firm names cannot masquerade as named charity specialists (1.254322ms)
+✔ explicit charity financial-statement services earn supported service criteria (0.565692ms)
+(node:11482) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/console/scoring-engine.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ a named person who completed the full charity diploma earns B2 without inventing an abbreviation (7.155746ms)
+✔ unassessed and assessed zero remain distinct (0.409319ms)
+✔ directory membership and generic seniority/ACA never earn points (0.744992ms)
+✔ dedicated page is distinct from a specialist team; never award either twice (9.864732ms)
+✔ casual SORP mentions are not substantive technical publications (1.270688ms)
+✔ network-wide clients and negated qualifications do not score (1.127969ms)
+✔ SORP marketing promises and commencement dates alone earn no technical points (0.855919ms)
+✔ one SORP training event cannot earn repeated training/speaking awards (1.341971ms)
+✔ awards always trace to exact evidence and source, invalidated evidence excluded (0.551946ms)
+✔ category caps and criterion identities are validated (0.640541ms)
+✔ encrypted backup round-trips and rejects tampering and wrong keys (3.223834ms)
+✔ not-for-profit is a sector description, never a negative finding (0.59242ms)
+✔ a separate missing-client sentence does not suppress documented external speaking (0.71393ms)
+✔ a separate missing qualification never becomes an affirmative qualification award (0.542104ms)
+✔ markdown and longer negative charity findings cannot turn generic directors into specialists (1.005626ms)
+✔ charity audit requirements in factsheets are not an offer of charity audit services (0.387241ms)
+✔ historic charity employment does not establish a current senior charity responsibility (0.45958ms)
+✔ a firm name and a factsheet heading never identify a senior professional (1.110303ms)
+✔ AI people awards require an extracted named person linked to the passage (0.599965ms)
+✔ named charity clients do not require an extracted staff member (0.499945ms)
+✔ generic technical libraries cannot earn any service-category points (0.356781ms)
+✔ AI SORP training claims cannot earn points against an unrelated event citation (0.487023ms)
+✔ AI category headings are not themselves affirmative evidence (0.380542ms)
+(node:11488) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/console/fetch-public.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ research blocks private, link-local, mapped and reserved addresses (10.929138ms)
+✔ research accepts only HTTPS standard-port URLs without credentials (0.430035ms)
+✔ level boundaries remain independent from scores, including zero versus incomplete (0.63565ms)
+✔ identity keys normalise case, spacing and punctuation without merging firms (2.693825ms)
+✔ robots security challenges and rate limits remain blocked (5.899145ms)
+✔ one global page-feedback component precedes Talk to us and supports five-star submissions (2.045316ms)
+✔ feedback accepts visitors, preserves signed-in identity and keeps contact separate (0.701004ms)
+✔ the founder workspace manages feedback, enquiries and explicit improvements (0.287143ms)
+✔ the migration constrains workflow state and grants only the existing runtime role (0.582788ms)
+✔ runtime requests never attempt schema mutation and the founder ledger has a unique migration (0.428522ms)
+(node:11505) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/customer-isolation.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ the legacy customer is identified by exact account, organisation and domain boundaries (2.113416ms)
+✔ collection filtering removes only isolated legacy-customer rows (20.132946ms)
+✔ SORP entry points block legacy customer access and outbound report email (1.044721ms)
+(node:11516) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/dashboard-recommendation.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ a new organisation starts with Are You SORP Ready (1.920435ms)
+✔ saved readiness work is continued rather than restarted (0.255012ms)
+✔ real readiness issues take priority after completion (0.202579ms)
+✔ completed impact work links to its saved recommendations (0.269342ms)
+(node:11523) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/features/director/model.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 21 concrete ratings across five areas; incomplete reports refused (2.275332ms)
+✔ scores use equal pillar weighting and bounded meaningful anchors (0.756592ms)
+✔ validation rejects invalid, incomplete and oversized payloads (0.351164ms)
+✔ agenda preserves actual context and never invents systems (1.216953ms)
+(node:11534) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/directory-verification.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ research approval, payment, and string truthy values cannot award MSI verification (1.338116ms)
+✔ explicit award and withdrawal preserve attributable decisions without affecting unrelated saves (0.942586ms)
+(node:11541) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/excellence/access-policy.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ new managed organisations start with only the Maturity Assessment (1.388666ms)
+✔ completed baseline never automatically unlocks a deep dive (1.497418ms)
+✔ access status does not overwrite stored pillar progress (0.292439ms)
+✔ the founder page requires the server-issued platform founder role (2.032342ms)
+✔ the research console uses the same server-issued founder role (0.226564ms)
+✔ the adviser UI uses the permission-enforcing account actions (0.282754ms)
+✔ delegated assessment writes recheck an active grant, adviser membership, entitlement and charity member (0.38642ms)
+✔ client invitations require their own approved permission (0.254448ms)
+✔ founder membership controls preserve a last active owner (0.399135ms)
+✔ expired or revoked adviser entitlements do not expose the adviser workspace (0.351834ms)
+✔ charity administrators manage adviser access in Settings with confirmation (0.289658ms)
+✔ invitation signup preserves context and acceptance still requires authentication (0.354359ms)
+✔ the organisation drawer exposes truthful invitation tracking and existing secure actions (0.583478ms)
+✔ the founder client-access form reaches its two-segment API route (0.275268ms)
+✔ founder directory controls stay separate from independent assessment scores (0.155713ms)
+✔ public directory honours explicit controls and preserves curated defaults (0.185783ms)
+✔ founder home uses the requested operational identity and the one shared set of six product tabs (1.366456ms)
+✔ founder administration navigation is persistent, complete and hash-synchronised (0.253545ms)
+✔ founder shell keeps its management chrome distinct while public shell remains intact (0.155561ms)
+✔ product dashboards use recorded rows and state truthful empty analytics (0.221478ms)
+✔ founder organisation and user data remain server-authorised (0.155464ms)
+✔ founder can grant any plan free for a chosen number of days, weeks or months (0.432815ms)
+(node:11566) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/api/hello/route.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ hello forwards contact and separate consent to the established message service (38.982907ms)
+✔ hello rejects invalid addresses before making a backend request (1.858536ms)
+✔ hello allows an optional message and sends an explicit hello downstream (1.282984ms)
+✔ hello never invents success when the message service refuses a submission (3.738746ms)
+✔ a homepage audience selection maps to an existing Growth event with an identifiable tag (139.867708ms)
+(node:11583) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/impact-review/rubric.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ claims scores are deterministic; excellence never receives a maturity score (1.999901ms)
+✔ missing disclosure never becomes a zero or unsupported failure score (0.299869ms)
+✔ fabricated quotations, false page references and incomplete reviews are rejected (0.579861ms)
+(node:11592) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/tool-access-policy.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ invitation details can be previewed before registration but acceptance stays authenticated (1.372753ms)
+(node:11598) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/onboarding/state.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ a final-topic answer is retained verbatim rather than interpreted as a professional diagnosis (9.122667ms)
+✔ one useful clarification is possible; a second cannot restart the conversation (1.097582ms)
+✔ reluctance and turn budgets take priority over optional curiosity (0.821433ms)
+✔ a professional detour leaves one bounded opportunity to understand the final answer (0.783638ms)
+✔ the last optional turn cannot open another follow-up and resume preserves the limit (0.8502ms)
+✔ natural prose is permitted for concerns and completion, with exact special question and validated objectives (2.086348ms)
+✔ generated acknowledgements are not mistaken for repeated identity requests (0.871309ms)
+✔ generated language cannot claim unperformed verification, credentials or saved account (1.779524ms)
+✔ manual name corrections change the rendered reply immediately and persist through resume (1.889209ms)
+✔ both stages receive bounded recent dialogue while the wording stage receives updated facts (2.036748ms)
+✔ a question about an optional topic can be answered without forcing the topic again (0.567069ms)
+✔ invalid model participation values cannot enter state (1.313304ms)
+✔ personal and unresolved answers remain conversation, not professional concerns (0.921732ms)
+✔ wording failure retains valid extraction and surfaces a notice; two-call cost is reserved (87.367681ms)
+✔ language output cannot choose field metadata or invent a permission to continue probing (1.962348ms)
+✔ a permitted social follow-up is chosen before progressing the information objective (0.665931ms)
+✔ the production two-stage pipeline offers and commits a social move before handoff (6.625773ms)
+✔ confirmation preserves the displayed correction acknowledgement and labels the UI action (0.602338ms)
+✔ a rich early answer may invite a follow-up only after explicit charity confirmation (0.834756ms)
+✔ repair turns do not consume optional curiosity, but the total hard cap still applies (1.78582ms)
+✔ uncertain classification cannot discard named clients or arbitrarily promote one (1.002024ms)
+✔ unnamed advisers and referral venues cannot become candidate organisations (0.58868ms)
+✔ explicit independent working status populates the shared organisation field (1.88106ms)
+✔ one bounded wording revision preserves extraction and accounts for every successful call (3.532077ms)
+✔ a second invalid draft stops without weakening validation or losing understood facts (2.978896ms)
+✔ a permitted natural close can omit optional topics without changing supplied facts (0.660642ms)
+(node:11607) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/onboarding/state.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ standalone email and optional skip advance without waiting for AI (16.996632ms)
+✔ only complete explicit first introductions can skip duplicate interpretation (2.613345ms)
+✔ a simple yes chooses a suggested charity for lookup without confirming its record (0.781004ms)
+✔ historic employment stays separate while registration asks only for essentials (1.328204ms)
+✔ past relationships cannot populate a current employer, even if a model incorrectly also proposes it (0.980648ms)
+✔ current and historical relationships coexist, with provenance and uncertainty (0.358763ms)
+✔ grounding tolerates typographic punctuation and case without dropping supplied identity (2.37977ms)
+✔ literal identity remains grounded even when a supporting quote has harmless extra words (0.550444ms)
+✔ professional summaries need evidence, but need not be verbatim substrings (0.320003ms)
+✔ fabricated identity and ungrounded professional summaries are rejected (0.822058ms)
+✔ historical roles and employers are not current registration facts (0.235719ms)
+✔ a flat list cannot enter a typed charity field (0.239938ms)
+✔ alternate names of one charity deduplicate while preserving historical relationship (0.325574ms)
+✔ manual name is authoritative across subsequent extraction and reload (0.656238ms)
+✔ manual email is authoritative across subsequent extraction and reload (0.220002ms)
+✔ manual role is authoritative across subsequent extraction and reload (0.22243ms)
+✔ manual organisation is authoritative across subsequent extraction and reload (0.247539ms)
+✔ a manual correction stays authoritative even if extraction proposes another correction (0.331951ms)
+✔ next-question validation uses the updated facts, rejecting stale requests for known details (0.337489ms)
+✔ question text cannot contradict its metadata and ask for known identity (0.148397ms)
+✔ a post-confirmation proposal is used only when its objective remains missing (21.488113ms)
+✔ additional professional context accumulates; explicit correction replaces it (0.996971ms)
+✔ early exit stops optional questions but cannot invent mandatory account details (0.208434ms)
+✔ one model call handles a turn and its complete state transition (0.936649ms)
+✔ model input is bounded structured memory rather than increasing raw history (0.624406ms)
+✔ raw historical/correction sentences fail entity validation (0.110514ms)
+✔ unnamed categories and portfolio counts cannot become charity candidates (0.092526ms)
+✔ historical work requires a present-focused role question, not merely a generic prompt (0.424879ms)
+✔ rejection without an active choice cannot imply an arbitrary charity selection (1.063381ms)
+✔ changing professional fields invalidates an earlier tailored question (0.307945ms)
+✔ explicit fact-map schema retains separate volunteered context and null unknowns (0.584916ms)
+✔ typed trusteeships cannot fill employment; only explicit current employment can (0.799982ms)
+✔ outage extraction does not turn historical or third-person work into current employment (0.348144ms)
+✔ resumption preserves relationship recency rather than making every mention new (0.370424ms)
+✔ generated wording cannot retain a manually corrected first name (0.35222ms)
+(node:11616) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/onboarding/state.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ four immediate facts do not imply five completed essentials (32.7036ms)
+✔ all seven editable text fields preserve edits and intentional clearing through extraction and resume (4.777783ms)
+✔ trusteeship alone is not employment and a named employer is not selected as charity (4.983581ms)
+✔ three optional questions stay separate and the last has the exact agreed wording (1.211319ms)
+✔ explicit starting-charity request survives an omitted model field without becoming confirmation (1.114392ms)
+(node:11617) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/onboarding/state.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ trustee relationship is inferred, suggested immediately and never silently confirmed (30.995194ms)
+✔ exact reminder preserves the entity, acknowledges the correction and does not search (8.543687ms)
+✔ incomplete registration remembers the charity while asking only for missing details (0.945602ms)
+✔ firm and approximate portfolio do not become the charity (1.464603ms)
+✔ multiple mentions and ambiguous other require a choice (5.135334ms)
+✔ employer rejection retains the employer and removes the charity suggestion (1.013012ms)
+✔ change of mind clears confirmed charity and stale matches at any objective (1.069911ms)
+✔ ambiguity, disagreement and questions never fill the currently requested field (0.80933ms)
+✔ early referral, interests, responsibilities and concern survive intervening corrections (1.15389ms)
+✔ direct edits and reload use the same relationship and question state (1.135289ms)
+✔ legacy draft migrates without losing facts or registry confirmation (0.790107ms)
+✔ entity boundary refuses corrections, questions and model-generated conversational wording (1.469649ms)
+✔ semantic correction changes only grounded fields while retaining other objectives (1.371632ms)
+✔ repairs do not consume the optional information budget; total exchanges remain bounded (0.567401ms)
+✔ portfolio clause never masks later named clients in the same answer (0.755701ms)
+✔ unfinished form edits survive resume but never complete registration (0.865325ms)
+✔ other charity resolves the original query even when the official name differs (0.67196ms)
+✔ semantic interpretation supersedes incidental lexical matches instead of retaining them (1.126544ms)
+✔ manual typing retains word separators while validation remains deterministic (0.643963ms)
+(node:11623) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/lib/onboarding/state.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ A: all early facts populate together and charity/discovery are remembered (37.433424ms)
+✔ B: partial first answer delivers a name without invented registration details (5.753054ms)
+✔ one bare name is enough for the first reward (1.666974ms)
+✔ greetings, general sentences and professional titles are not invented names (2.901426ms)
+✔ C: three charities require a choice, not an automatic first selection (1.387098ms)
+✔ D: early professional concerns are not asked again (1.13345ms)
+✔ short completed conversations stop and optional questions can be skipped (0.720491ms)
+✔ optional exchanges end at six; essential corrections end at ten (0.555556ms)
+✔ return destinations preserve product queries/hashes and reject redirect injection (1.168487ms)
+✔ email validation never manufactures an address (0.934274ms)
+✔ natural charity confirmation and selection resolve a lookup without assuming a first client (2.59269ms)
+(node:11637) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/api/readiness/problem/route.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ the recovery message proxy preserves the backend receipt (53.314136ms)
+✔ every report-reading failure uses the actionable recovery screen (10.510957ms)
+✔ Google account callback stays on the destination while the existing backend handles the account (1.180144ms)
+✔ Google account sign-in requests identity only and uses a short-lived signed state (0.395852ms)
+✔ the completed report leads into one consistent beyond-compliance journey (0.815155ms)
+(node:11645) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/api/readiness-account/route.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ report upload remains locked without an authenticated account (42.913208ms)
+✔ an authenticated account can reach reports without a readiness review (6.829372ms)
+(node:11659) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/api/growth-click/route.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ review feedback cannot send the published-review notification (53.438439ms)
+✔ report email waits for the completed report, then sends once before optional closing screens (13.041386ms)
+(node:11670) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/features/excellence/questions.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ native charity assessment preserves the established five-pillar, 25-question methodology (4.040544ms)
+✔ native Social Impact Excellence scoring remains deterministic (1.205158ms)
+✔ native Purpose pathway preserves the released assessment and guidance (5.595377ms)
+✔ Leadership pathway provides exactly five scored sections, 20 ratings and five qualitative questions (0.640886ms)
+✔ Leadership guidance is fully authored and question-specific (0.562696ms)
+✔ Leadership scoring reuses Purpose bands, excludes qualitative answers and rejects missing or invalid ratings (0.514064ms)
+✔ Leadership draft restoration sanitises invalid data without touching other product namespaces (0.923717ms)
+✔ Data pathway contains the complete authored 20-question methodology (0.619633ms)
+✔ Data scoring matches Purpose bands and excludes comments, reflections and evidence (0.957393ms)
+✔ Data persistence is versioned, restores drafts and preserves immutable submission history (1.075822ms)
+✔ Delivery pathway contains five sections, 20 authored ratings and five open reflections (0.368818ms)
+✔ Delivery embeds management accounting and operational practice without collapsing into finance alone (0.583545ms)
+✔ Delivery scoring uses Purpose bands and excludes comments, reflections and evidence (0.490709ms)
+✔ Delivery persistence remains versioned and isolated from every existing pillar (0.766604ms)
+✔ Communications pathway contains five sections, 20 authored ratings and five open reflections (1.520773ms)
+✔ Communications covers clear, credible and two-way impact communication without rewarding scale (0.614667ms)
+✔ Communications scoring uses Purpose bands and excludes comments, reflections and evidence (0.494212ms)
+✔ Communications persistence is versioned and isolated from all existing pillars (0.693124ms)
+(node:11678) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-activity-selection.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ activity choices remain multi-select until the user deliberately continues (3.05849ms)
+✔ not sure and none are exclusive activity choices (0.407033ms)
+✔ activity submission keeps every selection and optional detail (0.407031ms)
+✔ Historical Snapshot exposes a compact 19-question assessment trail at the bottom (1.606699ms)
+✔ full report records the complete deterministic chain and run versions (0.948639ms)
+✔ the focused header removes beta metadata while relevant journey copy remains honest (10.75027ms)
+(node:11700) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-current-additional.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ the 15 existing core questions and four scored areas are untouched by additional checks (13.388461ms)
+✔ tier 1 screens volunteer and circumstance checks but excludes higher-tier disclosures (0.454594ms)
+✔ tier 2 investment disclosure appears only when material investments are confirmed (0.264649ms)
+✔ tier 3 includes its automatic MUST checks without forcing screened-out activities (0.24258ms)
+✔ audited fundraising disclosure is screened only in England and Wales (0.215934ms)
+✔ unknown applicability and not-applicable answers do not become scored failures (0.82753ms)
+✔ every additional question has a SORP basis and applicability explanation (0.747394ms)
+✔ conversation CTA uses the requested address, organisation subject, and distinct Grow events (1.734885ms)
+✔ assessment milestones and best-effort Grow submission stay separate from core workflow (1.900328ms)
+✔ a Grow outage cannot reject or hold up the customer journey (418.73549ms)
+(node:11717) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-homework-timing.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ homework messages have readable dwell times and finish after the minimum without cutting a message (2.485439ms)
+(node:11725) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-journey-progress.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ a reassuring sentence cannot fabricate completion (1.039866ms)
+✔ a stale or incomplete document cannot advance to assessment (0.519053ms)
+✔ the example preserves the authoritative result and rejects conflicts, missing references and invalid evidence (0.457675ms)
+(node:11726) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-methodology-v1.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical V1.0 is exactly the approved 19-question structure (5.344686ms)
+✔ NOT SURE earns zero while retaining the denominator; S2 N/A alone is excluded (0.94937ms)
+✔ mandatory status is separate from Reporting Strength and tier/jurisdiction rules (0.387472ms)
+✔ Cow Console's approved record generates the public methodology and assessment-service copies (10.22405ms)
+(node:11739) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-payment-amounts.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ preset support amounts map exactly to Stripe pence (1.08865ms)
+✔ custom GBP amounts retain pence exactly (0.405595ms)
+✔ invalid and out-of-range amounts cannot reach Checkout (0.272028ms)
+(node:11750) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-public-model.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ guided review asks only the three most material unanswered published findings (2.903475ms)
+(node:11757) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-questionnaire.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ SORP snapshot keeps one stable 15-question scoring method (10.643374ms)
+✔ eligibility stays helpful for non-standard and uncertain routes (0.821637ms)
+✔ tier logic keeps uncertainty and the Tier 1 / Tier 2 boundary visible (0.338517ms)
+✔ additional checks respond transparently to activities and tier (0.50015ms)
+✔ the main score always uses the same 15 core answers (0.562639ms)
+✔ four deterministic area scores use the existing 15 answers without changing the overall score (0.573255ms)
+✔ the Snapshot and conversation share the eight visible readiness stages (0.399669ms)
+✔ SORP snapshot reuses canonical conversational setup and transparent conditional checks (3.770074ms)
+✔ every snapshot question must be answered before continuing (2.108457ms)
+(node:11764) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/api/sorp-report-file/route.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ the report relay accepts only a verified Charity Commission accounts PDF (58.401391ms)
+✔ the report relay rejects non-official and non-accounts URLs without fetching them (1.579621ms)
+✔ the report relay retries a successful HTML error response (5.949974ms)
+(node:11765) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-score-interpretation.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ mandatory distribution uses applicable MUST findings only and excludes genuine N/A (4.379087ms)
+✔ the five required synthetic distributions receive deterministic, proportionate interpretations (0.715721ms)
+✔ presentation guard replaces contradictory no-action copy only for non-clear mandatory findings (2.835433ms)
+(node:11782) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/SORP2026/src/app/sorp-public-model.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/SORP2026/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ TAR found but not fully read never completes homework or enables Quick Review (0.799722ms)
+✔ Retry refreshes a saved profile when the public-income tier is missing (5.199153ms)
+✔ fully read, indexed and assessed TAR allows homework completion and Quick Review (0.254536ms)
+ℹ tests 294
+ℹ suites 0
+ℹ pass 294
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3346.884258
