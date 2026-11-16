@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./director.module.css";
 type Slot = { start: string; end: string };
-export function DirectorBooking() {
+export function DirectorBooking({ panelOnly = false }: { panelOnly?: boolean }) {
   const [open, setOpen] = useState(false);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [error, setError] = useState("");
@@ -113,13 +113,15 @@ export function DirectorBooking() {
       timeStyle: "short",
       timeZone: "Europe/London",
     }).format(new Date(start));
+  if (panelOnly && !open) return null;
   return (
     <section
       id="director-conversation"
-      className={`${styles.booking}${open ? "" : ` ${styles.bookingClosed}`}`}
-      aria-labelledby="director-booking-title"
+      className={panelOnly ? styles.bookingStandalone : `${styles.booking}${open ? "" : ` ${styles.bookingClosed}`}`}
+      aria-labelledby={panelOnly ? undefined : "director-booking-title"}
+      aria-label={panelOnly ? "Book an introductory conversation" : undefined}
     >
-      <div>
+      {!panelOnly && <div>
         <p className={styles.kicker}>
           A human conversation. A useful first step.
         </p>
@@ -133,7 +135,7 @@ export function DirectorBooking() {
           fuller conversation would help.
         </p>
         <button type="button" className={styles.primary} aria-expanded={open} aria-controls="director-booking-panel" onClick={showBooking}>Book a 10-minute chat →</button>
-      </div>
+      </div>}
       {open && <div ref={panel} id="director-booking-panel" className={styles.bookingPanel} tabIndex={-1} aria-label="Choose a time for your 10-minute chat">
         <div className={styles.bookingPanelTop}><strong>Choose a time · Europe/London</strong><button type="button" className={styles.textButton} onClick={() => setOpen(false)}>Close ×</button></div>
         {confirmed ? (

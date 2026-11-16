@@ -1,280 +1,100 @@
 import type { Metadata } from "next";
-import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
-import { BetaToolAction, BetaAccountNote } from "@/components/beta-tool-entry";
+import { FolderHero } from "@/components/folder-hero";
+import { ToolLink } from "@/components/tool-link";
+import { DirectorToolsLink } from "@/features/director/tools-link";
 import { DirectorBooking } from "@/features/director/booking";
-import s from "@/features/director/director.module.css";
 import { site } from "@/lib/site";
+import s from "./director-landing.module.css";
+
 export const metadata: Metadata = {
-  title: "My Impact Director | Expert year-round impact support",
-  description:
-    "Your Impact Director, without the full-time salary. Human-led, year-round support for charities and social enterprises. Start with a free technology, data and AI assessment.",
+  title: "My Impact Director | Human-led, AI-powered impact support",
+  description: "Your Impact Director, without the full-time salary. Experienced people and intelligent technology helping your organisation measure, manage and improve its impact all year round.",
   ...(site.live ? { alternates: { canonical: "/my-impact-director/" } } : {}),
 };
+function Arrow() { return <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M4 4h12v12" stroke="currentColor" strokeWidth="1.5" /></svg>; }
+const assessment = "/my-impact-director/workspace/#assessment";
+const contact = "mailto:marcus@mysocialimpact.org?subject=My%20Impact%20Director%20%E2%80%94%20ongoing%20support";
+const plans = [
+  { name: "Free", price: "£0", detail: "Initial assessments, practical insights and available free-beta tools." },
+  { name: "Essentials", price: "£49", detail: "Digital guidance, recommendations and impact priorities." },
+  { name: "Supported", price: "£149", detail: "Digital tools with periodic human review." },
+  { name: "Director", price: "£495", detail: "Your ongoing human adviser. Strategic guidance and practical support, with scope agreed.", featured: true },
+  { name: "Bespoke", price: "£1,500+", detail: "Deeper senior involvement, board support and specialist projects." },
+];
+
 export default function MyImpactDirectorPage() {
-  return (
-    <main id="main" className={s.page}>
-      <FolderHero product="my-impact-director" paper="#fbf7ef" id="director-overview" className={s.hero}>
+  return <main id="main" className={s.page}>
+    <FolderHero product="my-impact-director" paper="#faf9f6" id="director-overview" className={s.hero}>
+      <div className={s.heroInner}>
         <div className={s.heroCopy}>
-          <p className={s.kicker}>
-            My Impact Director
-          </p>
-          <h1>
-            Your Impact Director.<br />
-            <em>Without the<br />full-time salary.</em>
-          </h1>
-          <p className={s.lead}>
-            Greater impact. Accessible to everyone.
-          </p>
-          <p>
-            Expert, outsourced support throughout the year. Helping charities
-            and social enterprises measure, manage and improve their impact,
-            without employing a full-time director.
-          </p>
-          <p className={s.heroPrinciple}>
-            Because social impact deserves to be taken as seriously as financial performance.
-          </p>
-          <p className={s.small}>
-            Try the free technology, data and AI assessment in the public beta. Ongoing human-led support is a separate, bespoke service.
-          </p>
-          <BetaToolAction className={s.primary} href="/my-impact-director/workspace/#assessment" label="Open AI Readiness Assessment" />
-          <BetaAccountNote destination="/my-impact-director/workspace/#assessment" />
+          <p className={s.eyebrow}>My Impact Director · Human-led. AI-powered.</p>
+          <h1>Your Impact Director.<br /><span>Without the<br />full-time salary.</span></h1>
+          <p className={s.lead}>Experienced, ongoing support to measure, manage and improve your social impact.</p>
+          <p className={s.heroPromise}>Real people. Powerful AI. More affordable than you might think.</p>
+          <div className={s.actions}>
+            <ToolLink className={s.primary} href={assessment}>Explore Our Free AI Assessment <Arrow /></ToolLink>
+            <a className={s.textLink} href="#director-pricing">See Our Monthly Support <span aria-hidden="true">↓</span></a>
+          </div>
         </div>
-        <div className={s.cowStage}>
-          <span className={s.orbit} aria-hidden="true" />
-          <span className={s.sciFi}>
-            This is where things
-            <br />
-            get a bit sci-fi.
-          </span>
-          <Image
-            src="/images/impact-director-cow.webp"
-            width={1024}
-            height={1536}
-            alt="The Ideas Shed’s original pink cyborg cow, holding an ‘I’ll be back’ coffee mug"
-            priority
-            sizes="(max-width: 700px) 85vw, 42vw"
-          />
-          <p className={s.cowNote}>
-            Don’t panic.
-            <br />
-            <strong>The humans are still in charge.</strong>
-          </p>
+        <figure className={s.heroPortrait}>
+          <Image src="/images/marcus-editorial.webp" width={640} height={857} alt="Marcus Warry, Chartered Accountant and co-founder of My Social Impact" loading="eager" sizes="(max-width: 700px) 90vw, (max-width: 1100px) 42vw, 460px" />
+          <figcaption><strong>Marcus Warry ACA</strong><span>Co-founder, My Social Impact</span></figcaption>
+        </figure>
+      </div>
+    </FolderHero>
+
+    <section id="assessment" className={s.assessment} aria-labelledby="ai-readiness-title">
+      <div className={s.assessmentInner}>
+        <div><p className={s.eyebrow}>Your first step · Free public beta</p><h2 id="ai-readiness-title">How AI-ready is<br />your organisation?</h2></div>
+        <div><p>Explore technology, data and AI through 21 questions. Discover practical opportunities in your personalised snapshot.</p>
+          <ToolLink className={s.primary} href={assessment}>Check Your AI Readiness — Free <span aria-hidden="true">→</span></ToolLink>
+          <p className={s.small}>Free account for one charity. Save your progress. This is AI readiness, not SORP compliance.</p>
         </div>
-      </FolderHero>
-      <section id="assessment" className={s.assessment} aria-label="My Impact Director assessment introduction">
-        <div className={s.invitation}>
-          <div><p className={s.kicker}>Free assessment · 21 star-rating questions · about 8 minutes</p><h2>How AI-savvy is<br /> <em>your organisation?</em></h2><p>Discover how you’re already using technology, data and AI, and where you could do more. No technical knowledge required.</p></div>
-          <div><span className={s.bigStar} aria-hidden="true">✳</span><BetaToolAction className={s.primary} href="/my-impact-director/workspace/#assessment" label="Find out how AI-savvy your organisation is" /><p className={s.small}>Your report, practical recommendations and conversation agenda are free.</p></div>
-        </div>
-      </section>
-      <section id="director-support" className={s.service}>
-        <div className={s.serviceIntro}>
-          <p className={s.kicker}>What we can do together, today</p>
-          <h2>
-            A place in<br />your team.<br /><em>All year round.</em>
-          </h2>
-          <p>
-            Not another impact measurement platform. An affordable member of the senior team.
-          </p>
-          <p>
-            Experienced people working alongside you, turning evidence into
-            everyday decisions. Tailored support, whether you need your first
-            Impact Director or extra capacity for an existing team.
-          </p>
-          <a className={s.textLink} href="#director-conversation">
-            Find your starting point ↗
-          </a>
-        </div>
-        <ol>
-          {[
-            [
-              "Understand the organisation",
-              "Use Social Impact Excellence to understand your maturity, priorities and leadership. Build on existing work and agree what needs to improve.",
-            ],
-            [
-              "Review the Data Pillar",
-              "Review the Data Pillar: how evidence is collected, stored, connected and used. Spreadsheets, databases and software included.",
-            ],
-            [
-              "Improve what’s useful",
-              "Simplify processes, connect tools or recommend alternatives where justified. We’re independent of impact measurement platforms; a new platform isn’t automatically the answer.",
-            ],
-            [
-              "Make impact part of management",
-              "Bring evidence into leadership conversations, decisions and regular improvement. Put learning to work, not just into a report.",
-            ],
-            [
-              "Keep the momentum",
-              "Work alongside experienced professionals throughout the year on priorities, measurement, reporting and continuous improvement. Useful automation and AI support the people, not the other way round.",
-            ],
-          ].map(([title, text], i) => (
-            <li key={title}>
-              <span>0{i + 1}</span>
-              <div>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </div>
-            </li>
-          ))}
+      </div>
+    </section>
+
+    <section className={`${s.section} ${s.expertise}`} aria-labelledby="director-expertise">
+      <div className={s.sectionHeading}><h2 id="director-expertise">Good technology.<br />Real people.</h2><p>AI does the heavy lifting. People help you make the right decisions.</p></div>
+      <div className={s.expertiseGrid}>
+        <article><span className={s.roleLabel}>Powered by AI</span><h3>Less routine work.</h3><ul><li>Research and analyse evidence.</li><li>Prepare reports and insights.</li></ul></article>
+        <article><span className={s.roleLabel}>Led by people</span><h3>More useful judgement.</h3><ul><li>Challenge assumptions and solve problems.</li><li>Turn insight into action.</li></ul></article>
+      </div>
+      <p className={s.technologyNote}>Automated monitoring and connected workflows are in development.</p>
+    </section>
+
+    <section id="director-support" className={`${s.section} ${s.service}`} aria-labelledby="director-service-title">
+      <div><p className={s.eyebrow}>An affordable member of your senior team</p><h2 id="director-service-title">A place in your team.<br />All year round.</h2></div>
+      <div><p>Someone who knows your organisation and helps you keep making progress.</p><ul><li>Regular leadership conversations and KPI reviews.</li><li>Strategy, evidence and progress updates.</li><li>Management and board input, by agreement.</li></ul></div>
+    </section>
+
+    <section id="director-pricing" className={s.pricing} aria-labelledby="director-pricing-title">
+      <div className={s.pricingInner}>
+        <div className={s.pricingIntro}><h2 id="director-pricing-title">Real expertise.<br /><span>Without the<br />full-time cost.</span></h2><p>Indicative monthly pricing. We’ll agree the right level of involvement for your organisation.</p><a className={s.lightAction} href={contact}>Let’s Talk About Your Organisation <Arrow /></a></div>
+        <ol className={s.plans} aria-label="Indicative monthly support options">
+          {plans.map((plan, index) => <li key={plan.name} className={plan.featured ? s.featuredPlan : undefined}>
+            <div><h3>{plan.name}</h3><p>{plan.detail}</p></div>
+            <div className={s.price}>{index > 0 && <small>from</small>}<strong>{plan.price}</strong>{index > 0 && <span>/month</span>}</div>
+          </li>)}
         </ol>
-      </section>
-      <section id="director-measurement" className={s.measurement}>
-        <p className={s.kicker}>A small question with very big consequences</p>
-        <p className={s.saying}>
-          “What gets measured
-          <br />
-          gets managed.”
-        </p>
-        <p className={s.attribution}>
-          Often associated with Peter Drucker, though the attribution is
-          uncertain. W. Edwards Deming warned against managing only what can be
-          measured: important things can resist easy quantification.
-        </p>
-        <h2>
-          But are we measuring
-          <br />
-          <em>what really matters?</em>
-        </h2>
-        <p>
-          Impact is a management discipline. Evidence should help us understand,
-          decide and improve, not simply give us more numbers to report.
-        </p>
-      </section>
-      <section id="director-future" className={s.future}>
-        <div>
-          <p className={s.kicker}>
-            The next chapter · possibilities, not promises
-          </p>
-          <h2>
-            Less “ask AI”.
-            <br />
-            <em>
-              More “work
-              <br />
-              with AI”.
-            </em>
-          </h2>
-          <p>
-            AI is beginning to do more than answer questions. Agents can use
-            tools, investigate information, plan work and carry out tasks within
-            agreed limits.
-          </p>
-          <p>
-            In time, that could let experienced professionals support more
-            organisations, while intelligent systems handle more routine work.
-            Human judgement and accountability stay at the centre.
-          </p>
+      </div>
+    </section>
+
+    <section id="director-marcus" className={`${s.section} ${s.marcus}`} aria-labelledby="director-marcus-title">
+      <div className={s.marcusGrid}>
+        <Image className={s.marcusPortrait} src="/images/marcus-editorial.webp" alt="Marcus Warry" width={640} height={857} sizes="(max-width: 700px) 80vw, 340px" />
+        <div><p className={s.eyebrow}>Someone in your corner.</p><h2 id="director-marcus-title">Marcus Warry ACA<span>Co-founder, My Social Impact</span></h2><p className={s.credentials}>Chartered Accountant · Social Impact Consultant</p>
+          <blockquote>“Social impact deserves the same attention as financial performance. We help turn good intentions into action — with someone experienced in your corner.”</blockquote>
+          <p className={s.small}>Support from Marcus and other experienced professionals, by agreement.</p>
+          <a className={s.primary} href={contact}>Talk to Marcus <Arrow /></a><a className={s.email} href="mailto:marcus@mysocialimpact.org">marcus@mysocialimpact.org</a>
         </div>
-        <div className={s.futureSheet}>
-          <span className={s.stamp}>
-            HUMAN
-            <br />
-            OVERSIGHT
-            <br />
-            BUILT IN
-          </span>
-          <h3>
-            A future working day
-            <br />
-            might include…
-          </h3>
-          <ul>
-            <li>Reviewing incoming impact evidence</li>
-            <li>Spotting emerging patterns and gaps</li>
-            <li>Connecting approved systems</li>
-            <li>Preparing leadership updates</li>
-            <li>Monitoring priorities and following up actions</li>
-            <li>Recommending practical improvements</li>
-          </ul>
-          <p>
-            <strong>Today:</strong> human-led, AI-enabled.
-            <br />
-            <strong>Tomorrow:</strong> increasingly agentic, with human judgement and accountability.
-          </p>
-          <p className={s.small}>
-            These agentic workflows are a development direction, not features
-            this assessment activates. Access, limits and human approval must be
-            agreed first.
-          </p>
-        </div>
-      </section>
-      <section id="director-partners" className={s.partners}>
-        <p className={s.kicker}>Complementary expertise</p>
-        <h2>
-          Human intelligence meets<br /><em>artificial intelligence.</em>
-        </h2>
-        <div className={s.partnerGrid}>
-          <article>
-            <a className={s.partnerLogo} href="https://www.mysocialimpact.org/" aria-label="Visit My Social Impact">
-            <Image
-              src="/brand/my-social-impact.png"
-              width={280}
-              height={90}
-              sizes="240px"
-              alt="My Social Impact"
-            />
-            </a>
-            <h3>Impact expertise</h3>
-            <p>
-              Social Impact Excellence methodology, strategy, measurement and
-              management.
-            </p>
-          </article>
-          <article>
-            <a className={s.partnerLogo} href="https://www.theideasshed.com/" aria-label="Visit The Ideas Shed">
-            <Image
-              src="/brand/the-ideas-shed.png"
-              width={180}
-              height={130}
-              sizes="180px"
-              alt="The Ideas Shed"
-            />
-            </a>
-            <h3>Intelligent possibilities</h3>
-            <p>
-              AI agents, creative thinking, software development and intelligent
-              digital systems.
-            </p>
-          </article>
-          <article>
-            <a className={s.partnerLogo} href="https://www.fluiditconsulting.co.uk/" aria-label="Visit Fluid">
-              <Image
-                src="https://www.fluiditconsulting.co.uk/wp-content/uploads/2025/06/Group-160.png"
-                alt="Fluid"
-                width={240}
-                height={90}
-                unoptimized
-              />
-            </a>
-            <h3>Systems that connect</h3>
-            <p>
-              A My Social Impact collaborator bringing IT consultancy, systems
-              integration and digital transformation expertise.
-            </p>
-            <p className={s.small}>
-              Fluid’s involvement is agreed for each engagement, rather than
-              assumed across the whole service.
-            </p>
-          </article>
-        </div>
-      </section>
-      <DirectorBooking />
-      <section id="director-ambition" className={s.closing}>
-        <p className={s.kicker}>The point isn’t clever technology.</p>
-        <h2>
-          Unlocking the full
-          <br />
-          <em>impact potential</em>
-          <br />
-          of every organisation.
-        </h2>
-        <p>
-          More accessible expertise. Better-informed decisions. More charities
-          and businesses making a greater positive difference to social and
-          environmental problems.
-        </p>
-      </section>
-    </main>
-  );
+      </div>
+      <DirectorBooking panelOnly />
+    </section>
+
+    <section id="director-ambition" className={s.closing} aria-labelledby="director-vision-title">
+      <div><h2 id="director-vision-title">Expert impact management.<br /><span>Accessible to everyone.</span></h2><p>Start with the free tools. When you’re ready, let’s talk about going further.</p></div>
+      <div className={s.closingActions}><DirectorToolsLink className={s.primary} /><a className={s.textLink} href={contact}>Talk to Marcus <Arrow /></a><a className={s.specialistLink} href="https://www.myimpactdirector.com/">More about the specialist service <Arrow /></a></div>
+    </section>
+  </main>;
 }
