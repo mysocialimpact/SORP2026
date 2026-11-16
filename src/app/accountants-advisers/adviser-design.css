@@ -149,3 +149,10 @@ body:has(.adviser-directory) .product-folder-sheet-edge { background: #cfddcf; }
   .adviser-future > div { display: block; }
   .adviser-future p { margin-top: 24px; }
 }
+.adviser-founder.adviser-invite { padding:0; overflow:hidden; }
+.adviser-founder > img { display:block; width:100%; height:auto; aspect-ratio:1; object-fit:cover; object-position:center 45%; }
+.adviser-founder > div { padding:26px; }
+.adviser-founder h2 { font-size:clamp(30px,3vw,44px); }
+.adviser-founder h2 em { color:#d9e8bf; }
+.adviser-founder p + p { margin-top:12px; }
+.adviser-directory-cta { display:inline-flex; padding:13px 20px; margin:6px 0 16px; background:#242329; color:#fff !important; border-radius:4px; font-weight:600; }

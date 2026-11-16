@@ -12,7 +12,7 @@ const destination = "/charity-impact-reports/review/";
 export function ReportReviewEntry() {
   const { status } = useNavigationAccount();
   return <ToolLink className="gateway-action" href={destination}>
-    {status === "signed-in" ? "Open my free report reviews" : "Register for my free reviews"}<span aria-hidden="true">→</span>
+    {status === "signed-in" ? "Open my free report reviews" : "Get Started — Free"}<span aria-hidden="true">→</span>
   </ToolLink>;
 }
 

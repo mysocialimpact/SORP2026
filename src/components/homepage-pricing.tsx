@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { BetaToolAction } from "./beta-tool-entry";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const plans = [
   {
     id: "free",
-    name: "FREE",
+    name: "FREE PUBLIC BETA",
     price: "£0",
     status: "Available now",
-    intro: "A serious starting point, with no card and no obligation.",
+    intro: "One account. One charity. Save your progress and return. No card required.",
     highlights: [
       "Full Are You SORP Ready? assessment",
       "Ask SORP and an initial automated report review",
@@ -18,7 +19,7 @@ const plans = [
     details: [
       "Complete the full SORP readiness journey and keep your result in your account.",
       "Ask three free SORP questions with official references.",
-      "Receive an initial automated review of published charity reporting evidence where the readiness journey supports it.",
+      "Review one impact report through both the Social Impact Claims Code and Social Impact Excellence perspectives.",
       "Use the introductory Social Impact Excellence maturity assessment and its guidance.",
       "Save progress and see available products through one basic platform account.",
       "Human review, advice and implementation support are optional and charged separately.",
@@ -121,7 +122,7 @@ export function HomepagePricing() {
         <div>
           <p className="gateway-kicker">One platform. A free-first model.</p>
           <h2 id="pricing-title">Powerful tools.<br /><span>Free wherever possible.</span></h2>
-          <p>Expert help whenever you need it.</p>
+          <p>Free Public Beta is available now. Plus and Adviser are future options; no subscription is needed to try the beta.</p>
         </div>
         <div className="homepage-pricing-controls" aria-label="Browse plans">
           <button type="button" onClick={() => move(-1)} disabled={!canGoBack} aria-controls="homepage-plans" aria-label="Previous plan">←</button>
@@ -153,15 +154,10 @@ export function HomepagePricing() {
       <div className="gateway-width">
         <div className="homepage-beta-invitation">
           <div>
-            <p className="gateway-kicker">Free early beta access</p>
-            <h3>We’re testing Plus and Adviser with a small group of charities, accountants and advisers. We’d love to hear from you if you’d like to get involved and help us make these tools better.</h3>
+            <p className="gateway-kicker">Free Public Beta · Open now</p>
+            <h3>Represent a charity or advise one? Explore our available tools for one charity, save your progress and help us make the platform better.</h3>
           </div>
-          <a
-            href="/contact/?interest=beta#say-hello"
-            onClick={() => window.dispatchEvent(new CustomEvent("sorp2026:contact-intent", { detail: { message: "I’d like to request free early beta access." } }))}
-          >
-            Request free beta access →
-          </a>
+          <BetaToolAction href="/are-you-sorp-ready/review/" label="Open Assessment" readiness />
         </div>
       </div>
 

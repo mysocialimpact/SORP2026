@@ -8,6 +8,7 @@ import { site } from "@/lib/site";
 import { HomepageAudience, HomepageReviewLink } from "@/components/homepage-welcome";
 import { HomepagePricing } from "@/components/homepage-pricing";
 import { HomepageManifesto } from "@/components/homepage-manifesto";
+import { BetaToolAction } from "@/components/beta-tool-entry";
 import "./homepage.css";
 export const metadata: Metadata = {
   title: "SORP 2026 — Reporting for greater impact",
@@ -46,10 +47,10 @@ export default function Home() {
               Free tools. Affordable expertise.<br /><span>For greater charity impact.</span>
             </h1>
             <p className="homepage-hero-definition">
-              We’re a UK-based social enterprise initiative helping charities and their advisers
-              navigate SORP 2026 and achieve greater impact.
+              Helping charities get ready for SORP 2026 — and demonstrate the difference they make.
             </p>
-            <p className="homepage-beta-note"><strong>Now in public beta.</strong> Charities and advisers can create a free account, start their readiness review and help shape what comes next.</p>
+            <p className="homepage-beta-note"><strong>Our public beta is now open.</strong> Create a free account to explore our available tools for one charity, save your progress and return whenever you like. No payment or credit card required.</p>
+            <div className="homepage-beta-actions"><BetaToolAction href="/are-you-sorp-ready/review/" label="Open Assessment" readiness/><a href="#products">Explore the Platform ↓</a></div>
           </div>
           <div className="gateway-intro-aside">
             <p className="homepage-editorial">SORP is the requirement.<br /><strong>Better impact is the opportunity.</strong></p>
@@ -74,6 +75,12 @@ export default function Home() {
               <HomepageReviewLink />
             </div>
           </div>
+          <ul className="homepage-beta-tools" aria-label="Explore the available beta tools">
+            <li><a href="/ask-sorp/"><strong>Ask SORP →</strong><span>Practical guidance. Three free questions.</span></a></li>
+            <li><a href="/charity-impact-reports/"><strong>Charity Impact Reports →</strong><span>One report, two free review perspectives.</span></a></li>
+            <li><a href="/social-impact-excellence/"><strong>Social Impact Excellence →</strong><span>A baseline across five impact pillars.</span></a></li>
+            <li><a href="/my-impact-director/"><strong>My Impact Director →</strong><span>Free AI readiness assessment; expert support by arrangement.</span></a></li>
+          </ul>
           <p className="homepage-source">Independent tools, grounded in the requirements. <a href="https://www.charitysorp.org/" target="_blank" rel="noopener noreferrer">Read the official Charities SORP <Arrow diagonal /></a></p>
         </section>
       </div>

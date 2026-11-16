@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ToolLink } from "@/components/tool-link";
+import { BetaToolAction, BetaAccountNote } from "@/components/beta-tool-entry";
 import { FolderHero } from "@/components/folder-hero";
-import { Arrow } from "@/components/ui";
 import { site } from "@/lib/site";
 import "./ask-sorp.css";
 
@@ -13,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const plans = [
-  { name: "FREE", price: "£0", status: "Available now", copy: "Three Ask SORP questions for everyone. Explore the tool at no cost." },
+  { name: "FREE PUBLIC BETA", price: "£0", status: "Available now", copy: "Three Ask SORP questions with a free account for one charity. No payment or credit card required." },
   { name: "PLUS", price: "£29", suffix: "/month", status: "Planned", copy: "Ask SORP is included within the wider Plus platform subscription, with extended access beyond the three free questions." },
   { name: "ADVISER", price: "£99", suffix: "/month", status: "Planned", copy: "Included within the wider Adviser platform subscription for accountants and advisers supporting charity clients." },
   { name: "BESPOKE", price: "Let’s talk", status: "By arrangement", copy: "Tailored solutions and development for organisations, professional practices and larger teams." },
@@ -28,7 +27,9 @@ export default function AskSorp() {
           <h1>Over 300 pages of SORP.<br /><span>Now you can just ask.</span></h1>
           <p className="ask-hero-lead">SORP 2026 can be complex. We’ve built Ask SORP to make understanding the requirements simpler, faster and more accessible.</p>
           <p className="ask-hero-support">Ask questions in plain English, explore the relevant guidance and see where the answers come from.</p>
-          <ToolLink className="ask-primary-action" href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></ToolLink>
+          <BetaToolAction className="ask-primary-action" href="/ask-sorp/workspace/" label="Ask a Question" />
+          <BetaAccountNote destination="/ask-sorp/workspace/" />
+          <p className="ask-reassurance">Three free questions in the public beta.</p>
           <p><Link href="/sample-charity/#ask">Explore a sample charity answer →</Link></p>
           <p><Link href="/sample-charity/#request-demo">Request a free demo →</Link></p>
           <p className="ask-reassurance">Relevant references. Uncertainty made clear. Professional judgement where it matters.</p>
@@ -70,7 +71,7 @@ export default function AskSorp() {
         <div className="ask-section-heading">
           <p className="ask-eyebrow">Simple access</p>
           <h2 id="ask-access-title">Start free.<br /><span>Go further when useful.</span></h2>
-          <p>Paid plans are in beta and are not currently available to purchase online.</p>
+          <p>The Free Public Beta is open now. Plus and Adviser are planned and are not currently available to purchase online.</p>
         </div>
         <ol className="ask-plan-grid" aria-label="Ask SORP access options" tabIndex={0}>
           {plans.map(plan => (
@@ -85,12 +86,11 @@ export default function AskSorp() {
 
         <div className="ask-beta">
           <div>
-            <p className="ask-eyebrow">Free early beta access</p>
+            <p className="ask-eyebrow">Free Public Beta · Open now</p>
             <h3>Help us make these tools better.</h3>
-            <p>We’re currently testing Plus and Adviser with a small group of charities, accountants and advisers.</p>
-            <p>We’re offering free access to selected beta participants and would love to hear from you if you’d like to get involved.</p>
+            <p>Represent a charity or advise one? Create your free account for one charity, try the available tools and tell us what would make them better.</p>
           </div>
-          <a href="/contact/?interest=beta#say-hello">Request free beta access <Arrow /></a>
+          <BetaToolAction href="/ask-sorp/workspace/" label="Ask a Question" />
         </div>
       </section>
 
@@ -100,7 +100,7 @@ export default function AskSorp() {
           <h2 id="ask-start-title">What do you need to know?</h2>
           <p>Ask your question in plain English. We’ll show you the relevant guidance and where the answer comes from.</p>
         </div>
-        <ToolLink href="/ask-sorp/workspace/">Ask SORP a question <Arrow /></ToolLink>
+        <BetaToolAction href="/ask-sorp/workspace/" label="Ask a Question" />
       </section>
     </main>
   );

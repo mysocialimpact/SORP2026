@@ -241,6 +241,7 @@ export async function POST(
           identity.account.id,
           JSON.stringify({
             ...facts,
+            ...(["charity", "adviser"].includes(saved.audience) ? { audience: saved.audience } : {}),
             professionalContext: saved.professionalContext || {},
           }),
           JSON.stringify(messages),
@@ -455,11 +456,13 @@ export async function POST(
         )
           throw new Error("This introduction belongs to another account.");
         await c.query(
-          `INSERT INTO research_console.onboarding_profiles(account_id,facts,messages,charity_identity,attribution) VALUES($1,$2,$3,$4,$5) ON CONFLICT(account_id) DO UPDATE SET facts=EXCLUDED.facts,messages=EXCLUDED.messages WHERE $6::boolean`,
+          `INSERT INTO research_console.onboarding_profiles(account_id,facts,messages,charity_identity,attribution) VALUES($1,$2,$3,$4,$5) ON CONFLICT(account_id) DO UPDATE SET facts=research_console.onboarding_profiles.facts || EXCLUDED.facts,messages=EXCLUDED.messages WHERE $6::boolean`,
           [
             identity.account.id,
             JSON.stringify({
               ...facts,
+              // Self-described audience is profile context, never an access role.
+              ...(body.audience === "charity" || body.audience === "adviser" ? { audience: body.audience } : {}),
               professionalContext: {
                 relationships: session.state.professional,
                 corrections: session.state.corrections,

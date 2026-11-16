@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ToolLink } from "./tool-link";
+import { isToolPage } from "@/lib/tool-access-policy";
 import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { folderForPath } from "@/lib/products";
@@ -14,7 +15,7 @@ function defaultAction(path: string): Action {
   if (path.startsWith("/sample-charity/")) return { label: "Request a free demo", href: "/sample-charity/#request-demo" };
   if (path.startsWith("/ask-sorp/")) return { label: "Ask SORP a question", href: "/ask-sorp/workspace/" };
   if (path.startsWith("/charity-impact-reports/")) return { label: "Get your free report assessment", href: "/charity-impact-reports/review/" };
-  if (path.startsWith("/social-impact-excellence/")) return { label: "Explore Social Impact Excellence", href: "/social-impact-excellence/#excellence-start" };
+  if (path.startsWith("/social-impact-excellence/")) return { label: "Open Maturity Assessment", href: "/social-impact-excellence/assessment/" };
   if (path.startsWith("/my-impact-director/")) return { label: "Check your AI readiness", href: "/my-impact-director/workspace/#assessment" };
   if (path.startsWith("/accountants-advisers/")) return { label: "Find an accountant", href: "/accountants-advisers/" };
   return { label: "Start your free SORP review", href: "/are-you-sorp-ready/review/?entry=intro" };
@@ -83,7 +84,7 @@ export function ProductActionBar() {
   return <>
     <aside ref={bar} className={`folder-action-bar${readinessLanding ? " is-readiness" : ""}${directorLanding ? " is-director" : ""}`} data-action-page={path} data-action-product={folder.slug} style={{ "--action-accent": folder.tabColour, "--action-ink": folder.tabInk } as React.CSSProperties} aria-label="Page actions">
       {readinessLanding && <Link className="folder-action-utility folder-action-presentation" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>}
-      <ToolLink className="folder-action-primary" href={action.href}>{path === "/" && account?.signedIn === false ? "Let’s Get Started" : readinessLanding && !account?.signedIn ? "Start Free Review" : action.label} <span aria-hidden="true">→</span></ToolLink>
+      <ToolLink className="folder-action-primary" href={action.href}>{account?.signedIn === false && isToolPage(action.href.split(/[?#]/)[0]) ? "Get Started — Free" : action.label} <span aria-hidden="true">→</span></ToolLink>
       {directorLanding && <button type="button" className="folder-action-utility folder-action-booking" onClick={() => window.dispatchEvent(new Event("director-booking-open"))}>Book a 10-minute chat <span aria-hidden="true">→</span></button>}
       <a className="folder-action-utility folder-action-feedback" href={path === "/contact/" ? "/#page-feedback" : "#page-feedback"}>Give feedback <span aria-hidden="true">→</span></a>
       <a className="folder-action-secondary" href="/contact/">Contact Us <span aria-hidden="true">→</span></a>

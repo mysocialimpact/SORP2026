@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BetaAccountNote } from "@/components/beta-tool-entry";
 import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,7 +23,7 @@ export default function CharityImpactReportsPage() {
           <h1>Go beyond SORP.<br/><span>Tell the full story of your impact.</span></h1>
           <p className="reports-hero-lead">An impact report brings your charity’s evidence, outcomes and stories together. Discover what yours does well — and how to make it stronger.</p>
           <div className="reports-hero-actions"><ReportReviewEntry/><a className="reports-login-link" href="#free-reviews">See the two free reviews ↓</a></div>
-          <p className="reports-hero-registration">Create a free account before generating your reviews. Already registered? <Link href="/login/?return=/charity-impact-reports/review/">Log in →</Link></p>
+          <BetaAccountNote className="reports-hero-registration" destination="/charity-impact-reports/review/" />
         </div>
         <div className="reports-hero-preview" aria-label="Your report reviewed through two methodologies">
           <p className="gateway-kicker">Your impact report</p><strong>One PDF.<br/>Two perspectives.</strong>

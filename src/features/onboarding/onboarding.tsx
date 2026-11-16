@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui";
 import { invitationTokenFromDestination } from "@/lib/account-navigation";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { VoiceInput, type VoiceState } from "./voice-input";
-import { readAudience } from "@/lib/audience-preference";
+import { readAudience, writeAudience, subscribeAudience, serverAudience } from "@/lib/audience-preference";
 import {
   advance,
   charityOptions,
@@ -50,7 +50,7 @@ async function post(action: string, body: unknown) {
   const response = await fetch(`/api/onboarding/${action}/`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(action === "complete" ? { ...(body as object), audience: readAudience() } : body),
     signal: AbortSignal.timeout(action === "search" ? 15000 : 30000),
   });
   const data = await response.json();
@@ -72,6 +72,7 @@ function publicLink(value: string) {
   }
 }
 export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbox?: boolean }) {
+  const audience = useSyncExternalStore(subscribeAudience, readAudience, serverAudience);
   const [previewVerificationUrl, setPreviewVerificationUrl] = useState("");
   const params = useSearchParams(),
     destination = safeDestination(params.get("next") || params.get("return") || "/are-you-sorp-ready/review/?entry=intro");
@@ -676,8 +677,14 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     <main id="main" className="onboarding-page">
       <div className="onboarding-shell">
         <div className="onboarding-heading">
-          <h1>Let’s get you started<span>!</span></h1>
-          <p>Just your name, email and charity. Talk, type or fill in the details yourself. Everything else is optional.</p>
+          <p className="onboarding-beta-label">Free Public Beta</p>
+          <h1>Let’s Get Started<span>.</span></h1>
+          <p>Represent a charity or advise one? Explore our available tools for one charity, save your progress and come back whenever you like.</p>
+          <p className="onboarding-beta-detail">Just your name, email and charity to start. No payment or credit card required. We recommend beginning with Are You SORP Ready?</p>
+          <fieldset className="onboarding-audience"><legend>How are you working with your charity? <small>Optional</small></legend>
+            <label><input type="radio" name="beta-audience" value="charity" checked={audience === "charity"} onChange={() => writeAudience("charity")} />I represent a charity</label>
+            <label><input type="radio" name="beta-audience" value="adviser" checked={audience === "adviser"} onChange={() => writeAudience("adviser")} />I advise a charity</label>
+          </fieldset>
           {previewEmailSandbox && <p className="onboarding-preview-notice">Preview test accounts only: use an address ending @example.invalid. Verification uses a private test inbox, not real email.</p>}
           <div className="onboarding-entry">
             <div className="onboarding-modes" aria-label="How to complete your details">

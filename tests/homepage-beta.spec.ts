@@ -2,13 +2,14 @@ import { test, expect } from "@playwright/test";
 
 test("homepage public beta message is slim, single-line and scrolls away", async ({ page }) => {
   await page.goto("/");
-  const bar = page.locator(".public-beta-bar-home");
-  await expect(bar).toHaveText("SORP 2026 · PUBLIC BETA · FREE ACCOUNTS NOW AVAILABLE");
+  const bar = page.locator(".public-beta-bar");
+  await expect(bar).toContainText("SORP 2026 · Public Beta");
   await expect(bar).toHaveCSS("position", "static");
   expect((await bar.boundingBox())!.height).toBeLessThan(45);
 
   const note = page.locator(".homepage-beta-note");
-  await expect(note).toHaveText("Now in public beta. Charities and advisers can create a free account, start their readiness review and help shape what comes next.");
+  await expect(note).toContainText("Our public beta is now open.");
+  await expect(note).toContainText("one charity");
   const spacing = await page.evaluate(() => {
     const intro = document.querySelector(".homepage-hero-definition")!.getBoundingClientRect();
     const beta = document.querySelector(".homepage-beta-note")!.getBoundingClientRect();
@@ -22,9 +23,10 @@ test("homepage public beta message is slim, single-line and scrolls away", async
   expect(scrolledBar.y + scrolledBar.height).toBeLessThan(0);
 });
 
-test("other public pages retain their existing announcement", async ({ page }) => {
+test("other public pages use the same discreet beta status", async ({ page }) => {
   await page.goto("/our-mission/");
   const bar = page.locator(".public-beta-bar");
-  await expect(bar).toContainText("Explore the platform. Tell us what you think. Help shape what comes next.");
-  await expect(bar).not.toHaveClass(/public-beta-bar-home/);
+  await expect(bar).toContainText("SORP 2026 · Public Beta");
+  await expect(bar).not.toContainText("FREE ACCOUNTS NOW AVAILABLE");
+  expect((await bar.boundingBox())!.height).toBeLessThan(45);
 });

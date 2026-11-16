@@ -11,7 +11,7 @@ try{
   page.on("request",r=>{if(r.method()==="POST"&&r.url().includes("/api/impact-report-review/"))uploads++;});
   await page.goto(base+"/charity-impact-reports/");
   await page.getByRole("heading",{name:"One report. Two perspectives.",exact:true}).waitFor();
-  const register=page.getByRole("link",{name:"Register for my free reviews"}).first();
+  const register=page.getByRole("link",{name:"Get Started — Free"}).first();
   await page.waitForFunction(()=>document.querySelector('.reports-hero-actions a')?.getAttribute('href')?.startsWith('/get-started/'));
   assert.equal(new URL(await register.getAttribute("href"),base).searchParams.get("next"),"/are-you-sorp-ready/review/");
   const zone=page.getByRole("region",{name:"Upload your impact report"});
