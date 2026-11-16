@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { after, test } from "node:test";
 import { GET } from "../src/app/api/sorp-account-export/route";
-import { assessmentDigest } from "../src/lib/sorp-auth/digest";
 
 const previousFetch = globalThis.fetch;
 const previousOrigin = process.env.SORP_BACKEND_ORIGIN;
@@ -18,7 +17,7 @@ after(() => {
   else process.env.SORP_AUTH_CUTOVER_ENABLED = previousCutover;
 });
 
-test("legacy owner export returns a complete private assessment only before cutover", async () => {
+test("legacy customer isolation prevents exporting historic records through SORP", async () => {
   process.env.SORP_BACKEND_ORIGIN = "https://mysocialimpact.org";
   process.env.SORP_AUTH_LEGACY_EXPORT_ENABLED = "true";
   process.env.SORP_AUTH_CUTOVER_ENABLED = "false";
@@ -38,13 +37,13 @@ test("legacy owner export returns a complete private assessment only before cuto
     headers: { cookie: "old-session=synthetic" },
   });
   const response = await GET(request);
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-disposition") || "", /attachment/);
+  // The standalone platform now excludes this legacy customer. Its original
+  // portal remains the owner of these records; this endpoint must not expose them.
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get("content-disposition"), null);
   assert.equal(response.headers.get("cache-control"), "private, no-store");
-  const data = await response.json() as { account: { id: string }; progress: unknown; sha256: string };
-  assert.equal(data.account.id, id);
-  assert.deepEqual(data.progress, progress);
-  assert.equal(data.sha256, assessmentDigest(progress));
+  const data = await response.json();
+  assert.deepEqual(data, { error: "The existing assessment could not be read." });
   process.env.SORP_AUTH_CUTOVER_ENABLED = "true";
   assert.equal((await GET(request)).status, 404);
   assert.equal(fetches, 1, "cutover must not consult the old service");

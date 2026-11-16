@@ -9,6 +9,8 @@ test("onboarding permits its own microphone while the rest of the site stays res
 });
 
 test("a denied microphone in the installed Mac app offers specific recovery and retry", async ({ page }) => {
+  await page.route("**/api/readiness-account/", route => route.fulfill({ json: { signedIn: false } }));
+  await page.route("**/api/onboarding/**", route => route.fulfill({ json: { available: true, conversationAvailable: true } }));
   await page.addInitScript(() => {
     const nativeMatchMedia = window.matchMedia.bind(window);
     window.matchMedia = (query: string) => query === "(display-mode: standalone)"
@@ -25,6 +27,7 @@ test("a denied microphone in the installed Mac app offers specific recovery and 
     });
   });
   await page.goto("/get-started/");
+  await page.getByRole("button", { name: "Let’s Have a Conversation", exact: true }).click();
   await page.getByRole("button", { name: "Record your answer" }).click();
   const alert = page.locator(".onboarding-voice").getByRole("alert");
   await expect(alert).toContainText("App info or Site settings");
