@@ -38,6 +38,11 @@ body .sorp-workspace-page .sorp-tool-progress { top: calc(var(--platform-navigat
 .gateway-footer .gateway-footer-cow { position: absolute; right: -22px; bottom: -126px; width: 220px; height: auto; filter: drop-shadow(-8px 8px 14px #0006); transform: rotate(-2deg); }
 .gateway-footer .gateway-footer-record { margin-top: 26px; padding-top: 16px; font-size: 11px; gap: 12px; flex-wrap: wrap; }
 @media (max-width: 900px) {
+  /* Tab widths change at this breakpoint, so their scroll container must too. */
+  .platform-sticky-navigation .product-folder { overflow: hidden; }
+  .platform-sticky-navigation .product-folder-tabs { width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; scroll-snap-type: x proximity; }
+  .platform-sticky-navigation .product-folder-tabs-track { display: flex; width: max-content; min-width: 100%; padding-inline: 20px; }
+  .platform-sticky-navigation .product-folder-tab { flex: 0 0 168px; scroll-snap-align: center; }
   .platform-sticky-navigation .gateway-header-inner { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; min-height: 0; padding-block: 10px; }
   .platform-sticky-navigation .gateway-brand-lockup { display: block; }
   .platform-sticky-navigation .gateway-wordmark { font-size: 25px; }

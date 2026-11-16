@@ -23,16 +23,15 @@ export default function AskSorp() {
     <main id="main" className="ask-page product-page product-ask">
       <FolderHero product="ask-sorp" paper="#fbfaf7" id="ask-overview" className="ask-hero">
         <div className="ask-hero-copy">
-          <p className="ask-eyebrow"><span className="ask-live-dot" />Live beta · Available now</p>
+          <p className="ask-eyebrow">Ask SORP · Guidance with sources</p>
           <h1>Over 300 pages of SORP.<br /><span>Now you can just ask.</span></h1>
-          <p className="ask-hero-lead">SORP 2026 can be complex. We’ve built Ask SORP to make understanding the requirements simpler, faster and more accessible.</p>
-          <p className="ask-hero-support">Ask questions in plain English, explore the relevant guidance and see where the answers come from.</p>
+          <p className="ask-hero-lead">Ask questions in plain English. Understand the requirements and see where the answers come from.</p>
+          <p className="ask-hero-support">Three free questions. Relevant references, uncertainty made clear, and room for professional judgement.</p>
+          <div className="product-entry">
           <BetaToolAction className="ask-primary-action" href="/ask-sorp/workspace/" label="Ask a Question" />
           <BetaAccountNote destination="/ask-sorp/workspace/" />
-          <p className="ask-reassurance">Three free questions in the public beta.</p>
-          <p><Link href="/sample-charity/#ask">Explore a sample charity answer →</Link></p>
-          <p><Link href="/sample-charity/#request-demo">Request a free demo →</Link></p>
-          <p className="ask-reassurance">Relevant references. Uncertainty made clear. Professional judgement where it matters.</p>
+          <Link className="product-example-link" href="/sample-charity/#ask">See a sample answer →</Link>
+          </div>
         </div>
         <div className="ask-hero-visual" aria-hidden="true">
           <span className="ask-visual-question">?</span>
@@ -45,7 +44,7 @@ export default function AskSorp() {
       <section className="ask-audiences" aria-labelledby="ask-audiences-title">
         <div className="ask-section-heading">
           <p className="ask-eyebrow">Who it helps</p>
-          <h2 id="ask-audiences-title">Made for charities.<br /><span>Useful to the people who advise them.</span></h2>
+          <h2 id="ask-audiences-title">For charities.<br /><span>And the people who advise them.</span></h2>
         </div>
         <div className="ask-audience-grid">
           <article className="is-charity">
@@ -84,14 +83,6 @@ export default function AskSorp() {
         </ol>
         <p className="ask-pricing-link"><Link href="/#pricing">See full platform pricing →</Link></p>
 
-        <div className="ask-beta">
-          <div>
-            <p className="ask-eyebrow">Free Public Beta · Open now</p>
-            <h3>Help us make these tools better.</h3>
-            <p>Represent a charity or advise one? Create your free account for one charity, try the available tools and tell us what would make them better.</p>
-          </div>
-          <BetaToolAction href="/ask-sorp/workspace/" label="Ask a Question" />
-        </div>
       </section>
 
       <section className="ask-start" aria-labelledby="ask-start-title">

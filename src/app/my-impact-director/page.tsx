@@ -24,21 +24,13 @@ export default function MyImpactDirectorPage() {
             <em>Without the<br />full-time salary.</em>
           </h1>
           <p className={s.lead}>
-            Greater impact. Accessible to everyone.
+            Expert support to measure, manage and improve your impact. All year round.
           </p>
-          <p>
-            Expert, outsourced support throughout the year. Helping charities
-            and social enterprises measure, manage and improve their impact,
-            without employing a full-time director.
-          </p>
-          <p className={s.heroPrinciple}>
-            Because social impact deserves to be taken as seriously as financial performance.
-          </p>
-          <p className={s.small}>
-            Try the free technology, data and AI assessment in the public beta. Ongoing human-led support is a separate, bespoke service.
-          </p>
+          <p>Start with a free assessment of your technology, data and AI readiness. Explore ongoing human-led support when you need it, as a separate bespoke service.</p>
+          <div className={s.heroActions}>
           <BetaToolAction className={s.primary} href="/my-impact-director/workspace/#assessment" label="Open AI Readiness Assessment" />
           <BetaAccountNote destination="/my-impact-director/workspace/#assessment" />
+          </div>
         </div>
         <div className={s.cowStage}>
           <span className={s.orbit} aria-hidden="true" />
@@ -239,13 +231,7 @@ export default function MyImpactDirectorPage() {
           </article>
           <article>
             <a className={s.partnerLogo} href="https://www.fluiditconsulting.co.uk/" aria-label="Visit Fluid">
-              <Image
-                src="https://www.fluiditconsulting.co.uk/wp-content/uploads/2025/06/Group-160.png"
-                alt="Fluid"
-                width={240}
-                height={90}
-                unoptimized
-              />
+              <span className={s.partnerName}>Fluid</span>
             </a>
             <h3>Systems that connect</h3>
             <p>

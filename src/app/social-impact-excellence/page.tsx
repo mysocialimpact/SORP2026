@@ -34,8 +34,9 @@ export default function ExcellencePage() {
             <h1>Social Impact{" "}<br />Excellence</h1>
             <p className="excellence-public-principle">We believe social impact should be embedded as a management discipline.</p>
             <p className="excellence-public-lead">A practical framework helping charities understand, manage and continuously improve their social impact.</p>
-            <BetaToolAction href="/social-impact-excellence/assessment/" label="Open Maturity Assessment" />
+            <div className="product-entry"><BetaToolAction href="/social-impact-excellence/assessment/" label="Open Maturity Assessment" />
             <BetaAccountNote destination="/social-impact-excellence/assessment/" />
+            </div>
           </div>
           <div className="excellence-public-mark" aria-label="Social Impact Excellence">
             <Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority sizes="(max-width: 700px) 62vw, 390px" />
@@ -63,7 +64,7 @@ export default function ExcellencePage() {
             <h2 id="excellence-journey-title">From an honest baseline{" "}<br />to continuous improvement.</h2>
           </header>
           <ol>{journey.map((stage) => <li key={stage.title}><span>{stage.number}</span><div><h3>{stage.title}</h3><p>{stage.text}</p></div></li>)}</ol>
-          <p>The free beta includes the 25-question Maturity Assessment across Purpose, Leadership, Data, Delivery and Communications. The deeper diagnostic, blueprint and roadmap stages require separate access; they are not included automatically.</p>
+          <p className="excellence-journey-note">Start free with 25 maturity questions across all five pillars. The deeper diagnostic, blueprint and roadmap require separate access.</p>
         </div>
       </section>
 
@@ -81,9 +82,7 @@ export default function ExcellencePage() {
           <p>Begin your Social Impact Excellence baseline for your selected charity.</p>
           <BetaToolAction href="/social-impact-excellence/assessment/" label="Open Maturity Assessment" />
           <p className="excellence-access-note">The Social Impact Maturity Assessment is available inside your registered SORP2026 account.</p>
-          <Link className="excellence-login-link" href="/login/?return=/social-impact-excellence/">Already registered? Log in <Arrow /></Link>
-          <p><Link href="/sample-charity/#maturity">Explore a sample charity baseline →</Link></p>
-          <p><Link href="/sample-charity/#request-demo">Request a free demo →</Link></p>
+          <p className="product-example-link"><Link href="/sample-charity/#maturity">Explore a sample charity baseline →</Link></p>
         </div>
       </section>
 

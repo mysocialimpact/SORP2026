@@ -40,6 +40,7 @@
 .sample-stages li { display:flex; gap:20px; align-items:baseline; }
 .sample-stages strong { min-width:230px; }
 .demo-request { display:grid; grid-template-columns:1fr 1fr; gap:30px; padding:35px; background:#263b35; color:white; border-radius:7px; }
+.sample-content > .demo-request { padding:clamp(24px,4vw,40px); }
 .demo-request h2 { margin:8px 0 12px; font-family:var(--serif),Georgia,serif; font-size:clamp(31px,3vw,45px); line-height:1.1; }
 .demo-request .gateway-kicker { color:#d8ff52; }
 .demo-request form { display:grid; gap:8px; align-content:start; }
