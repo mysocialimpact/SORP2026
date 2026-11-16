@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AccountGateway } from "./account-gateway";
 import { DirectorBooking } from "@/features/director/booking";
 import { limitations, rubric, type Framework, type ReviewResult } from "@/lib/impact-review/rubric";
@@ -19,7 +20,7 @@ export function ImpactReportReview() {
   const [selected,setSelected]=useState(""),[framework,setFramework]=useState<Framework>("claims"),[enquiry,setEnquiry]=useState("");
   const searched=useRef(false), enquiryKey=useRef("");
   const refresh=useCallback(async()=>{try{const value=await call();setData(value);setSelected(id=>id||value.documents[0]?.id||"");}catch(e){if((e as {status?:number}).status===401)setSignedOut(true);else setError((e as Error).message);}},[]);
-  useEffect(()=>{queueMicrotask(()=>void refresh());},[refresh]);
+  useEffect(()=>{const requested=new URL(window.location.href).searchParams.get("document");if(requested&&/^[a-f\d-]{36}$/i.test(requested))queueMicrotask(()=>setSelected(requested));queueMicrotask(()=>void refresh());},[refresh]);
   useEffect(()=>{
     if(!data?.reviews.some(r=>["queued","running"].includes(r.status))) return;
     const timer=setInterval(()=>void refresh(),4000);return()=>clearInterval(timer);
@@ -61,7 +62,7 @@ export function ImpactReportReview() {
         {doc.source_url&&<p className="impact-source">{doc.source_url}</p>}
         {!doc.confirmed_at?<><p>Would you like us to review this report? Please check it belongs to your charity and covers the period you want.</p><button disabled={!!busy} onClick={()=>void action({action:"confirm",id:doc.id},"Confirming document…")}>Yes, review this report →</button></>:<p>✓ You confirmed this document.</p>}
       </section>}
-      {doc?.confirmed_at&&<section><h3>One report. Two perspectives.</h3><p>Your first report review is free. Both frameworks use the same document and share your allowance.</p><div className="impact-tabs" role="group" aria-label="Review framework">{(["claims","excellence"] as const).map(f=><button aria-pressed={framework===f} key={f} onClick={()=>setFramework(f)}>{names[f]}</button>)}</div>
+      {doc?.confirmed_at&&<section><h3>One report. Two perspectives.</h3><p>Your first report review is free. Both frameworks use the same document and share your allowance.</p><div className="impact-tabs" role="group" aria-label="Review framework">{(["claims","excellence"] as const).map(f=><button aria-pressed={framework===f} key={f} onClick={()=>setFramework(f)}><Image src={f==="claims"?"/assets/social-impact-claims-code-transparent.png":"/assets/social-impact-excellence-transparent.png"} alt="" width={64} height={64}/><span>{names[f]}</span></button>)}</div>
         <p>{framework==="claims"?"How credible are the impact claims in this report?":"What does this report reveal about how the organisation manages social impact?"}</p>
         {!review||review.status==="failed"?<><button disabled={!!busy} onClick={()=>void action({action:"review",id:doc.id,framework},"Starting review…")}>{review?"Retry review":"Run free review"} →</button>{review?.error&&<p role="alert">{review.error}</p>}</>:review.status!=="complete"?<div className="impact-processing" role="status"><p>Reading the report and checking its evidence against {names[framework]}…</p><progress max={20} value={review.progress?.findings?.length||0}/><p>{review.progress?.findings?.length||0} of 20 checks complete. You can leave and return to your saved review.</p></div>:review.result&&<article className="impact-results" aria-label="Completed report review">
           <p className="gateway-kicker">{names[framework]} · Automated preliminary review · {new Date(review.updated_at).toLocaleDateString("en-GB")}</p><h3>Your report review</h3>
