@@ -2,32 +2,16 @@ import type { Metadata } from "next";
 import { FolderHero } from "@/components/folder-hero";
 import Image from "next/image";
 import Link from "next/link";
-import { ToolLink } from "@/components/tool-link";
 import { Arrow } from "@/components/ui";
+import { ReportReviewEntry, ReportReviewUpload } from "@/components/report-review-entry";
 import { site } from "@/lib/site";
 import "./reports.css";
 
 export const metadata: Metadata = {
-  title: "Charity Impact Reports | Go beyond SORP 2026",
-  description: "Bring together powerful stories, stronger evidence and clear methodology in a Charity Impact Report that goes beyond the statutory minimum.",
+  title: "Charity Impact Reports | One report. Two perspectives.",
+  description: "Go beyond SORP. Get two free reviews of your charity’s impact report: Social Impact Claims Code and Social Impact Excellence. Register, upload a PDF and explore practical improvements.",
   ...(site.live ? { alternates: { canonical: "/charity-impact-reports/" } } : {}),
 };
-
-function ReportArtwork() {
-  return <div className="reports-artwork" aria-hidden="true">
-    <div className="reports-artwork-sheet reports-artwork-story">
-      <span>THE HUMAN STORY</span><strong>People.<br/>Change.<br/>Possibility.</strong><i />
-    </div>
-    <div className="reports-artwork-sheet reports-artwork-evidence">
-      <span>EVIDENCE</span><div className="reports-artwork-chart"><i/><i/><i/><i/></div><small>OUTCOMES · LEARNING · CONTEXT</small>
-    </div>
-    <div className="reports-artwork-sheet reports-artwork-cover">
-      <small>YOUR FULLER IMPACT STORY</small>
-      <Image src="/product/charity-impact-reports.png" alt="" width={1787} height={887} priority />
-      <span>Stories / evidence / methodology</span>
-    </div>
-  </div>;
-}
 
 export default function CharityImpactReportsPage() {
   return <main id="main" className="gateway reports-page">
@@ -36,48 +20,55 @@ export default function CharityImpactReportsPage() {
         <div className="reports-hero-copy">
           <p className="gateway-kicker">Charity Impact Reports</p>
           <h1>Go beyond SORP.<br/><span>Tell the full story of your impact.</span></h1>
-          <p className="reports-hero-lead">SORP sets the framework. Your impact report tells the fuller story — through evidence, outcomes, photographs and case studies. Get a free assessment through two My Social Impact methodologies.</p>
-          <div className="reports-hero-actions">
-            <ToolLink className="gateway-action" href="/charity-impact-reports/review/">Get my free report review <Arrow /></ToolLink>
-            <Link className="reports-login-link" href="/login/?return=/charity-impact-reports/review/">Already registered? Log in</Link>
-            <Link className="reports-login-link" href="/sample-charity/#report">Explore a sample charity review →</Link>
-            <Link className="reports-login-link" href="/sample-charity/#request-demo">Request a free demo →</Link>
-          </div>
+          <p className="reports-hero-lead">An impact report brings your charity’s evidence, outcomes and stories together. Discover what yours does well — and how to make it stronger.</p>
+          <div className="reports-hero-actions"><ReportReviewEntry/><a className="reports-login-link" href="#free-reviews">See the two free reviews ↓</a></div>
+          <p className="reports-hero-registration">Create a free account before generating your reviews. Already registered? <Link href="/login/?return=/charity-impact-reports/review/">Log in →</Link></p>
         </div>
-        <ReportArtwork />
+        <div className="reports-hero-preview" aria-label="Your report reviewed through two methodologies">
+          <p className="gateway-kicker">Your impact report</p><strong>One PDF.<br/>Two perspectives.</strong>
+          <div className="reports-preview-logos"><Image src="/assets/social-impact-claims-code-transparent.png" alt="Social Impact Claims Code" width={1078} height={1090} priority/><span aria-hidden="true">+</span><Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority/></div>
+          <p>Two complementary review reports.<br/>One clearer way forward.</p>
+          <a href="#free-reviews">Explore your free reviews <Arrow/></a>
+        </div>
       </div>
     </FolderHero>
 
-    <section id="reports-connection" className="reports-connection gateway-width">
-      <div><p className="gateway-kicker">The SORP connection</p><h2>SORP establishes the reporting framework. <span>Your impact report brings the fuller story to life.</span></h2></div>
-      <div className="reports-connection-note">
-        <p>The published Charities SORP 2026 allows relevant additional material, including an impact assessment, to sit within or accompany the accounts. It also makes clear that information outside the statutory framework is not a substitute for good statutory reporting.</p>
-        <a href="https://www.charitysorp.org/download-a-full-sorp" target="_blank" rel="noreferrer">Read the official SORP · Module 1, paragraphs 1.5 and 1.33 <Arrow diagonal /></a>
+    <section id="free-reviews" className="reports-free gateway-width" aria-labelledby="reports-free-title">
+      <header className="reports-section-head"><p className="gateway-kicker">Two My Social Impact methodologies · Free</p><h2 id="reports-free-title">One report.<br/><span>Two perspectives.</span></h2><p>Submit your report once. Get two complementary automated reviews, with evidence references and practical recommendations.</p></header>
+      <div className="reports-perspectives">
+        <article className="reports-perspective reports-perspective-claims">
+          <div className="reports-method-brand"><Image src="/assets/social-impact-claims-code-transparent.png" alt="" width={1078} height={1090}/><p>Social Impact<br/><strong>Claims Code</strong><span>SICC · Claims &amp; credibility</span></p></div>
+          <h3>Can your impact claims stand up to scrutiny?</h3>
+          <p>Understand whether your claims are credible, proportionate and supported by the evidence in your report.</p>
+          <ul aria-label="Social Impact Claims Code principles">{["Evidence","Proportion","Transparency","Balance","Learning"].map(p=><li key={p}>{p}</li>)}</ul>
+          <p className="reports-method-output">Your review: indicative scores, specific findings and practical ways to strengthen your claims.</p>
+        </article>
+        <article className="reports-perspective reports-perspective-excellence">
+          <div className="reports-method-brand"><Image src="/assets/social-impact-excellence-transparent.png" alt="" width={1200} height={1200}/><p>Social Impact<br/><strong>Excellence</strong><span>SIE · Managing &amp; communicating impact</span></p></div>
+          <h3>What does your report show about managing impact?</h3>
+          <p>See how clearly your report demonstrates the way your charity understands, manages and communicates social impact.</p>
+          <ul aria-label="Social Impact Excellence pillars">{["Purpose","Leadership","Data","Delivery","Communications"].map(p=><li key={p}>{p}</li>)}</ul>
+          <p className="reports-method-output">Your review: evidence across five pillars, disclosure gaps and useful next steps. It assesses your report, not your organisation’s full maturity.</p>
+        </article>
       </div>
+      <ReportReviewUpload/>
+      <p className="reports-free-note">One free impact report review per account, with both perspectives included. Automated findings assess the published information; they do not independently verify it or provide audit assurance or certification.</p>
     </section>
 
-    <section id="reports-value" className="reports-value">
+    <section id="reports-support" className="reports-support" aria-labelledby="reports-support-title">
       <div className="gateway-width">
-        <header><p className="gateway-kicker">More than a report</p><h2>Evidence of real change.</h2></header>
-        <div className="reports-value-grid">
-          <article><span>01</span><h3>Stories</h3><p>Bring your impact to life.</p></article>
-          <article><span>02</span><h3>Evidence</h3><p>Show what has changed.</p></article>
-          <article><span>03</span><h3>Credibility</h3><p>Explain how you know.</p></article>
+        <header className="reports-section-head"><p className="gateway-kicker">AI gets you started. People take you further.</p><h2 id="reports-support-title">Expert help.<br/><span>When you need it.</span></h2><p>Talk to My Social Impact about your results, your next report or bringing an existing report to life online.</p></header>
+        <div className="reports-services">
+          <article><span className="reports-service-number">01</span><h3>Expert report review.</h3><p>A human review of your report, selected claims and supporting evidence. Deeper scrutiny, independent recommendations and a practical way forward within an agreed scope.</p><Link href="/contact/?service=expert-impact-review">Discuss an expert review <Arrow/></Link></article>
+          <article><span className="reports-service-number">02</span><h3>Create an impact report.</h3><p>Find the evidence. Tell the story that matters. Let My Social Impact help create or improve your next Charity Impact Report.</p><p className="reports-service-price">From £1,000 <small>Depending on your charity’s size and requirements.</small></p><Link href="/contact/?service=create-impact-report">Talk about your next report <Arrow/></Link></article>
+          <article><span className="reports-service-number">03</span><h3>Digitise your report.</h3><p>Turn your existing impact report into a beautiful, mobile-friendly website that’s easier to explore, understand and share.</p><p className="reports-service-price">From £250 <small>For a straightforward conversion of existing content.</small></p><p className="reports-service-partner">The Ideas Shed × My Social Impact</p><Link href="/contact/?service=digitise-impact-report">Bring your report online <Arrow/></Link></article>
         </div>
+        <p className="reports-support-note">Want to explore the options? <Link href="/contact/">Talk to us about your impact report →</Link></p>
       </div>
     </section>
 
-    <section className="reports-methods gateway-width" aria-label="Two complementary reviews">
-      <header><p className="gateway-kicker">One report. Two perspectives.</p><h2>Your first review. Free.</h2><p>New here? Create your free account and start with Are You SORP Ready? Your charity details carry across when you explore report reviews.</p></header>
-      <div className="reports-method-grid"><article><span>SICC</span><h3>Are your impact claims credible?</h3><p>Social Impact Claims Code</p><p>Evidence · Proportion · Transparency · Balance · Learning</p><p>Find out how credible, proportionate and well-supported your claims are.</p></article><article><span>SIE</span><h3>How effectively are you demonstrating social impact excellence?</h3><p>Social Impact Excellence</p><p>Purpose · Leadership · Data · Delivery · Communications</p><p>See what your report demonstrates and what needs further organisational assessment.</p></article></div>
-      <p className="reports-review-gate">An automated review of published information, with source references and practical improvements. It does not verify underlying evidence or provide audit assurance or certification. Processing time depends on your report.</p>
-    </section>
-    <section className="reports-methods gateway-width" aria-label="Who it helps"><div className="reports-method-grid"><article><h3>For charities</h3><p>Understand the strengths and weaknesses of your impact report, improve your evidence and tell a more compelling story.</p></article><article><h3>For accountants and advisers</h3><p>We welcome collaboration with accountants and advisers who want to help their charity clients go beyond SORP compliance and demonstrate their impact more effectively.</p></article></div></section>
-    <section id="reports-review" className="reports-review gateway-width">
-      <div><p className="gateway-kicker">Free · £0</p><h2>Your first Charity Impact Report Review.</h2><p>One report per account. Both SICC and SIE included.</p><ToolLink className="gateway-action" href="/charity-impact-reports/review/">Get my free report review <Arrow /></ToolLink></div>
-      <div><p className="gateway-kicker">Professional support · From £1,000</p><h2>Make your next report stronger.</h2><p>Let My Social Impact help create your next Charity Impact Report. Pricing depends on the size and requirements of your charity.</p><Link className="gateway-action" href="/contact/">Talk to us <Arrow /></Link></div>
-    </section>
-
-    <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow /></Link></nav>
+    <section className="reports-audiences gateway-width" aria-label="Who it helps"><article><h2>For charities</h2><p>Understand your report’s strengths, improve your evidence and tell a more compelling story.</p></article><article><h2>For accountants &amp; advisers</h2><p>Help your charity clients go beyond SORP compliance. We welcome collaboration to demonstrate their impact more effectively.</p></article></section>
+    <div className="reports-official gateway-width"><p>SORP provides the reporting framework. An impact report helps tell the fuller story.</p><a href="https://www.charitysorp.org/download-a-full-sorp" target="_blank" rel="noreferrer">Read the official Charities SORP <Arrow diagonal/></a></div>
+    <nav className="product-next gateway-width" aria-label="Next product"><span>Next section</span><Link href="/social-impact-excellence/">Social Impact Excellence <Arrow/></Link></nav>
   </main>;
 }
