@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {chromium} from "playwright";
 import {claimsPrinciples,excellencePillars} from "../src/lib/impact-review/rubric.ts";
+import {criteria} from "../src/lib/impact-review/mid/rubric.ts";
 const base="http://localhost:3000";
 const browser=await chromium.launch({executablePath:"/usr/bin/chromium",args:["--no-sandbox"]});
 try {
@@ -17,6 +18,11 @@ try {
    if(b.action==="confirm")doc.confirmed_at=new Date().toISOString();
    if(b.action==="review"){
     requests++;data.reviews.push({document_id:doc.id,framework:b.framework,status:"complete",updated_at:new Date().toISOString(),result:{overall:b.framework==="claims"?50:null,summary:"Synthetic UI fixture only.",sections:(b.framework==="claims"?claimsPrinciples:excellencePillars).map(p=>({name:p.name,status:"partial",rating:b.framework==="claims"?2:null,finding:"Partial disclosure.",strength:"Survey findings are disclosed.",gap:"The sample is unclear.",recommendation:"Explain the sampling method.",evidence:[{page:1,quote:"Participants reported increased confidence."}]})),recommendations:["Explain methods.","Include limitations.","Describe learning."],limitations:["Synthetic UI fixture."]}});
+    const result=data.reviews.at(-1).result;
+    result.methodologyVersion="1.0.0";result.overall=75;
+    result.criteria=criteria(b.framework).map(c=>({id:c.id,status:"assessed",score:3,explanation:"Synthetic disclosure fixture.",evidence:[{page:1,quote:"Participants reported increased confidence."}],improvement:"Explain the sampling method.",limitations:[],confidence:"medium",claimIds:[]}));
+    result.sections.forEach(s=>{s.score=75;});
+    result.actions={actions:[{title:"Explain methods",detail:"Describe sampling.",priority:"quick",criterionIds:[b.framework+".1.1"]}]};
    }
    return route.fulfill({json:{ok:true}});
   });
@@ -24,18 +30,18 @@ try {
   await page.goto(base+"/charity-impact-reports/review/");
   await page.getByRole("button",{name:"Yes, review this report"}).click();
   await page.getByRole("button",{name:"Run free review"}).click();
-  await page.getByText("50/100 · indicative document score").waitFor();
-  await page.getByRole("tab",{name:"Social Impact Excellence",exact:true}).click();
+  await page.getByText("75/100 · indicative report disclosure score").waitFor();
+  await page.getByRole("button",{name:"Social Impact Excellence",exact:true}).click();
   await page.getByRole("button",{name:"Run free review"}).click();
-  await page.getByRole("heading",{name:"Communications",exact:true}).waitFor();
-  await page.getByRole("tab",{name:"Social Impact Claims Code",exact:true}).click();
+  await page.getByRole("heading",{name:"Communications 75/100",exact:true}).waitFor();
+  await page.getByRole("button",{name:"Social Impact Claims Code",exact:true}).click();
   assert.equal(requests,2);
   await page.getByRole("button",{name:"Enquire about digitisation"}).click();
   await page.getByText(/Your enquiry is saved/).waitFor();
   assert.equal(enquiry.kind,"contact");assert.match(enquiry.message,/digitisation/);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.screenshot({path:"/tmp/impact-review-"+width+".png",fullPage:true});
-  await page.reload();await page.getByText("50/100 · indicative document score").waitFor();assert.equal(requests,2);
+  await page.reload();await page.getByText("75/100 · indicative report disclosure score").waitFor();assert.equal(requests,2);
   console.log(width+"px: confirmation, both frameworks, saved-result switching, return, enquiry and overflow checks passed (controlled responses).");
   await c.close();
  }
