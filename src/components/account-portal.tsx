@@ -69,6 +69,7 @@ export function AccountPortal({ returnTo, embedded = false }: { returnTo?: strin
       <Link className="account-forgot" href={`/forgot-password/?return=${encodeURIComponent(destination)}`} onClick={() => rememberAccountReturn(destination)}>Forgotten your password?</Link>
       <button className="gateway-action account-submit" disabled={busy} type="submit">{busy ? "Please wait…" : "Log in to SORP2026 →"}</button>
     </form>}
-    <p className="account-note">{embedded ? "One account for your SORP2026 tools. You’ll return straight to this assessment." : "One account for your SORP2026 tools. If you previously used Social Impact Excellence, contact support before creating a new account so your saved work can be checked. Google sign-in is currently unavailable."}</p>
+    <p className="account-note">{embedded ? "One account for your SORP2026 tools. You’ll return straight to this assessment." : "One account for your SORP2026 tools. Log in to continue your saved work."}</p>
+    {!embedded && <details className="account-help"><summary>Used an older My Social Impact account?</summary><p>If you previously used Social Impact Excellence, <Link href="/contact/">contact us</Link> before creating another account so your saved work can be checked.</p></details>}
   </div>;
 }

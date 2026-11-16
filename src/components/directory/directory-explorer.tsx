@@ -108,8 +108,8 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
           <p className="directory-eyebrow">In Development · Public directory</p>
           <h1>Find the right<br/><em>charity accountant.</em></h1>
           <p className="adviser-intro">Good financial advice has never been more important for charities.</p>
-          <p>With SORP 2026 introducing new reporting requirements, we’re building a better way to find experienced, reliable and affordable accountants who understand charities.</p>
-          <p>This directory is an early version. Explore the listings, check the evidence and discuss suitability and fees directly with each firm.</p>
+          <p>We’re building a better way to find experienced, reliable and affordable accountants who understand charities and the new SORP requirements.</p>
+          <p>This early directory is open to everyone. Check the listed evidence and discuss suitability and fees directly with each firm.</p>
           <a className="adviser-directory-cta" href="#directory">Explore the Directory ↓</a>
           <form onSubmit={findNearby} className="adviser-search">
             <label htmlFor="directory-query">Find a charity accountant</label>
@@ -119,7 +119,7 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
           </form>
           <nav className="adviser-quick-links" aria-label="Directory shortcuts"><a href="#directory">Browse the A–Z ↓</a><button onClick={() => { setMode("map"); document.getElementById("directory")?.scrollIntoView(); }}>Explore the map ↗</button><button onClick={() => comparison.current?.showModal()}>Your shortlist ({saved.length})</button></nav>
         </div>
-        <aside className="adviser-invite adviser-founder"><Image src="/images/marcus-editorial.webp" alt="Marcus Warry, Chartered Accountant and co-founder of My Social Impact" width={1122} height={1402} priority sizes="(max-width: 700px) 90vw, 420px"/><div><h2>Let’s talk<br/><em>charity accounting.</em></h2><p>I’m Marcus Warry, a Chartered Accountant (ACA) and co-founder of My Social Impact.</p><p>We’re combining professional experience with technology to help charities find the right accounting support.</p><p>If you’re a charity accountant or adviser, I’d love to hear about your work and discuss how you might be featured as the directory develops.</p><a href="mailto:marcus@mysocialimpact.org?subject=Charity%20accountants%20directory">Email Marcus ↗</a></div></aside>
+        <aside className="adviser-invite adviser-founder"><Image src="/images/marcus-editorial.webp" alt="Marcus Warry, Chartered Accountant and co-founder of My Social Impact" width={1122} height={1402} priority sizes="(max-width: 700px) 90vw, 420px"/><div><h2>Let’s talk<br/><em>charity accounting.</em></h2><p>I’m Marcus Warry, a Chartered Accountant (ACA) and co-founder of My Social Impact.</p><p>Are you a charity accountant or adviser? I’d love to hear about your work and discuss your inclusion as the directory develops.</p><a href="mailto:marcus@mysocialimpact.org?subject=Charity%20accountants%20directory">Email Marcus ↗</a></div></aside>
         <div className="adviser-icaew"><a href="https://www.icaew.com/" target="_blank" rel="noopener noreferrer">ICAEW<span>Chartered Accountants</span></a><p>We’re prioritising ICAEW Chartered Accountants and firms, using source records to check credentials and build a clearer picture of charity-sector experience. ICAEW membership is not a guarantee of affordability, specialist expertise or service quality. This independent directory is not an ICAEW endorsement.</p><details><summary>About the directory</summary><p>We haven’t personally assessed every firm. Inclusion is based on stated charity specialisms and public information. Each profile links to its sources. Map pins represent office postcode centres, not entrances.</p></details></div>
       </div>
     </FolderHero>

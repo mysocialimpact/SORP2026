@@ -1,0 +1,3 @@
+320px: logos, three services, registration gate, anonymous drop safety, file validation and signed-in upload handoff passed (controlled upload API).
+390px: logos, three services, registration gate, anonymous drop safety, file validation and signed-in upload handoff passed (controlled upload API).
+1440px: logos, three services, registration gate, anonymous drop safety, file validation and signed-in upload handoff passed (controlled upload API).

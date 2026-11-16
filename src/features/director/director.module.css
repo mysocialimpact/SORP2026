@@ -88,10 +88,11 @@
 .hero {
   position: relative;
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
   max-width: 1600px;
   margin: auto;
-  padding: 45px max(28px, 5vw) 0;
+  padding: 48px max(28px, calc((100vw - 1280px) / 2)) 0;
   background:
     radial-gradient(ellipse at 90% 60%, #ffd7c6, transparent 54%),
     linear-gradient(#d9ff68 0%, #ecf4d6 9%, var(--paper) 38%);
@@ -103,7 +104,7 @@
   z-index: 1;
 }
 .hero h1 {
-  font-size: clamp(48px, 5.5vw, 84px);
+  font-size: clamp(46px, 4.7vw, 76px);
   font-weight: 650;
   margin: 28px 0;
 }
@@ -111,8 +112,8 @@
   color: #a92752;
 }
 .hero .lead {
-  font-size: clamp(23px, 2.2vw, 32px);
-  line-height: 1.3;
+  font-size: clamp(22px, 1.8vw, 27px);
+  line-height: 1.4;
   margin-bottom: 20px;
 }
 .heroCopy > p:not(.kicker) {
@@ -125,11 +126,12 @@
 }
 .heroActions {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 25px;
-  margin: 30px 0 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  margin: 28px 0 0;
 }
+.heroActions > p { margin:0; font-size:14px; line-height:1.6; }
 .primary,
 .secondary {
   display: inline-flex;
@@ -146,14 +148,12 @@
 .primary {
   background: var(--pink);
   color: var(--ink);
-  box-shadow: 4px 4px 0 var(--ink);
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
+  box-shadow: none;
+  transition: background-color 0.15s, color 0.15s;
 }
 .primary:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--ink);
+  background: var(--ink);
+  color: #fff;
 }
 .secondary {
   background: var(--paper);
@@ -184,7 +184,7 @@
   position: relative;
   width: min(100%, 510px);
   height: auto;
-  max-height: 680px;
+  max-height: 620px;
   object-fit: contain;
   object-position: bottom;
   z-index: 1;
@@ -727,6 +727,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 35px;
 }
+.partnerName { font-size:48px; font-weight:600; letter-spacing:-.04em; color:#fff; }
 .partnerGrid article {
   border-top: 1px solid #142e3c33;
   padding-top: 25px;
@@ -775,6 +776,7 @@
 }
 .bookingClosed { grid-template-columns: 1fr; }
 .bookingClosed > div:first-child { max-width: 700px; }
+.booking > div:first-child > .primary { margin-top: 24px; }
 .booking h2 {
   margin: 22px 0;
 }
@@ -868,7 +870,7 @@
     min-height: 0;
   }
   .hero h1 {
-    font-size: 55px;
+    font-size: clamp(44px, 5.7vw, 55px);
   }
   .cowNote {
     right: -10px;
@@ -916,8 +918,9 @@
     padding-bottom: 30px;
   }
   .heroActions {
-    gap: 22px;
+    gap: 14px;
   }
+  .heroActions > p { font-size:14px; }
   .cowStage {
     max-width: 430px;
     width: 90%;

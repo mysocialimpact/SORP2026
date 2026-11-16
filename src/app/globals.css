@@ -1803,4 +1803,10 @@ h2 em {
   }
 }
 .beta-account-note { max-width:660px; font-size:14px; line-height:1.6; margin:16px 0; }
+.product-entry { display:flex; flex-direction:column; align-items:flex-start; gap:14px; margin-top:28px; }
+.product-entry .beta-tool-action { margin:0; }
+main .product-entry .beta-account-note { margin:0; font-size:14px; line-height:1.6; }
+.beta-tool-action { gap:24px; min-height:48px; text-decoration:none; }
+.beta-tool-action > svg { flex-shrink:0; }
+.product-example-link { display:inline-flex; align-items:center; min-height:44px; font-size:14px; text-underline-offset:4px; }
 .beta-account-note a { text-decoration:underline; text-underline-offset:3px; }

@@ -1,0 +1,54 @@
+
+Running 32 tests using 2 workers
+
+(node:14069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14067) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/homepage-beta.spec.ts:26:5 › other public pages use the same discreet beta status (2.5s)
+  ✓   2 [desktop] › tests/homepage-beta.spec.ts:3:5 › homepage public beta message is slim, single-line and scrolls away (3.0s)
+  ✓   3 [desktop] › tests/sample-charity.spec.ts:3:5 › the fictional walkthrough connects the four products and explains locked stages (1.9s)
+  ✓   5 [desktop] › tests/sample-charity.spec.ts:33:5 › signed-in demo request uses the account email without asking for more details (1.6s)
+  ✓   4 [desktop] › tests/sample-charity.spec.ts:14:5 › demo request retains visitor email after failure and only confirms an accepted request (3.7s)
+(node:14487) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   7 [desktop] › tests/onboarding-flagship.spec.ts:101:5 › charity search shows real waiting, ambiguous results, and recoverable no-match and errors (5.0s)
+  ✓   6 [desktop] › tests/onboarding-flagship.spec.ts:73:5 › three essentials allow registration without any optional details and celebrate only on success (6.9s)
+  ✓   8 [desktop] › tests/onboarding-flagship.spec.ts:128:5 › a slow saved-draft response does not override the visitor's manual mode (4.2s)
+  ✓  10 [desktop] › tests/onboarding-flagship.spec.ts:203:5 › manual corrections travel with Send without an extra save request (2.5s)
+  ✓  11 [desktop] › tests/onboarding-flagship.spec.ts:215:5 › a repeated assistant reply appears only once, as the current reply (1.8s)
+  ✓   9 [desktop] › tests/onboarding-flagship.spec.ts:142:5 › first answer renders immediately during a slow response; all eight fields share state (9.0s)
+  ✓  13 [desktop] › tests/onboarding-flagship.spec.ts:256:5 › trustee and employer remain distinct; optional conversation answers populate the same editable boxes (5.0s)
+  ✓  12 [desktop] › tests/onboarding-flagship.spec.ts:234:5 › manual route requires charity, allows optional blanks, preserves return route and has no overflow (8.7s)
+  ✓  14 [desktop] › tests/onboarding-flagship.spec.ts:270:5 › reduced motion keeps progress usable and service errors remain visible (4.4s)
+  ✓  16 [desktop] › tests/onboarding-flagship.spec.ts:307:7 › microphone browser contract › recording survives unavailable visualisation (3.2s)
+(node:15364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  15 [desktop] › tests/onboarding-flagship.spec.ts:284:7 › microphone browser contract › actual MediaRecorder lifecycle with fixture transcription and editable text (6.5s)
+(node:15456) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [mobile] › tests/homepage-beta.spec.ts:3:5 › homepage public beta message is slim, single-line and scrolls away (2.9s)
+  ✓  18 [mobile] › tests/homepage-beta.spec.ts:26:5 › other public pages use the same discreet beta status (3.3s)
+  ✓  19 [mobile] › tests/sample-charity.spec.ts:3:5 › the fictional walkthrough connects the four products and explains locked stages (2.5s)
+  ✓  21 [mobile] › tests/sample-charity.spec.ts:33:5 › signed-in demo request uses the account email without asking for more details (2.6s)
+(node:15823) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  20 [mobile] › tests/sample-charity.spec.ts:14:5 › demo request retains visitor email after failure and only confirms an accepted request (4.0s)
+(node:15833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  22 [mobile] › tests/onboarding-flagship.spec.ts:73:5 › three essentials allow registration without any optional details and celebrate only on success (7.9s)
+  ✓  23 [mobile] › tests/onboarding-flagship.spec.ts:101:5 › charity search shows real waiting, ambiguous results, and recoverable no-match and errors (7.6s)
+  ✓  24 [mobile] › tests/onboarding-flagship.spec.ts:128:5 › a slow saved-draft response does not override the visitor's manual mode (5.0s)
+  -  26 [mobile] › tests/onboarding-flagship.spec.ts:203:5 › manual corrections travel with Send without an extra save request
+  ✓  27 [mobile] › tests/onboarding-flagship.spec.ts:215:5 › a repeated assistant reply appears only once, as the current reply (3.0s)
+  ✓  25 [mobile] › tests/onboarding-flagship.spec.ts:142:5 › first answer renders immediately during a slow response; all eight fields share state (13.3s)
+  ✓  28 [mobile] › tests/onboarding-flagship.spec.ts:234:5 › manual route requires charity, allows optional blanks, preserves return route and has no overflow (11.5s)
+  ✓  29 [mobile] › tests/onboarding-flagship.spec.ts:256:5 › trustee and employer remain distinct; optional conversation answers populate the same editable boxes (7.3s)
+  -  31 [mobile] › tests/onboarding-flagship.spec.ts:284:7 › microphone browser contract › actual MediaRecorder lifecycle with fixture transcription and editable text
+  -  32 [mobile] › tests/onboarding-flagship.spec.ts:307:7 › microphone browser contract › recording survives unavailable visualisation
+  ✓  30 [mobile] › tests/onboarding-flagship.spec.ts:270:5 › reduced motion keeps progress usable and service errors remain visible (4.2s)
+
+  3 skipped
+  29 passed (1.4m)

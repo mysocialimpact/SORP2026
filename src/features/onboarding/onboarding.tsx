@@ -577,7 +577,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
                 {!selected && (
                   <div className="charity-discovery">
                     {["searching", "confirming"].includes(discovery) && <div className="charity-discovery-progress" role="status"><span className="discovery-orbit" aria-hidden="true" /><strong>{discovery === "searching" ? "Searching the official charity register…" : "Confirming your chosen charity…"}</strong><p>Your details stay safe while we find the right record.</p></div>}
-                    <p>Separate from your employer. Find and confirm the charity you want to explore.</p>
+                    <p>Choose the charity you want to explore — it can be different from your employer.</p>
                     {charityOptions(state).length > 0 && (
                       <div className="charity-mentions">
                         {charityOptions(state).map((c) => (
@@ -595,7 +595,6 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
                         ))}
                       </div>
                     )}
-                    <p>We confirm an official charity record so your saved work and report are attached to the right organisation. The public sample and free demo do not need confirmation.</p>
                     <div className="charity-search">
                       <label htmlFor="charity-lookup">
                         Charity name or registration number
@@ -612,7 +611,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
                         <button type="button" disabled={busy || !query.trim()} onClick={() => void search()}>Find →</button>
                       </div>
                     </div>
-                    <p>Names can be ambiguous. If a name fails, enter the charity’s registration number above. Your other details will stay in place.</p>
+                    <p>We’ll check the official register before attaching your work to this charity.</p>
                     {searched && !candidates.length && (
                       <p>
                         No reliable registry match yet. Try the charity number
@@ -679,9 +678,9 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
         <div className="onboarding-heading">
           <p className="onboarding-beta-label">Free Public Beta</p>
           <h1>Let’s Get Started<span>.</span></h1>
-          <p>Represent a charity or advise one? Explore our available tools for one charity, save your progress and come back whenever you like.</p>
-          <p className="onboarding-beta-detail">Just your name, email and charity to start. No payment or credit card required. We recommend beginning with Are You SORP Ready?</p>
-          <fieldset className="onboarding-audience"><legend>How are you working with your charity? <small>Optional</small></legend>
+          <p>One free account for one charity. Explore the tools, save your work and return any time.</p>
+          <p className="onboarding-beta-detail">Just your name, email and charity. Talk to us or fill in the form. No card required.</p>
+          <fieldset className="onboarding-audience"><legend>Your connection to the charity <small>Optional</small></legend>
             <label><input type="radio" name="beta-audience" value="charity" checked={audience === "charity"} onChange={() => writeAudience("charity")} />I represent a charity</label>
             <label><input type="radio" name="beta-audience" value="adviser" checked={audience === "adviser"} onChange={() => writeAudience("adviser")} />I advise a charity</label>
           </fieldset>

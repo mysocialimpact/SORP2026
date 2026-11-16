@@ -1,0 +1,74 @@
+[
+  {
+    "width": 375,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  },
+  {
+    "width": 430,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  },
+  {
+    "width": 768,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  },
+  {
+    "width": 900,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  },
+  {
+    "width": 1024,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  },
+  {
+    "width": 1280,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  },
+  {
+    "width": 1440,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  },
+  {
+    "width": 1920,
+    "navigation": "pass",
+    "keyboardTabs": "pass",
+    "heroSpacing": "pass",
+    "allFiveEntranceGates": "pass",
+    "manualForm": "pass",
+    "accessibilityViolations": 0
+  }
+]

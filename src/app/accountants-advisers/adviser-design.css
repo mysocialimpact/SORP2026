@@ -6,7 +6,9 @@ body:has(.adviser-directory) .product-folder-sheet-edge { background: #cfddcf; }
 .adviser-hero { position: relative; padding: 64px 0 28px; }
 .adviser-hero::before { content: ""; pointer-events: none; position: absolute; inset: 0; opacity: .2; background: repeating-linear-gradient(0deg, transparent 0 35px, #7d95731c 36px); mask-image: linear-gradient(90deg,transparent,black); }
 .adviser-hero-grid { position: relative; display: grid; grid-template-columns: minmax(0,1.65fr) minmax(300px,1fr); gap: 46px 7%; align-items: start; }
-.adviser-directory h1 { font-size: clamp(56px,6.9vw,100px); }
+.adviser-directory h1 { font-size: clamp(50px,5.4vw,80px); line-height:1.04; }
+.adviser-hero-copy > p:not(.directory-eyebrow) { max-width:640px; }
+.adviser-hero-copy > p + p { margin-top:18px; }
 .adviser-intro { font-size: 21px; margin-bottom: 25px; }
 .adviser-search { max-width: 620px; }
 .adviser-search label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
@@ -149,10 +151,11 @@ body:has(.adviser-directory) .product-folder-sheet-edge { background: #cfddcf; }
   .adviser-future > div { display: block; }
   .adviser-future p { margin-top: 24px; }
 }
-.adviser-founder.adviser-invite { padding:0; overflow:hidden; }
-.adviser-founder > img { display:block; width:100%; height:auto; aspect-ratio:1; object-fit:cover; object-position:center 45%; }
+.adviser-founder.adviser-invite { padding:0; overflow:hidden; transform:none; box-shadow:0 8px 28px #263e3110; }
+.adviser-founder > img { display:block; width:100%; height:auto; aspect-ratio:1.15; object-fit:cover; object-position:center 40%; }
 .adviser-founder > div { padding:26px; }
 .adviser-founder h2 { font-size:clamp(30px,3vw,44px); }
 .adviser-founder h2 em { color:#d9e8bf; }
+.adviser-founder h2 { margin-bottom:18px; line-height:1.08; }
 .adviser-founder p + p { margin-top:12px; }
-.adviser-directory-cta { display:inline-flex; padding:13px 20px; margin:6px 0 16px; background:#242329; color:#fff !important; border-radius:4px; font-weight:600; }
+.adviser-directory-cta { display:inline-flex; padding:13px 20px; margin:24px 0; background:#242329; color:#fff !important; border-radius:4px; font-weight:600; }
