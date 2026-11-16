@@ -37,12 +37,13 @@ try {
 
     await page.goto(base + "/get-started/");
     await expect(page.getByRole("heading", { name: "Let’s Get Started." })).toBeVisible();
+    await page.getByRole("button", { name: "Fill In the Essentials", exact: true }).click();
     await page.getByRole("radio", { name: "I represent a charity" }).check();
     await page.reload();
+    await page.getByRole("button", { name: "Fill In the Essentials", exact: true }).click();
     await expect(page.getByRole("radio", { name: "I represent a charity" })).toBeChecked();
     const audience = width === 390 ? "adviser" : "charity";
     await page.getByRole("radio", { name: audience === "adviser" ? "I advise a charity" : "I represent a charity" }).check();
-    await page.getByRole("button", { name: "Fill in the form" }).click();
     await page.locator('input[name="name"]').fill("Synthetic Beta Tester");
     await page.locator('input[name="email"]').fill("beta@example.invalid");
     await expect(page.locator('.profile-next button')).toBeDisabled();

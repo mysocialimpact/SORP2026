@@ -25,6 +25,9 @@ export async function POST(request: Request) {
   // This onboarding journey requires a server-confirmed registry selection.
   // Do not change existing login, invitation or legacy account endpoints.
   if (payload.action === "signup" && payload.progress?.onboarding) {
+    if (!["charity", "adviser"].includes(payload.progress.onboarding.audience)) {
+      return Response.json({ error: "Choose whether you represent or advise the charity." }, { status: 422 });
+    }
     const { enabled, getSession, sameOrigin } = await import("../../../lib/onboarding/server.ts");
     const { accountReady } = await import("../../../lib/onboarding/state.ts");
     try { sameOrigin(request); } catch { return Response.json({ error: "Please use this website to create your account." }, { status: 403 }); }

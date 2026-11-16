@@ -39,6 +39,9 @@ import {
 import type { Candidate } from "@/app/sorp-public-model";
 export const runtime = "nodejs";
 export const maxDuration = 300;
+// Configuration is checked without making a paid model call. Turn failures
+// explicitly withdraw this capability so the UI can offer the shared form.
+const conversationConfigured = () => !!(process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY);
 const snapshot = (session: Awaited<ReturnType<typeof getSession>>) =>
   session
     ? {
@@ -46,6 +49,7 @@ const snapshot = (session: Awaited<ReturnType<typeof getSession>>) =>
         messages: session.messages,
         question: nextQuestion(session.state),
         selected: session.state.charity.confirmed,
+        conversationAvailable: conversationConfigured(),
       }
     : {};
 const json = (data: unknown, status = 200) =>
@@ -114,12 +118,13 @@ export async function GET(
       });
     }
     const session = await getSession(request);
-    if (!session) return json({ available: true });
+    if (!session) return json({ available: true, conversationAvailable: conversationConfigured() });
     return json({
       available: true,
       state: session.state,
       messages: session.messages,
       selected: session.selected,
+      conversationAvailable: conversationConfigured(),
     });
   } catch (error) {
     if (error instanceof StaleConversation)
@@ -173,9 +178,10 @@ export async function POST(
           state: existing.state,
           messages: existing.messages,
           selected: existing.selected,
+          conversationAvailable: conversationConfigured(),
         });
       const id = await createSession(attributionFrom(body.attribution));
-      const response = json({ available: true });
+      const response = json({ available: true, conversationAvailable: conversationConfigured() });
       response.headers.append(
         "set-cookie",
         `${sessionCookie}=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400${request.headers.get("x-forwarded-proto") === "https" || new URL(request.url).protocol === "https:" ? "; Secure" : ""}`,
@@ -304,6 +310,7 @@ export async function POST(
       );
       let next = before,
         notice = "";
+      let conversationAvailable = conversationConfigured();
       try {
         if (quick) next = quick;
         else {
@@ -318,6 +325,7 @@ export async function POST(
         }
       } catch (e) {
         next = fallbackTurn(before, body.message, body.skip === true);
+        conversationAvailable = false;
         notice =
           e instanceof Error
             ? e.message
@@ -330,6 +338,7 @@ export async function POST(
       const saved = await saveSession(reserved, next, messages);
       const response = json({
         ...snapshot(saved),
+        conversationAvailable,
         notice,
         objective: nextObjective(saved.state),
         lookup:
