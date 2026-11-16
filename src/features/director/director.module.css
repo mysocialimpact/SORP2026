@@ -8,6 +8,8 @@
   font-family: var(--sans), sans-serif;
   overflow: clip;
 }
+.bookingStandalone { --pink:#efc6d8; margin-top:32px; scroll-margin-top:180px; }
+.bookingStandalone .bookingPanel { width:100%; max-width:780px; margin-inline:auto; scroll-margin-top:180px; }
 .page * {
   box-sizing: border-box;
 }
