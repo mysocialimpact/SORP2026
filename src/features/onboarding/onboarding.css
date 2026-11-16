@@ -226,3 +226,107 @@ body:has(.onboarding-page) > .platform-sticky-navigation { position:relative; to
   .voice-wave { flex-basis:auto; margin-left:0; }
 }
 @media(prefers-reduced-motion:reduce) { .voice-recording .voice-button { animation:none; } .voice-wave i { transition:none; } }
+
+/* A welcome first; one shared workspace appears when an approach is chosen. */
+.onboarding-page { background:#faf9f6; }
+.onboarding-shell { max-width:1320px; padding:40px 40px 0; }
+.onboarding-heading { position:relative; display:grid; grid-template-columns:1.08fr 1fr; align-items:center; gap:64px; padding:22px 0 54px; margin:0; }
+.onboarding-welcome-title,.onboarding-welcome-copy { position:relative; z-index:1; }
+.onboarding-heading .onboarding-beta-label { display:flex; align-items:center; gap:9px; padding:0; margin:0 0 24px; background:none; color:#476050; font:650 11px/1.5 var(--sans); letter-spacing:.09em; text-transform:uppercase; }
+.onboarding-beta-label::before { content:""; width:6px; height:6px; border-radius:50%; background:#cc4824; }
+.onboarding-heading h1 { font:550 clamp(64px,7.6vw,106px)/.98 var(--sans); letter-spacing:-.065em; margin:0; text-wrap:initial; }
+.onboarding-heading h1 > span { color:#db4925; }
+.onboarding-welcome-copy { max-width:485px; padding-top:28px; }
+.onboarding-welcome-copy p { margin:0 0 18px; font-size:17px; line-height:1.6; }
+.onboarding-welcome-copy .onboarding-welcome-lead { font:400 clamp(30px,3.1vw,41px)/1.12 var(--sans); letter-spacing:-.025em; margin-bottom:20px; max-width:24ch; }
+.onboarding-welcome-copy .onboarding-welcome-promise { color:#62645f; font-size:14px; line-height:1.6; margin:0; max-width:47ch; }
+.onboarding-welcome-art { position:absolute; width:115px; height:115px; right:-12px; top:-34px; pointer-events:none; }
+.onboarding-invitation { border-top:1px solid #d6d5cd; padding-top:32px; }
+.onboarding-philosophy { display:grid; grid-template-columns:1.08fr 1fr; gap:64px; align-items:center; margin-bottom:25px; }
+.onboarding-philosophy h2 { font:500 clamp(24px,2.4vw,32px)/1.15 var(--sans); letter-spacing:-.04em; margin:0; }
+.onboarding-philosophy p { max-width:47ch; font-size:15px; line-height:1.65; color:#62645f; margin:0; }
+.onboarding-methods { display:grid; grid-template-columns:1.08fr 1fr; gap:18px; }
+.onboarding-method { display:grid; grid-template-columns:48px minmax(0,1fr) 20px; align-items:center; gap:20px; min-height:138px; padding:26px; border:1px solid #c9cac1; border-radius:12px; text-align:left; background:#fffdf8; color:var(--ink); font-family:var(--sans); cursor:pointer; transition:transform .2s,box-shadow .2s,border-color .2s; }
+.onboarding-method.method-conversation { background:#28282b; border-color:#28282b; color:#fffdf8; }
+.onboarding-method .method-icon { display:grid; place-items:center; width:48px; height:48px; border-radius:50%; background:#eeeee8; color:#344e43; }
+.method-conversation .method-icon { background:#d9f19a; color:#263b35; }
+.onboarding-method svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.5; flex-shrink:0; }
+.method-copy strong { display:block; font-size:clamp(18px,1.6vw,23px); font-weight:550; line-height:1.25; letter-spacing:-.025em; }
+.method-copy > span { display:block; margin-top:8px; font-size:13px; line-height:1.5; color:#62645f; }
+.method-conversation .method-copy > span { color:#dddcd5; }
+.onboarding-method:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 10px 24px #24232912; border-color:#9ba788; }
+.onboarding-method[aria-pressed="true"] { outline:2px solid #c04421; outline-offset:3px; }
+.onboarding-method:disabled { opacity:1!important; cursor:default; }
+.conversation-unavailable .method-conversation { background:#efeee9; color:#6a6b64; border-color:#d4d4cb; }
+.conversation-unavailable .method-conversation .method-icon { background:#dedfd5; color:#6a6b64; }
+.conversation-unavailable .method-conversation .method-copy > span { color:#66685f; }
+.conversation-unavailable .method-form { background:#28282b; color:#fffdf8; border-color:#28282b; }
+.conversation-unavailable .method-form .method-copy > span { color:#dddcd5; }
+.onboarding-entry-note { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:17px 0 6px; color:#686960; font-size:12px; }
+.onboarding-entry-note p { margin:0; }.onboarding-entry-note a { color:var(--ink); text-decoration:underline; text-underline-offset:4px; }
+.onboarding-session { margin-top:28px; scroll-margin-top:24px; }
+.onboarding-session[hidden] { display:none; }
+.onboarding-session:focus { outline:none; }
+.onboarding-session:not([hidden]) { animation:onboarding-entry .28s ease-out both; }
+@keyframes onboarding-entry { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.onboarding-audience { margin:0 0 24px; gap:12px; }
+.onboarding-audience legend { padding-bottom:12px; font-size:14px; }
+.onboarding-audience label { background:#fffdf8; border-color:#cecec4; }
+.onboarding-session:has(.mode-form) .onboarding-audience { max-width:780px; margin-inline:auto; }
+.onboarding-notice { display:flex; align-items:center; flex-wrap:wrap; gap:8px 18px; border:0; border-radius:8px; background:#eeeee6; color:#494e43; font-size:14px; line-height:1.6; padding:16px 20px; }
+.onboarding-notice .onboarding-text-button { padding:0; }
+.onboarding-workspace { border-color:#d5d3cb; box-shadow:0 12px 38px #24232907; }
+.onboarding-conversation { background:#fffefb; }
+.conversation-topline { background:#f6f3ed; }
+.onboarding-profile { background:#f4f3ef; border-color:#d5d3cb; }
+.profile-milestones { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.has-begun .onboarding-heading { display:block; padding:0 0 24px; }
+.has-begun .onboarding-heading h1 { font-size:40px; letter-spacing:-.05em; }
+.has-begun .onboarding-heading h1 br,.has-begun .onboarding-beta-label,.has-begun .onboarding-welcome-copy,.has-begun .onboarding-welcome-art,.has-begun .onboarding-philosophy { display:none; }
+.has-begun .onboarding-invitation { padding-top:20px; }
+.has-begun .onboarding-method { padding:14px 20px; min-height:70px; grid-template-columns:32px minmax(0,1fr) 18px; gap:12px; }
+.has-begun .method-icon { width:32px; height:32px; }
+.has-begun .method-copy strong { font-size:16px; }.has-begun .method-copy > span { display:none; }
+.onboarding-footer { padding-block:28px; border-top:1px solid #e1ded7; margin-top:28px; }
+@media(max-width:1000px) {
+ .onboarding-shell { padding:32px 24px 0; }
+ .onboarding-heading,.onboarding-philosophy { gap:32px; }
+ .onboarding-welcome-art { width:90px; height:90px; top:-24px; }
+ .onboarding-method { padding:22px; gap:12px; grid-template-columns:40px minmax(0,1fr) 16px; }
+ .onboarding-method .method-icon { width:40px; height:40px; }
+}
+@media(max-width:700px) {
+ .onboarding-shell { padding:28px 20px 0; }
+ .onboarding-heading { grid-template-columns:1fr; gap:18px; padding:0 0 22px; }
+ .onboarding-heading h1 { font-size:clamp(54px,16vw,72px); }
+ .onboarding-heading .onboarding-beta-label { margin-bottom:18px; }
+ .onboarding-welcome-art { right:0; top:5px; width:80px; height:80px; }
+ .onboarding-welcome-copy { padding:0; }
+ .onboarding-welcome-copy .onboarding-welcome-lead { font-size:26px; max-width:23ch; margin-bottom:10px; }
+ .onboarding-welcome-copy p { font-size:14px; line-height:1.6; margin-bottom:12px; }
+ .onboarding-welcome-copy .onboarding-welcome-promise { font-size:12px; }
+ .onboarding-invitation { padding-top:20px; }
+ .onboarding-philosophy { grid-template-columns:1fr; gap:10px; margin-bottom:18px; }
+ .onboarding-philosophy h2 { font-size:24px; }.onboarding-philosophy h2 br { display:none; }
+ .onboarding-philosophy p { font-size:13px; line-height:1.55; }
+ .onboarding-methods { grid-template-columns:1fr; gap:12px; }
+ .onboarding-method { min-height:105px; padding:18px; grid-template-columns:38px minmax(0,1fr) 16px; gap:14px; }
+ .onboarding-method .method-icon { width:38px; height:38px; }.method-copy strong { font-size:18px; }.method-copy > span { font-size:12px; margin-top:5px; }
+ .onboarding-entry-note { font-size:11px; gap:10px; padding-top:16px; }
+ .has-begun .onboarding-heading h1 { font-size:32px; }.has-begun .onboarding-heading { padding-bottom:20px; }
+ .has-begun .onboarding-methods { grid-template-columns:1fr 1fr; gap:10px; }
+ .has-begun .onboarding-method { display:flex; gap:8px; padding:12px; min-height:72px; }
+ .has-begun .method-copy strong { font-size:13px; line-height:1.35; }.has-begun .onboarding-method > svg { display:none; }
+ .has-begun .onboarding-method .method-icon { width:25px; height:25px; flex-shrink:0; background:transparent; color:inherit; }
+ .has-begun .onboarding-method .method-icon svg { width:20px; height:20px; }
+ .onboarding-audience { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+ .onboarding-audience legend { font-size:13px; }.onboarding-audience label { padding:12px 10px; font-size:12px; line-height:1.4; gap:7px; }
+ .onboarding-audience input { flex:0 0 16px; width:16px; height:16px; margin:0; }
+ .onboarding-session { margin-top:22px; }
+ .onboarding-profile { background:#f4f3ef; }.onboarding-conversation { background:#fffefb; }
+}
+/* Keep the existing product tabs scrollable at narrow tablet widths on this page. */
+@media(min-width:701px) and (max-width:1000px) {
+ body:has(.onboarding-page) .product-folder-tabs { overflow-x:auto; width:calc(100% - 48px); scrollbar-width:none; }
+ body:has(.onboarding-page) .product-folder-tabs-track { min-width:900px; }
+}

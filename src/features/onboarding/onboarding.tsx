@@ -51,7 +51,7 @@ async function post(action: string, body: unknown) {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(action === "complete" ? { ...(body as object), audience: readAudience() } : body),
-    signal: AbortSignal.timeout(action === "search" ? 15000 : 30000),
+    signal: AbortSignal.timeout(action === "start" ? 8000 : action === "search" ? 15000 : 30000),
   });
   const data = await response.json();
   if (!response.ok)
@@ -59,7 +59,7 @@ async function post(action: string, body: unknown) {
       new Error(
         data.error || "We couldn’t complete that yet. Please try again.",
       ),
-      { snapshot: data.state ? data : undefined },
+      { snapshot: data.state ? data : undefined, status: response.status },
     );
   return data;
 }
@@ -78,6 +78,8 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     destination = safeDestination(params.get("next") || params.get("return") || "/are-you-sorp-ready/review/?entry=intro");
   const [state, setState] = useState<Conversation>(initialConversation),
     [mode, setMode] = useState<"conversation" | "form">("conversation");
+  const [begun, setBegun] = useState(false);
+  const [conversationAvailability, setConversationAvailability] = useState<"checking" | "available" | "unavailable">("checking");
   const [draft, setDraft] = useState(""),
     [busy, setBusy] = useState(true),
     [notice, setNotice] = useState(""),
@@ -126,12 +128,12 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     candidates = state.charity.candidates;
   const objective = nextObjective(state),
     completed = objective === "complete";
-  const accountReady = canCreateAccount(state);
+  const accountReady = canCreateAccount(state) && !!audience;
   const fieldComplete = (key: FieldKey) =>
     key === "email"
       ? validEmail(state.facts.email)
       : validEntity(state.facts[key], key);
-  const count = essentialKeys.filter(fieldComplete).length + Number(!!selected);
+  const count = essentialKeys.filter(fieldComplete).length + Number(!!selected) + Number(!!audience);
   const product = destination.startsWith("/ask-sorp")
     ? "Ask SORP"
     : destination.startsWith("/are-you-sorp-ready")
@@ -232,10 +234,9 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     // The timer tracks field revisions; the promise reads the current canonical snapshot.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editVersion, service]);
-  async function start(next: "conversation" | "form") {
+  async function start() {
     if (started.current) return;
     started.current = true;
-    interacted.current = true;
     // Loading a draft must not override a method the visitor has just chosen.
     setNotice("");
     setBusy(true);
@@ -253,19 +254,29 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     try {
       const data = await post("start", { attribution });
       setService(true);
+      setConversationAvailability(data.conversationAvailable === true ? "available" : "unavailable");
       if (data.state) {
         accept(data);
       }
     } catch {
+      started.current = false;
       setService(false);
-      if (next === "conversation")
-        setNotice(
-          "Conversation assistance is unavailable here. Clear details can still fill your profile; please check them or edit directly.",
-        );
+      setConversationAvailability("unavailable");
+      setNotice("We couldn’t connect just now. You can add your details, then retry to confirm your charity.");
     }
     setBusy(false);
     lock.current = false;
-    draftRef.current?.focus({ preventScroll: true });
+  }
+  function chooseMode(next: "conversation" | "form") {
+    if (next === "conversation" && conversationAvailability !== "available") return;
+    interacted.current = true;
+    setMode(next);
+    setBegun(true);
+    requestAnimationFrame(() => {
+      const session = document.getElementById("onboarding-session");
+      session?.scrollIntoView({ behavior: "auto", block: "start" });
+      session?.focus({ preventScroll: true });
+    });
   }
   function update(next: Conversation, previous: Conversation) {
     const keys = editableKeys.filter(
@@ -348,7 +359,11 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
         setHistory(data.messages?.length
           ? data.messages
           : (items) => [...items, { role: "assistant", text: nextQuestion(normaliseConversation(data.state)) }].slice(-22));
-        setNotice(data.notice || "");
+        if (data.conversationAvailable === false) {
+          setConversationAvailability("unavailable");
+          setMode("form");
+          setNotice("Let’s carry on with the essentials for now. Your details are here, ready to check and edit.");
+        } else setNotice(data.notice || "");
         if (accountCreated) await post("complete", { fields: currentState.current.facts });
         if (data.lookup) {
           setQuery(data.lookup);
@@ -363,6 +378,11 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     } catch (e) {
       if (!skip) setDraft(message);
       recover(e);
+      if ((e as { status?: number }).status === 503 || e instanceof TypeError || (e instanceof DOMException && e.name === "TimeoutError")) {
+        setConversationAvailability("unavailable");
+        setMode("form");
+        setNotice("The conversation is taking a break. Your details are still here — carry on with the essentials.");
+      }
     } finally {
       clearTimeout(reassurance);
       lock.current = false;
@@ -444,8 +464,8 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
   async function createAccount(event: FormEvent) {
     event.preventDefault();
     if (lock.current) return;
-    if (!canCreateAccount(currentState.current)) {
-      setAccountError("Complete your details and confirm the official charity record before creating your account.");
+    if (!canCreateAccount(currentState.current) || !readAudience()) {
+      setAccountError("Add your details, choose your connection to the charity and confirm its official record first.");
       return;
     }
     if (password !== confirmPassword) {
@@ -525,7 +545,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     const controller = new AbortController();
     void fetch("/api/readiness-account/", {
       cache: "no-store",
-      signal: controller.signal,
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(8000)]),
     })
       .then(async (response) => {
         const account = await response.json();
@@ -533,7 +553,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
         if (!response.ok || !account.signedIn) {
           const response = await fetch("/api/onboarding/session/", {
             cache: "no-store",
-            signal: controller.signal,
+            signal: AbortSignal.any([controller.signal, AbortSignal.timeout(8000)]),
           });
           const saved = await response.json();
           if (
@@ -547,10 +567,14 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
               ))
           ) {
             accept(saved);
+            started.current = true;
             setService(true);
+            setConversationAvailability(saved.conversationAvailable === true ? "available" : "unavailable");
+            setMode(saved.conversationAvailable === true ? "conversation" : "form");
+            setBegun(true);
             setBusy(false);
           } else if (!controller.signal.aborted) {
-            void start("conversation");
+            void start();
           }
           return;
         }
@@ -559,7 +583,7 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
         if (!controller.signal.aborted) window.location.replace(destination);
       })
       .catch(() => {
-        if (!controller.signal.aborted) void start("conversation");
+        if (!controller.signal.aborted) void start();
       });
     return () => controller.abort();
     // Load once per destination. accept reads refs, not a captured state snapshot.
@@ -674,40 +698,61 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
     setEditVersion(v => v + 1);
   }
   return (
-    <main id="main" className="onboarding-page">
+    <main id="main" className={`onboarding-page${begun ? " has-begun" : ""}`}>
       <div className="onboarding-shell">
-        <div className="onboarding-heading">
-          <p className="onboarding-beta-label">Free Public Beta</p>
-          <h1>Let’s Get Started<span>.</span></h1>
-          <p>Represent a charity or advise one? Explore our available tools for one charity, save your progress and come back whenever you like.</p>
-          <p className="onboarding-beta-detail">Just your name, email and charity to start. No payment or credit card required. We recommend beginning with Are You SORP Ready?</p>
-          <fieldset className="onboarding-audience"><legend>How are you working with your charity? <small>Optional</small></legend>
-            <label><input type="radio" name="beta-audience" value="charity" checked={audience === "charity"} onChange={() => writeAudience("charity")} />I represent a charity</label>
-            <label><input type="radio" name="beta-audience" value="adviser" checked={audience === "adviser"} onChange={() => writeAudience("adviser")} />I advise a charity</label>
+        <header className="onboarding-heading">
+          <div className="onboarding-welcome-title">
+            <p className="onboarding-beta-label">Free public beta</p>
+            <h1>Let’s Get <br />Started<span>.</span></h1>
+          </div>
+          <div className="onboarding-welcome-copy">
+            <p className="onboarding-welcome-lead">A better understanding of your charity starts here.</p>
+            <p>Explore useful tools and fresh insights. Help your charity prepare for what’s ahead.</p>
+            <p className="onboarding-welcome-promise">One free account for one charity. Your progress is saved, ready for whenever you return.</p>
+          </div>
+          <svg className="onboarding-welcome-art" aria-hidden="true" viewBox="0 0 180 180" fill="none">
+            <circle cx="92" cy="88" r="56" fill="#d9f19a" />
+            <ellipse cx="87" cy="94" rx="81" ry="31" transform="rotate(-34 87 94)" stroke="#335346" strokeWidth="1" />
+            <path d="M142 20v40M122 40h40M128 26l28 28M128 54l28-28" stroke="#d84a24" strokeWidth="2" />
+            <circle cx="26" cy="129" r="5" fill="#d84a24" />
+          </svg>
+        </header>
+        <section className={`onboarding-invitation${conversationAvailability === "unavailable" ? " conversation-unavailable" : ""}`} aria-label="Choose how to get started">
+          <div className="onboarding-philosophy">
+            <h2>We prefer conversations<br /> to forms.</h2>
+            <p>Tell our AI guide about yourself and your charity. Speak, type or fill in the essentials.</p>
+          </div>
+          <div className="onboarding-methods" aria-label="How to complete your details">
+            <button type="button" className="onboarding-method method-conversation" aria-label={conversationAvailability === "unavailable" ? "Conversation back soon" : "Let’s Have a Conversation"} aria-pressed={begun && mode === "conversation"} aria-controls="onboarding-session" disabled={conversationAvailability !== "available"} onClick={() => chooseMode("conversation")}>
+              <span className="method-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8" /></svg></span>
+              <span className="method-copy"><strong>{conversationAvailability === "unavailable" ? "Conversation back soon" : "Let’s Have a Conversation"}</strong><span>{conversationAvailability === "checking" ? "Getting your guide ready…" : conversationAvailability === "unavailable" ? "You can start with the essentials." : "Speak or type naturally. Our AI guide will help."}</span></span>
+              <Arrow diagonal />
+            </button>
+            <button type="button" className="onboarding-method method-form" aria-label="Fill In the Essentials" aria-pressed={begun && mode === "form"} aria-controls="onboarding-session" onClick={() => chooseMode("form")}>
+              <span className="method-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3" /></svg></span>
+              <span className="method-copy"><strong>Fill In the Essentials</strong><span>Prefer a form? Just a few details to begin.</span></span>
+              <Arrow diagonal />
+            </button>
+          </div>
+          <div className="onboarding-entry-note"><span>No card required.</span><p>Already registered? <Link href={`/login/?next=${encodeURIComponent(destination)}`}>Log in</Link></p></div>
+        </section>
+        <section id="onboarding-session" className="onboarding-session" hidden={!begun} tabIndex={-1} aria-label={mode === "conversation" ? "Your conversation and live form" : "Your essential details"}>
+          <fieldset className="onboarding-audience"><legend>Your connection to the charity</legend>
+            <label><input type="radio" name="beta-audience" value="charity" required checked={audience === "charity"} onChange={() => writeAudience("charity")} />I represent a charity</label>
+            <label><input type="radio" name="beta-audience" value="adviser" required checked={audience === "adviser"} onChange={() => writeAudience("adviser")} />I advise a charity</label>
           </fieldset>
           {previewEmailSandbox && <p className="onboarding-preview-notice">Preview test accounts only: use an address ending @example.invalid. Verification uses a private test inbox, not real email.</p>}
-          <div className="onboarding-entry">
-            <div className="onboarding-modes" aria-label="How to complete your details">
-              <button type="button" aria-pressed={mode === "conversation"} onClick={() => setMode("conversation")}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8" /></svg>
-                Talk to us
-              </button>
-              <button type="button" aria-pressed={mode === "form"} onClick={() => setMode("form")}>Fill in the form <Arrow diagonal /></button>
-            </div>
-            <p>Already registered? <Link href={`/login/?next=${encodeURIComponent(destination)}`}>Log in</Link></p>
-          </div>
-        </div>
-        {accountCreated && <section id="onboarding-success" tabIndex={-1} className="onboarding-celebration" role="status"><span aria-hidden="true">✦</span><h2>Brilliant! You’re ready to go!</h2><p>We’ve found your charity and set up your SORP2026 account.</p><Link className="onboarding-primary" href={destination}>Continue to SORP 2026 →</Link><button type="button" className="onboarding-text-button" onClick={() => { setProfileOpen(true); setMode("form"); document.getElementById("onboarding-profile-form")?.scrollIntoView({ behavior: "auto" }); }}>Tell us a little more (optional)</button></section>}
-        {notice && <p className="onboarding-notice" role="status">{notice}</p>}
+        {accountCreated && <section id="onboarding-success" tabIndex={-1} className="onboarding-celebration" role="status"><span aria-hidden="true">✦</span><h2>Brilliant! You’re ready to go!</h2><p>We’ve found your charity and set up your SORP2026 account.</p><Link className="onboarding-primary" href={destination}>Continue to SORP 2026 →</Link><button type="button" className="onboarding-text-button" onClick={showOptionalDetails}>Tell us a little more (optional)</button></section>}
+        {notice && <p className="onboarding-notice" role="status">{notice}{!service && <button type="button" className="onboarding-text-button" disabled={busy} onClick={() => void start()}>Retry connection</button>}</p>}
         <div className={`onboarding-workspace mode-${mode}${profileOpen ? " profile-open" : ""}`}>
-          <button type="button" className="onboarding-mobile-summary" aria-expanded={profileOpen || mode === "form"} aria-controls="onboarding-profile-form"
+          {(mode === "conversation" || conversationAvailability === "available") && <button type="button" className="onboarding-mobile-summary" aria-expanded={profileOpen || mode === "form"} aria-controls="onboarding-profile-form"
             onClick={() => { if (mode === "form") setMode("conversation"); else setProfileOpen(open => !open); }}>
-            <span><strong>{count}/3 essentials</strong><span>{mode === "form" ? "Back to conversation ↑" : profileOpen ? "Close details ↑" : "Your live form ↓"}</span></span>
+            <span><strong>{count}/4 essentials</strong><span>{mode === "form" ? "Back to conversation ↑" : profileOpen ? "Close details ↑" : "Your live form ↓"}</span></span>
             <span className="mobile-profile-values">{fieldKeys.filter(key => state.facts[key]).map(key => <span key={key}>{state.facts[key]}</span>)}</span>
             {reward && <span className="mobile-profile-reward" role="status">✓ {reward.title}</span>}
-          </button>
+          </button>}
           <section className="onboarding-conversation" aria-label="Your introduction">
-            <div className="conversation-topline"><span><i /> YOUR CONVERSATION</span><span>Talk. Type. Make it yours.</span></div>
+            <div className="conversation-topline"><span><i /> YOUR CONVERSATION</span><span>Your AI guide · Speak or type.</span></div>
             <div className="conversation-body">
               <div className="conversation-thread" ref={threadRef} role="log" aria-label="Your conversation" aria-live="polite">
                 {visibleHistory.map((h, i) => <div key={i} className={`conversation-message history-${h.role}`}><small>{h.role === "user" ? "YOU" : "SORP 2026"}</small><p>{h.text}</p></div>)}
@@ -747,13 +792,13 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
           </section>
           <aside className="onboarding-profile" aria-label="Your live editable profile">
             <div className="profile-heading"><div><p className="onboarding-eyebrow">YOUR LIVE FORM</p><h2>Taking shape<span>.</span></h2></div>
-              <span key={count} className="profile-count" aria-label={`${count} of 3 required details completed`}>{count}<small>/3</small></span>
+              <span key={count} className="profile-count" aria-label={`${count} of 4 required details completed`}>{count}<small>/4</small></span>
             </div>
-            <div className="profile-progress" role="progressbar" aria-label="Required details" aria-valuenow={count} aria-valuemin={0} aria-valuemax={3}><span style={{ width: `${count / 3 * 100}%` }} /></div>
-            <div className="profile-milestones" aria-hidden="true">{[...essentialKeys, "charity"].map((key, index) => <span key={key} className={(index < 2 ? fieldComplete(key as FieldKey) : !!selected) ? "achieved" : ""}>{index < 2 ? labels[key as FieldKey] : "Charity"}</span>)}</div>
+            <div className="profile-progress" role="progressbar" aria-label="Required details" aria-valuenow={count} aria-valuemin={0} aria-valuemax={4}><span style={{ width: `${count / 4 * 100}%` }} /></div>
+            <div className="profile-milestones" aria-hidden="true">{[...essentialKeys, "charity", "connection"].map((key, index) => <span key={key} className={(index < 2 ? fieldComplete(key as FieldKey) : key === "charity" ? !!selected : !!audience) ? "achieved" : ""}>{index < 2 ? labels[key as FieldKey] : key === "charity" ? "Charity" : "Connection"}</span>)}</div>
             <form id="onboarding-profile-form" onSubmit={e => { e.preventDefault(); if (accountReady) setAccountOpen(true); }}>
               <fieldset>
-                <legend>Your details <small>Three essentials</small></legend>
+                <legend>Your details</legend>
                 <div className="profile-fields">
                   {essentialKeys.map((key, index) => <label className={`profile-field${changed.includes(key) ? " field-arrived" : ""}${state.facts[key] ? " has-value" : ""}`} key={key}>
                     <span><small>{String(index + 1).padStart(2, "0")}</small>{labels[key]}{fieldComplete(key) && <i aria-hidden="true">✓</i>}</span>
@@ -784,13 +829,14 @@ export function Onboarding({ previewEmailSandbox = false }: { previewEmailSandbo
               </fieldset>
               <div className="profile-next">
                 {accountCreated ? <Link className="onboarding-primary" href={destination}>Continue to SORP 2026 →</Link> : <button type="submit" className="onboarding-primary" disabled={!accountReady || busy}>Get started <span>→</span></button>}
-                <p>{accountCreated ? "Ready when you are. Everything else is optional." : accountReady ? "Create your free account. No payment required." : "Add your name, email and confirm your charity."}</p>
+                <p>{accountCreated ? "Ready when you are. Everything else is optional." : accountReady ? "Create your free account. No payment required." : "Add your name, email, connection and confirmed charity."}</p>
               </div>
             </form>
             <p className="profile-destination">Next: <strong>{product}</strong></p>
           </aside>
         </div>
-        <aside className="onboarding-next-bar" aria-label="Your next step"><span>{accountCreated ? <button type="button" className="onboarding-text-button" onClick={showOptionalDetails}>Tell us a little more (optional)</button> : discovery === "searching" || discovery === "confirming" ? "Let’s find and confirm your charity." : accountReady ? "Nearly there! Secure your account to continue." : "Just three things to get started: your name, email and charity."}</span>{accountCreated ? <Link className="onboarding-primary" href={destination}>Continue to SORP 2026 →</Link> : accountReady && <button type="button" className="onboarding-primary" onClick={() => setAccountOpen(true)}>Secure my account →</button>}</aside>
+        {(accountReady || accountCreated) && <aside className="onboarding-next-bar" aria-label="Your next step"><span>{accountCreated ? "Everything is saved. You’re ready to explore." : "Your essentials are ready. Make your account yours."}</span>{accountCreated ? <Link className="onboarding-primary" href={destination}>Continue to SORP 2026 →</Link> : <button type="button" className="onboarding-primary" onClick={() => setAccountOpen(true)}>Secure my account →</button>}</aside>}
+        </section>
         <footer className="onboarding-footer"><span>My Social Impact × The Ideas Shed</span><span>One account. Greater impact.</span></footer>
       </div>
       <dialog

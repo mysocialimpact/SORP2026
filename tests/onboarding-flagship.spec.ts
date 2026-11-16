@@ -45,7 +45,7 @@ async function fixture(page: Page, delay = 0, verificationRequired = true) {
       if (action === "search") state = { ...state, charity: { ...state.charity, confirmed: null, candidates: [charity], phase: "confirm" } };
       if (action === "confirm") state = confirmCharity(state, charity);
       if (request.method() === "POST") state.revision++;
-      return route.fulfill({ json: { state, messages, notice: "", question: nextQuestion(state) } });
+      return route.fulfill({ json: { state, messages, notice: "", conversationAvailable: true, question: nextQuestion(state) } });
     }
     return route.fulfill({ json: { ok: true, account: null } });
   });
@@ -53,6 +53,8 @@ async function fixture(page: Page, delay = 0, verificationRequired = true) {
 }
 async function open(page: Page) {
   await page.goto("/get-started/?next=/ask-sorp/workspace/");
+  await page.getByRole("button", { name: "Let’s Have a Conversation", exact: true }).click();
+  await page.getByRole("radio", { name: "I represent a charity" }).check();
   await expect(page.locator("#introduction-answer")).toBeEnabled();
 }
 async function send(page: Page, text: string) {
@@ -61,7 +63,7 @@ async function send(page: Page, text: string) {
   await expect(page.locator(".conversation-activity")).toHaveCount(0);
 }
 async function form(page: Page) {
-  await page.getByRole("button", { name: "Fill in the form", exact: false }).click();
+  await page.getByRole("button", { name: "Fill In the Essentials", exact: false }).click();
 }
 async function choose(page: Page) {
   await page.getByLabel("Charity name or registration number").fill("Interim Spaces");
@@ -70,14 +72,96 @@ async function choose(page: Page) {
   await page.getByRole("button", { name: "Yes, that’s my charity!" }).click();
   await expect(page.locator(".confirmed-charity")).toContainText(charity.name);
 }
-test("three essentials allow registration without any optional details and celebrate only on success", async ({ page }, info) => {
+test("welcome offers two clear choices before revealing any registration fields", async ({ page }) => {
+  await fixture(page);
+  await page.goto("/get-started/?next=/ask-sorp/workspace/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Let’s Get Started.");
+  await expect(page.getByRole("button", { name: "Let’s Have a Conversation", exact: true })).toBeEnabled();
+  await expect(page.locator("#onboarding-session")).toBeHidden();
+  await expect(page.locator("input[name=name]")).toBeHidden();
+  await expect(page.getByRole("link", { name: "Log in", exact: true }).last()).toHaveAttribute("href", /next=.*ask-sorp/);
+  const audit = await new AxeBuilder({ page }).include("main").analyze();
+  expect(audit.violations).toEqual([]);
+  await form(page);
+  await expect(page.locator("#onboarding-session")).toBeFocused();
+  await expect(page.locator("input[name=name]")).toBeVisible();
+});
+
+test("unavailable AI offers the shared form and keeps verified charity registration working", async ({ page }) => {
+  const service = await fixture(page, 0, false);
+  await page.route("**/api/onboarding/start/", route => route.fulfill({ json: { available: true, conversationAvailable: false } }));
+  await page.goto("/get-started/");
+  await expect(page.getByRole("button", { name: "Conversation back soon" })).toBeDisabled();
+  await expect(page.locator(".onboarding-notice")).toHaveCount(0);
+  await form(page);
+  await page.locator('input[name=name]').fill("Alex Rowan");
+  await page.locator('input[name=email]').fill("alex@example.com");
+  await choose(page);
+  await expect(page.locator(".profile-next button")).toBeDisabled();
+  await page.getByRole("radio", { name: "I advise a charity" }).check();
+  await page.locator(".profile-next button").click();
+  await page.getByLabel("Choose a password").fill("Synthetic-pass-123");
+  await page.getByLabel("Confirm your password").fill("Synthetic-pass-123");
+  await page.getByRole("button", { name: "Create my account" }).click();
+  await expect(page.locator(".onboarding-celebration")).toBeVisible();
+  expect(service.registration()).toMatchObject({ progress: { onboarding: { audience: "adviser", selected: { registrationNumber: charity.registrationNumber } } } });
+  expect(service.actions()).not.toContain("turn");
+});
+
+test("a failed AI turn preserves captured details and makes the manual route primary", async ({ page }) => {
+  const service = await fixture(page);
+  await open(page);
+  await page.route("**/api/onboarding/turn/", route => route.fulfill({ json: {
+    state: advance(service.state(), extractImmediate(intro, service.state())),
+    conversationAvailable: false, notice: "Provider quota detail must not be shown", messages: [],
+  } }));
+  await send(page, intro);
+  await expect(page.locator(".onboarding-notice")).toContainText("carry on with the essentials");
+  await expect(page.locator(".onboarding-notice")).not.toContainText("Provider quota");
+  await expect(page.locator('input[name=name]')).toBeVisible();
+  await expect(page.locator('input[name=name]')).toHaveValue("Sarah Jones");
+  await expect(page.getByRole("button", { name: "Fill In the Essentials", exact: true })).toHaveAttribute("aria-pressed", "true");
+});
+
+for (const audience of ["charity", "adviser"] as const) {
+  for (const method of ["conversation", "form"] as const) {
+    test(`${audience} ${method} entry saves the same confirmed identity and context`, async ({ page }) => {
+      const service = await fixture(page, 0, false);
+      await page.goto("/get-started/?next=/ask-sorp/workspace/");
+      await page.getByRole("button", { name: method === "conversation" ? "Let’s Have a Conversation" : "Fill In the Essentials", exact: true }).click();
+      await page.getByRole("radio", { name: audience === "charity" ? "I represent a charity" : "I advise a charity" }).check();
+      if (method === "conversation") { await send(page, intro); await form(page); }
+      else {
+        await page.locator('input[name=name]').fill("Sarah Jones");
+        await page.locator('input[name=email]').fill("sarah@example.com");
+      }
+      await choose(page);
+      await page.locator(".profile-next button").click();
+      await page.getByLabel("Choose a password").fill("Synthetic-pass-123");
+      await page.getByLabel("Confirm your password").fill("Synthetic-pass-123");
+      await page.getByRole("button", { name: "Create my account" }).click();
+      await expect(page.locator(".onboarding-celebration a")).toHaveAttribute("href", "/ask-sorp/workspace/");
+      expect(service.registration()).toMatchObject({ name: "Sarah Jones", email: "sarah@example.com", progress: { onboarding: { audience, selected: { registrationNumber: charity.registrationNumber } } } });
+    });
+  }
+}
+
+test("the account endpoint rejects missing or invalid charity context before account creation", async ({ request }) => {
+  for (const audience of [undefined, "founder"]) {
+    const response = await request.post("/api/readiness-account/", { data: { action: "signup", progress: { onboarding: { audience } } } });
+    expect(response.status()).toBe(422);
+    expect((await response.json()).error).toContain("represent or advise");
+  }
+});
+
+test("four essentials allow registration without any optional details and celebrate only on success", async ({ page }, info) => {
   const service = await fixture(page, 0, false); await open(page); await form(page);
   await page.locator('input[name=name]').fill("Alex Rowan");
   await page.locator('input[name=email]').fill("alex@example.com");
-  await expect(page.locator('.profile-count')).toContainText('2/3');
+  await expect(page.locator('.profile-count')).toContainText('3/4');
   await expect(page.locator('.profile-next button')).toBeDisabled();
   await choose(page);
-  await expect(page.locator('.profile-count')).toContainText('3/3');
+  await expect(page.locator('.profile-count')).toContainText('4/4');
   await expect(page.locator('input[name=role]')).toHaveValue('');
   await expect(page.locator('input[name=organisation]')).toHaveValue('');
   await expect(page.getByLabel('I work independently')).toHaveCount(0);
@@ -134,9 +218,9 @@ test("a slow saved-draft response does not override the visitor's manual mode", 
     await route.fallback();
   });
   await page.reload({ waitUntil: "domcontentloaded" });
-  await page.getByRole("button", { name: "Fill in the form", exact: true }).click();
+  await page.getByRole("button", { name: "Fill In the Essentials", exact: true }).click();
   await expect(page.locator('input[name=name]')).toHaveValue("Sarah Jones");
-  await expect(page.getByRole("button", { name: "Fill in the form", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Fill In the Essentials", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#onboarding-profile-form")).toBeVisible();
 });
 test("first answer renders immediately during a slow response; all eight fields share state", async ({ page }, info) => {
@@ -152,7 +236,7 @@ test("first answer renders immediately during a slow response; all eight fields 
   await expect(page.locator(".conversation-activity")).toBeVisible();
   await expect(page.locator(".field-arrived")).toHaveCount(4);
   await expect(page.locator(".conversation-reward.has-reward")).toContainText("4 details captured");
-  await expect(page.locator(".profile-milestones .achieved")).toHaveCount(2);
+  await expect(page.locator(".profile-milestones .achieved")).toHaveCount(3);
   if (info.project.name === "mobile") {
     await expect(page.locator(".mobile-profile-reward")).toBeVisible();
     await expect(page.locator(".onboarding-mobile-summary")).toBeInViewport();
@@ -173,7 +257,7 @@ test("first answer renders immediately during a slow response; all eight fields 
   await expect(page.locator(".profile-next button")).toBeEnabled();
   expect(service.state().facts.organisation).toBe("Burton Sweet");
   expect(service.state().charity.confirmed?.name).toBe(charity.name);
-  await page.getByRole("button", { name: "Talk to us", exact: true }).click();
+  await page.getByRole("button", { name: "Let’s Have a Conversation", exact: true }).click();
   await expect(page.locator("input[name=name]")).toHaveValue("Sarah Jones ACA");
   await expect(page.locator("textarea[name=discovery]")).toHaveValue("A colleague at a conference.");
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
@@ -258,7 +342,7 @@ test("trustee and employer remain distinct; optional conversation answers popula
   await send(page, "I’m Alex Jones, a trustee at Interim Spaces. I work for Cedar Advisory. My email is alex@example.com.");
   await expect(page.locator("input[name=organisation]")).toHaveValue("Cedar Advisory");
   await form(page); await choose(page);
-  await page.getByRole("button", { name: "Talk to us", exact: true }).click();
+  await page.getByRole("button", { name: "Let’s Have a Conversation", exact: true }).click();
   await send(page, "I manage reporting and advise trustees.");
   await expect(page.locator("textarea[name=responsibilities]")).toHaveValue("I manage reporting and advise trustees");
   await send(page, "I heard about you through a colleague.");
@@ -275,7 +359,7 @@ test("reduced motion keeps progress usable and service errors remain visible", a
   await expect(page.locator("#introduction-answer")).toBeEnabled();
   await page.route("**/api/onboarding/turn/", route => route.fulfill({ status: 503, json: { error: "Service temporarily unavailable. Please retry." } }));
   await send(page, "Please use Interim Spaces");
-  await expect(page.locator(".onboarding-notice")).toContainText("Please retry");
+  await expect(page.locator(".onboarding-notice")).toContainText("carry on with the essentials");
   await expect(page.locator("#onboarding-profile-form input[name=email]")).toHaveValue("sarah@example.com");
   await expect(page.locator("#introduction-answer")).toHaveValue("Please use Interim Spaces");
 });
