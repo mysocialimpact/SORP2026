@@ -580,3 +580,10 @@
 .sample-entry a:first-child { background:#d8ff52; }
 .sample-entry a:hover { text-decoration:underline; }
 .sample-entry a:focus-visible { outline:3px solid #f44312; outline-offset:3px; }
+.homepage-beta-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; margin-top:20px; }
+.homepage-beta-actions > a:not(.gateway-action) { font-size:14px; text-underline-offset:4px; }
+.homepage-beta-tools { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; list-style:none; padding:0; margin:24px 0; }
+.homepage-beta-tools a { display:flex; flex-direction:column; gap:6px; padding:18px 0; border-bottom:1px solid #d4d6ce; text-decoration:none; }
+.homepage-beta-tools strong { font-size:16px; }
+.homepage-beta-tools span { font-size:13px; line-height:1.5; color:#5c625b; }
+@media(max-width:600px) { .homepage-beta-tools { grid-template-columns:1fr; } }

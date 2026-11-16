@@ -2,12 +2,13 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { isReadinessComplete } from "@/lib/readiness-status";
+import { isReadinessComplete, isReadinessStarted } from "@/lib/readiness-status";
 
 type NavigationAccountState = {
   pathname?: string;
   status: "checking" | "signed-out" | "signed-in" | "unavailable";
   readinessComplete: boolean;
+  readinessStarted?: boolean;
   founder: boolean;
 };
 
@@ -25,7 +26,7 @@ export function NavigationAccountProvider({ children }: { children: ReactNode })
         const data = await response.json();
         if (controller.signal.aborted) return;
         setState(data.signedIn === true
-          ? { pathname, status: "signed-in", readinessComplete: isReadinessComplete(data.progress), founder: data.platformAccess?.founder === true }
+          ? { pathname, status: "signed-in", readinessComplete: isReadinessComplete(data.progress), readinessStarted: isReadinessStarted(data.progress), founder: data.platformAccess?.founder === true }
           : { pathname, status: "signed-out", readinessComplete: false, founder: false });
       })
       .catch(() => { if (!controller.signal.aborted) setState({ pathname, status: "unavailable", readinessComplete: false, founder: false }); });

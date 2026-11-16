@@ -1802,3 +1802,5 @@ h2 em {
     transition: none !important;
   }
 }
+.beta-account-note { max-width:660px; font-size:14px; line-height:1.6; margin:16px 0; }
+.beta-account-note a { text-decoration:underline; text-underline-offset:3px; }

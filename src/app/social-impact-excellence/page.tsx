@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ToolLink } from "@/components/tool-link";
+import { BetaToolAction, BetaAccountNote } from "@/components/beta-tool-entry";
 import { FolderHero } from "@/components/folder-hero";
 import { Arrow } from "@/components/ui";
 import { ExcellenceHome } from "@/features/excellence/excellence-home";
@@ -34,6 +34,8 @@ export default function ExcellencePage() {
             <h1>Social Impact{" "}<br />Excellence</h1>
             <p className="excellence-public-principle">We believe social impact should be embedded as a management discipline.</p>
             <p className="excellence-public-lead">A practical framework helping charities understand, manage and continuously improve their social impact.</p>
+            <BetaToolAction href="/social-impact-excellence/assessment/" label="Open Maturity Assessment" />
+            <BetaAccountNote destination="/social-impact-excellence/assessment/" />
           </div>
           <div className="excellence-public-mark" aria-label="Social Impact Excellence">
             <Image src="/assets/social-impact-excellence-transparent.png" alt="Social Impact Excellence" width={1200} height={1200} priority sizes="(max-width: 700px) 62vw, 390px" />
@@ -61,6 +63,7 @@ export default function ExcellencePage() {
             <h2 id="excellence-journey-title">From an honest baseline{" "}<br />to continuous improvement.</h2>
           </header>
           <ol>{journey.map((stage) => <li key={stage.title}><span>{stage.number}</span><div><h3>{stage.title}</h3><p>{stage.text}</p></div></li>)}</ol>
+          <p>The free beta includes the 25-question Maturity Assessment across Purpose, Leadership, Data, Delivery and Communications. The deeper diagnostic, blueprint and roadmap stages require separate access; they are not included automatically.</p>
         </div>
       </section>
 
@@ -75,8 +78,8 @@ export default function ExcellencePage() {
       <section id="excellence-start" className="excellence-public-access gateway-width" aria-labelledby="excellence-access-title">
         <div><p className="gateway-kicker">Your starting point on SORP2026.org</p><h2 id="excellence-access-title">Start with<br />your organisation.</h2></div>
         <div>
-          <p>Create your SORP2026 account and begin your Social Impact Excellence baseline.</p>
-          <ToolLink className="gateway-action" href="/social-impact-excellence/assessment/">Get started with Social Impact Excellence <Arrow /></ToolLink>
+          <p>Begin your Social Impact Excellence baseline for your selected charity.</p>
+          <BetaToolAction href="/social-impact-excellence/assessment/" label="Open Maturity Assessment" />
           <p className="excellence-access-note">The Social Impact Maturity Assessment is available inside your registered SORP2026 account.</p>
           <Link className="excellence-login-link" href="/login/?return=/social-impact-excellence/">Already registered? Log in <Arrow /></Link>
           <p><Link href="/sample-charity/#maturity">Explore a sample charity baseline →</Link></p>

@@ -8,6 +8,7 @@ import { VerificationBadge } from "./verification-badge";
 import { ExternalRecognition } from "./external-recognition";
 import type { MapView } from "./directory-map";
 import { FolderHero } from "@/components/folder-hero";
+import Image from "next/image";
 const DirectoryMap = dynamic(() => import("./directory-map"), { ssr: false, loading: () => <div className="directory-map-loading">Opening your UK map…</div> });
 const storageKey = "sorp2026.accountant-shortlist";
 
@@ -104,9 +105,12 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
     <FolderHero product="home" as="header" className="adviser-hero">
       <div className="directory-width adviser-hero-grid">
         <div className="adviser-hero-copy">
-          <p className="directory-eyebrow">Independent research · For charities</p>
-          <h1>Find the people<br/>behind the <em>numbers.</em></h1>
-          <p className="adviser-intro">Find specialist charity accountants.<br/>Compare their experience. Start an informed conversation.</p>
+          <p className="directory-eyebrow">In Development · Public directory</p>
+          <h1>Find the right<br/><em>charity accountant.</em></h1>
+          <p className="adviser-intro">Good financial advice has never been more important for charities.</p>
+          <p>With SORP 2026 introducing new reporting requirements, we’re building a better way to find experienced, reliable and affordable accountants who understand charities.</p>
+          <p>This directory is an early version. Explore the listings, check the evidence and discuss suitability and fees directly with each firm.</p>
+          <a className="adviser-directory-cta" href="#directory">Explore the Directory ↓</a>
           <form onSubmit={findNearby} className="adviser-search">
             <label htmlFor="directory-query">Find a charity accountant</label>
             <div><input id="directory-query" name="query" type="search" placeholder="Firm, town, village or postcode" value={postcode} onChange={e => { request.current?.abort(); setBusy(false); setPostcode(e.target.value); setQuery(normalisePostcode(e.target.value) ? "" : e.target.value); setOrigin(null); setArea(null); setPostcodeError(""); changeFilters(); }} aria-describedby={postcodeError ? "directory-postcode-error" : "directory-search-hint"}/><button disabled={busy} type="submit">{busy ? "Finding…" : "Search ↗"}</button></div>
@@ -115,8 +119,8 @@ export function DirectoryExplorer({ firms, spotlight }: { firms: Firm[]; spotlig
           </form>
           <nav className="adviser-quick-links" aria-label="Directory shortcuts"><a href="#directory">Browse the A–Z ↓</a><button onClick={() => { setMode("map"); document.getElementById("directory")?.scrollIntoView(); }}>Explore the map ↗</button><button onClick={() => comparison.current?.showModal()}>Your shortlist ({saved.length})</button></nav>
         </div>
-        <aside className="adviser-invite adviser-trust"><p className="directory-eyebrow">A clearer starting point</p><h2>Expertise you can explore.<br/><em>Evidence you can see.</em></h2><p>Compare charity experience, relevant services and named specialists. Follow the sources behind each profile.</p><ul><li><strong>Public evidence</strong><span>Research into services, qualifications and charity-sector experience.</span></li><li><strong>Human judgement</strong><span>My Social Impact reviews evidence and can speak with firms to understand their expertise.</span></li></ul><a href="#directory-approach">Understand the trust signals ↓</a></aside>
-        <div className="adviser-icaew"><a href="https://www.icaew.com/" target="_blank" rel="noopener noreferrer">ICAEW<span>Chartered Accountants</span></a><p>We’re starting with ICAEW firms because our founder, Marcus Warry, is an ICAEW Chartered Accountant. ICAEW is the Institute of Chartered Accountants in England and Wales. This is an independent directory, not an ICAEW endorsement.</p><details><summary>About the directory</summary><p>We haven’t personally assessed every firm. Inclusion is based on stated charity specialisms and public information. The original 110 records and researched Burton Sweet listing are preserved. Each profile links to its sources. Map pins represent office postcode centres, not entrances.</p></details></div>
+        <aside className="adviser-invite adviser-founder"><Image src="/images/marcus-editorial.webp" alt="Marcus Warry, Chartered Accountant and co-founder of My Social Impact" width={1122} height={1402} priority sizes="(max-width: 700px) 90vw, 420px"/><div><h2>Let’s talk<br/><em>charity accounting.</em></h2><p>I’m Marcus Warry, a Chartered Accountant (ACA) and co-founder of My Social Impact.</p><p>We’re combining professional experience with technology to help charities find the right accounting support.</p><p>If you’re a charity accountant or adviser, I’d love to hear about your work and discuss how you might be featured as the directory develops.</p><a href="mailto:marcus@mysocialimpact.org?subject=Charity%20accountants%20directory">Email Marcus ↗</a></div></aside>
+        <div className="adviser-icaew"><a href="https://www.icaew.com/" target="_blank" rel="noopener noreferrer">ICAEW<span>Chartered Accountants</span></a><p>We’re prioritising ICAEW Chartered Accountants and firms, using source records to check credentials and build a clearer picture of charity-sector experience. ICAEW membership is not a guarantee of affordability, specialist expertise or service quality. This independent directory is not an ICAEW endorsement.</p><details><summary>About the directory</summary><p>We haven’t personally assessed every firm. Inclusion is based on stated charity specialisms and public information. Each profile links to its sources. Map pins represent office postcode centres, not entrances.</p></details></div>
       </div>
     </FolderHero>
     {spotlight}

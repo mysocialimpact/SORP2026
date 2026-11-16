@@ -1,15 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ToolLink } from "@/components/tool-link";
+import { BetaToolAction, BetaAccountNote } from "@/components/beta-tool-entry";
 import { FolderHero } from "@/components/folder-hero";
 
-const reviewUrl = "/are-you-sorp-ready/review/?entry=intro";
+const reviewUrl = "/are-you-sorp-ready/review/";
 
 function StartReview({ compact = false }: { compact?: boolean }) {
   return (
-    <ToolLink className={compact ? "sr-start sr-start-compact" : "sr-start"} href={reviewUrl}>
-      Start Free Review <span aria-hidden="true">→</span>
-    </ToolLink>
+    <BetaToolAction className={compact ? "sr-start sr-start-compact" : "sr-start"} href={reviewUrl} label="Start Assessment" readiness />
   );
 }
 
@@ -45,7 +43,7 @@ export function SorpReadyPage() {
           </div>
           <div className="sr-hero-intro">
             <p>Take our completely free readiness review. Get your score, identify what needs attention and discover what to do next.</p>
-            <strong>100% free. No obligation.</strong>
+            <BetaAccountNote />
             <div className="sr-hero-actions">
               <StartReview />
               <Link className="sr-play" href="/are-you-sorp-ready/presentation/">Play Presentation <span aria-hidden="true">▶</span></Link>

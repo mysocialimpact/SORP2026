@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Arrow } from "@/components/ui";
 import { readAudience, serverAudience, subscribeAudience, writeAudience, type Audience } from "@/lib/audience-preference";
-import { ToolLink } from "@/components/tool-link";
-import { useNavigationAccount } from "@/components/navigation-account";
+import { BetaToolAction } from "@/components/beta-tool-entry";
 import { trackSorpEvent } from "@/app/sorp-growth";
 
 let audiencePageSession: string | null = null;
@@ -103,10 +102,7 @@ export function HomepageAudience() {
 }
 
 export function HomepageReviewLink() {
-  const { status } = useNavigationAccount();
-  return <ToolLink className="gateway-action" href="/are-you-sorp-ready/review/?entry=intro">
-    {status === "signed-in" ? "Start your free review" : "Let’s Get Started"} <Arrow />
-  </ToolLink>;
+  return <BetaToolAction href="/are-you-sorp-ready/review/" label="Start Assessment" readiness />;
 }
 
 export function HomepageHello() {
