@@ -109,7 +109,6 @@ export function HomepageManifesto() {
           </div>
           <div>
             <strong>Dr Chris Arnold</strong>
-            <span>Creative Director</span>
             <span>Social Impact Strategist</span>
           </div>
         </div>
