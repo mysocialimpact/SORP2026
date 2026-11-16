@@ -1,5 +1,5 @@
 import { PILLARS, QUESTIONS } from "../../features/excellence/questions.ts";
-export const REVIEW_VERSION = "report-evidence-1";
+export const REVIEW_VERSION = "mid-1.0.0";
 export const claimsPrinciples = [
   { name: "Evidence", definition: "Know what supports the claim; distinguish activity, outputs, outcomes and impact." },
   { name: "Proportion", definition: "Do not turn contribution into causation or uncertainty into certainty." },
@@ -16,7 +16,8 @@ export type PageText = { page: number; text: string };
 export type Finding = { name: string; status: "demonstrated" | "partial" | "not_disclosed" | "cannot_determine";
   rating: number | null; finding: string; strength: string; gap: string; recommendation: string;
   evidence: { page: number; quote: string }[] };
-export type ReviewResult = { summary: string; sections: Finding[]; recommendations: string[]; limitations: string[]; overall: number | null };
+export type ReviewResult = { summary: string; sections: (Finding & {score?:number|null})[]; recommendations: string[]; limitations: string[]; overall: number | null;
+ methodologyVersion?:string;framework?:Framework;criteria?:import("./mid/assessment").Criterion[];actions?:import("./mid/assessment").Actions };
 const normalise = (text: string) => text.normalize("NFKC").replace(/\s+/g," ").trim().toLowerCase();
 export function validateReview(value: unknown, framework: Framework, pages: PageText[]): ReviewResult {
   const r = value as ReviewResult;

@@ -9,7 +9,7 @@ export function currentAccountDestination(fallback?: string) {
   if (current.pathname.replace(/\/$/, "") !== target.pathname.replace(/\/$/, "")) return safeDestination(fallback);
   return safeDestination(`${current.pathname}${current.search || target.search}${current.hash || target.hash}`);
 }
-export const registrationHref = (destination: string) => `/get-started/?next=${encodeURIComponent(safeDestination(destination))}`;
+export const registrationHref = (destination: string) => `/get-started/?next=${encodeURIComponent(safeDestination(destination).startsWith("/charity-impact-reports/review") ? "/are-you-sorp-ready/review/" : safeDestination(destination))}`;
 export const signInHref = (destination: string) => `/login/?return=${encodeURIComponent(safeDestination(destination, true))}`;
 
 /** Preserve the legacy invitation-aware signup contract through the gateway. */

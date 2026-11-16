@@ -13,7 +13,7 @@ for (const destination of [
  '/my-impact-director/?view=report#assessment',
  `/invitation/${'a'.repeat(64)}/`,
 ]) test(`central gateway and sign in retain ${destination}`, () => {
- assert.equal(new URL(registrationHref(destination), 'https://sorp2026.org').searchParams.get('next'), destination);
+ assert.equal(new URL(registrationHref(destination), 'https://sorp2026.org').searchParams.get('next'), destination.startsWith('/charity-impact-reports/review') ? '/are-you-sorp-ready/review/' : destination);
  assert.equal(new URL(signInHref(destination), 'https://sorp2026.org').searchParams.get('return'), destination);
 });
 for (const destination of ['https://evil.invalid/', '//evil.invalid', '/\\evil.invalid', '/api/checkout/', '/login/?next=//evil.invalid', '/get-started/?next=/get-started/']) test(`reject unsafe or looping return ${destination}`, () => assert.equal(safeDestination(destination), '/dashboard/'));
